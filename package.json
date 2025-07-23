@@ -12,10 +12,8 @@
     "preview": "next build && next start",
         "clean": "rm -rf .next",
     "analyze": "ANALYZE=true npm run build",
-    "dev-setup": "node scripts/dev-setup.js",
     "db:reset": "npx prisma db push --force-reset",
-    "db:migrate": "npx prisma migrate deploy",
-    "backup:sqlite": "node scripts/backup-sqlite.js"
+    "db:migrate": "npx prisma migrate deploy"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
