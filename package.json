@@ -4,8 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "prisma generate && node scripts/force-migrate.js && next build",
-    "db:migrate": "node scripts/migrate-production.js",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",
@@ -15,6 +14,7 @@
     "analyze": "ANALYZE=true npm run build",
     "dev-setup": "node scripts/dev-setup.js",
     "db:reset": "npx prisma db push --force-reset",
+    "db:migrate": "npx prisma migrate deploy",
     "backup:sqlite": "node scripts/backup-sqlite.js"
   },
   "dependencies": {
