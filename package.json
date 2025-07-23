@@ -11,9 +11,8 @@
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
     "preview": "next build && next start",
-    "clean": "rm -rf .next",
+        "clean": "rm -rf .next",
     "analyze": "ANALYZE=true npm run build",
-    "seed:neon": "node seed-neon.js",
     "dev-setup": "node scripts/dev-setup.js",
     "db:reset": "npx prisma db push --force-reset",
     "backup:sqlite": "node scripts/backup-sqlite.js"
