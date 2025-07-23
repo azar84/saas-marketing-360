@@ -13,11 +13,10 @@
     "preview": "next build && next start",
     "clean": "rm -rf .next",
     "analyze": "ANALYZE=true npm run build",
-    "seed:postgres": "node seed-postgres.js",
     "seed:neon": "node seed-neon.js",
     "dev-setup": "node scripts/dev-setup.js",
-    "setup-local-db": "node scripts/setup-local-db.js",
-    "db:reset": "npx prisma db push --force-reset && node scripts/setup-local-db.js"
+    "db:reset": "npx prisma db push --force-reset",
+    "backup:sqlite": "node scripts/backup-sqlite.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -45,7 +44,7 @@
     "jsonwebtoken": "^9.0.2",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.522.0",
-    "next": "15.3.4",
+    "next": "^15.4.3",
     "next-themes": "^0.4.6",
     "node-fetch": "^3.3.2",
     "nodemailer": "^7.0.3",

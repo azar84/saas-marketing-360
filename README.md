@@ -20,7 +20,7 @@ A modern Next.js website with a comprehensive admin panel and CMS features for m
 
 - **Frontend**: Next.js, React, TypeScript
 - **Styling**: Tailwind CSS
-- **Database**: SQLite (development) / PostgreSQL (production)
+- **Database**: SQLite (local development and production)
 - **ORM**: Prisma
 - **UI Components**: Custom component library
 

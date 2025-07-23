@@ -26,10 +26,31 @@ function verifyToken(token: string) {
 export function middleware(request: NextRequest) {
   console.log('🔒 Middleware executing for:', request.nextUrl.pathname);
   
-  // Simple test - redirect all admin panel routes to login
-  if (request.nextUrl.pathname.startsWith('/admin-panel') && request.nextUrl.pathname !== '/admin-panel/login') {
-    console.log('🔐 Admin panel route detected - redirecting to login');
-    return NextResponse.redirect(new URL('/admin-panel/login', request.url));
+  // Handle admin panel authentication
+  if (request.nextUrl.pathname.startsWith('/admin-panel')) {
+    // Skip auth for login and reset password pages
+    if (request.nextUrl.pathname === '/admin-panel/login' || 
+        request.nextUrl.pathname === '/admin-panel/reset-password') {
+      return NextResponse.next();
+    }
+
+    // Check for JWT token in cookies or headers
+    const token = request.cookies.get('adminToken')?.value || 
+                  request.headers.get('authorization')?.replace('Bearer ', '');
+
+    if (!token) {
+      console.log('🔐 No token found - redirecting to login');
+      return NextResponse.redirect(new URL('/admin-panel/login', request.url));
+    }
+
+    const decoded = verifyToken(token);
+    if (!decoded) {
+      console.log('🔐 Invalid token - redirecting to login');
+      return NextResponse.redirect(new URL('/admin-panel/login', request.url));
+    }
+
+    // Add user info to request for API routes
+    (request as AuthenticatedRequest).user = decoded;
   }
 
   // Get the response for all routes
