@@ -25,6 +25,36 @@ async function ensureHomePage() {
         }
       });
       console.log('✅ Created home page with ID:', homePage.id);
+
+      // Ensure home hero exists
+      const homeHero = await prisma.homePageHero.upsert({
+        where: { id: 1 },
+        update: {},
+        create: {
+          id: 1,
+          tagline: 'Welcome to Your Platform',
+          headline: 'Transform Your Business with AI-Powered Solutions',
+          subheading: 'Streamline operations, enhance customer experience, and drive growth with our intelligent platform.',
+          backgroundColor: '#FFFFFF',
+          isActive: true,
+          animationType: 'video',
+          animationData: JSON.stringify({ videoUrl: '', autoplay: false, loop: false })
+        }
+      });
+      console.log('✅ Created home hero with ID:', homeHero.id);
+
+      // Create a page section that links home page to home hero
+      const homeHeroSection = await prisma.pageSection.create({
+        data: {
+          pageId: homePage.id,
+          sectionType: 'home_hero',
+          title: 'Home Hero',
+          sortOrder: 1,
+          isVisible: true
+        }
+      });
+      console.log('✅ Created home hero section with ID:', homeHeroSection.id);
+
       return homePage;
     }
     

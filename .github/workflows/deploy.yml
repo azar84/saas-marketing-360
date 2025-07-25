@@ -1,0 +1,45 @@
+name: Deploy and Seed Database
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy-and-seed:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Generate Prisma client
+      run: npx prisma generate
+
+    - name: Deploy to platform (example for Railway/Render/etc)
+      run: |
+        # This step will vary based on your deployment platform
+        # For Railway: railway up
+        # For Render: render deploy
+        # For DigitalOcean: doctl apps create
+        echo "Deploying to your platform..."
+        # Add your deployment command here
+
+    - name: Wait for deployment
+      run: sleep 30
+
+    - name: Seed database
+      run: |
+        # Call the seed API endpoint
+        curl -X POST ${{ secrets.DEPLOY_URL }}/api/admin/seed-database
+      env:
+        DEPLOY_URL: ${{ secrets.DEPLOY_URL }} 
