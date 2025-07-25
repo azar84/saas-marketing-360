@@ -206,6 +206,13 @@ const useTypingAnimation = (text: string, speed: number = 40) => {
   return { displayText, isComplete };
 };
 
+// Add this type at the top of the file (or near other types/interfaces)
+type ConversationStep = {
+  type: string;
+  message?: string;
+  delay: number;
+};
+
 interface HeroSectionProps {
   heroData?: any;
 }
@@ -374,7 +381,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
   // Conversation effect
   useEffect(() => {
     const runConversation = () => {
-      conversationFlow.forEach((step, index) => {
+      conversationFlow.forEach((step: ConversationStep, index: number) => {
         setTimeout(() => {
           if (step.type === 'typing') {
             setIsTyping(true);
