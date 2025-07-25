@@ -202,25 +202,25 @@ export function generateMetaTags({
       type,
       url,
       images: image ? [{ url: image }] : [],
-      siteName: 'Saski AI',
+      siteName: 'Your Company',
     },
     twitter: {
       card: 'summary_large_image',
       title,
       description,
       images: image ? [image] : [],
-      creator: '@saskiai',
+      creator: '@yourcompany',
     },
   };
 }
 
 export const siteConfig = {
-  siteName: 'AI Assistant',
-  description: 'Transform your customer communication with AI-powered automation',
+  siteName: 'Your Company',
+  description: 'Your company description',
   url: 'https://example.com',
   ogImage: 'https://example.com/og.jpg',
-  creator: '@ai_assistant',
-  keywords: ['AI', 'customer support', 'automation', 'chatbot', 'communication']
+  creator: '@yourcompany',
+  keywords: ['your', 'company', 'keywords']
 } as const;
 
 /**

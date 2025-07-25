@@ -327,7 +327,7 @@ export default function AdminPanel() {
               }}
             >
               <h1 className="text-3xl font-bold mb-2">
-                Welcome to {siteSettings?.footerCompanyName || 'Saski AI'} Admin
+                Welcome to {siteSettings?.footerCompanyName || 'Your Company'} Admin
               </h1>
               <p style={{ color: '#E2E8F0' }}>Manage your website content, pages, and settings from this central dashboard.</p>
             </div>
@@ -620,12 +620,24 @@ export default function AdminPanel() {
                 <Globe className="w-5 h-5 text-white" />
               </div>
             )}
-            <span 
-              className="text-xl font-bold"
-              style={{ color: adminColors.textPrimary }}
-            >
-              {siteSettings?.footerCompanyName || 'Saski AI'}
-            </span>
+            <div className="flex flex-col">
+              <span 
+                className="text-sm font-bold truncate max-w-[120px]"
+                style={{ color: adminColors.textPrimary }}
+                title={siteSettings?.footerCompanyName || 'Your Company'}
+              >
+                {siteSettings?.footerCompanyName || 'Your Company'}
+              </span>
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:text-blue-800 transition-colors"
+                title="Open website in new tab"
+              >
+                View Website →
+              </a>
+            </div>
           </div>
           <div className="flex items-center space-x-2">
             <button
@@ -718,10 +730,11 @@ export default function AdminPanel() {
                 </div>
               )}
               <span 
-                className="text-lg font-bold"
+                className="text-sm font-bold truncate max-w-[120px]"
                 style={{ color: adminColors.textPrimary }}
+                title={siteSettings?.footerCompanyName || 'Your Company'}
               >
-                {siteSettings?.footerCompanyName || 'Saski AI'}
+                {siteSettings?.footerCompanyName || 'Your Company'}
               </span>
             </div>
           </div>

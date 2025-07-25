@@ -271,7 +271,7 @@ export default function ClientHeader({
                     >
                       <Image
                         src={logoUrl}
-                        alt="Saski AI"
+                        alt="Your Company"
                         width={200}
                         height={60}
                         className="h-10 lg:h-12 w-auto object-contain transition-all duration-300 group-hover:brightness-110"
@@ -303,7 +303,7 @@ export default function ClientHeader({
                         whileHover={{ x: 2 }}
                         transition={{ type: "spring", stiffness: 400, damping: 10 }}
                       >
-                        Saski AI
+                        Your Company
                       </motion.span>
                     </div>
                   );

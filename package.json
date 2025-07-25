@@ -1,5 +1,5 @@
 {
-  "name": "saskiai-website",
+  "name": "saas-cms",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -82,11 +82,10 @@
     "react",
     "typescript",
     "tailwindcss",
-    "ai",
-    "chatbot",
-    "customer-service",
-    "automation"
+    "saas",
+    "cms",
+    "website-builder"
   ],
-  "author": "Saski AI Team",
-  "description": "Award-winning website for Saski AI - Transform your customer communication with AI"
+  "author": "Your Name",
+  "description": "SaaS CMS with Next.js and PostgreSQL"
 }

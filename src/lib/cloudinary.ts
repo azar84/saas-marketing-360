@@ -82,7 +82,7 @@ export const uploadToCloudinary = async (
     const result = await new Promise<CloudinaryUploadResult>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
-          folder: options.folder || 'saski-ai',
+          folder: options.folder || 'yourcompany',
           public_id: options.public_id,
           resource_type: options.resource_type || 'auto',
           transformation: options.transformation,

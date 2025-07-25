@@ -1346,7 +1346,7 @@ export default function SiteSettingsManager() {
                       <li>• Sign up for a free account at <a href="https://cloudinary.com" target="_blank" rel="noopener noreferrer" className="underline">cloudinary.com</a></li>
                       <li>• Get your credentials from the Dashboard → Settings → Access Keys</li>
                       <li>• Cloudinary will be used for all media uploads and image transformations</li>
-                      <li>• Files will be stored in the "saski-ai" folder by default</li>
+                      <li>• Files will be stored in the "yourcompany" folder by default</li>
                     </ul>
                   </div>
                 </>

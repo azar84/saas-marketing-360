@@ -16,7 +16,7 @@ interface SupportSectionProps {
 const SupportSection: React.FC<SupportSectionProps> = ({
   heading = "Real-Time, Always-On Support",
   title = "No Delays. No Queues. Just Instant Answers.",
-  description = "Whether it's 2 PM or 2 AM, Saski AI answers instantly—no wait, no backlog. Your customers get support, and you stay focused on growth.",
+  description = "Whether it's 2 PM or 2 AM, our platform answers instantly—no wait, no backlog. Your customers get support, and you stay focused on growth.",
   imageUrl = "https://saskiai.com/wp-content/uploads/2025/06/ChatGPT-Image-Jun-5-2025-at-09_59_27-AM-1.png",
   imageAlt = "Real-time AI customer support illustration showing instant responses across multiple channels",
   className = ""

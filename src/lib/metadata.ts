@@ -48,16 +48,16 @@ async function getSiteSettings() {
     const settings = await prisma.siteSettings.findFirst();
     return {
       baseUrl: settings?.baseUrl || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
-      siteName: settings?.footerCompanyName || 'Saski AI',
-      siteDescription: settings?.footerCompanyDescription || 'Transform Your Customer Communication with AI',
+      siteName: settings?.footerCompanyName || 'Your Company',
+      siteDescription: settings?.footerCompanyDescription || 'Your company description',
       ogImage: settings?.logoUrl || settings?.logoLightUrl || '/favicon.svg'
     };
   } catch (error) {
     console.error('Error fetching site settings:', error);
     return {
       baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
-      siteName: 'Saski AI',
-      siteDescription: 'Transform Your Customer Communication with AI',
+      siteName: 'Your Company',
+      siteDescription: 'Your company description',
       ogImage: '/favicon.svg'
     };
   }
@@ -69,8 +69,8 @@ async function getJsonLdSiteSettings(): Promise<JsonLdSiteSettings> {
     const settings = await prisma.siteSettings.findFirst();
     return {
       baseUrl: settings?.baseUrl || process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
-      siteName: settings?.footerCompanyName || 'Saski AI',
-      siteDescription: settings?.footerCompanyDescription || 'Transform Your Customer Communication with AI',
+      siteName: settings?.footerCompanyName || 'Your Company',
+      siteDescription: settings?.footerCompanyDescription || 'Your company description',
       logoUrl: settings?.logoUrl || settings?.logoLightUrl || undefined,
       logoLightUrl: settings?.logoLightUrl || undefined,
       logoDarkUrl: settings?.logoDarkUrl || undefined,
@@ -87,8 +87,8 @@ async function getJsonLdSiteSettings(): Promise<JsonLdSiteSettings> {
     console.error('Error fetching JSON-LD site settings:', error);
     return {
       baseUrl: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
-      siteName: 'Saski AI',
-      siteDescription: 'Transform Your Customer Communication with AI'
+      siteName: 'Your Company',
+      siteDescription: 'Your company description'
     };
   }
 }
@@ -566,7 +566,7 @@ function createSlug(text: string): string {
 // Generate 404 metadata
 function generateNotFoundMetadata(): Metadata {
   return {
-    title: "Page Not Found | Saski AI",
+    title: "Page Not Found | Your Company",
     description: "The page you're looking for doesn't exist.",
     robots: {
       index: false,
@@ -578,7 +578,7 @@ function generateNotFoundMetadata(): Metadata {
 // Generate error metadata
 function generateErrorMetadata(): Metadata {
   return {
-    title: "Error | Saski AI",
+    title: "Error | Your Company",
     description: "An error occurred while loading this page.",
     robots: {
       index: false,

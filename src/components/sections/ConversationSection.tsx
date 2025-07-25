@@ -17,9 +17,9 @@ interface ConversationSectionProps {
 const ConversationSection: React.FC<ConversationSectionProps> = ({
   heading = "Smarter Conversations, Less Work",
   title = "Your AI Assistant. Everywhere Your Customers Are.",
-  description = "Saski AI responds on SMS, WhatsApp, voice, chat, and social platforms — instantly capturing leads, solving support issues, and syncing with your CRM.",
+  description = "Our platform responds on SMS, WhatsApp, voice, chat, and social platforms — instantly capturing leads, solving support issues, and syncing with your CRM.",
   imageUrl = "https://saskiai.com/wp-content/uploads/2025/06/ChatGPT-Image-Jun-1-2025-at-08_09_09-AM.png",
-  imageAlt = "3D illustration of Saski AI assistant interface automating customer support tasks including chat replies, CRM updates, appointment confirmations, and ticket creation across WhatsApp, Messenger, SMS, and voice channels.",
+  imageAlt = "3D illustration of our assistant interface automating customer support tasks including chat replies, CRM updates, appointment confirmations, and ticket creation across WhatsApp, Messenger, SMS, and voice channels.",
   className = ""
 }) => {
   const channels = [

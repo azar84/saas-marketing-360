@@ -620,7 +620,7 @@ const FeatureGroupsManager: React.FC = () => {
                   type="text"
                   value={formData.heading}
                   onChange={(e) => setFormData({ ...formData, heading: e.target.value })}
-                  placeholder="e.g., Why Saski AI?"
+                  placeholder="e.g., Why Choose Us?"
                   required
                   className="h-12"
                 />

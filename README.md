@@ -1,4 +1,4 @@
-# 🏆 Saski AI - Award-Winning Website
+# 🏆 Your Company - Award-Winning Website
 
 > **Transform Your Customer Communication with AI**
 
@@ -233,7 +233,7 @@ For support and questions:
 
 ---
 
-**Made with ❤️ by the Saski AI Team**
+**Made with ❤️ by the Your Company Team**
 
 <!-- Latest deployment: Dynamic rendering fixes applied -->
 <!-- Last updated: 2025-06-29 17:05 UTC -->

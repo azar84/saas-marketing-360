@@ -8,21 +8,21 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/webp', 'image/avif'],
     domains: [
-      'saskiai-backend-00cf6a2d4e4f.herokuapp.com', 
-      'saskiai.com', 
+      'yourcompany-backend.herokuapp.com', 
+      'yourcompany.com', 
       'api.producthunt.com',
       'res.cloudinary.com'
     ],
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'saskiai-backend-00cf6a2d4e4f.herokuapp.com',
+        hostname: 'yourcompany-backend.herokuapp.com',
         port: '',
         pathname: '/uploads/**',
       },
       {
         protocol: 'https',
-        hostname: 'saskiai.com',
+        hostname: 'yourcompany.com',
         port: '',
         pathname: '/wp-content/uploads/**',
       },

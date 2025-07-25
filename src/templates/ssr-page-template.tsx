@@ -1,5 +1,5 @@
 /**
- * SSR Page Template for Saski AI Website
+ * SSR Page Template for Your Company Website
  * 
  * Copy this template when creating new pages to ensure SSR is properly configured.
  * 

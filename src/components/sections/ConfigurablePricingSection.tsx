@@ -335,7 +335,7 @@ export default function ConfigurablePricingSection({
             {heading || pricingSection.heading || 'Pricing Plans'}
           </h2>
           <p className="text-xl max-w-3xl mx-auto" style={{ color: designSystem?.textSecondary || '#6B7280' }}>
-            {subheading || pricingSection.subheading || 'Choose a plan below and unlock all the features of Saski AI'}
+            {subheading || pricingSection.subheading || 'Choose a plan below and unlock all the features'}
           </p>
         </div>
 

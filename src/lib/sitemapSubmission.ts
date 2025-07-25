@@ -107,7 +107,7 @@ async function submitToBing(sitemapUrl: string): Promise<SubmissionResult> {
     const response = await fetch(pingUrl, {
       method: 'GET',
       headers: {
-        'User-Agent': 'Saski AI Website CMS/1.0'
+        'User-Agent': 'Your Company Website CMS/1.0'
       }
     });
 

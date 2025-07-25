@@ -83,7 +83,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
   useEffect(() => {
     if (propFeatures.length > 0) {
       setFeatures(propFeatures);
-      setGroupHeading(propHeading || 'Why Saski AI?');
+              setGroupHeading(propHeading || 'Why Choose Us?');
       setGroupSubheading(propSubheading || 'Simple. Smart. Built for growing businesses');
       setLayoutType(propLayoutType || 'grid');
       setFinalBackgroundColor(backgroundColor || '#ffffff');
@@ -94,7 +94,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
     const fetchFeatures = async () => {
       try {
         let featuresData: GlobalFeature[] = [];
-        let heading = 'Why Saski AI?';
+        let heading = 'Why Choose Us?';
         let subheading = 'Simple. Smart. Built for growing businesses';
         let layout: 'grid' | 'list' = 'grid';
         let bgColor = backgroundColor || '#ffffff';
@@ -178,7 +178,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
       } catch (error) {
         // Fall back to default features if everything fails
         setFeatures(defaultFeatures);
-        setGroupHeading(propHeading || 'Why Saski AI?');
+        setGroupHeading(propHeading || 'Why Choose Us?');
         setGroupSubheading(propSubheading || 'Simple. Smart. Built for growing businesses');
         setLayoutType('grid');
         setFinalBackgroundColor(backgroundColor || '#ffffff');
@@ -213,7 +213,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
     return (
       <FeaturesListLayout 
         features={features}
-        heading={groupHeading || 'Why Saski AI?'}
+        heading={groupHeading || 'Why Choose Us?'}
         subheading={groupSubheading}
         backgroundColor={finalBackgroundColor}
       />
@@ -224,7 +224,7 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
   return (
     <FeaturesGridLayout 
       features={features}
-      heading={groupHeading || 'Why Saski AI?'}
+              heading={groupHeading || 'Why Choose Us?'}
       subheading={groupSubheading}
       backgroundColor={finalBackgroundColor}
     />

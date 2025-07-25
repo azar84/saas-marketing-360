@@ -22,32 +22,32 @@ const manrope = Manrope({
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Saski AI - Transform Your Customer Communication with AI",
-    description: "Empower your business with intelligent conversations across WhatsApp, SMS, Telegram, and more. Automate responses, capture leads, and delight customers 24/7.",
-    keywords: "AI chatbot, customer service automation, WhatsApp business, multi-channel communication, lead generation",
-    authors: [{ name: "Saski AI" }],
-    creator: "Saski AI",
-    publisher: "Saski AI",
+    title: "Your Company - Your Company Description",
+    description: "Your company description and value proposition.",
+    keywords: "your, company, keywords",
+    authors: [{ name: "Your Company" }],
+    creator: "Your Company",
+    publisher: "Your Company",
     formatDetection: {
       email: false,
       address: false,
       telephone: false,
     },
-    metadataBase: new URL("https://saskiai.com"),
+    metadataBase: new URL("https://yourcompany.com"),
     alternates: {
       canonical: "/",
     },
     openGraph: {
-      title: "Saski AI - Transform Your Customer Communication with AI",
-      description: "Empower your business with intelligent conversations across WhatsApp, SMS, Telegram, and more. Automate responses, capture leads, and delight customers 24/7.",
-      url: "https://saskiai.com",
-      siteName: "Saski AI",
+      title: "Your Company - Your Company Description",
+      description: "Your company description and value proposition.",
+      url: "https://yourcompany.com",
+      siteName: "Your Company",
       images: [
         {
           url: "/og-image.jpg",
           width: 1200,
           height: 630,
-          alt: "Saski AI - AI-Powered Customer Communication",
+          alt: "Your Company - Your Company Description",
         },
       ],
       locale: "en_US",
@@ -55,10 +55,10 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: "Saski AI - Transform Your Customer Communication with AI",
-      description: "Empower your business with intelligent conversations across WhatsApp, SMS, Telegram, and more.",
+      title: "Your Company - Your Company Description",
+      description: "Your company description and value proposition.",
       images: ["/og-image.jpg"],
-      creator: "@saskiai",
+      creator: "@yourcompany",
     },
     robots: {
       index: true,

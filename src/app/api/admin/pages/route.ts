@@ -17,7 +17,7 @@ async function ensureHomePage() {
         data: {
           slug: 'home',
           title: 'Home',
-          metaTitle: 'Saski AI - AI Customer Service Automation',
+          metaTitle: 'Your Company - Your Company Description',
           metaDesc: 'Transform your customer communication with AI-powered automation. Book appointments, answer questions, and provide support 24/7.',
           sortOrder: 0,
           showInHeader: false, // Home page doesn't need to show in header navigation

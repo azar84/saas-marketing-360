@@ -155,7 +155,7 @@ export default function AdminLogin() {
               <div className="relative">
                 <Image
                   src={getAppropriateLogoUrl()!}
-                  alt={siteSettings.footerCompanyName || 'Saski AI'}
+                  alt={siteSettings.footerCompanyName || 'Your Company'}
                   width={200}
                   height={60}
                   className="h-16 w-auto object-contain"
@@ -168,7 +168,7 @@ export default function AdminLogin() {
                   <Shield className="w-6 h-6 text-white" />
                 </div>
                 <span className="text-2xl font-bold text-gray-900">
-                  {siteSettings.footerCompanyName || 'Saski AI'}
+                  {siteSettings.footerCompanyName || 'Your Company'}
                 </span>
               </div>
             )}
@@ -340,7 +340,7 @@ export default function AdminLogin() {
         {/* Footer */}
         <div className="text-center mt-8">
           <p className="text-gray-500 text-xs">
-            {siteSettings.footerCompanyName || 'Saski AI'}. {(siteSettings.footerCopyrightMessage || 'All rights reserved.').replace('{year}', new Date().getFullYear().toString())}
+            {siteSettings.footerCompanyName || 'Your Company'}. {(siteSettings.footerCopyrightMessage || 'All rights reserved.').replace('{year}', new Date().getFullYear().toString())}
           </p>
           {siteSettings.footerCompanyDescription && (
             <p className="text-gray-400 text-xs mt-1 max-w-sm mx-auto">

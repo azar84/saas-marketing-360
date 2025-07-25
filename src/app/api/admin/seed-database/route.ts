@@ -76,7 +76,7 @@ export async function POST() {
       create: {
         slug: 'home',
         title: 'Home',
-        metaDesc: 'Welcome to Saski AI - Transform your customer communication with AI'
+        metaDesc: 'Welcome to Your Company - Your company description'
       }
     });
     console.log('✅ Home page created:', homePage.slug);

@@ -155,21 +155,21 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
       geometricRef.current.appendChild(shape);
     }
 
-    // Create animated SaskiAI logos spread across full width
-    console.log('🚀 Creating 15 animated SaskiAI logos...');
+    // Create animated logos spread across full width
+    console.log('🚀 Creating 15 animated logos...');
     for (let i = 0; i < 15; i++) {
       const logoContainer = document.createElement('div');
-      logoContainer.className = 'saski-logo';
+              logoContainer.className = 'company-logo';
       logoContainer.style.position = 'absolute';
       logoContainer.style.left = `${Math.random() * 100}%`;
       logoContainer.style.top = `${Math.random() * 100}%`;
       logoContainer.style.animation = `logoFloat ${20 + Math.random() * 10}s linear infinite ${Math.random() * 20}s`;
       logoContainer.style.zIndex = '35';
       
-      // Create SaskiAI logo using the actual favicon.svg
+              // Create company logo using the actual favicon.svg
       const logo = document.createElement('img');
       logo.src = '/favicon.svg';
-      logo.alt = 'SaskiAI';
+              logo.alt = 'Your Company';
       logo.style.width = '60px';
       logo.style.height = '60px';
       logo.style.opacity = '0.8';

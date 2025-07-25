@@ -10,9 +10,9 @@ interface VideoSectionProps {
 }
 
 const VideoSection: React.FC<VideoSectionProps> = ({
-  heading = "See Saski AI in Action",
+  heading = "See Our Platform in Action",
   title = "See How Easily You Can Launch Your AI Assistant",
-  description = "In under 3 minutes, see how Saski AI helps you automate support, connect your tools, and launch your assistant across multiple channels without any technical setup.",
+  description = "In under 3 minutes, see how our platform helps you automate support, connect your tools, and launch your assistant across multiple channels without any technical setup.",
   videoUrl = "https://youtu.be/SQp3KsYigJw?si=404RMXbZafG78Lay",
   videoId = "SQp3KsYigJw",
   className = ""
@@ -68,7 +68,7 @@ const VideoSection: React.FC<VideoSectionProps> = ({
                   <iframe
                     className="absolute inset-0 w-full h-full animate-fade-in-up"
                     src={`https://www.youtube.com/embed/${embedVideoId}?controls=1&rel=0&playsinline=1&cc_load_policy=0&autoplay=0&modestbranding=1`}
-                    title="Saski AI Demo Video"
+                    title="Demo Video"
                     frameBorder="0"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowFullScreen

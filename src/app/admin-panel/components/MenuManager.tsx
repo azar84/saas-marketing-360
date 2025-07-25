@@ -1894,7 +1894,7 @@ export default function MenuManager() {
                   <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
                     <span className="text-white font-bold text-sm">S</span>
                   </div>
-                  <span className="font-bold text-lg">Saski AI</span>
+                  <span className="font-bold text-lg">Your Company</span>
                 </div>
                 
                 {/* Navigation Preview */}

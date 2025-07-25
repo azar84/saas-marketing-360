@@ -5,7 +5,7 @@
   --font-family-sans: 'Manrope', system-ui, sans-serif;
   --font-family-mono: ui-monospace, 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
   
-  /* Saski AI Brand Colors */
+  /* Your Company Brand Colors */
   --color-saski-purple: #5243E9;
   --color-saski-purple-light: #6366F1;
   --color-saski-purple-dark: #4338CA;

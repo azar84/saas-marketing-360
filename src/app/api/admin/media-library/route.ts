@@ -207,7 +207,7 @@ async function handleFileUpload(request: NextRequest) {
   try {
     // Upload to Cloudinary
     const cloudinaryResult = await uploadToCloudinary(file, {
-      folder: 'saski-ai/media',
+      folder: 'yourcompany/media',
       resource_type: resourceType,
     });
 
@@ -323,7 +323,7 @@ async function handleUrlImport(request: NextRequest) {
 
     // Upload to Cloudinary
     const cloudinaryResult = await uploadToCloudinary(buffer, {
-      folder: 'saski-ai/media',
+      folder: 'yourcompany/media',
       resource_type: resourceType,
     });
 

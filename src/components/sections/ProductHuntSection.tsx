@@ -14,9 +14,9 @@ interface ProductHuntSectionProps {
 
 const ProductHuntSection: React.FC<ProductHuntSectionProps> = ({
   heading = "We're Launching on Product Hunt!",
-  description = "Mark your calendars! Saski AI is launching on Product Hunt on July 7th. Join thousands of entrepreneurs, developers, and business leaders who are discovering the future of AI-powered customer support.",
+  description = "Mark your calendars! Our platform is launching on Product Hunt on July 7th. Join thousands of entrepreneurs, developers, and business leaders who are discovering the future of AI-powered customer support.",
   badgeUrl = "https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=965134&theme=light&t=1748875046361",
-  badgeAlt = "Saski AI - Saski AI – Multichannel AI Support Built for SMB's | Product Hunt",
+  badgeAlt = "Your Company - Multichannel AI Support Built for SMB's | Product Hunt",
   productHuntUrl = "https://www.producthunt.com/products/saski-ai?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-saski-ai",
   callToAction = "Get notified when we launch and help us reach #1 Product of the Day!",
   className = ""
