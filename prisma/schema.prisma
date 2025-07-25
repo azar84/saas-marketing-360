@@ -365,12 +365,22 @@ model CTA {
   id                Int            @id @default(autoincrement())
   text              String
   url               String
+  customId          String?
   icon              String?
   style             String         @default("primary")
   target            String         @default("_self")
   isActive          Boolean        @default(true)
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
+  onClickEvent      String?
+  onHoverEvent      String?
+  onMouseOutEvent   String?
+  onFocusEvent      String?
+  onBlurEvent       String?
+  onKeyDownEvent    String?
+  onKeyUpEvent      String?
+  onTouchStartEvent String?
+  onTouchEndEvent   String?
   events            Json?
   headerCTAs        HeaderCTA[]
   heroPrimary       HeroSection[]  @relation("HeroPrimaryCTA")
