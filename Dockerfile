@@ -47,8 +47,8 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy the seed script (if not already copied)
-COPY --from=builder /app/prisma/seed.js ./prisma/seed.js
+# Copy the Prisma schema and seed script
+COPY --from=builder /app/prisma ./prisma
 
 # Install Prisma CLI and bcryptjs for seeding (in the runner stage)
 USER root
