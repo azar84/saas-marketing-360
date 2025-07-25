@@ -50,13 +50,9 @@ model SiteSettings {
   baseUrl                  String?  @default("")
   createdAt                DateTime @default(now())
   updatedAt                DateTime @updatedAt
-  gaMeasurementId          String?
-  gtmContainerId           String?
+  gaMeasurementId          String?  @default("NULL")
+  gtmContainerId           String?  @default("NULL")
   gtmEnabled               Boolean  @default(false)
-  cloudinaryEnabled        Boolean  @default(false)
-  cloudinaryCloudName      String?
-  cloudinaryApiKey         String?
-  cloudinaryApiSecret      String?
 
   @@map("site_settings")
 }
@@ -375,16 +371,6 @@ model CTA {
   isActive          Boolean        @default(true)
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
-  customId          String?
-  onClickEvent      String?
-  onHoverEvent      String?
-  onMouseOutEvent   String?
-  onFocusEvent      String?
-  onBlurEvent       String?
-  onKeyDownEvent    String?
-  onKeyUpEvent      String?
-  onTouchStartEvent String?
-  onTouchEndEvent   String?
   events            Json?
   headerCTAs        HeaderCTA[]
   heroPrimary       HeroSection[]  @relation("HeroPrimaryCTA")
@@ -431,9 +417,6 @@ model HomePageHero {
   ctaSecondaryUrl  String?
   mediaUrl         String?
   backgroundColor  String?  @default("#FFFFFF")
-  // Animation configuration
-  animationType    String?  @default("conversation") // conversation, video, html, script, image, none
-  animationData    String?  // JSON string for animation configuration
   isActive         Boolean  @default(true)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
