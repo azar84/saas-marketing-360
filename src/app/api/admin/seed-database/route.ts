@@ -81,6 +81,32 @@ export async function POST() {
     });
     console.log('✅ Home page created:', homePage.slug);
 
+    // Check if home hero section already exists for this page
+    const existingHomeHeroSection = await prisma.pageSection.findFirst({
+      where: {
+        pageId: homePage.id,
+        sectionType: 'home_hero'
+      }
+    });
+
+    let homeHeroSection;
+    if (!existingHomeHeroSection) {
+      // Create a page section that links home page to home hero
+      homeHeroSection = await prisma.pageSection.create({
+        data: {
+          pageId: homePage.id,
+          sectionType: 'home_hero',
+          title: 'Home Hero',
+          sortOrder: 1,
+          isVisible: true
+        }
+      });
+      console.log('✅ Home hero section created:', homeHeroSection.id);
+    } else {
+      homeHeroSection = existingHomeHeroSection;
+      console.log('✅ Home hero section already exists:', homeHeroSection.id);
+    }
+
     console.log('🎉 Database seeding completed successfully!');
 
     return NextResponse.json({
@@ -90,7 +116,8 @@ export async function POST() {
         siteSettings: siteSettings.id,
         headerConfig: headerConfig.id,
         menu: menu.id,
-        homePage: homePage.slug
+        homePage: homePage.slug,
+        homeHeroSection: homeHeroSection.id
       }
     });
 
