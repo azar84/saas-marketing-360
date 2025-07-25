@@ -54,12 +54,13 @@ COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chmod +x ./docker-entrypoint.sh
 
-# Create data directory for SQLite database
+# Create data directory for SQLite database and set permissions
 RUN mkdir -p ./data && chown nextjs:nodejs ./data
 
-# Install Prisma CLI and bcryptjs for seeding (in the runner stage)
+# Install Prisma CLI globally and bcryptjs locally for seeding
 USER root
-RUN npm install -g prisma bcryptjs
+RUN npm install -g prisma
+RUN npm install bcryptjs
 USER nextjs
 
 # Use the entrypoint script
