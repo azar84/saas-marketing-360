@@ -49,7 +49,17 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { logoUrl, faviconUrl, faviconLightUrl, faviconDarkUrl, baseUrl } = body;
+    const { 
+      logoUrl, 
+      faviconUrl, 
+      faviconLightUrl, 
+      faviconDarkUrl, 
+      baseUrl,
+      cloudinaryEnabled,
+      cloudinaryCloudName,
+      cloudinaryApiKey,
+      cloudinaryApiSecret
+    } = body;
 
     // Check if settings already exist
     const existingSettings = await prisma.siteSettings.findFirst();
@@ -65,6 +75,10 @@ export async function POST(request: NextRequest) {
           faviconLightUrl: faviconLightUrl || existingSettings.faviconLightUrl,
           faviconDarkUrl: faviconDarkUrl || existingSettings.faviconDarkUrl,
           baseUrl: baseUrl !== undefined ? baseUrl : existingSettings.baseUrl,
+          cloudinaryEnabled: cloudinaryEnabled !== undefined ? cloudinaryEnabled : existingSettings.cloudinaryEnabled,
+          cloudinaryCloudName: cloudinaryCloudName !== undefined ? cloudinaryCloudName : existingSettings.cloudinaryCloudName,
+          cloudinaryApiKey: cloudinaryApiKey !== undefined ? cloudinaryApiKey : existingSettings.cloudinaryApiKey,
+          cloudinaryApiSecret: cloudinaryApiSecret !== undefined ? cloudinaryApiSecret : existingSettings.cloudinaryApiSecret,
         }
       });
     } else {
@@ -76,6 +90,10 @@ export async function POST(request: NextRequest) {
           faviconLightUrl,
           faviconDarkUrl,
           baseUrl: baseUrl || '',
+          cloudinaryEnabled: cloudinaryEnabled || false,
+          cloudinaryCloudName: cloudinaryCloudName || null,
+          cloudinaryApiKey: cloudinaryApiKey || null,
+          cloudinaryApiSecret: cloudinaryApiSecret || null,
           smtpEnabled: false,
           smtpPort: 587,
           smtpSecure: true,

@@ -2,6 +2,88 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+
+// Advanced client-only component for animated HTML content
+const ClientOnlyHTML: React.FC<{ htmlContent: string; fallback: React.ReactNode }> = ({ htmlContent, fallback }) => {
+  const [isClient, setIsClient] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  useEffect(() => {
+    if (isClient && containerRef.current && htmlContent) {
+      try {
+        // Create a temporary container to parse the HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = htmlContent;
+        
+        // Extract styles and scripts
+        const styles = tempDiv.querySelectorAll('style');
+        const scripts = tempDiv.querySelectorAll('script');
+        
+        // Remove styles and scripts from the content
+        styles.forEach(style => style.remove());
+        scripts.forEach(script => script.remove());
+        
+        // Set the HTML content without styles and scripts
+        containerRef.current.innerHTML = tempDiv.innerHTML;
+        
+        // Add styles to document head
+        styles.forEach((style, index) => {
+          const newStyle = document.createElement('style');
+          newStyle.textContent = style.textContent || '';
+          document.head.appendChild(newStyle);
+        });
+        
+        // Execute scripts
+        scripts.forEach((script, index) => {
+          const newScript = document.createElement('script');
+          if (script.src) {
+            newScript.src = script.src;
+          } else {
+            newScript.textContent = script.textContent || '';
+          }
+          document.head.appendChild(newScript);
+        });
+        
+        // Cleanup function
+        return () => {
+          // Remove added styles and scripts
+          styles.forEach(() => {
+            const addedStyles = document.head.querySelectorAll('style');
+            if (addedStyles.length > 0) {
+              document.head.removeChild(addedStyles[addedStyles.length - 1]);
+            }
+          });
+          scripts.forEach(() => {
+            const addedScripts = document.head.querySelectorAll('script');
+            if (addedScripts.length > 0) {
+              document.head.removeChild(addedScripts[addedScripts.length - 1]);
+            }
+          });
+        };
+      } catch (error) {
+        console.error('Error processing animated HTML:', error);
+        // Fallback to simple innerHTML
+        containerRef.current.innerHTML = htmlContent;
+      }
+    }
+  }, [isClient, htmlContent]);
+
+  if (!isClient) {
+    return <>{fallback}</>;
+  }
+
+  return (
+    <div 
+      ref={containerRef}
+      className="w-full h-full"
+      suppressHydrationWarning={true}
+    />
+  );
+};
 import { 
   ArrowRight, 
   Play, 
@@ -249,12 +331,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
     }
   };
 
-  // Conversation flow
-  const conversationFlow: Array<{
-    type: 'user' | 'ai' | 'typing';
-    message?: string;
-    delay: number;
-  }> = [
+  // Dynamic conversation flow from heroData
+  const conversationFlow = heroData?.animationData?.conversationFlow || [
     {
       type: 'user',
       message: "Hi! Can I return a product if I'm outside Canada?",
@@ -339,6 +417,296 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
       Calendar, BookOpen, Gift, Rocket
     };
     return icons[iconName] || Shield;
+  };
+
+  // Render different animation types
+  const renderAnimation = () => {
+    const animationType = heroData?.animationType || 'conversation';
+    
+    switch (animationType) {
+      case 'video':
+        return (
+          <motion.div 
+            className="w-full aspect-video overflow-hidden"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            {heroData?.animationData?.videoUrl ? (
+              (() => {
+                const videoUrl = heroData.animationData.videoUrl;
+                
+                // Check if it's a YouTube URL
+                const youtubeRegex = /(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/;
+                const youtubeMatch = videoUrl.match(youtubeRegex);
+                
+                if (youtubeMatch) {
+                  // It's a YouTube URL, create embed URL
+                  const videoId = youtubeMatch[1];
+                  const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=${heroData?.animationData?.autoplay ? '1' : '0'}&loop=${heroData?.animationData?.loop ? '1' : '0'}&mute=${heroData?.animationData?.autoplay ? '1' : '0'}&controls=${!heroData?.animationData?.autoplay ? '1' : '0'}&rel=0&modestbranding=1&playsinline=1`;
+                  
+                  return (
+                    <iframe
+                      src={embedUrl}
+                      className="w-full h-full rounded-2xl"
+                      frameBorder="0"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                      title="Hero video"
+                    />
+                  );
+                } else {
+                  // It's a direct video file URL
+                  return (
+                    <video 
+                      className="w-full h-full rounded-2xl object-cover"
+                      controls={!heroData?.animationData?.autoplay}
+                      muted={heroData?.animationData?.autoplay}
+                      autoPlay={heroData?.animationData?.autoplay}
+                      loop={heroData?.animationData?.loop}
+                      playsInline
+                    >
+                      <source src={videoUrl} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  );
+                }
+              })()
+            ) : (
+              <div className="w-full h-full bg-gray-200 rounded-2xl flex items-center justify-center">
+                <span className="text-gray-500">No video URL provided</span>
+              </div>
+            )}
+          </motion.div>
+        );
+
+      case 'html':
+        return (
+          <motion.div 
+            className="w-full h-full overflow-hidden p-6"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <ClientOnlyHTML 
+              htmlContent={heroData?.animationData?.htmlContent || ''}
+              fallback={
+                <div className="w-full h-full flex items-center justify-center">
+                  <span className="text-gray-500">
+                    {heroData?.animationData?.htmlContent ? 'Loading animated content...' : 'No HTML content provided'}
+                  </span>
+                </div>
+              }
+            />
+          </motion.div>
+        );
+
+      case 'script':
+        return (
+          <motion.div 
+            className="w-full h-full overflow-hidden"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            {heroData?.animationData?.scriptContent ? (
+              <>
+                <div id="custom-animation-container" className="w-full h-full" />
+                <script
+                  dangerouslySetInnerHTML={{
+                    __html: `
+                      (function() {
+                        try {
+                          ${heroData.animationData.scriptContent}
+                        } catch (error) {
+                          console.error('Custom animation script error:', error);
+                        }
+                      })();
+                    `
+                  }}
+                />
+              </>
+            ) : (
+              <div className="w-full h-full bg-gray-200 rounded-2xl flex items-center justify-center">
+                <span className="text-gray-500">No script content provided</span>
+              </div>
+            )}
+          </motion.div>
+        );
+
+      case 'image':
+        return (
+          <motion.div 
+            className="w-full h-full overflow-hidden"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            {(heroData?.animationData?.imageUrl || heroData?.animationData?.imageItem?.publicUrl) ? (
+              <img 
+                src={heroData.animationData.imageUrl || heroData.animationData.imageItem.publicUrl}
+                alt={heroData.animationData.imageAlt || heroData.animationData.imageItem?.alt || 'Hero animation'}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <span className="text-gray-500">No image selected</span>
+              </div>
+            )}
+          </motion.div>
+        );
+
+      case 'none':
+        return null;
+
+      case 'conversation':
+      default:
+        return (
+          <div className="relative mb-8 lg:mb-0">
+            {/* Floating AI Avatar with Subtle Animation */}
+            <motion.div
+              animate={{ 
+                y: [0, -12, 0],
+                rotate: [0, 2, -2, 0]
+              }}
+              transition={{ 
+                duration: 6,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="absolute -top-8 -left-8 z-20"
+            >
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.2 }}
+              >
+                <AIAvatar size="lg" className="shadow-xl shadow-[var(--color-primary)]/25" />
+                {/* Verified Badge */}
+                <motion.div
+                  animate={{ scale: [1, 1.1, 1] }}
+                  transition={{ duration: 3, repeat: Infinity }}
+                  className="absolute -bottom-1 -right-1 bg-white rounded-full p-1.5 shadow-lg border border-gray-200/40"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
+                </motion.div>
+              </motion.div>
+            </motion.div>
+
+            {/* Enhanced Glassmorphism Chat Window */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden"
+              style={{
+                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)'
+              }}
+            >
+              {/* Chat Header */}
+              <div className="bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-600 px-6 py-4">
+                <div className="flex items-center gap-3">
+                  <AIAvatar size="sm" />
+                  <div>
+                    <h3 className="text-white font-semibold text-sm">AI Assistant</h3>
+                    <p className="text-purple-100 text-xs">Online • Responding</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Chat Messages */}
+              <div className="p-5 space-y-4 h-80 overflow-y-auto">
+                <AnimatePresence>
+                  {messages.map((message, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -15, scale: 0.95 }}
+                      transition={{ duration: 0.4, ease: "easeOut" }}
+                      className={`flex gap-3 ${message.type === 'ai' ? 'justify-start' : 'justify-end'}`}
+                    >
+                      {message.type === 'ai' && (
+                        <AIAvatar size="sm" className="flex-shrink-0 mt-1" />
+                      )}
+                      
+                      <div className={`max-w-xs px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+                        message.type === 'ai' 
+                          ? 'bg-gradient-to-br from-purple-600 via-purple-500 to-indigo-600 text-white rounded-bl-sm shadow-lg' 
+                          : 'bg-gray-50 text-gray-900 rounded-br-sm border border-gray-200 shadow-sm'
+                      }`}>
+                        <p>
+                          {message.type === 'ai' && index === messages.length - 1 
+                            ? aiResponse.displayText 
+                            : message.message}
+                        </p>
+                        {message.type === 'ai' && index === messages.length - 1 && !aiResponse.isComplete && (
+                          <motion.span
+                            animate={{ opacity: [0, 1, 0] }}
+                            transition={{ duration: 1, repeat: Infinity }}
+                            className="inline-block w-2 h-4 bg-white/80 ml-1"
+                          />
+                        )}
+                      </div>
+
+                      {message.type === 'user' && (
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center flex-shrink-0 mt-1">
+                          <User className="w-4 h-4 text-white" />
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+
+                {/* Typing Indicator */}
+                <AnimatePresence>
+                  {isTyping && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="flex gap-3 justify-start"
+                    >
+                      <AIAvatar size="sm" className="flex-shrink-0 mt-1" />
+                      <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-indigo-600 text-white px-4 py-3 rounded-2xl rounded-bl-sm shadow-lg">
+                        <div className="flex gap-1">
+                          {[0, 1, 2].map((i) => (
+                            <motion.div
+                              key={`typing-dot-${i}`}
+                              animate={{ scale: [1, 1.3, 1] }}
+                              transition={{ 
+                                duration: 1, 
+                                repeat: Infinity, 
+                                delay: i * 0.2 
+                              }}
+                              className="w-2 h-2 bg-white/80 rounded-full"
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
+              {/* Chat Input Area */}
+              <div className="border-t border-gray-100 p-4">
+                <div className="flex items-center gap-3">
+                  <div className="flex-1 bg-gray-50 rounded-full px-4 py-2 text-sm text-gray-500">
+                    Type a message...
+                  </div>
+                  <button className="bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-full transition-colors">
+                    <Send className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        );
+    }
   };
 
 
@@ -725,161 +1093,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
             )}
           </motion.div>
 
-          {/* Right Side - Enhanced Glassmorphism Chat UI */}
+          {/* Right Side - Dynamic Animation */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="relative mb-8 lg:mb-0"
+            className="relative mb-8 lg:mb-0 flex items-center justify-center"
           >
-            {/* Floating AI Avatar with Subtle Animation */}
-            <motion.div
-              animate={{ 
-                y: [0, -12, 0],
-                rotate: [0, 2, -2, 0]
-              }}
-              transition={{ 
-                duration: 6,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              className="absolute -top-8 -left-8 z-20"
-            >
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.2 }}
-              >
-                <AIAvatar size="lg" className="shadow-xl shadow-[var(--color-primary)]/25" />
-                {/* Verified Badge */}
-                <motion.div
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                  className="absolute -bottom-1 -right-1 bg-white rounded-full p-1.5 shadow-lg border border-gray-200/40"
-                >
-                                      <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
-                </motion.div>
-              </motion.div>
-            </motion.div>
-
-            {/* Enhanced Glassmorphism Chat Window */}
-            <div className="relative bg-white/90 backdrop-blur-xl border border-white/60 rounded-3xl shadow-2xl shadow-purple-500/20 overflow-hidden">
-              
-              {/* Refined Chat Header */}
-                        <div className="flex items-center justify-between px-6 py-4 bg-gradient-to-r from-purple-50/80 to-indigo-50/80 border-b border-white/30 backdrop-blur-sm">
-            <div className="flex items-center gap-3">
-              <AIAvatar size="sm" />
-              <div>
-                <div className="font-semibold text-gray-900 text-sm">
-                  AI Assistant
-                </div>
-                <div className="text-xs text-purple-600 flex items-center gap-1.5">
-                  <motion.div 
-                    animate={{ scale: [1, 1.3, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="w-1.5 h-1.5 bg-purple-600 rounded-full"
-                  />
-                      Online • Avg response: 0.2s
-                    </div>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-400/80"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-400/80"></div>
-                  <div className="w-3 h-3 rounded-full bg-green-400/80"></div>
-                </div>
-              </div>
-
-              {/* Refined Chat Messages */}
-              <div className="p-5 space-y-4 h-80 overflow-y-auto">
-                <AnimatePresence>
-                  {messages.map((message, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -15, scale: 0.95 }}
-                      transition={{ duration: 0.4, ease: "easeOut" }}
-                      className={`flex gap-3 ${message.type === 'ai' ? 'justify-start' : 'justify-end'}`}
-                    >
-                      {message.type === 'ai' && (
-                        <AIAvatar size="sm" className="flex-shrink-0 mt-1" />
-                      )}
-                      
-                      <div className={`max-w-xs px-4 py-3 rounded-2xl text-sm leading-relaxed ${
-                        message.type === 'ai' 
-                          ? 'bg-gradient-to-br from-purple-600 via-purple-500 to-indigo-600 text-white rounded-bl-sm shadow-lg' 
-                          : 'bg-gray-50 text-gray-900 rounded-br-sm border border-gray-200 shadow-sm'
-                      }`}>
-                        <p>
-                          {message.type === 'ai' && index === messages.length - 1 
-                            ? aiResponse.displayText 
-                            : message.message}
-                        </p>
-                        {message.type === 'ai' && index === messages.length - 1 && !aiResponse.isComplete && (
-                          <motion.span
-                            animate={{ opacity: [0, 1, 0] }}
-                            transition={{ duration: 1, repeat: Infinity }}
-                            className="inline-block w-2 h-4 bg-white/80 ml-1"
-                          />
-                        )}
-                      </div>
-
-                      {message.type === 'user' && (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center flex-shrink-0 mt-1">
-                          <User className="w-4 h-4 text-white" />
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-
-                {/* Typing Indicator */}
-                <AnimatePresence>
-                  {isTyping && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="flex gap-3 justify-start"
-                    >
-                      <AIAvatar size="sm" className="flex-shrink-0 mt-1" />
-                      <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-indigo-600 text-white px-4 py-3 rounded-2xl rounded-bl-sm shadow-lg">
-                        <div className="flex gap-1">
-                          {[0, 1, 2].map((i) => (
-                            <motion.div
-                              key={`typing-dot-${i}`}
-                              animate={{ scale: [1, 1.3, 1] }}
-                              transition={{ 
-                                duration: 1, 
-                                repeat: Infinity, 
-                                delay: i * 0.2 
-                              }}
-                              className="w-2 h-2 bg-white/80 rounded-full"
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Chat Input Area */}
-              <div className="p-4 border-t border-white/20 bg-white/40 backdrop-blur-sm">
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 bg-white/80 rounded-xl px-4 py-2 text-sm text-gray-500 border border-gray-200/50">
-                    Type your message...
-                  </div>
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="bg-gradient-to-br from-purple-600 via-purple-500 to-indigo-600 p-2 rounded-xl shadow-lg hover:shadow-purple-500/25 transition-all duration-200"
-                  >
-                    <Send className="w-4 h-4 text-white" />
-                  </motion.button>
-                </div>
-              </div>
-            </div>
+            {renderAnimation()}
           </motion.div>
         </div>
       </div>

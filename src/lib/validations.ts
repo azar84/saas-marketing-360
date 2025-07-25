@@ -73,16 +73,28 @@ export const SiteSettingsSchema = z.object({
   footerCompanyDescription: optionalString,
   footerBackgroundColor: z.string().optional().nullable(),
   footerTextColor: z.string().optional().nullable(),
-  gaMeasurementId: z.string().optional().nullable().refine(val => {
-    if (val === '' || val === null || val === undefined) return true;
+  gaMeasurementId: z.string().optional().nullable().transform(val => {
+    if (val === 'NULL' || val === '' || val === null || val === undefined) return null;
+    return val;
+  }).refine(val => {
+    if (val === null || val === undefined) return true;
     return /^G-[A-Z0-9]{10}$/.test(val);
   }, { message: 'Invalid GA4 Measurement ID format. Must be G-XXXXXXXXXX' }),
-  gtmContainerId: z.string().optional().nullable().refine(val => {
-    if (val === '' || val === null || val === undefined) return true;
+  gtmContainerId: z.string().optional().nullable().transform(val => {
+    if (val === 'NULL' || val === '' || val === null || val === undefined) return null;
+    return val;
+  }).refine(val => {
+    if (val === null || val === undefined) return true;
     return /^GTM-[A-Z0-9]{5,8}$/.test(val);
   }, { message: 'Invalid GTM Container ID format. Must be GTM-XXXXX to GTM-XXXXXXXX' }),
   gtmEnabled: z.boolean().optional(),
   baseUrl: optionalUrl,
+  
+  // Cloudinary Configuration
+  cloudinaryEnabled: z.boolean().optional(),
+  cloudinaryCloudName: optionalString,
+  cloudinaryApiKey: optionalString,
+  cloudinaryApiSecret: optionalString,
 });
 
 // Partial schema for updates - all fields are optional

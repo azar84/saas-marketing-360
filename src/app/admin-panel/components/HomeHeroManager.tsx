@@ -46,6 +46,7 @@ import {
   Palette
 } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
+import MediaSelector from '@/components/ui/MediaSelector';
 import { useDesignSystem } from '@/hooks/useDesignSystem';
 
 // Available icons for trust indicators and CTA buttons
@@ -113,6 +114,9 @@ interface HomeHeroData {
   primaryCta?: CTAButton | null;
   secondaryCta?: CTAButton | null;
   trustIndicators: TrustIndicator[];
+  // Animation configuration
+  animationType?: string; // conversation, video, html, script, image, none
+  animationData?: any; // JSON object for animation configuration
 }
 
 const HomeHeroManager: React.FC = () => {
@@ -129,7 +133,40 @@ const HomeHeroManager: React.FC = () => {
       { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
       { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
       { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
-    ]
+    ],
+    animationType: 'conversation',
+    animationData: {
+      conversationFlow: [
+        {
+          type: 'user',
+          message: "Hi! Can I return a product if I'm outside Canada?",
+          delay: 1000
+        },
+        {
+          type: 'typing',
+          delay: 2000
+        },
+        {
+          type: 'ai',
+          message: "Yes! Returns are accepted within 30 days globally. Need help creating a return label?",
+          delay: 3500
+        },
+        {
+          type: 'user',
+          message: "That would be great! My order number is #SK-2024-001",
+          delay: 6000
+        },
+        {
+          type: 'typing',
+          delay: 7000
+        },
+        {
+          type: 'ai',
+          message: "Perfect! I've generated your return label and sent it to your email. You'll also receive tracking updates. Anything else I can help with?",
+          delay: 8500
+        }
+      ]
+    }
   });
 
   const [availableCTAs, setAvailableCTAs] = useState<CTAButton[]>([]);
@@ -542,6 +579,316 @@ const HomeHeroManager: React.FC = () => {
                     </div>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            {/* Animation Configuration */}
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Animation Configuration</h3>
+              
+              <div className="space-y-6">
+                {/* Animation Type */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Animation Type
+                  </label>
+                  <select
+                    value={heroData.animationType || 'conversation'}
+                    onChange={(e) => {
+                      const newType = e.target.value;
+                      let newAnimationData = { ...heroData.animationData };
+                      
+                      // Initialize animation data based on type
+                      switch (newType) {
+                        case 'html':
+                          newAnimationData = { htmlContent: '' };
+                          break;
+                        case 'video':
+                          newAnimationData = { videoUrl: '', autoplay: false, loop: false };
+                          break;
+                        case 'script':
+                          newAnimationData = { scriptContent: '' };
+                          break;
+                        case 'image':
+                          newAnimationData = { imageUrl: '', imageAlt: '', imageItem: null };
+                          break;
+                        case 'conversation':
+                          newAnimationData = {
+                            conversationFlow: [
+                              {
+                                type: 'user',
+                                message: "Hi! Can I return a product if I'm outside Canada?",
+                                delay: 1000
+                              },
+                              {
+                                type: 'typing',
+                                delay: 2000
+                              },
+                              {
+                                type: 'ai',
+                                message: "Yes! Returns are accepted within 30 days globally. Need help creating a return label?",
+                                delay: 3500
+                              }
+                            ]
+                          };
+                          break;
+                        default:
+                          newAnimationData = {};
+                      }
+                      
+                      setHeroData(prev => ({
+                        ...prev,
+                        animationType: newType,
+                        animationData: newAnimationData
+                      }));
+                    }}
+                    className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent"
+                  >
+                    <option value="conversation">Conversation Animation</option>
+                    <option value="video">Video</option>
+                    <option value="html">HTML Content</option>
+                    <option value="script">Custom Script</option>
+                    <option value="image">Image</option>
+                    <option value="none">No Animation</option>
+                  </select>
+                </div>
+
+                {/* Animation Data Configuration */}
+                {heroData.animationType === 'conversation' && (
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-3">Conversation Flow</h4>
+                    <p className="text-sm text-gray-600 mb-4">
+                      Configure the conversation messages that will be displayed in the animation.
+                    </p>
+                    
+                    <div className="space-y-3">
+                      {(heroData.animationData?.conversationFlow || []).map((message: any, index: number) => (
+                        <div key={index} className="p-3 bg-white rounded border">
+                          <div className="flex items-center gap-2 mb-2">
+                            <select
+                              value={message.type}
+                              onChange={(e) => {
+                                const newFlow = [...(heroData.animationData?.conversationFlow || [])];
+                                newFlow[index] = { ...newFlow[index], type: e.target.value };
+                                setHeroData(prev => ({
+                                  ...prev,
+                                  animationData: { ...prev.animationData, conversationFlow: newFlow }
+                                }));
+                              }}
+                              className="text-sm border border-gray-300 rounded px-2 py-1"
+                            >
+                              <option value="user">User</option>
+                              <option value="ai">AI</option>
+                              <option value="typing">Typing</option>
+                            </select>
+                            <input
+                              type="number"
+                              value={message.delay}
+                              onChange={(e) => {
+                                const newFlow = [...(heroData.animationData?.conversationFlow || [])];
+                                newFlow[index] = { ...newFlow[index], delay: parseInt(e.target.value) };
+                                setHeroData(prev => ({
+                                  ...prev,
+                                  animationData: { ...prev.animationData, conversationFlow: newFlow }
+                                }));
+                              }}
+                              placeholder="Delay (ms)"
+                              className="text-sm border border-gray-300 rounded px-2 py-1 w-24"
+                            />
+                            <button
+                              onClick={() => {
+                                const newFlow = (heroData.animationData?.conversationFlow || []).filter((_: any, i: number) => i !== index);
+                                setHeroData(prev => ({
+                                  ...prev,
+                                  animationData: { ...prev.animationData, conversationFlow: newFlow }
+                                }));
+                              }}
+                              className="text-red-500 hover:text-red-700 text-sm"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                          {message.type !== 'typing' && (
+                            <textarea
+                              value={message.message || ''}
+                              onChange={(e) => {
+                                const newFlow = [...(heroData.animationData?.conversationFlow || [])];
+                                newFlow[index] = { ...newFlow[index], message: e.target.value };
+                                setHeroData(prev => ({
+                                  ...prev,
+                                  animationData: { ...prev.animationData, conversationFlow: newFlow }
+                                }));
+                              }}
+                              placeholder="Enter message..."
+                              className="w-full p-2 border border-gray-300 rounded text-sm"
+                              rows={2}
+                            />
+                          )}
+                        </div>
+                      ))}
+                      <button
+                        onClick={() => {
+                          const newFlow = [...(heroData.animationData?.conversationFlow || []), {
+                            type: 'user',
+                            message: '',
+                            delay: 1000
+                          }];
+                          setHeroData(prev => ({
+                            ...prev,
+                            animationData: { ...prev.animationData, conversationFlow: newFlow }
+                          }));
+                        }}
+                        className="w-full p-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors"
+                      >
+                        + Add Message
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {heroData.animationType === 'video' && (
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-3">Video Configuration</h4>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Video URL
+                        </label>
+                        <input
+                          type="url"
+                          value={heroData.animationData?.videoUrl || ''}
+                          onChange={(e) => setHeroData(prev => ({
+                            ...prev,
+                            animationData: { ...prev.animationData, videoUrl: e.target.value }
+                          }))}
+                          placeholder="https://youtu.be/VIDEO_ID or https://example.com/video.mp4"
+                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          Supports YouTube URLs (e.g., https://youtu.be/VIDEO_ID) and direct video files (.mp4, .webm, etc.)
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="autoplay"
+                          checked={heroData.animationData?.autoplay || false}
+                          onChange={(e) => setHeroData(prev => ({
+                            ...prev,
+                            animationData: { ...prev.animationData, autoplay: e.target.checked }
+                          }))}
+                          className="rounded border-gray-300"
+                        />
+                        <label htmlFor="autoplay" className="text-sm text-gray-700">
+                          Autoplay
+                        </label>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="loop"
+                          checked={heroData.animationData?.loop || false}
+                          onChange={(e) => setHeroData(prev => ({
+                            ...prev,
+                            animationData: { ...prev.animationData, loop: e.target.checked }
+                          }))}
+                          className="rounded border-gray-300"
+                        />
+                        <label htmlFor="loop" className="text-sm text-gray-700">
+                          Loop
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {heroData.animationType === 'html' && (
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-3">HTML Content</h4>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        HTML Code
+                      </label>
+                      <textarea
+                        value={heroData.animationData?.htmlContent || ''}
+                        onChange={(e) => setHeroData(prev => ({
+                          ...prev,
+                          animationData: { ...prev.animationData, htmlContent: e.target.value }
+                        }))}
+                        placeholder="<div>Your HTML content here...</div>"
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent font-mono text-sm"
+                        rows={6}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {heroData.animationType === 'script' && (
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-3">Custom Script</h4>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        JavaScript Code
+                      </label>
+                      <textarea
+                        value={heroData.animationData?.scriptContent || ''}
+                        onChange={(e) => setHeroData(prev => ({
+                          ...prev,
+                          animationData: { ...prev.animationData, scriptContent: e.target.value }
+                        }))}
+                        placeholder="// Your JavaScript code here..."
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent font-mono text-sm"
+                        rows={6}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {heroData.animationType === 'image' && (
+                  <div className="p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-medium text-gray-900 mb-3">Image Configuration</h4>
+                    <div className="space-y-3">
+                      <MediaSelector
+                        label="Select Image"
+                        value={heroData.animationData?.imageItem || null}
+                        onChange={(media) => {
+                          const mediaItem = Array.isArray(media) ? media[0] : media;
+                          setHeroData(prev => ({
+                            ...prev,
+                            animationData: { 
+                              ...prev.animationData, 
+                              imageItem: mediaItem || null,
+                              imageUrl: mediaItem?.publicUrl || '',
+                              imageAlt: mediaItem?.alt || ''
+                            }
+                          }));
+                        }}
+                        allowMultiple={false}
+                        acceptedTypes={['image']}
+                        placeholder="Select image from media library"
+                        required
+                      />
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Alt Text
+                        </label>
+                        <input
+                          type="text"
+                          value={heroData.animationData?.imageAlt || ''}
+                          onChange={(e) => setHeroData(prev => ({
+                            ...prev,
+                            animationData: { ...prev.animationData, imageAlt: e.target.value }
+                          }))}
+                          placeholder="Image description for accessibility"
+                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent"
+                        />
+                        <p className="text-xs text-gray-500 mt-1">
+                          This text will be used by screen readers and displayed if the image fails to load.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

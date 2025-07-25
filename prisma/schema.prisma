@@ -50,9 +50,13 @@ model SiteSettings {
   baseUrl                  String?  @default("")
   createdAt                DateTime @default(now())
   updatedAt                DateTime @updatedAt
-  gaMeasurementId          String?  @default("NULL")
-  gtmContainerId           String?  @default("NULL")
+  gaMeasurementId          String?
+  gtmContainerId           String?
   gtmEnabled               Boolean  @default(false)
+  cloudinaryEnabled        Boolean  @default(false)
+  cloudinaryCloudName      String?
+  cloudinaryApiKey         String?
+  cloudinaryApiSecret      String?
 
   @@map("site_settings")
 }
@@ -427,6 +431,9 @@ model HomePageHero {
   ctaSecondaryUrl  String?
   mediaUrl         String?
   backgroundColor  String?  @default("#FFFFFF")
+  // Animation configuration
+  animationType    String?  @default("conversation") // conversation, video, html, script, image, none
+  animationData    String?  // JSON string for animation configuration
   isActive         Boolean  @default(true)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt

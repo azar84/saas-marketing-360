@@ -14,10 +14,7 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   
-  // Cloudinary (optional)
-  CLOUDINARY_CLOUD_NAME: z.string().optional(),
-  CLOUDINARY_API_KEY: z.string().optional(),
-  CLOUDINARY_API_SECRET: z.string().optional(),
+
   
   // Google Analytics (optional)
   NEXT_PUBLIC_GA_ID: z.string().optional(),

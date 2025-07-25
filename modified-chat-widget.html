@@ -1,0 +1,235 @@
+<!-- 🔹 CONTAINER: Modified for hero section -->
+<div id="saski-chat-wrapper">
+  <div id="saski-chat" class="saski-chat-window show">
+    <div class="saski-header">
+      <span class="saski-title">AI Assistant</span>
+      <span class="saski-status">● Online · Avg response 0.2 s</span>
+    </div>
+    <div id="saski-messages" class="saski-messages"></div>
+    <form id="saski-input-form" class="saski-input-form">
+      <input type="text" placeholder="Type your message…" autocomplete="off" />
+      <button type="submit">➤</button>
+    </form>
+  </div>
+</div>
+
+<!-- 🔹 STYLES: Modified for hero section -->
+<style>
+  #saski-chat-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+  }
+
+  .saski-chat-window {
+    width: 280px;
+    background: #f8f5ff;
+    border-radius: 1rem;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    max-height: 350px;
+    overflow: hidden;
+    font-family: Arial, sans-serif;
+  }
+
+  .saski-chat-window.hidden {
+    transform: translateY(0);
+    opacity: 1;
+  }
+
+  .saski-chat-window.show {
+    animation: saski-slideIn 0.5s ease forwards;
+  }
+
+  @keyframes saski-slideIn {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .saski-header {
+    padding: 1rem;
+    background: linear-gradient(135deg,#7540ff,#9b4dff);
+    color: #fff;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+  }
+
+  .saski-title { font-weight: bold; display: block; margin-bottom: .25rem; }
+  .saski-status { font-size: .75rem; opacity: .8; }
+
+  .saski-messages {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+  }
+
+  .saski-message {
+    display: inline-block;
+    clear: both;
+    margin: .3rem 0;
+    padding: .6rem 1rem;
+    max-width: 85%;
+    border-radius: 1rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: saski-messageIn 0.4s forwards ease;
+  }
+
+  .saski-message.user {
+    background: #fff;
+    color: #333;
+    align-self: flex-end;
+    margin-left: auto;
+  }
+
+  .saski-message.bot {
+    background: linear-gradient(135deg,#8340ff,#bf3eff);
+    background-size: 200% 200%;
+    color: #fff;
+    align-self: flex-start;
+    margin-right: auto;
+    animation: saski-messageIn .4s forwards ease, saski-gradientShift 4s ease infinite alternate;
+  }
+
+  @keyframes saski-messageIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes saski-gradientShift {
+    from { background-position: 0% 50%; }
+    to   { background-position: 100% 50%; }
+  }
+
+  .saski-typing {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: #e6e6e6;
+    border-radius: 20px;
+    padding: 8px 12px;
+    margin: .3rem 0;
+  }
+
+  .saski-typing__dot {
+    width: 8px;
+    height: 8px;
+    background: #8d8c91;
+    border-radius: 50%;
+    opacity: 0;
+    animation: saski-loadingFade 1s infinite;
+  }
+
+  .saski-typing__dot:nth-child(2) { animation-delay: .2s; }
+  .saski-typing__dot:nth-child(3) { animation-delay: .4s; }
+
+  @keyframes saski-loadingFade {
+    0%   { opacity: 0; }
+    50%  { opacity: 0.8; }
+    100% { opacity: 0; }
+  }
+
+  .saski-input-form {
+    display: flex;
+    padding: .75rem;
+    border-top: 1px solid #ddd;
+    background: #f3f0ff;
+  }
+
+  .saski-input-form input {
+    flex: 1;
+    padding: .5rem .75rem;
+    border: none;
+    border-radius: 1rem;
+    background: #fff;
+    margin-right: .5rem;
+    font-size: 1rem;
+  }
+
+  .saski-input-form button {
+    background: linear-gradient(135deg,#8340ff,#bf3eff);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+</style>
+
+<!-- 🔹 SCRIPT: Modified for hero section -->
+<script>
+  const saskiChat = document.getElementById("saski-chat");
+  const saskiMessages = document.getElementById("saski-messages");
+
+  const saskiConversation = [
+    { from: "user", text: "Hi! Can I return a product if I'm outside Canada?", delay: 1000 },
+    { from: "bot",  text: "Yes! Returns are accepted within 30 days globally. Need help creating a return label?", delay: 2000 },
+    { from: "user", text: "That would be great! My order number is #SK-2024-001", delay: 2000 }
+  ];
+
+  function startSaskiChat() {
+    // Chat is already visible, just start the conversation
+    let i = 0;
+    function next() {
+      if (i >= saskiConversation.length) return;
+      const msg = saskiConversation[i++];
+      if (msg.from === "bot") {
+        showSaskiTyping();
+        setTimeout(() => {
+          hideSaskiTyping();
+          addSaskiMessage(msg);
+          next();
+        }, 1500);
+      } else {
+        addSaskiMessage(msg);
+        next();
+      }
+    }
+    next();
+  }
+
+  function addSaskiMessage({ from, text }) {
+    const div = document.createElement("div");
+    div.className = "saski-message " + from;
+    div.textContent = text;
+    saskiMessages.appendChild(div);
+    saskiMessages.scrollTop = saskiMessages.scrollHeight;
+  }
+
+  function showSaskiTyping() {
+    const typing = document.createElement("div");
+    typing.className = "saski-typing";
+    typing.id = "saski-typing";
+    typing.innerHTML =
+      '<div class="saski-typing__dot"></div>' +
+      '<div class="saski-typing__dot"></div>' +
+      '<div class="saski-typing__dot"></div>';
+    saskiMessages.appendChild(typing);
+    saskiMessages.scrollTop = saskiMessages.scrollHeight;
+  }
+
+  function hideSaskiTyping() {
+    const t = document.getElementById("saski-typing");
+    if (t) saskiMessages.removeChild(t);
+  }
+
+  // Start immediately when script loads
+  setTimeout(startSaskiChat, 500);
+
+  // User input handling
+  document.getElementById("saski-input-form").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const input = this.querySelector("input");
+    const text = input.value.trim();
+    if (text) {
+      addSaskiMessage({ from: "user", text });
+      input.value = "";
+    }
+  });
+</script> 

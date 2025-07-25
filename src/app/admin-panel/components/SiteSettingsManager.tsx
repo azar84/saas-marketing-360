@@ -100,6 +100,12 @@ interface SiteSettings {
   // Base URL
   baseUrl?: string | null;
   
+  // Cloudinary Configuration
+  cloudinaryEnabled?: boolean;
+  cloudinaryCloudName?: string | null;
+  cloudinaryApiKey?: string | null;
+  cloudinaryApiSecret?: string | null;
+  
   createdAt?: string;
   updatedAt?: string;
 }
@@ -134,7 +140,7 @@ export default function SiteSettingsManager() {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [activeTab, setActiveTab] = useState<'general' | 'company' | 'email'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'company' | 'email' | 'cloudinary'>('general');
   
   // File upload states
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -483,6 +489,20 @@ export default function SiteSettingsManager() {
             <div className="flex items-center space-x-2">
               <Mail className="w-4 h-4" />
               <span>Email Settings</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('cloudinary')}
+            className={`py-2 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'cloudinary'
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+            }`}
+          >
+            <div className="flex items-center space-x-2">
+              <Upload className="w-4 h-4" />
+              <span>Cloudinary</span>
             </div>
           </button>
         </nav>
@@ -1242,6 +1262,106 @@ export default function SiteSettingsManager() {
               </div>
             </Card>
           </div>
+        </div>
+      )}
+
+      {/* Cloudinary Settings Tab */}
+      {activeTab === 'cloudinary' && (
+        <div className="space-y-6">
+          <Card className="p-6">
+            <div className="flex items-center space-x-3 mb-6">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Upload className="w-5 h-5 text-purple-600" />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-gray-900">Cloudinary Configuration</h3>
+                <p className="text-gray-600 text-sm">Configure Cloudinary for media uploads and management</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <input
+                  type="checkbox"
+                  id="cloudinaryEnabled"
+                  checked={settings.cloudinaryEnabled || false}
+                  onChange={(e) => handleEmailSettingChange('cloudinaryEnabled', e.target.checked)}
+                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                />
+                <label htmlFor="cloudinaryEnabled" className="text-sm font-medium text-gray-700">
+                  Enable Cloudinary Media Management
+                </label>
+              </div>
+
+              {settings.cloudinaryEnabled && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Cloud Name
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="your-cloud-name"
+                      value={settings.cloudinaryCloudName || ''}
+                      onChange={(e) => handleEmailSettingChange('cloudinaryCloudName', e.target.value)}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Your Cloudinary cloud name (found in your dashboard)
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      API Key
+                    </label>
+                    <Input
+                      type="text"
+                      placeholder="123456789012345"
+                      value={settings.cloudinaryApiKey || ''}
+                      onChange={(e) => handleEmailSettingChange('cloudinaryApiKey', e.target.value)}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Your Cloudinary API key
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      API Secret
+                    </label>
+                    <Input
+                      type="password"
+                      placeholder="your-api-secret"
+                      value={settings.cloudinaryApiSecret || ''}
+                      onChange={(e) => handleEmailSettingChange('cloudinaryApiSecret', e.target.value)}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Your Cloudinary API secret (keep this secure)
+                    </p>
+                  </div>
+
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h4 className="text-sm font-semibold text-blue-800 mb-2">ℹ️ Cloudinary Setup Instructions</h4>
+                    <ul className="text-sm text-blue-700 space-y-1">
+                      <li>• Sign up for a free account at <a href="https://cloudinary.com" target="_blank" rel="noopener noreferrer" className="underline">cloudinary.com</a></li>
+                      <li>• Get your credentials from the Dashboard → Settings → Access Keys</li>
+                      <li>• Cloudinary will be used for all media uploads and image transformations</li>
+                      <li>• Files will be stored in the "saski-ai" folder by default</li>
+                    </ul>
+                  </div>
+                </>
+              )}
+
+              {!settings.cloudinaryEnabled && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                  <h4 className="text-sm font-semibold text-yellow-800 mb-2">⚠️ Cloudinary Disabled</h4>
+                  <p className="text-sm text-yellow-700">
+                    Media uploads will not work without Cloudinary configuration. Enable Cloudinary and configure your credentials to use the media library.
+                  </p>
+                </div>
+              )}
+            </div>
+          </Card>
         </div>
       )}
     </div>

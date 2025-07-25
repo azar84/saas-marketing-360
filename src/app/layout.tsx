@@ -7,6 +7,7 @@ import DynamicFavicon from "../components/layout/DynamicFavicon";
 import AnalyticsProvider from "../components/layout/AnalyticsProvider";
 import ScriptInjector from "../components/layout/ScriptInjector";
 import GlobalJavaScriptInjector from "../components/layout/GlobalJavaScriptInjector";
+import "../lib/init"; // Initialize server configuration
 import "./globals.css";
 
 // Force dynamic rendering to prevent static generation issues

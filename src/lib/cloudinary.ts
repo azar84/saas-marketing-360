@@ -1,11 +1,49 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { prisma } from './db';
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+// Function to get Cloudinary config from database or environment
+export async function getCloudinaryConfig() {
+  try {
+    const settings = await prisma.siteSettings.findFirst();
+    
+    if (settings?.cloudinaryEnabled && settings.cloudinaryCloudName && settings.cloudinaryApiKey && settings.cloudinaryApiSecret) {
+      return {
+        cloud_name: settings.cloudinaryCloudName,
+        api_key: settings.cloudinaryApiKey,
+        api_secret: settings.cloudinaryApiSecret,
+      };
+    }
+    
+    // Fallback to environment variables
+    if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+      return {
+        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+        api_key: process.env.CLOUDINARY_API_KEY,
+        api_secret: process.env.CLOUDINARY_API_SECRET,
+      };
+    }
+    
+    throw new Error('Cloudinary not configured in site settings or environment variables');
+  } catch (error) {
+    console.error('Error getting Cloudinary config:', error);
+    throw new Error('Cloudinary configuration not found');
+  }
+}
+
+// Function to configure Cloudinary with database settings or environment variables
+export async function configureCloudinary() {
+  try {
+    const config = await getCloudinaryConfig();
+    cloudinary.config(config);
+    return true;
+  } catch (error) {
+    console.error('Failed to configure Cloudinary:', error);
+    return false;
+  }
+}
+
+// Initialize Cloudinary configuration
+configureCloudinary().catch(console.error);
 
 export interface CloudinaryUploadResult {
   public_id: string;
@@ -28,6 +66,9 @@ export const uploadToCloudinary = async (
   } = {}
 ): Promise<CloudinaryUploadResult> => {
   try {
+    // Ensure Cloudinary is configured
+    await configureCloudinary();
+
     // Convert File to buffer if needed
     let buffer: Buffer;
     if (file instanceof File) {
@@ -67,6 +108,9 @@ export const uploadToCloudinary = async (
 
 export const deleteFromCloudinary = async (public_id: string): Promise<void> => {
   try {
+    // Ensure Cloudinary is configured
+    await configureCloudinary();
+    
     await cloudinary.uploader.destroy(public_id);
   } catch (error) {
     console.error('Cloudinary delete error:', error);
