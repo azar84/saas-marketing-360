@@ -1,7 +1,0 @@
-version: 2
-updates:
-  # Disable Docker updates to prevent auto-generated workflows
-  - package-ecosystem: "docker"
-    directory: "/"
-    schedule:
-      interval: "never" 
