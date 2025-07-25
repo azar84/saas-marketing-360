@@ -50,13 +50,17 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copy the Prisma schema and seed script
 COPY --from=builder /app/prisma ./prisma
 
+# Copy the entrypoint script
+COPY --from=builder /app/docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x ./docker-entrypoint.sh
+
 # Install Prisma CLI and bcryptjs for seeding (in the runner stage)
 USER root
 RUN npm install -g prisma bcryptjs
 USER nextjs
 
-# Run migrations and seed script on container start
-CMD npx prisma migrate deploy && node ./prisma/seed.js && node server.js
+# Use the entrypoint script
+CMD ["./docker-entrypoint.sh"]
 
 USER nextjs
 
