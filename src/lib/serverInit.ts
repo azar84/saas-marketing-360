@@ -25,10 +25,10 @@ export async function initializeServerConfig() {
     }
     
     // Load other configurations as needed
-    if (settings?.baseUrl) {
-      process.env.NEXT_PUBLIC_BASE_URL = settings.baseUrl;
-      console.log(`✅ Base URL set from database: ${settings.baseUrl}`);
-    }
+    // if (settings?.baseUrl) {
+    //   process.env.NEXT_PUBLIC_BASE_URL = settings.baseUrl;
+    //   console.log(`✅ Base URL set from database: ${settings.baseUrl}`);
+    // }
     
     console.log('✅ Server configuration initialized');
     
