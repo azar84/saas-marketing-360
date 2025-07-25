@@ -421,13 +421,13 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
 
   // Render different animation types
   const renderAnimation = () => {
-    const animationType = heroData?.animationType || 'conversation';
+    const animationType = heroData?.animationType || 'video';
     
     switch (animationType) {
       case 'video':
         return (
           <motion.div 
-            className="w-full aspect-video overflow-hidden"
+            className="w-full max-w-4xl aspect-video overflow-hidden"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -484,7 +484,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
       case 'html':
         return (
           <motion.div 
-            className="w-full h-full overflow-hidden p-6"
+            className="w-full max-w-4xl h-full min-h-[500px] overflow-hidden p-6"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -506,7 +506,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
       case 'script':
         return (
           <motion.div 
-            className="w-full h-full overflow-hidden"
+            className="w-full max-w-4xl h-full min-h-[500px] overflow-hidden"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -537,15 +537,15 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
           </motion.div>
         );
 
-      case 'image':
-        return (
-          <motion.div 
-            className="w-full h-full overflow-hidden"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            whileHover={{ scale: 1.02 }}
-          >
+                  case 'image':
+              return (
+                <motion.div
+                  className="w-full h-full overflow-hidden"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.6, delay: 0.4 }}
+                  whileHover={{ scale: 1.02 }}
+                >
             {(heroData?.animationData?.imageUrl || heroData?.animationData?.imageItem?.publicUrl) ? (
               <img 
                 src={heroData.animationData.imageUrl || heroData.animationData.imageItem.publicUrl}
@@ -560,151 +560,23 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
           </motion.div>
         );
 
-      case 'none':
-        return null;
-
-      case 'conversation':
       default:
         return (
-          <div className="relative mb-8 lg:mb-0">
-            {/* Floating AI Avatar with Subtle Animation */}
-            <motion.div
-              animate={{ 
-                y: [0, -12, 0],
-                rotate: [0, 2, -2, 0]
-              }}
-              transition={{ 
-                duration: 6,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-              className="absolute -top-8 -left-8 z-20"
-            >
-              <motion.div
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.2 }}
-              >
-                <AIAvatar size="lg" className="shadow-xl shadow-[var(--color-primary)]/25" />
-                {/* Verified Badge */}
-                <motion.div
-                  animate={{ scale: [1, 1.1, 1] }}
-                  transition={{ duration: 3, repeat: Infinity }}
-                  className="absolute -bottom-1 -right-1 bg-white rounded-full p-1.5 shadow-lg border border-gray-200/40"
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
-                </motion.div>
-              </motion.div>
-            </motion.div>
-
-            {/* Enhanced Glassmorphism Chat Window */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="relative bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden"
-              style={{
-                boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.1)'
-              }}
-            >
-              {/* Chat Header */}
-              <div className="bg-gradient-to-r from-purple-600 via-purple-500 to-indigo-600 px-6 py-4">
-                <div className="flex items-center gap-3">
-                  <AIAvatar size="sm" />
-                  <div>
-                    <h3 className="text-white font-semibold text-sm">AI Assistant</h3>
-                    <p className="text-purple-100 text-xs">Online • Responding</p>
-                  </div>
-                </div>
+          <motion.div 
+            className="w-full max-w-4xl h-full min-h-[500px] overflow-hidden flex items-center justify-center"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            whileHover={{ scale: 1.02 }}
+          >
+            <div className="text-center">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Video className="w-8 h-8 text-gray-400" />
               </div>
-
-              {/* Chat Messages */}
-              <div className="p-5 space-y-4 h-80 overflow-y-auto">
-                <AnimatePresence>
-                  {messages.map((message, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -15, scale: 0.95 }}
-                      transition={{ duration: 0.4, ease: "easeOut" }}
-                      className={`flex gap-3 ${message.type === 'ai' ? 'justify-start' : 'justify-end'}`}
-                    >
-                      {message.type === 'ai' && (
-                        <AIAvatar size="sm" className="flex-shrink-0 mt-1" />
-                      )}
-                      
-                      <div className={`max-w-xs px-4 py-3 rounded-2xl text-sm leading-relaxed ${
-                        message.type === 'ai' 
-                          ? 'bg-gradient-to-br from-purple-600 via-purple-500 to-indigo-600 text-white rounded-bl-sm shadow-lg' 
-                          : 'bg-gray-50 text-gray-900 rounded-br-sm border border-gray-200 shadow-sm'
-                      }`}>
-                        <p>
-                          {message.type === 'ai' && index === messages.length - 1 
-                            ? aiResponse.displayText 
-                            : message.message}
-                        </p>
-                        {message.type === 'ai' && index === messages.length - 1 && !aiResponse.isComplete && (
-                          <motion.span
-                            animate={{ opacity: [0, 1, 0] }}
-                            transition={{ duration: 1, repeat: Infinity }}
-                            className="inline-block w-2 h-4 bg-white/80 ml-1"
-                          />
-                        )}
-                      </div>
-
-                      {message.type === 'user' && (
-                        <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-400 to-gray-500 flex items-center justify-center flex-shrink-0 mt-1">
-                          <User className="w-4 h-4 text-white" />
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-
-                {/* Typing Indicator */}
-                <AnimatePresence>
-                  {isTyping && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      className="flex gap-3 justify-start"
-                    >
-                      <AIAvatar size="sm" className="flex-shrink-0 mt-1" />
-                      <div className="bg-gradient-to-br from-purple-600 via-purple-500 to-indigo-600 text-white px-4 py-3 rounded-2xl rounded-bl-sm shadow-lg">
-                        <div className="flex gap-1">
-                          {[0, 1, 2].map((i) => (
-                            <motion.div
-                              key={`typing-dot-${i}`}
-                              animate={{ scale: [1, 1.3, 1] }}
-                              transition={{ 
-                                duration: 1, 
-                                repeat: Infinity, 
-                                delay: i * 0.2 
-                              }}
-                              className="w-2 h-2 bg-white/80 rounded-full"
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {/* Chat Input Area */}
-              <div className="border-t border-gray-100 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="flex-1 bg-gray-50 rounded-full px-4 py-2 text-sm text-gray-500">
-                    Type a message...
-                  </div>
-                  <button className="bg-purple-600 hover:bg-purple-700 text-white p-2 rounded-full transition-colors">
-                    <Send className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No Content Selected</h3>
+              <p className="text-gray-500">Please select a content type from the admin panel</p>
+            </div>
+          </motion.div>
         );
     }
   };
@@ -1094,12 +966,16 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
           </motion.div>
 
           {/* Right Side - Dynamic Animation */}
-          <motion.div
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="relative mb-8 lg:mb-0 flex items-center justify-center"
-          >
+                      <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className={`relative w-full h-full min-h-[500px] ${
+                heroData?.animationType === 'image' 
+                  ? 'flex items-stretch' 
+                  : 'flex items-center justify-center'
+              }`}
+            >
             {renderAnimation()}
           </motion.div>
         </div>

@@ -114,9 +114,9 @@ interface HomeHeroData {
   primaryCta?: CTAButton | null;
   secondaryCta?: CTAButton | null;
   trustIndicators: TrustIndicator[];
-  // Animation configuration
-  animationType?: string; // conversation, video, html, script, image, none
-  animationData?: any; // JSON object for animation configuration
+  // Creatives configuration
+  animationType?: string; // video, html, script, image
+  animationData?: any; // JSON object for creatives configuration
 }
 
 const HomeHeroManager: React.FC = () => {
@@ -582,18 +582,18 @@ const HomeHeroManager: React.FC = () => {
               </div>
             </div>
 
-            {/* Animation Configuration */}
+            {/* Creatives Configuration */}
             <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Animation Configuration</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Creatives Configuration</h3>
               
               <div className="space-y-6">
-                {/* Animation Type */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Animation Type
-                  </label>
+                                  {/* Type */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Type
+                    </label>
                   <select
-                    value={heroData.animationType || 'conversation'}
+                    value={heroData.animationType || 'video'}
                     onChange={(e) => {
                       const newType = e.target.value;
                       let newAnimationData = { ...heroData.animationData };
@@ -612,26 +612,6 @@ const HomeHeroManager: React.FC = () => {
                         case 'image':
                           newAnimationData = { imageUrl: '', imageAlt: '', imageItem: null };
                           break;
-                        case 'conversation':
-                          newAnimationData = {
-                            conversationFlow: [
-                              {
-                                type: 'user',
-                                message: "Hi! Can I return a product if I'm outside Canada?",
-                                delay: 1000
-                              },
-                              {
-                                type: 'typing',
-                                delay: 2000
-                              },
-                              {
-                                type: 'ai',
-                                message: "Yes! Returns are accepted within 30 days globally. Need help creating a return label?",
-                                delay: 3500
-                              }
-                            ]
-                          };
-                          break;
                         default:
                           newAnimationData = {};
                       }
@@ -644,107 +624,14 @@ const HomeHeroManager: React.FC = () => {
                     }}
                     className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent"
                   >
-                    <option value="conversation">Conversation Animation</option>
                     <option value="video">Video</option>
                     <option value="html">HTML Content</option>
                     <option value="script">Custom Script</option>
                     <option value="image">Image</option>
-                    <option value="none">No Animation</option>
                   </select>
                 </div>
 
-                {/* Animation Data Configuration */}
-                {heroData.animationType === 'conversation' && (
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <h4 className="font-medium text-gray-900 mb-3">Conversation Flow</h4>
-                    <p className="text-sm text-gray-600 mb-4">
-                      Configure the conversation messages that will be displayed in the animation.
-                    </p>
-                    
-                    <div className="space-y-3">
-                      {(heroData.animationData?.conversationFlow || []).map((message: any, index: number) => (
-                        <div key={index} className="p-3 bg-white rounded border">
-                          <div className="flex items-center gap-2 mb-2">
-                            <select
-                              value={message.type}
-                              onChange={(e) => {
-                                const newFlow = [...(heroData.animationData?.conversationFlow || [])];
-                                newFlow[index] = { ...newFlow[index], type: e.target.value };
-                                setHeroData(prev => ({
-                                  ...prev,
-                                  animationData: { ...prev.animationData, conversationFlow: newFlow }
-                                }));
-                              }}
-                              className="text-sm border border-gray-300 rounded px-2 py-1"
-                            >
-                              <option value="user">User</option>
-                              <option value="ai">AI</option>
-                              <option value="typing">Typing</option>
-                            </select>
-                            <input
-                              type="number"
-                              value={message.delay}
-                              onChange={(e) => {
-                                const newFlow = [...(heroData.animationData?.conversationFlow || [])];
-                                newFlow[index] = { ...newFlow[index], delay: parseInt(e.target.value) };
-                                setHeroData(prev => ({
-                                  ...prev,
-                                  animationData: { ...prev.animationData, conversationFlow: newFlow }
-                                }));
-                              }}
-                              placeholder="Delay (ms)"
-                              className="text-sm border border-gray-300 rounded px-2 py-1 w-24"
-                            />
-                            <button
-                              onClick={() => {
-                                const newFlow = (heroData.animationData?.conversationFlow || []).filter((_: any, i: number) => i !== index);
-                                setHeroData(prev => ({
-                                  ...prev,
-                                  animationData: { ...prev.animationData, conversationFlow: newFlow }
-                                }));
-                              }}
-                              className="text-red-500 hover:text-red-700 text-sm"
-                            >
-                              Remove
-                            </button>
-                          </div>
-                          {message.type !== 'typing' && (
-                            <textarea
-                              value={message.message || ''}
-                              onChange={(e) => {
-                                const newFlow = [...(heroData.animationData?.conversationFlow || [])];
-                                newFlow[index] = { ...newFlow[index], message: e.target.value };
-                                setHeroData(prev => ({
-                                  ...prev,
-                                  animationData: { ...prev.animationData, conversationFlow: newFlow }
-                                }));
-                              }}
-                              placeholder="Enter message..."
-                              className="w-full p-2 border border-gray-300 rounded text-sm"
-                              rows={2}
-                            />
-                          )}
-                        </div>
-                      ))}
-                      <button
-                        onClick={() => {
-                          const newFlow = [...(heroData.animationData?.conversationFlow || []), {
-                            type: 'user',
-                            message: '',
-                            delay: 1000
-                          }];
-                          setHeroData(prev => ({
-                            ...prev,
-                            animationData: { ...prev.animationData, conversationFlow: newFlow }
-                          }));
-                        }}
-                        className="w-full p-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-gray-400 hover:text-gray-700 transition-colors"
-                      >
-                        + Add Message
-                      </button>
-                    </div>
-                  </div>
-                )}
+
 
                 {heroData.animationType === 'video' && (
                   <div className="p-4 bg-gray-50 rounded-lg">

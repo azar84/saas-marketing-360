@@ -26,38 +26,11 @@ export async function GET() {
         primaryCta: null,
         secondaryCta: null,
         isActive: true,
-        animationType: 'conversation',
+        animationType: 'video',
         animationData: {
-          conversationFlow: [
-            {
-              type: 'user',
-              message: "Hi! Can I return a product if I'm outside Canada?",
-              delay: 1000
-            },
-            {
-              type: 'typing',
-              delay: 2000
-            },
-            {
-              type: 'ai',
-              message: "Yes! Returns are accepted within 30 days globally. Need help creating a return label?",
-              delay: 3500
-            },
-            {
-              type: 'user',
-              message: "That would be great! My order number is #SK-2024-001",
-              delay: 6000
-            },
-            {
-              type: 'typing',
-              delay: 7000
-            },
-            {
-              type: 'ai',
-              message: "Perfect! I've generated your return label and sent it to your email. You'll also receive tracking updates. Anything else I can help with?",
-              delay: 8500
-            }
-          ]
+          videoUrl: '',
+          autoplay: false,
+          loop: false
         },
         trustIndicators: [
           { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
@@ -83,38 +56,11 @@ export async function GET() {
       primaryCta: homeHero.ctaPrimary || null,         // Include actual CTA button data
       secondaryCta: homeHero.ctaSecondary || null,     // Include actual CTA button data
       isActive: homeHero.isActive,
-      animationType: homeHero.animationType || 'conversation',
+      animationType: homeHero.animationType || 'video',
       animationData: homeHero.animationData ? JSON.parse(homeHero.animationData) : {
-        conversationFlow: [
-          {
-            type: 'user',
-            message: "Hi! Can I return a product if I'm outside Canada?",
-            delay: 1000
-          },
-          {
-            type: 'typing',
-            delay: 2000
-          },
-          {
-            type: 'ai',
-            message: "Yes! Returns are accepted within 30 days globally. Need help creating a return label?",
-            delay: 3500
-          },
-          {
-            type: 'user',
-            message: "That would be great! My order number is #SK-2024-001",
-            delay: 6000
-          },
-          {
-            type: 'typing',
-            delay: 7000
-          },
-          {
-            type: 'ai',
-            message: "Perfect! I've generated your return label and sent it to your email. You'll also receive tracking updates. Anything else I can help with?",
-            delay: 8500
-          }
-        ]
+        videoUrl: '',
+        autoplay: false,
+        loop: false
       },
       trustIndicators: [                    // Default trust indicators since DB doesn't have them
         { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
@@ -224,7 +170,7 @@ export async function PUT(request: NextRequest) {
           ctaSecondaryText: null,
           ctaSecondaryUrl: null,
           mediaUrl: null,
-          animationType: updateData.animationType || 'conversation',
+          animationType: updateData.animationType || 'video',
           animationData: updateData.animationData ? JSON.stringify(updateData.animationData) : null,
           isActive: updateData.isActive !== undefined ? updateData.isActive : true
         }
@@ -239,7 +185,7 @@ export async function PUT(request: NextRequest) {
         primaryCtaId: homeHero.ctaPrimaryId,
         secondaryCtaId: homeHero.ctaSecondaryId,
         isActive: homeHero.isActive,
-        animationType: homeHero.animationType || 'conversation',
+        animationType: homeHero.animationType || 'video',
         animationData: homeHero.animationData ? JSON.parse(homeHero.animationData) : updateData.animationData,
         trustIndicators: updateData.trustIndicators || [
           { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
