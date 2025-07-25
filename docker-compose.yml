@@ -1,16 +1,20 @@
 version: '3.8'
 
 services:
-  # Next.js Application with embedded SQLite database
+  # Next.js Application with embedded PostgreSQL database
   app:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "3000:3000"
+      - "5432:5432"
     environment:
       - NODE_ENV=production
-      - DATABASE_URL=file:./data/saas_cms.db
+      - POSTGRES_DB=saas_cms
+      - POSTGRES_USER=saas_cms_user
+      - POSTGRES_PASSWORD=saas_cms_password
+      - DATABASE_URL=postgresql://saas_cms_user:saas_cms_password@localhost:5432/saas_cms
       - JWT_SECRET=your-jwt-secret-change-in-production
       - CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
       - CLOUDINARY_API_KEY=your-cloudinary-api-key
@@ -18,8 +22,6 @@ services:
       - GOOGLE_ANALYTICS_ID=your-google-analytics-id
       - GOOGLE_TAG_MANAGER_ID=your-google-tag-manager-id
     volumes:
-      # Persist SQLite database
-      - ./data:/app/data
       # Persist uploads
       - ./public/uploads:/app/public/uploads
       # Persist logs
