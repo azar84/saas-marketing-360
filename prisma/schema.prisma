@@ -48,6 +48,11 @@ model SiteSettings {
   footerBackgroundColor    String?  @default("#F9FAFB")
   footerTextColor          String?  @default("#374151")
   baseUrl                  String?  @default("")
+  cloudinaryEnabled        Boolean  @default(false)
+  cloudinaryCloudName      String?
+  cloudinaryApiKey         String?
+  cloudinaryApiSecret      String?
+  cloudinaryUploadPreset   String?
   createdAt                DateTime @default(now())
   updatedAt                DateTime @updatedAt
   gaMeasurementId          String?  @default("NULL")

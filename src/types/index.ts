@@ -12,7 +12,7 @@ export interface StrapiMedia {
 
 export interface StrapiEntity {
   id: number;
-  attributes: Record<string, any>;
+  attributes: Record<string, unknown>;
 }
 
 // Hero Section Types
