@@ -1,8 +1,5 @@
-# Use PostgreSQL 15 Alpine as base image
-FROM postgres:15-alpine AS base
-
-# Install Node.js and npm
-RUN apk add --no-cache nodejs npm
+# Use Node.js 18 Alpine as base image
+FROM node:18-alpine AS base
 
 # Install dependencies only when needed
 FROM base AS deps
@@ -49,27 +46,14 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # Copy the Prisma schema and seed script
 COPY --from=builder /app/prisma ./prisma
 
-# Copy the entrypoint script
-COPY --from=builder /app/init-app.sh ./init-app.sh
-RUN chmod +x ./init-app.sh
-
-# Install Prisma CLI and bcryptjs
+# Install Prisma CLI
 RUN npm install -g prisma
-RUN npm install bcryptjs
 
-# Copy PostgreSQL configuration
-COPY postgresql.conf /etc/postgresql/postgresql.conf
-
-# Expose ports
-EXPOSE 3000 5432
+# Expose port (Heroku will set PORT environment variable)
+EXPOSE $PORT
 
 # Set environment variables
-ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
-ENV POSTGRES_DB saas_cms
-ENV POSTGRES_USER saas_cms_user
-ENV POSTGRES_PASSWORD saas_cms_password
-ENV DATABASE_URL postgresql://saas_cms_user:saas_cms_password@localhost:5432/saas_cms
 
-# Use the init script
-CMD ["./init-app.sh"] 
+# Use the startup script for Heroku
+CMD ["sh", "-c", "npx prisma migrate deploy && node ./prisma/seed.js && exec node server.js"] 
