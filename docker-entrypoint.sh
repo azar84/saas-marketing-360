@@ -10,6 +10,9 @@ export HOSTNAME=${HOSTNAME:-"0.0.0.0"}
 # Create data directory and ensure SQLite database is accessible
 DB_PATH=$(echo $DATABASE_URL | sed 's/file://')
 mkdir -p $(dirname "$DB_PATH")
+chmod 755 $(dirname "$DB_PATH")
+touch "$DB_PATH" 2>/dev/null || true
+chmod 644 "$DB_PATH" 2>/dev/null || true
 echo "Using SQLite database at: $DB_PATH"
 
 # Run Prisma migrations
