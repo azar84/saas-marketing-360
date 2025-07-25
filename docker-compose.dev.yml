@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  # Next.js Application (Development)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=file:./prisma/dev.db
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=dev-secret-key
+      - CLOUDINARY_CLOUD_NAME=your-cloudinary-cloud-name
+      - CLOUDINARY_API_KEY=your-cloudinary-api-key
+      - CLOUDINARY_API_SECRET=your-cloudinary-api-secret
+      - GOOGLE_ANALYTICS_ID=your-google-analytics-id
+      - GOOGLE_TAG_MANAGER_ID=your-google-tag-manager-id
+    volumes:
+      # Mount source code for hot reloading
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+      # Persist database
+      - ./prisma:/app/prisma
+      # Persist uploads
+      - ./public/uploads:/app/public/uploads
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - app-network
+    command: npm run dev
+
+  # SQLite Database (Development)
+  db:
+    image: alpine:latest
+    command: sh -c "apk add --no-cache sqlite && mkdir -p /data && sqlite3 /data/dev.db 'CREATE TABLE IF NOT EXISTS test (id INTEGER PRIMARY KEY);' && tail -f /dev/null"
+    volumes:
+      - ./prisma:/data
+    restart: unless-stopped
+    networks:
+      - app-network
+
+  # Database Admin (Optional - for viewing SQLite database)
+  db-admin:
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - "8080:80"
+    environment:
+      - PMA_HOST=db
+      - PMA_PORT=3306
+    depends_on:
+      - db
+    restart: unless-stopped
+    networks:
+      - app-network
+    profiles:
+      - tools
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  database:
+    driver: local
+  uploads:
+    driver: local 
