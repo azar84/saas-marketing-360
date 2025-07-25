@@ -47,6 +47,17 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
+# Copy the seed script (if not already copied)
+COPY --from=builder /app/prisma/seed.js ./prisma/seed.js
+
+# Install Prisma CLI and bcryptjs for seeding (in the runner stage)
+USER root
+RUN npm install -g prisma bcryptjs
+USER nextjs
+
+# Run migrations and seed script on container start
+CMD npx prisma migrate deploy && node ./prisma/seed.js && node server.js
+
 USER nextjs
 
 EXPOSE 3000
@@ -56,5 +67,4 @@ ENV PORT 3000
 ENV HOSTNAME "0.0.0.0"
 
 # server.js is created by next build from the standalone output
-# https://nextjs.org/docs/pages/api-reference/next-config-js/output
-CMD ["node", "server.js"] 
+# https://nextjs.org/docs/pages/api-reference/next-config-js/output 
