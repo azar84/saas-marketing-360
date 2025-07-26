@@ -426,7 +426,7 @@ async function fetchHomeHeroData() {
           }
         ]
       },
-      trustIndicators: [
+      trustIndicators: homeHero.trustIndicators ? JSON.parse(homeHero.trustIndicators) : [
         { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
         { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
         { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
