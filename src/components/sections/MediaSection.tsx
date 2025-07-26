@@ -597,6 +597,11 @@ const MediaSection: React.FC<MediaSectionProps> = ({
   };
 
   const renderMedia = () => {
+    // If no media URL is provided, don't render anything
+    if (!mediaUrl || mediaUrl.trim() === '') {
+      return null;
+    }
+
     if (mediaType === 'video') {
       const videoId = getVideoId(mediaUrl);
       if (videoId) {
@@ -624,6 +629,10 @@ const MediaSection: React.FC<MediaSectionProps> = ({
           src={mediaUrl}
           alt={mediaAlt || headline}
           className="w-full h-auto"
+          onError={(e) => {
+            // Hide the image if it fails to load
+            e.currentTarget.style.display = 'none';
+          }}
         />
       </div>
     );
