@@ -29,6 +29,11 @@ tests/
 
 # Build artifacts (will be regenerated)
 .next/
+.next/cache/
+.next/cache/webpack/
+.next/cache/eslint/
+.next/cache/swc/
+.next/trace/
 out/
 dist/
 build/
@@ -40,6 +45,8 @@ build/
 # OS files
 .DS_Store
 Thumbs.db
+**/.DS_Store
+**/Thumbs.db
 
 # Temporary files
 *.tmp
@@ -51,4 +58,33 @@ prisma/migrations/
 prisma/dev.db
 
 # Scripts (not needed in production)
-scripts/ 
+scripts/
+
+# Additional optimizations
+node_modules/.cache/
+node_modules/.prisma/
+node_modules/@types/
+*.tsbuildinfo
+.eslintcache
+.stylelintcache
+
+# Development dependencies (will be installed fresh)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.npmrc
+
+# Source maps (not needed in production)
+*.map
+
+# Local development files
+.env.example
+.env.sample
+
+# Uploads directory (will be empty in production)
+public/uploads/
+
+# Node modules cache and logs
+node_modules/**/*.log
+node_modules/**/yarn-error.log
+node_modules/**/npm-debug.log* 

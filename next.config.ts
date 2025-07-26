@@ -9,11 +9,34 @@ const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
   generateEtags: false,
+  // Additional size optimizations
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  webpack: (config, { dev, isServer }) => {
+    // Optimize bundle size
+    if (!dev && !isServer) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            vendor: {
+              test: /[\\/]node_modules[\\/]/,
+              name: 'vendors',
+              chunks: 'all',
+            },
+          },
+        },
+      };
+    }
+    return config;
+  },
   images: {
     formats: ['image/webp', 'image/avif'],
     domains: [
-      'yourcompany-backend.herokuapp.com', 
-      'yourcompany.com', 
+      'yourcompany-backend.herokuapp.com',
+      'yourcompany.com',
       'api.producthunt.com',
       'res.cloudinary.com'
     ],
