@@ -21,6 +21,9 @@ export async function GET() {
         heading: 'Automate Conversations, Capture Leads, Serve Customers — All Without Code',
         subheading: 'Deploy intelligent assistants to SMS, WhatsApp, and your website in minutes. Transform customer support while you focus on growth.',
         backgroundColor: '#FFFFFF',
+        backgroundImage: '',
+        backgroundSize: 'cover',
+        backgroundOverlay: '',
         primaryCtaId: null,
         secondaryCtaId: null,
         primaryCta: null,
@@ -51,6 +54,9 @@ export async function GET() {
       heading: homeHero.headline,           // Map headline -> heading
       subheading: homeHero.subheading,
       backgroundColor: homeHero.backgroundColor || '#FFFFFF',
+      backgroundImage: homeHero.backgroundImage || '',
+      backgroundSize: homeHero.backgroundSize || 'cover',
+      backgroundOverlay: homeHero.backgroundOverlay || '',
       primaryCtaId: homeHero.ctaPrimaryId || null,    // Use actual CTA ID from database
       secondaryCtaId: homeHero.ctaSecondaryId || null, // Use actual CTA ID from database
       primaryCta: homeHero.ctaPrimary || null,         // Include actual CTA button data

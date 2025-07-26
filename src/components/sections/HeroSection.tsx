@@ -595,19 +595,36 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
       ref={heroRef}
       style={{ 
         opacity,
-        backgroundColor: heroData?.backgroundColor || '#FFFFFF'
+        backgroundColor: heroData?.backgroundColor || '#FFFFFF',
+        backgroundImage: heroData?.backgroundImage ? `url(${heroData.backgroundImage})` : 'none',
+        backgroundSize: heroData?.backgroundSize || 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
       }}
       className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 sm:pt-20 lg:pt-24"
     >
-      {/* Enhanced Background with Soft Radial Gradient */}
-      <div 
-        className="absolute inset-0" 
-        style={{
-          background: heroData?.backgroundColor 
-            ? `radial-gradient(circle at center, ${heroData.backgroundColor}, ${heroData.backgroundColor})`
-            : 'radial-gradient(circle at center, #FBFBFB, #FFFFFF)'
-        }}
-      />
+      {/* Background Overlay */}
+      {heroData?.backgroundOverlay && (
+        <div 
+          className="absolute inset-0" 
+          style={{
+            backgroundColor: heroData.backgroundOverlay,
+            opacity: 0.1
+          }}
+        />
+      )}
+
+      {/* Enhanced Background with Soft Radial Gradient - Only if no background image */}
+      {!heroData?.backgroundImage && (
+        <div 
+          className="absolute inset-0" 
+          style={{
+            background: heroData?.backgroundColor 
+              ? `radial-gradient(circle at center, ${heroData.backgroundColor}, ${heroData.backgroundColor})`
+              : 'radial-gradient(circle at center, #FBFBFB, #FFFFFF)'
+          }}
+        />
+      )}
       
       {/* Subtle Particle Background - Reduced */}
       <div className="absolute inset-0 pointer-events-none">
