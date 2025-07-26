@@ -601,7 +601,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
       style={{ 
         opacity,
         backgroundColor: heroData?.backgroundColor || '#FFFFFF',
-        backgroundImage: heroData?.backgroundImage ? `url(${heroData.backgroundImage})` : 'none',
+        backgroundImage: heroData?.backgroundImage ? `url(${heroData.backgroundImage})` : 'url(https://images.unsplash.com/photo-1557804506-669a67965ba0?w=1200&h=800&fit=crop)',
         backgroundSize: heroData?.backgroundSize || 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
