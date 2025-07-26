@@ -200,7 +200,7 @@ class AppScheduler {
         return isNaN(num) ? undefined : num;
       });
       
-      let nextRun = new Date(now);
+      const nextRun = new Date(now);
       
       // Reset seconds and milliseconds
       nextRun.setSeconds(0, 0);
