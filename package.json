@@ -18,7 +18,8 @@
     "db:migrate": "npx prisma migrate deploy",
     "db:push": "prisma db push",
     "db:generate": "prisma generate",
-    "db:seed": "node prisma/seed.js"
+    "db:seed": "node prisma/seed.js",
+    "cron:sitemap": "node scripts/cron-sitemap.js"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
