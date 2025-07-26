@@ -5,6 +5,10 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
+  // Optimize build size
+  compress: true,
+  poweredByHeader: false,
+  generateEtags: false,
   images: {
     formats: ['image/webp', 'image/avif'],
     domains: [
