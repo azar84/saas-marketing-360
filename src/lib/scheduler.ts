@@ -185,35 +185,93 @@ class AppScheduler {
    * Calculate next run time based on cron expression
    */
   private calculateNextRun(cronExpression: string): Date {
+    try {
+      const now = new Date();
+      const parts = cronExpression.split(' ');
+      
+      if (parts.length !== 5) {
+        console.warn(`Invalid cron expression: ${cronExpression}, using default`);
+        return this.getDefaultNextRun();
+      }
+      
+      const [minute, hour, day, month, dayOfWeek] = parts.map(part => {
+        if (part === '*') return undefined;
+        const num = parseInt(part);
+        return isNaN(num) ? undefined : num;
+      });
+      
+      let nextRun = new Date(now);
+      
+      // Reset seconds and milliseconds
+      nextRun.setSeconds(0, 0);
+      
+      // Handle minutes
+      if (minute !== undefined) {
+        nextRun.setMinutes(minute);
+        if (nextRun <= now) {
+          nextRun.setHours(nextRun.getHours() + 1);
+        }
+      }
+      
+      // Handle hours
+      if (hour !== undefined) {
+        nextRun.setHours(hour);
+        nextRun.setMinutes(minute !== undefined ? minute : 0);
+        if (nextRun <= now) {
+          nextRun.setDate(nextRun.getDate() + 1);
+        }
+      }
+      
+      // Handle day of week (0 = Sunday, 1 = Monday, etc.)
+      if (dayOfWeek !== undefined) {
+        const currentDay = nextRun.getDay();
+        const targetDay = dayOfWeek;
+        let daysToAdd = (targetDay - currentDay + 7) % 7;
+        
+        // If it's today and the time has passed, move to next week
+        if (daysToAdd === 0 && nextRun <= now) {
+          daysToAdd = 7;
+        }
+        
+        nextRun.setDate(nextRun.getDate() + daysToAdd);
+        nextRun.setHours(hour !== undefined ? hour : 0);
+        nextRun.setMinutes(minute !== undefined ? minute : 0);
+      }
+      
+      // Handle day of month
+      if (day !== undefined && dayOfWeek === undefined) {
+        nextRun.setDate(day);
+        nextRun.setHours(hour !== undefined ? hour : 0);
+        nextRun.setMinutes(minute !== undefined ? minute : 0);
+        
+        // If the date has passed this month, move to next month
+        if (nextRun <= now) {
+          nextRun.setMonth(nextRun.getMonth() + 1);
+          nextRun.setDate(day);
+        }
+      }
+      
+      // Validate the result
+      if (isNaN(nextRun.getTime()) || nextRun.getTime() <= 0) {
+        console.warn(`Invalid calculated date for cron: ${cronExpression}, using default`);
+        return this.getDefaultNextRun();
+      }
+      
+      return nextRun;
+    } catch (error) {
+      console.error(`Error calculating next run for cron: ${cronExpression}`, error);
+      return this.getDefaultNextRun();
+    }
+  }
+
+  /**
+   * Get default next run time (1 hour from now)
+   */
+  private getDefaultNextRun(): Date {
     const now = new Date();
-    const [minute, hour, day, month, dayOfWeek] = cronExpression.split(' ').map(Number);
-    
-    let nextRun = new Date(now);
-    
-    // Simple cron parser (handles basic cases)
-    if (minute !== undefined && minute !== now.getMinutes()) {
-      nextRun.setMinutes(minute);
-      if (nextRun <= now) {
-        nextRun.setHours(nextRun.getHours() + 1);
-      }
-    }
-    
-    if (hour !== undefined && hour !== now.getHours()) {
-      nextRun.setHours(hour);
-      nextRun.setMinutes(minute || 0);
-      if (nextRun <= now) {
-        nextRun.setDate(nextRun.getDate() + 1);
-      }
-    }
-    
-    if (dayOfWeek !== undefined && dayOfWeek !== now.getDay()) {
-      const daysUntilNext = (dayOfWeek - now.getDay() + 7) % 7;
-      nextRun.setDate(nextRun.getDate() + daysUntilNext);
-      nextRun.setHours(hour || 0);
-      nextRun.setMinutes(minute || 0);
-    }
-    
-    return nextRun;
+    now.setHours(now.getHours() + 1);
+    now.setMinutes(0, 0, 0);
+    return now;
   }
 
   /**

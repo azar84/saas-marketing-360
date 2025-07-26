@@ -29,6 +29,11 @@ interface CronSchedule {
   customExpression?: string;
 }
 
+interface Message {
+  type: 'success' | 'error';
+  text: string;
+}
+
 const CronExpressionEditor = ({ 
   cronExpression, 
   onSave, 
@@ -103,12 +108,21 @@ const CronExpressionEditor = ({
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Edit Schedule</h3>
         <div className="flex gap-2">
-          <Button onClick={handleSave} size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-            <Save className="w-4 h-4 mr-1" />
+          <Button 
+            onClick={handleSave} 
+            size="sm" 
+            leftIcon={<Save className="w-4 h-4" />}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
             Save
           </Button>
-          <Button onClick={onCancel} variant="outline" size="sm" className="text-gray-600 border-gray-200 hover:bg-gray-50">
-            <X className="w-4 h-4 mr-1" />
+          <Button 
+            onClick={onCancel} 
+            variant="outline" 
+            size="sm" 
+            leftIcon={<X className="w-4 h-4" />}
+            className="text-gray-600 border-gray-200 hover:bg-gray-50"
+          >
             Cancel
           </Button>
         </div>
@@ -216,6 +230,12 @@ export default function SchedulerManager() {
   const [tasks, setTasks] = useState<ScheduledTask[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingTask, setEditingTask] = useState<string | null>(null);
+  const [message, setMessage] = useState<Message | null>(null);
+
+  const showMessage = (type: 'success' | 'error', text: string) => {
+    setMessage({ type, text });
+    setTimeout(() => setMessage(null), 5000); // Auto-hide after 5 seconds
+  };
 
   const fetchData = async () => {
     try {
@@ -225,6 +245,7 @@ export default function SchedulerManager() {
       setTasks(data.tasks);
     } catch (error) {
       console.error('Failed to fetch scheduler data:', error);
+      showMessage('error', 'Failed to load scheduler data');
     } finally {
       setLoading(false);
     }
@@ -243,26 +264,59 @@ export default function SchedulerManager() {
       });
       
       if (response.ok) {
+        showMessage('success', `Scheduler ${action === 'start' ? 'started' : 'stopped'} successfully`);
         fetchData();
+      } else {
+        const error = await response.json();
+        showMessage('error', error.error || `Failed to ${action} scheduler`);
       }
     } catch (error) {
       console.error(`Failed to ${action} scheduler:`, error);
+      showMessage('error', `Failed to ${action} scheduler`);
     }
   };
 
   const handleTaskAction = async (taskId: string, action: 'trigger' | 'toggle') => {
     try {
-      const response = await fetch('/api/admin/scheduler', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ action, taskId })
-      });
-      
-      if (response.ok) {
-        fetchData();
+      if (action === 'trigger') {
+        const response = await fetch('/api/admin/scheduler', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, taskId })
+        });
+        
+        if (response.ok) {
+          showMessage('success', 'Task triggered successfully');
+          fetchData();
+        } else {
+          const error = await response.json();
+          showMessage('error', error.error || 'Failed to trigger task');
+        }
+      } else if (action === 'toggle') {
+        const task = tasks.find(t => t.id === taskId);
+        const newEnabledStatus = !task?.enabled;
+        
+        const response = await fetch('/api/admin/scheduler', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            taskId, 
+            updates: { enabled: newEnabledStatus } 
+          })
+        });
+        
+        if (response.ok) {
+          const status = newEnabledStatus ? 'enabled' : 'disabled';
+          showMessage('success', `Task ${status} successfully`);
+          fetchData();
+        } else {
+          const error = await response.json();
+          showMessage('error', error.error || 'Failed to toggle task');
+        }
       }
     } catch (error) {
       console.error(`Failed to ${action} task:`, error);
+      showMessage('error', `Failed to ${action} task`);
     }
   };
 
@@ -275,16 +329,64 @@ export default function SchedulerManager() {
       });
       
       if (response.ok) {
+        showMessage('success', 'Schedule updated successfully');
         fetchData();
         setEditingTask(null);
+      } else {
+        const error = await response.json();
+        showMessage('error', error.error || 'Failed to update schedule');
       }
     } catch (error) {
       console.error('Failed to update task:', error);
+      showMessage('error', 'Failed to update schedule');
     }
   };
 
   const formatDate = (date: Date | string) => {
-    return new Date(date).toLocaleString();
+    try {
+      const dateObj = new Date(date);
+      
+      // Check if date is valid
+      if (isNaN(dateObj.getTime()) || dateObj.getTime() <= 0) {
+        return 'Invalid date';
+      }
+      
+      const now = new Date();
+      const diffMs = dateObj.getTime() - now.getTime();
+      const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      
+      // If it's within the next 24 hours, show relative time
+      if (diffMs > 0 && diffMs < 24 * 60 * 60 * 1000) {
+        if (diffHours === 0) {
+          const diffMinutes = Math.floor(diffMs / (1000 * 60));
+          return `in ${diffMinutes} minute${diffMinutes !== 1 ? 's' : ''}`;
+        }
+        return `in ${diffHours} hour${diffHours !== 1 ? 's' : ''}`;
+      }
+      
+      // If it's within the next 7 days, show day and time
+      if (diffMs > 0 && diffDays < 7) {
+        return dateObj.toLocaleDateString('en-US', { 
+          weekday: 'short',
+          month: 'short', 
+          day: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit'
+        });
+      }
+      
+      // Otherwise show full date
+      return dateObj.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    } catch (error) {
+      return 'Invalid date';
+    }
   };
 
   const getStatusColor = (enabled: boolean) => {
@@ -309,22 +411,44 @@ export default function SchedulerManager() {
         </div>
         <div className="flex gap-2">
           {status?.isRunning ? (
-            <Button onClick={() => handleSchedulerAction('stop')} variant="outline" className="text-red-600 border-red-200 hover:bg-red-50">
-              <Pause className="w-4 h-4 mr-2" />
+            <Button 
+              onClick={() => handleSchedulerAction('stop')} 
+              variant="outline" 
+              leftIcon={<Pause className="w-4 h-4" />}
+              className="text-red-600 border-red-200 hover:bg-red-50"
+            >
               Stop Scheduler
             </Button>
           ) : (
-            <Button onClick={() => handleSchedulerAction('start')} className="bg-green-600 hover:bg-green-700 text-white">
-              <Play className="w-4 h-4 mr-2" />
+            <Button 
+              onClick={() => handleSchedulerAction('start')} 
+              leftIcon={<Play className="w-4 h-4" />}
+              className="bg-green-600 hover:bg-green-700 text-white"
+            >
               Start Scheduler
             </Button>
           )}
-          <Button onClick={fetchData} variant="outline" className="text-gray-600 border-gray-200 hover:bg-gray-50">
-            <RefreshCw className="w-4 h-4 mr-2" />
+          <Button 
+            onClick={fetchData} 
+            variant="outline" 
+            leftIcon={<RefreshCw className="w-4 h-4" />}
+            className="text-gray-600 border-gray-200 hover:bg-gray-50"
+          >
             Refresh
           </Button>
         </div>
       </div>
+
+      {/* Message */}
+      {message && (
+        <div className={`p-4 rounded-lg ${
+          message.type === 'success' 
+            ? 'bg-green-50 text-green-800 border border-green-200' 
+            : 'bg-red-50 text-red-800 border border-red-200'
+        }`}>
+          {message.text}
+        </div>
+      )}
 
       {/* Status Overview */}
       <Card className="p-6">
@@ -343,7 +467,7 @@ export default function SchedulerManager() {
           </div>
           <div className="text-center">
             <div className="text-2xl font-bold text-gray-900">
-              {status?.nextTask ? formatDate(status.nextTask.nextRun).split(',')[0] : 'None'}
+              {status?.nextTask ? formatDate(status.nextTask.nextRun) : 'No tasks scheduled'}
             </div>
             <div className="text-sm text-gray-600">Next Task</div>
           </div>
@@ -396,29 +520,32 @@ export default function SchedulerManager() {
                       onClick={() => setEditingTask(task.id)}
                       variant="outline"
                       size="sm"
+                      leftIcon={<Edit className="w-4 h-4" />}
                       className="text-blue-600 border-blue-200 hover:bg-blue-50"
                       title="Edit schedule"
                     >
-                      <Edit className="w-4 h-4" />
+                      Edit
                     </Button>
                     <Button
                       onClick={() => handleTaskAction(task.id, 'trigger')}
                       variant="outline"
                       size="sm"
+                      leftIcon={<Play className="w-4 h-4" />}
                       className="text-green-600 border-green-200 hover:bg-green-50"
                       disabled={task.isRunning}
                       title="Run task now"
                     >
-                      <Play className="w-4 h-4" />
+                      Run
                     </Button>
                     <Button
                       onClick={() => handleTaskAction(task.id, 'toggle')}
                       variant="outline"
                       size="sm"
+                      leftIcon={task.enabled ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
                       className={task.enabled ? 'text-red-600 border-red-200 hover:bg-red-50' : 'text-green-600 border-green-200 hover:bg-green-50'}
                       title={task.enabled ? 'Disable task' : 'Enable task'}
                     >
-                      {task.enabled ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
+                      {task.enabled ? 'Disable' : 'Enable'}
                     </Button>
                   </div>
                 </div>
