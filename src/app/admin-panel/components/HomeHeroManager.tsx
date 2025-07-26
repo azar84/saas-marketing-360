@@ -220,6 +220,7 @@ const HomeHeroManager: React.FC = () => {
   const handleSave = async () => {
     setSaving(true);
     try {
+      console.log('Saving hero data:', heroData);
       const response = await fetch('/api/admin/home-hero', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -230,11 +231,17 @@ const HomeHeroManager: React.FC = () => {
         const result = await response.json();
         // Handle the new API response format
         if (result.success && result.data) {
-          // Ensure trustIndicators is always an array
+          console.log('Fetched hero data from API:', result.data);
+          // Ensure trustIndicators is always an array and preserve background image fields
           const heroData = {
             ...result.data,
+            backgroundColor: result.data.backgroundColor || '#FFFFFF',
+            backgroundImage: result.data.backgroundImage || '',
+            backgroundSize: result.data.backgroundSize || 'cover',
+            backgroundOverlay: result.data.backgroundOverlay || '',
             trustIndicators: result.data.trustIndicators || []
           };
+          console.log('Processed hero data:', heroData);
           setHeroData(heroData);
           setMessage({ type: 'success', text: result.message || 'Hero section updated successfully!' });
         } else {
@@ -602,7 +609,9 @@ const HomeHeroManager: React.FC = () => {
                     
                     <MediaSelector
                       onChange={(media: any) => {
+                        console.log('MediaSelector onChange called with:', media);
                         if (media && !Array.isArray(media)) {
+                          console.log('Setting background image to:', media.publicUrl);
                           setHeroData(prev => ({ 
                             ...prev, 
                             backgroundImage: media.publicUrl

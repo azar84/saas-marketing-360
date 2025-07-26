@@ -590,6 +590,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
 
 
 
+  // Debug logging
+  console.log('HeroSection rendering with heroData:', heroData);
+  console.log('Background image:', heroData?.backgroundImage);
+  console.log('Background size:', heroData?.backgroundSize);
+
   return (
     <motion.section 
       ref={heroRef}
