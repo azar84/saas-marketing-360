@@ -17,7 +17,8 @@ import {
   Search,
   Calendar,
   Hash,
-  ArrowUpDown
+  ArrowUpDown,
+  ExternalLink
 } from 'lucide-react';
 
 interface Page {
@@ -334,6 +335,15 @@ export default function PagesManager() {
                 </div>
 
                 <div className="flex items-center gap-2 ml-4">
+                  <Button
+                    onClick={() => window.open(`/${page.slug}`, '_blank')}
+                    variant="outline"
+                    size="sm"
+                    className="text-green-600 border-green-200 hover:bg-green-50"
+                    title="View page in frontend"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                  </Button>
                   <Button
                     onClick={() => handleEdit(page)}
                     variant="outline"
