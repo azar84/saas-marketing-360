@@ -38,46 +38,6 @@ class AppScheduler {
       },
       enabled: true
     });
-
-    // Database cleanup task - runs weekly on Sunday at 3 AM UTC
-    this.addTask({
-      id: 'db-cleanup',
-      name: 'Database Cleanup and Maintenance',
-      cronExpression: '0 3 * * 0', // Weekly on Sunday at 3 AM UTC
-      task: async () => {
-        try {
-          console.log('🕐 [Scheduler] Starting database cleanup...');
-          // Add database cleanup logic here
-          // - Clean old logs
-          // - Optimize tables
-          // - Archive old data
-          console.log('✅ [Scheduler] Database cleanup completed');
-        } catch (error) {
-          console.error('❌ [Scheduler] Database cleanup failed:', error);
-        }
-      },
-      enabled: true
-    });
-
-    // Analytics aggregation task - runs daily at 1 AM UTC
-    this.addTask({
-      id: 'analytics-aggregation',
-      name: 'Analytics Data Aggregation',
-      cronExpression: '0 1 * * *', // Daily at 1 AM UTC
-      task: async () => {
-        try {
-          console.log('🕐 [Scheduler] Starting analytics aggregation...');
-          // Add analytics aggregation logic here
-          // - Aggregate daily stats
-          // - Generate reports
-          // - Update dashboards
-          console.log('✅ [Scheduler] Analytics aggregation completed');
-        } catch (error) {
-          console.error('❌ [Scheduler] Analytics aggregation failed:', error);
-        }
-      },
-      enabled: true
-    });
   }
 
   /**
@@ -107,13 +67,25 @@ class AppScheduler {
   }
 
   /**
-   * Enable or disable a task
+   * Set task enabled/disabled status
    */
   setTaskEnabled(taskId: string, enabled: boolean): boolean {
     const task = this.tasks.get(taskId);
     if (task) {
       task.enabled = enabled;
-      console.log(`🔧 [Scheduler] ${enabled ? 'Enabled' : 'Disabled'} task: ${taskId}`);
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Update task cron expression
+   */
+  updateTaskCron(taskId: string, cronExpression: string): boolean {
+    const task = this.tasks.get(taskId);
+    if (task) {
+      task.cronExpression = cronExpression;
+      task.nextRun = this.calculateNextRun(cronExpression);
       return true;
     }
     return false;

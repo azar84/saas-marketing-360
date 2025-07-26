@@ -8,24 +8,21 @@ export async function GET(request: NextRequest) {
     const tasks = scheduler.getTasks();
 
     return NextResponse.json({
-      success: true,
-      data: {
-        status,
-        tasks: tasks.map(task => ({
-          id: task.id,
-          name: task.name,
-          cronExpression: task.cronExpression,
-          enabled: task.enabled,
-          isRunning: task.isRunning,
-          lastRun: task.lastRun,
-          nextRun: task.nextRun
-        }))
-      }
+      status,
+      tasks: tasks.map(task => ({
+        id: task.id,
+        name: task.name,
+        cronExpression: task.cronExpression,
+        enabled: task.enabled,
+        isRunning: task.isRunning,
+        lastRun: task.lastRun,
+        nextRun: task.nextRun
+      }))
     });
   } catch (error) {
     console.error('Failed to get scheduler status:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to get scheduler status' },
+      { error: 'Failed to get scheduler status' },
       { status: 500 }
     );
   }
@@ -40,49 +37,40 @@ export async function POST(request: NextRequest) {
     switch (action) {
       case 'start':
         scheduler.start();
-        return NextResponse.json({
-          success: true,
-          message: 'Scheduler started successfully'
-        });
+        return NextResponse.json({ success: true });
 
       case 'stop':
         scheduler.stop();
-        return NextResponse.json({
-          success: true,
-          message: 'Scheduler stopped successfully'
-        });
+        return NextResponse.json({ success: true });
 
       case 'trigger':
         if (!taskId) {
           return NextResponse.json(
-            { success: false, message: 'Task ID is required' },
+            { error: 'Task ID is required' },
             { status: 400 }
           );
         }
         
         const triggered = await scheduler.triggerTask(taskId);
         if (triggered) {
-          return NextResponse.json({
-            success: true,
-            message: `Task ${taskId} triggered successfully`
-          });
+          return NextResponse.json({ success: true });
         } else {
           return NextResponse.json(
-            { success: false, message: `Task ${taskId} not found or disabled` },
+            { error: `Task ${taskId} not found or disabled` },
             { status: 404 }
           );
         }
 
       default:
         return NextResponse.json(
-          { success: false, message: 'Invalid action' },
+          { error: 'Invalid action' },
           { status: 400 }
         );
     }
   } catch (error) {
     console.error('Failed to execute scheduler action:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to execute scheduler action' },
+      { error: 'Failed to execute scheduler action' },
       { status: 500 }
     );
   }
@@ -92,11 +80,11 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
-    const { taskId, enabled, cronExpression } = body;
+    const { taskId, updates } = body;
 
     if (!taskId) {
       return NextResponse.json(
-        { success: false, message: 'Task ID is required' },
+        { error: 'Task ID is required' },
         { status: 400 }
       );
     }
@@ -104,25 +92,26 @@ export async function PUT(request: NextRequest) {
     const task = scheduler.getTask(taskId);
     if (!task) {
       return NextResponse.json(
-        { success: false, message: 'Task not found' },
+        { error: 'Task not found' },
         { status: 404 }
       );
     }
 
-    if (enabled !== undefined) {
-      scheduler.setTaskEnabled(taskId, enabled);
+    // Update enabled status
+    if (updates.enabled !== undefined) {
+      scheduler.setTaskEnabled(taskId, updates.enabled);
     }
 
-    // Note: Updating cron expression would require re-adding the task
-    // For now, we'll just return success
-    return NextResponse.json({
-      success: true,
-      message: 'Task updated successfully'
-    });
+    // Update cron expression
+    if (updates.cronExpression) {
+      scheduler.updateTaskCron(taskId, updates.cronExpression);
+    }
+
+    return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Failed to update task:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to update task' },
+      { error: 'Failed to update task' },
       { status: 500 }
     );
   }
