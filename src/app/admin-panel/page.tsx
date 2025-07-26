@@ -25,7 +25,8 @@ import {
   Zap,
   MessageSquare,
   Mail,
-  LogOut
+  LogOut,
+  Clock
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -54,11 +55,12 @@ import SEOManager from './components/SEOManager';
 import ScriptSectionManager from './components/ScriptSectionManager';
 import NewsletterManager from './components/NewsletterManager';
 import UserManagement from './components/UserManagement';
+import SchedulerManager from './components/SchedulerManager';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-type Section = 'dashboard' | 'pages' | 'page-builder' | 'home-hero' | 'hero-sections' | 'features-management' | 'media-sections' | 'media-library' | 'pricing' | 'testimonials' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'html-sections' | 'script-installation' | 'menu-management' | 'seo-manager' | 'users' | 'analytics' | 'site-settings' | 'cta-manager' | 'design-system';
+type Section = 'dashboard' | 'pages' | 'page-builder' | 'home-hero' | 'hero-sections' | 'features-management' | 'media-sections' | 'media-library' | 'pricing' | 'testimonials' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'html-sections' | 'script-installation' | 'menu-management' | 'seo-manager' | 'users' | 'analytics' | 'site-settings' | 'cta-manager' | 'design-system' | 'scheduler';
 
 const navigation = [
   { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard, color: 'text-blue-600' },
@@ -81,6 +83,7 @@ const navigation = [
   { id: 'testimonials', name: 'Testimonials', icon: Users, color: 'text-indigo-600' },
   { id: 'users', name: 'Users', icon: Users, color: 'text-pink-600' },
   { id: 'analytics', name: 'Analytics', icon: BarChart3, color: 'text-emerald-600' },
+  { id: 'scheduler', name: 'Scheduler', icon: Clock, color: 'text-orange-600' },
   { id: 'design-system', name: 'Design System', icon: Layers, color: 'text-blue-600' },
   { id: 'site-settings', name: 'Site Settings', icon: Settings, color: 'text-gray-600' },
 ];
@@ -313,6 +316,12 @@ export default function AdminPanel() {
                 Analytics dashboard coming soon...
               </p>
             </div>
+          </div>
+        );
+      case 'scheduler':
+        return (
+          <div className="p-8 space-y-8">
+            <SchedulerManager />
           </div>
         );
       case 'dashboard':

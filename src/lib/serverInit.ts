@@ -1,4 +1,5 @@
 import { prisma } from './db';
+import scheduler from './scheduler';
 
 /**
  * Initialize server configuration by loading settings from database
@@ -29,6 +30,14 @@ export async function initializeServerConfig() {
     //   process.env.NEXT_PUBLIC_BASE_URL = settings.baseUrl;
     //   console.log(`✅ Base URL set from database: ${settings.baseUrl}`);
     // }
+    
+    // Start the built-in scheduler
+    try {
+      scheduler.start();
+      console.log('✅ Built-in scheduler started successfully');
+    } catch (error) {
+      console.error('❌ Failed to start scheduler:', error);
+    }
     
     console.log('✅ Server configuration initialized');
     
