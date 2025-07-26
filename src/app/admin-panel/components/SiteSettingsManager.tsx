@@ -1093,15 +1093,15 @@ export default function SiteSettingsManager() {
               </div>
 
               <div className="space-y-4">
-                <div className="flex items-center space-x-3">
+                <div className="flex items-center">
                   <input
                     type="checkbox"
                     id="smtpEnabled"
                     checked={settings.smtpEnabled || false}
                     onChange={(e) => handleEmailSettingChange('smtpEnabled', e.target.checked)}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    className="h-4 w-4 text-blue-600 bg-gray-200 border-black rounded focus:ring-blue-500 focus:ring-2 checked:bg-blue-600 checked:border-blue-600"
                   />
-                  <label htmlFor="smtpEnabled" className="text-sm font-medium text-gray-700">
+                  <label htmlFor="smtpEnabled" className="ml-2 block text-sm text-gray-700">
                     Enable SMTP Email Sending
                   </label>
                 </div>
@@ -1132,15 +1132,15 @@ export default function SiteSettingsManager() {
                       />
                     </div>
 
-                    <div className="flex items-center space-x-3">
+                    <div className="flex items-center">
                       <input
                         type="checkbox"
                         id="smtpSecure"
                         checked={settings.smtpSecure || false}
                         onChange={(e) => handleEmailSettingChange('smtpSecure', e.target.checked)}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                        className="h-4 w-4 text-blue-600 bg-gray-200 border-black rounded focus:ring-blue-500 focus:ring-2 checked:bg-blue-600 checked:border-blue-600"
                       />
-                      <label htmlFor="smtpSecure" className="text-sm font-medium text-gray-700">
+                      <label htmlFor="smtpSecure" className="ml-2 block text-sm text-gray-700">
                         Use SSL/TLS
                       </label>
                     </div>
