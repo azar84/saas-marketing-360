@@ -48,46 +48,11 @@ import {
 import { Button, Input } from '@/components/ui';
 import MediaSelector from '@/components/ui/MediaSelector';
 import { useDesignSystem } from '@/hooks/useDesignSystem';
-
-// Available icons for trust indicators and CTA buttons
-const availableIcons = [
-  { name: 'Shield', icon: Shield, label: 'Shield' },
-  { name: 'Clock', icon: Clock, label: 'Clock' },
-  { name: 'Code', icon: Code, label: 'Code' },
-  { name: 'Globe', icon: Globe, label: 'Globe' },
-  { name: 'Zap', icon: Zap, label: 'Lightning' },
-  { name: 'Star', icon: Star, label: 'Star' },
-  { name: 'Award', icon: Award, label: 'Award' },
-  { name: 'Users', icon: Users, label: 'Users' },
-  { name: 'TrendingUp', icon: TrendingUp, label: 'Trending Up' },
-  { name: 'Heart', icon: Heart, label: 'Heart' },
-  { name: 'Sparkles', icon: Sparkles, label: 'Sparkles' },
-  { name: 'Play', icon: Play, label: 'Play' },
-  { name: 'ArrowRight', icon: ArrowRight, label: 'Arrow Right' },
-  { name: 'Download', icon: Download, label: 'Download' },
-  { name: 'ExternalLink', icon: ExternalLink, label: 'External Link' },
-  { name: 'Mail', icon: Mail, label: 'Mail' },
-  { name: 'Phone', icon: Phone, label: 'Phone' },
-  { name: 'MessageSquare', icon: MessageSquare, label: 'Message' },
-  { name: 'Video', icon: Video, label: 'Video' },
-  { name: 'Calendar', icon: Calendar, label: 'Calendar' },
-  { name: 'BookOpen', icon: BookOpen, label: 'Book' },
-  { name: 'Gift', icon: Gift, label: 'Gift' },
-  { name: 'Rocket', icon: Rocket, label: 'Rocket' },
-  { name: 'Trophy', icon: Trophy, label: 'Trophy' },
-  { name: 'Lock', icon: Lock, label: 'Lock' },
-  { name: 'Check', icon: Check, label: 'Check' },
-  { name: 'MessageCircle', icon: MessageCircle, label: 'Message Circle' },
-  { name: 'Smartphone', icon: Smartphone, label: 'Smartphone' },
-  { name: 'MapPin', icon: MapPin, label: 'Map Pin' },
-  { name: 'Settings', icon: Settings, label: 'Settings' },
-  { name: 'Target', icon: Target, label: 'Target' },
-  { name: 'Palette', icon: Palette, label: 'Palette' }
-];
+import UniversalIconPicker from '@/components/ui/UniversalIconPicker';
 
 interface TrustIndicator {
   id?: number;
-  iconName: string;
+  iconName: string; // This will now store the full format: "library:iconName"
   text: string;
   sortOrder: number;
   isVisible: boolean;
@@ -288,7 +253,7 @@ const HomeHeroManager: React.FC = () => {
 
   const addTrustIndicator = () => {
     const newIndicator: TrustIndicator = {
-      iconName: 'Star',
+      iconName: 'lucide:Star',
       text: 'New Feature',
       sortOrder: (heroData.trustIndicators || []).length,
       isVisible: true
@@ -316,8 +281,40 @@ const HomeHeroManager: React.FC = () => {
   };
 
   const getIconComponent = (iconName: string) => {
-    const iconData = availableIcons.find(icon => icon.name === iconName);
-    return iconData ? iconData.icon : Shield;
+    if (!iconName) return Shield;
+    
+    // Handle new format: "library:iconName"
+    if (iconName.includes(':')) {
+      const [library, name] = iconName.split(':');
+      
+      // Import the appropriate icon library
+      let iconLibrary;
+      switch (library) {
+        case 'lucide':
+          iconLibrary = require('lucide-react');
+          break;
+        case 'react-icons-fa':
+          iconLibrary = require('react-icons/fa');
+          break;
+        case 'react-icons-md':
+          iconLibrary = require('react-icons/md');
+          break;
+        case 'react-icons-io':
+          iconLibrary = require('react-icons/io');
+          break;
+        case 'react-icons-bi':
+          iconLibrary = require('react-icons/bi');
+          break;
+        default:
+          return Shield;
+      }
+      
+      return iconLibrary[name] || Shield;
+    }
+    
+    // Fallback to old format for backward compatibility
+    // This part of the code is no longer needed as UniversalIconPicker handles all icons
+    return Shield; 
   };
 
   const getSelectedCTA = (ctaId: number | null) => {
@@ -345,10 +342,10 @@ const HomeHeroManager: React.FC = () => {
       <div className="space-y-8">
 
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-3xl font-bold text-gray-900">Home Page Hero</h2>
-            <p className="text-gray-600 mt-1">Manage your homepage hero section content and CTAs</p>
+            <h2 className="text-3xl font-bold" style={{ color: designSystem?.textPrimary || '#000000' }}>Home Page Hero</h2>
+            <p className="mt-1" style={{ color: designSystem?.textSecondary || '#666666' }}>Manage your homepage hero section content and CTAs</p>
           </div>
           <div className="flex items-center gap-3">
             <Button
@@ -412,11 +409,11 @@ const HomeHeroManager: React.FC = () => {
             style={{ backgroundColor: heroData.backgroundColor }}
           >
             <div className="max-w-4xl mx-auto">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4 leading-tight">
-                {heroData.heading}
+              <h1 className="text-4xl font-bold mb-4 leading-tight" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                {heroData.heading || 'Your Hero Heading'}
               </h1>
-              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
-                {heroData.subheading}
+              <p className="text-lg mb-8 leading-relaxed" style={{ color: designSystem?.textSecondary || '#666666' }}>
+                {heroData.subheading || 'Your compelling subheading that explains your value proposition and encourages visitors to take action.'}
               </p>
               <div className="flex flex-wrap gap-4 mb-8">
                 {heroData.primaryCtaId && heroData.primaryCta && (
@@ -442,7 +439,7 @@ const HomeHeroManager: React.FC = () => {
                 {(heroData.trustIndicators || []).filter(indicator => indicator.isVisible).map((indicator, index) => {
                   const IconComponent = getIconComponent(indicator.iconName);
                   return (
-                    <div key={index} className="flex items-center gap-2 text-gray-600">
+                    <div key={index} className="flex items-center gap-2" style={{ color: designSystem?.textSecondary || '#666666' }}>
                       <IconComponent className="w-4 h-4 text-green-600" />
                       <span className="text-sm font-medium">{indicator.text}</span>
                     </div>
@@ -457,45 +454,49 @@ const HomeHeroManager: React.FC = () => {
             {/* Main Content */}
             <div className="space-y-6">
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Main Content</h3>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: designSystem?.textPrimary || '#000000' }}>Main Content</h3>
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Heading
+                    <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      Hero Heading
                     </label>
-                    <textarea
+                    <Input
+                      type="text"
                       value={heroData.heading}
-                      onChange={(e) => setHeroData(prev => ({ ...prev, heading: e.target.value }))}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent resize-none"
-                      rows={3}
-                      placeholder="Enter main heading..."
+                      onChange={(e) => setHeroData({ ...heroData, heading: e.target.value })}
+                      placeholder="Enter your hero heading"
+                      className="w-full"
                     />
                   </div>
-
+                  
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Subheading
+                    <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      Hero Subheading
                     </label>
                     <textarea
                       value={heroData.subheading}
-                      onChange={(e) => setHeroData(prev => ({ ...prev, subheading: e.target.value }))}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent resize-none"
+                      onChange={(e) => setHeroData({ ...heroData, subheading: e.target.value })}
+                      placeholder="Enter your hero subheading"
                       rows={3}
-                      placeholder="Enter subheading..."
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                      style={{ 
+                        color: designSystem?.textPrimary || '#000000',
+                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                      }}
                     />
                   </div>
-
-                  <div className="flex items-center gap-3">
+                  
+                  <div className="flex items-center">
                     <input
                       type="checkbox"
                       id="heroActive"
                       checked={heroData.isActive}
-                      onChange={(e) => setHeroData(prev => ({ ...prev, isActive: e.target.checked }))}
+                      onChange={(e) => setHeroData({ ...heroData, isActive: e.target.checked })}
                       className="w-4 h-4 text-[#5243E9] border-gray-300 rounded focus:ring-[#5243E9]"
                     />
-                    <label htmlFor="heroActive" className="text-sm font-medium text-gray-700">
-                      Hero section is active
+                    <label htmlFor="heroActive" className="text-sm font-medium ml-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      Enable Hero Section
                     </label>
                   </div>
                 </div>
@@ -508,19 +509,19 @@ const HomeHeroManager: React.FC = () => {
                     <Palette className="w-5 h-5 text-indigo-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-gray-900">Styling</h3>
-                    <p className="text-gray-600 text-sm">Customize the hero section appearance</p>
+                    <h3 className="text-lg font-semibold" style={{ color: designSystem?.textPrimary || '#000000' }}>Styling</h3>
+                    <p className="text-sm" style={{ color: designSystem?.textSecondary || '#666666' }}>Customize the hero section appearance</p>
                   </div>
                 </div>
 
                 <div className="space-y-6">
                   {/* Background Color */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3">
+                    <label className="block text-sm font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>
                       Background Color
                     </label>
-                    <p className="text-xs text-gray-500 mb-4">
-                      Select a background color for the hero section.
+                    <p className="text-xs mb-4" style={{ color: designSystem?.textMuted || '#999999' }}>
+                      Choose a background color for your hero section. Use hex codes (e.g., #ffffff) or CSS color names.
                     </p>
                     
                     {/* Design System Color Palette */}
@@ -545,7 +546,7 @@ const HomeHeroManager: React.FC = () => {
                               </div>
                             )}
                           </div>
-                          <span className="text-xs text-gray-600 block truncate">
+                          <span className="text-xs block truncate" style={{ color: designSystem?.textSecondary || '#666666' }}>
                             {colorOption.name}
                           </span>
                         </div>
@@ -572,6 +573,10 @@ const HomeHeroManager: React.FC = () => {
                           onChange={(e) => setHeroData(prev => ({ ...prev, backgroundColor: e.target.value }))}
                           className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent font-mono text-sm"
                           placeholder="#FFFFFF"
+                          style={{ 
+                            color: designSystem?.textPrimary || '#000000',
+                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          }}
                         />
                       </div>
                     </div>
@@ -581,105 +586,87 @@ const HomeHeroManager: React.FC = () => {
 
               {/* Creatives Configuration */}
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Creatives Configuration</h3>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: designSystem?.textPrimary || '#000000' }}>Creatives Configuration</h3>
                 
-                <div className="space-y-6">
-                                    {/* Type */}
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Type
-                      </label>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      Creatives Type
+                    </label>
                     <select
-                      value={heroData.animationType || 'video'}
-                      onChange={(e) => {
-                        const newType = e.target.value;
-                        let newAnimationData = { ...heroData.animationData };
-                        
-                        // Initialize animation data based on type
-                        switch (newType) {
-                          case 'html':
-                            newAnimationData = { htmlContent: '' };
-                            break;
-                          case 'video':
-                            newAnimationData = { videoUrl: '', autoplay: false, loop: false };
-                            break;
-                          case 'script':
-                            newAnimationData = { scriptContent: '' };
-                            break;
-                          case 'image':
-                            newAnimationData = { imageUrl: '', imageAlt: '', imageItem: null };
-                            break;
-                          default:
-                            newAnimationData = {};
-                        }
-                        
-                        setHeroData(prev => ({
-                          ...prev,
-                          animationType: newType,
-                          animationData: newAnimationData
-                        }));
+                      value={heroData.animationType || ''}
+                      onChange={(e) => setHeroData({ ...heroData, animationType: e.target.value })}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      style={{ 
+                        color: designSystem?.textPrimary || '#000000',
+                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
                       }}
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent"
                     >
+                      <option value="">No Animation</option>
                       <option value="video">Video</option>
                       <option value="html">HTML Content</option>
                       <option value="script">Custom Script</option>
                       <option value="image">Image</option>
                     </select>
                   </div>
-
-
-
+                  
                   {heroData.animationType === 'video' && (
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <h4 className="font-medium text-gray-900 mb-3">Video Configuration</h4>
-                      <div className="space-y-3">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Video URL
-                          </label>
-                          <input
-                            type="url"
-                            value={heroData.animationData?.videoUrl || ''}
-                            onChange={(e) => setHeroData(prev => ({
-                              ...prev,
-                              animationData: { ...prev.animationData, videoUrl: e.target.value }
-                            }))}
-                            placeholder="https://youtu.be/VIDEO_ID or https://example.com/video.mp4"
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent"
-                          />
-                          <p className="text-xs text-gray-500 mt-1">
-                            Supports YouTube URLs (e.g., https://youtu.be/VIDEO_ID) and direct video files (.mp4, .webm, etc.)
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-2">
+                    <div className="space-y-4">
+                      <h4 className="font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>Video Configuration</h4>
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                          Video URL
+                        </label>
+                        <input
+                          type="url"
+                          value={heroData.animationData?.videoUrl || ''}
+                          onChange={(e) => setHeroData({
+                            ...heroData,
+                            animationData: { ...heroData.animationData, videoUrl: e.target.value }
+                          })}
+                          placeholder="https://example.com/video.mp4"
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          style={{ 
+                            color: designSystem?.textPrimary || '#000000',
+                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          }}
+                        />
+                        <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
+                          Enter the URL of your video file (MP4, WebM, etc.)
+                        </p>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex items-center">
                           <input
                             type="checkbox"
                             id="autoplay"
                             checked={heroData.animationData?.autoplay || false}
-                            onChange={(e) => setHeroData(prev => ({
-                              ...prev,
-                              animationData: { ...prev.animationData, autoplay: e.target.checked }
-                            }))}
-                            className="rounded border-gray-300"
+                            onChange={(e) => setHeroData({
+                              ...heroData,
+                              animationData: { ...heroData.animationData, autoplay: e.target.checked }
+                            })}
+                            className="w-4 h-4 text-[#5243E9] border-gray-300 rounded focus:ring-[#5243E9]"
                           />
-                          <label htmlFor="autoplay" className="text-sm text-gray-700">
-                            Autoplay
+                          <label htmlFor="autoplay" className="text-sm ml-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                            Autoplay video
                           </label>
                         </div>
-                        <div className="flex items-center gap-2">
+                        
+                        <div className="flex items-center">
                           <input
                             type="checkbox"
                             id="loop"
                             checked={heroData.animationData?.loop || false}
-                            onChange={(e) => setHeroData(prev => ({
-                              ...prev,
-                              animationData: { ...prev.animationData, loop: e.target.checked }
-                            }))}
-                            className="rounded border-gray-300"
+                            onChange={(e) => setHeroData({
+                              ...heroData,
+                              animationData: { ...heroData.animationData, loop: e.target.checked }
+                            })}
+                            className="w-4 h-4 text-[#5243E9] border-gray-300 rounded focus:ring-[#5243E9]"
                           />
-                          <label htmlFor="loop" className="text-sm text-gray-700">
-                            Loop
+                          <label htmlFor="loop" className="text-sm ml-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                            Loop video
                           </label>
                         </div>
                       </div>
@@ -687,89 +674,84 @@ const HomeHeroManager: React.FC = () => {
                   )}
 
                   {heroData.animationType === 'html' && (
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <h4 className="font-medium text-gray-900 mb-3">HTML Content</h4>
+                    <div className="space-y-4">
+                      <h4 className="font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>HTML Content</h4>
+                      
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          HTML Code
+                        <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                          HTML Content
                         </label>
                         <textarea
                           value={heroData.animationData?.htmlContent || ''}
-                          onChange={(e) => setHeroData(prev => ({
-                            ...prev,
-                            animationData: { ...prev.animationData, htmlContent: e.target.value }
-                          }))}
+                          onChange={(e) => setHeroData({
+                            ...heroData,
+                            animationData: { ...heroData.animationData, htmlContent: e.target.value }
+                          })}
                           placeholder="<div>Your HTML content here...</div>"
-                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent font-mono text-sm"
                           rows={6}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm"
+                          style={{ 
+                            color: designSystem?.textPrimary || '#000000',
+                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          }}
                         />
                       </div>
                     </div>
                   )}
-
+                  
                   {heroData.animationType === 'script' && (
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <h4 className="font-medium text-gray-900 mb-3">Custom Script</h4>
+                    <div className="space-y-4">
+                      <h4 className="font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>Custom Script</h4>
+                      
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                           JavaScript Code
                         </label>
                         <textarea
                           value={heroData.animationData?.scriptContent || ''}
-                          onChange={(e) => setHeroData(prev => ({
-                            ...prev,
-                            animationData: { ...prev.animationData, scriptContent: e.target.value }
-                          }))}
+                          onChange={(e) => setHeroData({
+                            ...heroData,
+                            animationData: { ...heroData.animationData, scriptContent: e.target.value }
+                          })}
                           placeholder="// Your JavaScript code here..."
-                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent font-mono text-sm"
                           rows={6}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm"
+                          style={{ 
+                            color: designSystem?.textPrimary || '#000000',
+                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          }}
                         />
                       </div>
                     </div>
                   )}
 
                   {heroData.animationType === 'image' && (
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <h4 className="font-medium text-gray-900 mb-3">Image Configuration</h4>
-                      <div className="space-y-3">
+                    <div className="space-y-4">
+                      <h4 className="font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>Image Configuration</h4>
+                      
+                      <div>
+                        <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                          Select Image
+                        </label>
                         <MediaSelector
-                          label="Select Image"
-                          value={heroData.animationData?.imageItem || null}
                           onChange={(media) => {
                             const mediaItem = Array.isArray(media) ? media[0] : media;
-                            setHeroData(prev => ({
-                              ...prev,
+                            setHeroData({
+                              ...heroData,
                               animationData: { 
-                                ...prev.animationData, 
-                                imageItem: mediaItem || null,
+                                ...heroData.animationData, 
                                 imageUrl: mediaItem?.publicUrl || '',
-                                imageAlt: mediaItem?.alt || ''
+                                imageItem: mediaItem
                               }
-                            }));
+                            });
                           }}
+                          value={heroData.animationData?.imageItem || null}
                           allowMultiple={false}
                           acceptedTypes={['image']}
-                          placeholder="Select image from media library"
-                          required
                         />
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Alt Text
-                          </label>
-                          <input
-                            type="text"
-                            value={heroData.animationData?.imageAlt || ''}
-                            onChange={(e) => setHeroData(prev => ({
-                              ...prev,
-                              animationData: { ...prev.animationData, imageAlt: e.target.value }
-                            }))}
-                            placeholder="Image description for accessibility"
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent"
-                          />
-                          <p className="text-xs text-gray-500 mt-1">
-                            This text will be used by screen readers and displayed if the image fails to load.
-                          </p>
-                        </div>
+                        <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
+                          Choose an image to display in your hero section
+                        </p>
                       </div>
                     </div>
                   )}
@@ -778,74 +760,68 @@ const HomeHeroManager: React.FC = () => {
 
               {/* Call-to-Action Buttons */}
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Call-to-Action Buttons</h3>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: designSystem?.textPrimary || '#000000' }}>Call-to-Action Buttons</h3>
                 
                 <div className="space-y-6">
-                  {/* Primary CTA */}
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <h4 className="font-medium text-gray-900 mb-3">Primary CTA Button</h4>
+                  <div>
+                    <h4 className="font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>Primary CTA Button</h4>
                     
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Select CTA Button
+                        <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                          Select Primary CTA
                         </label>
                         <select
                           value={heroData.primaryCtaId || ''}
-                          onChange={(e) => setHeroData(prev => ({ 
-                            ...prev, 
-                            primaryCtaId: e.target.value ? Number(e.target.value) : null 
-                          }))}
-                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent"
+                          onChange={(e) => setHeroData({ ...heroData, primaryCtaId: e.target.value ? parseInt(e.target.value) : null })}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          style={{ 
+                            color: designSystem?.textPrimary || '#000000',
+                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          }}
                         >
-                          <option value="">No CTA Button</option>
+                          <option value="">No Primary CTA</option>
                           {availableCTAs.map(cta => (
-                            <option key={cta.id} value={cta.id}>
-                              {cta.text} ({cta.url})
-                            </option>
+                            <option key={cta.id} value={cta.id}>{cta.text}</option>
                           ))}
                         </select>
                       </div>
+                      
                       {heroData.primaryCtaId && (
-                        <div className="text-sm text-gray-600 bg-gray-100 p-3 rounded">
-                          <p><strong>Selected:</strong> {getSelectedCTA(heroData.primaryCtaId)?.text}</p>
-                          <p><strong>URL:</strong> {getSelectedCTA(heroData.primaryCtaId)?.url}</p>
-                          <p><strong>Style:</strong> {getSelectedCTA(heroData.primaryCtaId)?.style}</p>
+                        <div className="text-sm bg-gray-100 p-3 rounded" style={{ color: designSystem?.textSecondary || '#666666', backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>
+                          <strong>Selected:</strong> {getSelectedCTA(heroData.primaryCtaId)?.text}
                         </div>
                       )}
                     </div>
                   </div>
-
-                  {/* Secondary CTA */}
-                  <div className="p-4 bg-gray-50 rounded-lg">
-                    <h4 className="font-medium text-gray-900 mb-3">Secondary CTA Button</h4>
+                  
+                  <div>
+                    <h4 className="font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>Secondary CTA Button</h4>
                     
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Select CTA Button
+                        <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                          Select Secondary CTA
                         </label>
                         <select
                           value={heroData.secondaryCtaId || ''}
-                          onChange={(e) => setHeroData(prev => ({ 
-                            ...prev, 
-                            secondaryCtaId: e.target.value ? Number(e.target.value) : null 
-                          }))}
-                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent"
+                          onChange={(e) => setHeroData({ ...heroData, secondaryCtaId: e.target.value ? parseInt(e.target.value) : null })}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          style={{ 
+                            color: designSystem?.textPrimary || '#000000',
+                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          }}
                         >
-                          <option value="">No CTA Button</option>
+                          <option value="">No Secondary CTA</option>
                           {availableCTAs.map(cta => (
-                            <option key={cta.id} value={cta.id}>
-                              {cta.text} ({cta.url})
-                            </option>
+                            <option key={cta.id} value={cta.id}>{cta.text}</option>
                           ))}
                         </select>
                       </div>
+                      
                       {heroData.secondaryCtaId && (
-                        <div className="text-sm text-gray-600 bg-gray-100 p-3 rounded">
-                          <p><strong>Selected:</strong> {getSelectedCTA(heroData.secondaryCtaId)?.text}</p>
-                          <p><strong>URL:</strong> {getSelectedCTA(heroData.secondaryCtaId)?.url}</p>
-                          <p><strong>Style:</strong> {getSelectedCTA(heroData.secondaryCtaId)?.style}</p>
+                        <div className="text-sm bg-gray-100 p-3 rounded" style={{ color: designSystem?.textSecondary || '#666666', backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>
+                          <strong>Selected:</strong> {getSelectedCTA(heroData.secondaryCtaId)?.text}
                         </div>
                       )}
                     </div>
@@ -858,7 +834,7 @@ const HomeHeroManager: React.FC = () => {
             <div className="space-y-6">
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Trust Indicators</h3>
+                  <h3 className="text-lg font-semibold" style={{ color: designSystem?.textPrimary || '#000000' }}>Trust Indicators</h3>
                   <Button
                     onClick={addTrustIndicator}
                     size="sm"
@@ -870,71 +846,71 @@ const HomeHeroManager: React.FC = () => {
                 </div>
 
                 <div className="space-y-4">
-                  {(heroData.trustIndicators || []).map((indicator, index) => {
-                    const IconComponent = getIconComponent(indicator.iconName);
-                    return (
-                      <div key={index} className="p-4 bg-gray-50 rounded-lg">
-                        <div className="flex items-center gap-3 mb-3">
-                          <GripVertical className="w-4 h-4 text-gray-400" />
-                          <input
-                            type="checkbox"
-                            checked={indicator.isVisible}
-                            onChange={(e) => updateTrustIndicator(index, 'isVisible', e.target.checked)}
-                            className="w-4 h-4 text-[#5243E9] border-gray-300 rounded focus:ring-[#5243E9]"
+                  {(heroData.trustIndicators || []).map((indicator, index) => (
+                    <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <div className="flex items-center gap-3 mb-3">
+                        <GripVertical className="w-4 h-4" style={{ color: designSystem?.textMuted || '#999999' }} />
+                        <input
+                          type="checkbox"
+                          checked={indicator.isVisible}
+                          onChange={(e) => updateTrustIndicator(index, 'isVisible', e.target.checked)}
+                          className="w-4 h-4 text-[#5243E9] border-gray-300 rounded focus:ring-[#5243E9]"
+                        />
+                        <div className="flex items-center gap-2" style={{ color: designSystem?.textSecondary || '#666666' }}>
+                          {React.createElement(getIconComponent(indicator.iconName), { className: "w-4 h-4" })}
+                          <span className="text-sm font-medium">{indicator.text}</span>
+                        </div>
+                        <Button
+                          onClick={() => removeTrustIndicator(index)}
+                          size="sm"
+                          variant="outline"
+                          className="ml-auto text-red-600 hover:text-red-700 hover:bg-red-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+
+                      <div className="space-y-3">
+                        <div>
+                          <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                            Icon
+                          </label>
+                          <UniversalIconPicker
+                            value={indicator.iconName}
+                            onChange={(iconName) => updateTrustIndicator(index, 'iconName', iconName)}
+                            placeholder="Select an icon..."
+                            className="w-full"
+                            textPrimary={designSystem?.textPrimary || '#000000'}
+                            textSecondary={designSystem?.textSecondary || '#666666'}
+                            textMuted={designSystem?.textMuted || '#999999'}
+                            backgroundPrimary={designSystem?.backgroundPrimary || '#ffffff'}
+                            backgroundSecondary={designSystem?.backgroundSecondary || '#f9fafb'}
                           />
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
-                            <IconComponent className="w-4 h-4" />
-                            <span>Indicator {index + 1}</span>
-                          </div>
-                          <Button
-                            onClick={() => removeTrustIndicator(index)}
-                            size="sm"
-                            variant="outline"
-                            className="ml-auto text-red-600 hover:text-red-700 hover:bg-red-50"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
                         </div>
 
-                        <div className="space-y-3">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Icon
-                            </label>
-                            <select
-                              value={indicator.iconName}
-                              onChange={(e) => updateTrustIndicator(index, 'iconName', e.target.value)}
-                              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent"
-                            >
-                              {availableIcons.map(icon => (
-                                <option key={icon.name} value={icon.name}>
-                                  {icon.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Text
-                            </label>
-                            <input
-                              type="text"
-                              value={indicator.text}
-                              onChange={(e) => updateTrustIndicator(index, 'text', e.target.value)}
-                              className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent"
-                              placeholder="99.9% Uptime"
-                            />
-                          </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                            Text
+                          </label>
+                          <input
+                            type="text"
+                            value={indicator.text}
+                            onChange={(e) => updateTrustIndicator(index, 'text', e.target.value)}
+                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent"
+                            placeholder="99.9% Uptime"
+                            style={{ 
+                              color: designSystem?.textPrimary || '#000000',
+                              backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                            }}
+                          />
                         </div>
                       </div>
-                    );
-                  })}
-
+                    </div>
+                  ))}
+                  
                   {(heroData.trustIndicators || []).length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
-                      <p>No trust indicators added yet.</p>
-                      <p className="text-sm">Click "Add Indicator" to get started.</p>
+                    <div className="text-center py-8" style={{ color: designSystem?.textMuted || '#999999' }}>
+                      No trust indicators added yet. Click "Add Trust Indicator" to get started.
                     </div>
                   )}
                 </div>

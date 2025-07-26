@@ -532,7 +532,7 @@ export const MediaSearchSchema = z.object({
 });
 
 // Page Builder Validation Schemas
-export const SectionTypeEnum = z.enum(['hero', 'home_hero', 'features', 'media', 'testimonials', 'pricing', 'faq', 'form', 'cta', 'html', 'custom']);
+export const SectionTypeEnum = z.enum(['hero', 'home_hero', 'features', 'media', 'testimonials', 'pricing', 'faq', 'form', 'cta', 'html', 'team', 'custom']);
 
 export const CreatePageSectionSchema = z.object({
   pageId: IdSchema,
@@ -551,7 +551,8 @@ export const CreatePageSectionSchema = z.object({
   faqCategoryId: z.number().int().positive().nullable().optional(),
   contactSectionId: z.number().int().positive().nullable().optional(),
   formId: z.number().int().positive().nullable().optional(),
-  htmlSectionId: z.number().int().positive().nullable().optional()
+  htmlSectionId: z.number().int().positive().nullable().optional(),
+  teamSectionId: z.number().int().positive().nullable().optional()
 });
 
 export const UpdatePageSectionSchema = CreatePageSectionSchema.extend({

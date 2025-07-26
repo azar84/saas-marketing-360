@@ -56,11 +56,12 @@ import ScriptSectionManager from './components/ScriptSectionManager';
 import NewsletterManager from './components/NewsletterManager';
 import UserManagement from './components/UserManagement';
 import SchedulerManager from './components/SchedulerManager';
+import TeamSectionsManager from './components/TeamSectionsManager';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-type Section = 'dashboard' | 'pages' | 'page-builder' | 'home-hero' | 'hero-sections' | 'features-management' | 'media-sections' | 'media-library' | 'pricing' | 'testimonials' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'html-sections' | 'script-installation' | 'menu-management' | 'seo-manager' | 'users' | 'analytics' | 'site-settings' | 'cta-manager' | 'design-system' | 'scheduler';
+type Section = 'dashboard' | 'pages' | 'page-builder' | 'home-hero' | 'hero-sections' | 'features-management' | 'media-sections' | 'media-library' | 'pricing' | 'testimonials' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'html-sections' | 'script-installation' | 'menu-management' | 'seo-manager' | 'users' | 'analytics' | 'site-settings' | 'cta-manager' | 'design-system' | 'scheduler' | 'team-sections';
 
 const navigation = [
   { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard, color: 'text-blue-600' },
@@ -70,6 +71,7 @@ const navigation = [
   { id: 'home-hero', name: 'Home Page Hero', icon: Home, color: 'text-rose-600' },
   { id: 'hero-sections', name: 'Hero Sections', icon: Image, color: 'text-purple-600' },
   { id: 'features-management', name: 'Features Management', icon: Star, color: 'text-amber-600' },
+  { id: 'team-sections', name: 'Team Sections', icon: Users, color: 'text-indigo-600' },
   { id: 'media-sections', name: 'Media Sections', icon: Play, color: 'text-red-600' },
   { id: 'media-library', name: 'Media Library', icon: FolderOpen, color: 'text-blue-600' },
   { id: 'pricing', name: 'Pricing Plans', icon: DollarSign, color: 'text-green-600' },
@@ -322,6 +324,12 @@ export default function AdminPanel() {
         return (
           <div className="p-8 space-y-8">
             <SchedulerManager />
+          </div>
+        );
+      case 'team-sections':
+        return (
+          <div className="p-8 space-y-8">
+            <TeamSectionsManager />
           </div>
         );
       case 'dashboard':

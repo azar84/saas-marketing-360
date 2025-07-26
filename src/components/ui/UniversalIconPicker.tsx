@@ -32,6 +32,12 @@ interface UniversalIconPickerProps {
   disabled?: boolean;
   showPreview?: boolean;
   maxHeight?: string;
+  // Design system colors
+  textPrimary?: string;
+  textSecondary?: string;
+  textMuted?: string;
+  backgroundPrimary?: string;
+  backgroundSecondary?: string;
 }
 
 const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
@@ -41,7 +47,12 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
   className = "",
   disabled = false,
   showPreview = true,
-  maxHeight = "400px"
+  maxHeight = "400px",
+  textPrimary = "#000000",
+  textSecondary = "#666666",
+  textMuted = "#999999",
+  backgroundPrimary = "#ffffff",
+  backgroundSecondary = "#f9fafb"
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -181,26 +192,30 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
         disabled={disabled}
         className={`
           w-full flex items-center justify-between px-3 py-2 border rounded-lg
-          bg-white text-left transition-all duration-200
+          text-left transition-all duration-200
           ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:border-gray-400 focus:border-blue-500'}
           ${isOpen ? 'border-blue-500 ring-2 ring-blue-500/20' : 'border-gray-300'}
         `}
+        style={{ 
+          backgroundColor: backgroundPrimary,
+          color: textPrimary
+        }}
       >
         <div className="flex items-center space-x-2 min-w-0 flex-1">
           {CurrentIcon && showPreview && (
-            <CurrentIcon className="w-5 h-5 text-gray-600 flex-shrink-0" />
+            <CurrentIcon className="w-5 h-5 flex-shrink-0" style={{ color: textSecondary }} />
           )}
-          <span className="truncate text-sm">
+          <span className="truncate text-sm" style={{ color: textPrimary }}>
             {value ? value.split(':')[1] : placeholder}
           </span>
         </div>
         <div className="flex items-center space-x-1">
           {CurrentIcon && (
-            <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+            <span className="text-xs px-2 py-1 rounded" style={{ color: textMuted, backgroundColor: backgroundSecondary }}>
               {value?.split(':')[0]}
             </span>
           )}
-          <Search className="w-4 h-4 text-gray-400" />
+          <Search className="w-4 h-4" style={{ color: textMuted }} />
         </div>
       </button>
 
@@ -215,16 +230,20 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
             className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-xl z-50 min-w-[600px] w-max max-w-[800px]"
           >
             {/* Header */}
-            <div className="p-4 border-b border-gray-100">
+            <div className="p-4 border-b border-gray-100" style={{ backgroundColor: backgroundPrimary }}>
               <div className="flex items-center space-x-3 mb-4">
                 <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/4 w-4 h-4 text-gray-400" />
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/4 w-4 h-4" style={{ color: textMuted }} />
                   <input
                     type="text"
                     placeholder="Search all icon libraries..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    style={{ 
+                      color: textPrimary,
+                      backgroundColor: backgroundPrimary
+                    }}
                     autoFocus
                   />
                 </div>
@@ -232,6 +251,7 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
                   type="button"
                   onClick={() => setIsOpen(false)}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  style={{ color: textPrimary }}
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -241,11 +261,15 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
               <div className="flex items-center justify-between">
                 {/* Library Filter */}
                 <div className="flex items-center space-x-2">
-                  <Filter className="w-4 h-4 text-gray-400" />
+                  <Filter className="w-4 h-4" style={{ color: textMuted }} />
                   <select
                     value={selectedLibrary}
                     onChange={(e) => setSelectedLibrary(e.target.value)}
                     className="text-sm border border-gray-200 rounded px-3 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                    style={{ 
+                      color: textPrimary,
+                      backgroundColor: backgroundPrimary
+                    }}
                   >
                     {libraryOptions.map(option => (
                       <option key={option.value} value={option.value}>
@@ -260,14 +284,22 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
                   <button
                     type="button"
                     onClick={() => setViewMode('grid')}
-                    className={`p-2 text-sm ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600'}`}
+                    className={`p-2 text-sm ${viewMode === 'grid' ? 'bg-blue-500 text-white' : ''}`}
+                    style={{ 
+                      backgroundColor: viewMode === 'grid' ? '#3b82f6' : backgroundPrimary,
+                      color: viewMode === 'grid' ? '#ffffff' : textSecondary
+                    }}
                   >
                     <Grid className="w-4 h-4" />
                   </button>
                   <button
                     type="button"
                     onClick={() => setViewMode('list')}
-                    className={`p-2 text-sm ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'bg-white text-gray-600'}`}
+                    className={`p-2 text-sm ${viewMode === 'list' ? 'bg-blue-500 text-white' : ''}`}
+                    style={{ 
+                      backgroundColor: viewMode === 'list' ? '#3b82f6' : backgroundPrimary,
+                      color: viewMode === 'list' ? '#ffffff' : textSecondary
+                    }}
                   >
                     <List className="w-4 h-4" />
                   </button>
@@ -276,7 +308,7 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
 
               {/* Search Stats */}
               {searchTerm && (
-                <div className="mt-3 text-sm text-gray-500">
+                <div className="mt-3 text-sm" style={{ color: textMuted }}>
                   Found {filteredResults.length} icons across all libraries
                 </div>
               )}
@@ -285,7 +317,7 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
             {/* Icons Grid/List */}
             <div 
               className="overflow-y-auto"
-              style={{ maxHeight }}
+              style={{ maxHeight, backgroundColor: backgroundPrimary }}
             >
               {viewMode === 'grid' ? (
                 <div className="grid grid-cols-12 gap-2 p-4">
@@ -298,21 +330,25 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
                         type="button"
                         onClick={() => handleIconSelect(result)}
                         className={`
-                          p-3 rounded-lg transition-all duration-200 hover:bg-gray-100 relative
-                          ${isSelected ? 'bg-blue-100 border-2 border-blue-500' : 'border border-transparent'}
+                          p-3 rounded-lg transition-all duration-200 relative
+                          ${isSelected ? 'border-2 border-blue-500' : 'border border-transparent'}
                         `}
+                        style={{
+                          backgroundColor: isSelected ? '#dbeafe' : backgroundPrimary,
+                          color: textPrimary
+                        }}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         title={`${result.name} (${result.libraryName})`}
                       >
                         <div className="relative">
-                          <result.component className="w-6 h-6 text-gray-700" />
+                          <result.component className="w-6 h-6" style={{ color: textSecondary }} />
                           {isSelected && (
                             <Check className="absolute -top-1 -right-1 w-3 h-3 text-blue-500 bg-white rounded-full" />
                           )}
                         </div>
                         {/* Library indicator */}
-                        <div className="absolute bottom-1 right-1 w-3 h-3 bg-gray-300 rounded-full text-[8px] flex items-center justify-center text-gray-600 font-medium">
+                        <div className="absolute bottom-1 right-1 w-3 h-3 rounded-full text-[8px] flex items-center justify-center font-medium" style={{ backgroundColor: backgroundSecondary, color: textMuted }}>
                           {result.library.charAt(0).toUpperCase()}
                         </div>
                       </motion.button>
@@ -330,16 +366,20 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
                         type="button"
                         onClick={() => handleIconSelect(result)}
                         className={`
-                          w-full flex items-center space-x-4 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100
-                          ${isSelected ? 'bg-blue-100 border border-blue-500' : 'border border-transparent'}
+                          w-full flex items-center space-x-4 px-4 py-3 rounded-lg transition-all duration-200
+                          ${isSelected ? 'border border-blue-500' : 'border border-transparent'}
                         `}
+                        style={{
+                          backgroundColor: isSelected ? '#dbeafe' : backgroundPrimary,
+                          color: textPrimary
+                        }}
                         whileHover={{ x: 2 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <result.component className="w-6 h-6 text-gray-700 flex-shrink-0" />
+                        <result.component className="w-6 h-6 flex-shrink-0" style={{ color: textSecondary }} />
                         <div className="flex-1 text-left">
-                          <span className="text-sm font-medium text-gray-700 block">{result.name}</span>
-                          <span className="text-xs text-gray-500">{result.libraryName}</span>
+                          <span className="text-sm font-medium block" style={{ color: textPrimary }}>{result.name}</span>
+                          <span className="text-xs" style={{ color: textMuted }}>{result.libraryName}</span>
                         </div>
                         {isSelected && (
                           <Check className="w-5 h-5 text-blue-500 ml-auto" />
@@ -351,7 +391,7 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
               )}
 
               {filteredResults.length === 0 && (
-                <div className="p-12 text-center text-gray-500">
+                <div className="p-12 text-center" style={{ color: textMuted }}>
                   <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
                   <p className="text-lg font-medium">No icons found</p>
                   <p className="text-sm mt-2">

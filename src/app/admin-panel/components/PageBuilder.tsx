@@ -43,7 +43,8 @@ import {
   ArrowDown,
   CheckCircle,
   AlertCircle,
-  Code
+  Code,
+  Users
 } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
 
@@ -59,6 +60,7 @@ const sectionIcons = {
   form: MessageSquare,
   cta: MousePointer,
   html: Code,
+  team: Users,
   custom: Settings
 };
 
@@ -74,6 +76,7 @@ const sectionLabels = {
   form: 'Form',
   cta: 'Call to Action',
   html: 'HTML Section',
+  team: 'Team Section',
   custom: 'Custom'
 };
 
@@ -100,6 +103,7 @@ interface PageSection {
   faqSectionId?: number;
   formId?: number;
   htmlSectionId?: number;
+  teamSectionId?: number;
 }
 
 interface Page {
@@ -293,6 +297,7 @@ interface FormData {
   faqSectionId?: number;
   formId?: number;
   htmlSectionId?: number;
+  teamSectionId?: number;
 }
 
 interface AvailableContent {
@@ -303,6 +308,7 @@ interface AvailableContent {
   faqSections: any[];
   forms: any[];
   htmlSections: any[];
+  teamSections: any[];
 }
 
 const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
@@ -327,7 +333,8 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
     pricingSectionId: undefined,
     faqSectionId: undefined,
     formId: undefined,
-    htmlSectionId: undefined
+    htmlSectionId: undefined,
+    teamSectionId: undefined
   });
 
   // Available content for selection
@@ -338,7 +345,8 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
     pricingSections: [],
     faqSections: [],
     forms: [],
-    htmlSections: []
+    htmlSections: [],
+    teamSections: []
   });
 
   // Track which hero sections are in use by other pages
@@ -518,6 +526,10 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
       setMessage({ type: 'error', text: 'Please select an HTML section' });
       return;
     }
+    if (formData.sectionType === 'team' && !formData.teamSectionId) {
+      setMessage({ type: 'error', text: 'Please select a team section' });
+      return;
+    }
 
     setSaving(true);
     try {
@@ -688,7 +700,8 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
       pricingSectionId: undefined,
       faqSectionId: undefined,
       formId: undefined,
-      htmlSectionId: undefined
+      htmlSectionId: undefined,
+      teamSectionId: undefined
     });
     setEditingSection(null);
     setShowAddSection(false);
@@ -1343,6 +1356,57 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                 </div>
               )}
 
+              {formData.sectionType === 'team' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                    Select Team Section *
+                    {formData.teamSectionId && (
+                      <span className="ml-2 text-sm text-green-600">✓ Selected</span>
+                    )}
+                  </label>
+                  <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
+                    {availableContent.teamSections.map((teamSection) => (
+                      <button
+                        key={teamSection.id}
+                        type="button"
+                        onClick={() => setFormData({ ...formData, teamSectionId: teamSection.id })}
+                        className={`p-3 rounded-lg border-2 text-left transition-all duration-200 ${
+                          formData.teamSectionId === teamSection.id
+                            ? 'border-green-500 bg-green-50 text-green-900'
+                            : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="font-medium">{teamSection.name}</div>
+                          {formData.teamSectionId === teamSection.id && (
+                            <CheckCircle className="w-5 h-5 text-green-600" />
+                          )}
+                        </div>
+                        {teamSection.heading && (
+                          <div className="text-sm text-gray-600 mt-1">{teamSection.heading}</div>
+                        )}
+                        <div className="text-xs text-gray-400 mt-1 flex items-center space-x-3">
+                          <span className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded-md font-medium">
+                            Team Section
+                          </span>
+                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md font-medium">
+                            {teamSection._count.teamMembers} members
+                          </span>
+                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-md font-medium">
+                            {teamSection._count.pageSections} page uses
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                    {availableContent.teamSections.length === 0 && (
+                      <p className="text-gray-500 text-center py-4">
+                        No team sections available. Create one first in Team Sections manager.
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+
               {/* Title */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1405,7 +1469,7 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
               {/* Actions */}
               <div className="flex space-x-4 pt-4 border-t border-gray-200">
                 {/* Validation Status */}
-                {(formData.sectionType === 'hero' || formData.sectionType === 'features' || formData.sectionType === 'media' || formData.sectionType === 'pricing' || formData.sectionType === 'faq' || formData.sectionType === 'form' || formData.sectionType === 'html') && (
+                {(formData.sectionType === 'hero' || formData.sectionType === 'features' || formData.sectionType === 'media' || formData.sectionType === 'pricing' || formData.sectionType === 'faq' || formData.sectionType === 'form' || formData.sectionType === 'html' || formData.sectionType === 'team') && (
                   <div className="flex-1 text-sm">
                     {formData.sectionType === 'hero' && !formData.heroSectionId && (
                       <div className="text-amber-600 flex items-center">
@@ -1449,13 +1513,20 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                         Please select an HTML section
                       </div>
                     )}
-                    {((formData.sectionType === 'hero' && formData.heroSectionId) || 
+                    {formData.sectionType === 'team' && !formData.teamSectionId && (
+                      <div className="text-amber-600 flex items-center">
+                        <AlertCircle className="w-4 h-4 mr-1" />
+                        Please select a team section
+                      </div>
+                    )}
+                                        {((formData.sectionType === 'hero' && formData.heroSectionId) ||
                       (formData.sectionType === 'features' && formData.featureGroupId) ||
                       (formData.sectionType === 'media' && formData.mediaSectionId) ||
                       (formData.sectionType === 'pricing' && formData.pricingSectionId) ||
                       (formData.sectionType === 'faq' && formData.faqSectionId) ||
                       (formData.sectionType === 'form' && formData.formId) ||
-                      (formData.sectionType === 'html' && formData.htmlSectionId)) && (
+                      (formData.sectionType === 'html' && formData.htmlSectionId) ||
+                      (formData.sectionType === 'team' && formData.teamSectionId)) && (
                       <div className="text-green-600 flex items-center">
                         <CheckCircle className="w-4 h-4 mr-1" />
                         Ready to save

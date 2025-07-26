@@ -11,6 +11,7 @@ import PricingSection from './PricingSection';
 import ConfigurablePricingSection from './ConfigurablePricingSection';
 import FormSection from './FormSection';
 import HtmlSection from './HtmlSection';
+import TeamSection from './TeamSection';
 
 interface PageSection {
   id: number;
@@ -206,6 +207,43 @@ interface PageSection {
     jsContent?: string;
     isActive: boolean;
   };
+  teamSection?: {
+    id: number;
+    name: string;
+    heading: string;
+    subheading?: string;
+    layoutType: 'grid' | 'staggered' | 'cards' | 'list';
+    backgroundColor?: string;
+    headingColor?: string;
+    subheadingColor?: string;
+    cardBackgroundColor?: string;
+    photoBackgroundColor?: string;
+    nameColor?: string;
+    positionColor?: string;
+    bioColor?: string;
+    socialTextColor?: string;
+    socialBackgroundColor?: string;
+    paddingTop: number;
+    paddingBottom: number;
+    containerMaxWidth: 'xl' | '2xl' | 'full';
+    isActive: boolean;
+    teamMembers: Array<{
+      id: number;
+      name: string;
+      position: string;
+      bio?: string;
+      photoUrl?: string;
+      photoAlt?: string;
+      email?: string;
+      linkedinUrl?: string;
+      twitterUrl?: string;
+      githubUrl?: string;
+      websiteUrl?: string;
+      sortOrder: number;
+      isActive: boolean;
+    }>;
+  };
+  teamSectionId?: number;
 }
 
 interface ServerDynamicPageRendererProps {
@@ -292,7 +330,19 @@ async function fetchPageSections(pageSlug: string): Promise<PageSection[]> {
             }
           }
         },
-        htmlSection: true
+        htmlSection: true,
+        teamSection: {
+          include: {
+            teamMembers: {
+              where: {
+                isActive: true
+              },
+              orderBy: {
+                sortOrder: 'asc'
+              }
+            }
+          }
+        }
       },
       orderBy: {
         sortOrder: 'asc'
@@ -704,7 +754,7 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
 
   const generateSectionId = (section: PageSection, index: number) => {
     const sectionType = section.sectionType.toLowerCase();
-    const sectionName = section.title || section.heroSection?.name || section.featureGroup?.name || section.mediaSection?.headline || section.pricingSection?.name || section.faqSection?.name || section.form?.name || section.htmlSection?.name || 'section';
+    const sectionName = section.title || section.heroSection?.name || section.featureGroup?.name || section.mediaSection?.headline || section.pricingSection?.name || section.faqSection?.name || section.form?.name || section.htmlSection?.name || section.teamSection?.name || 'section';
     const cleanName = sectionName.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
     return `${sectionType}-${cleanName}-${index}`;
   };
@@ -872,6 +922,36 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
             <HtmlSection 
               key={section.id} 
               htmlSection={section.htmlSection}
+            />
+          );
+        }
+        break;
+
+      case 'team':
+        if (section.teamSection) {
+          return wrapWithSectionDiv(
+            <TeamSection 
+              key={section.id} 
+              id={section.teamSection.id}
+              name={section.teamSection.name}
+              heading={section.teamSection.heading}
+              subheading={section.teamSection.subheading}
+              layoutType={section.teamSection.layoutType}
+              backgroundColor={section.teamSection.backgroundColor}
+              headingColor={section.teamSection.headingColor}
+              subheadingColor={section.teamSection.subheadingColor}
+              cardBackgroundColor={section.teamSection.cardBackgroundColor}
+              photoBackgroundColor={section.teamSection.photoBackgroundColor}
+              nameColor={section.teamSection.nameColor}
+              positionColor={section.teamSection.positionColor}
+              bioColor={section.teamSection.bioColor}
+              socialTextColor={section.teamSection.socialTextColor}
+              socialBackgroundColor={section.teamSection.socialBackgroundColor}
+              paddingTop={section.teamSection.paddingTop}
+              paddingBottom={section.teamSection.paddingBottom}
+              containerMaxWidth={section.teamSection.containerMaxWidth}
+              isActive={section.teamSection.isActive}
+              teamMembers={section.teamSection.teamMembers}
             />
           );
         }

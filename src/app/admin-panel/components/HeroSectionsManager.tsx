@@ -11,6 +11,30 @@ import {
 import MediaSelector from '@/components/ui/MediaSelector';
 import { useDesignSystem, getThemeDefaults } from '@/hooks/useDesignSystem';
 
+// Add CSS for placeholder styling
+const placeholderStyles = `
+  ::placeholder {
+    color: var(--color-text-muted, #999999) !important;
+    opacity: 1;
+  }
+  ::-webkit-input-placeholder {
+    color: var(--color-text-muted, #999999) !important;
+    opacity: 1;
+  }
+  ::-moz-placeholder {
+    color: var(--color-text-muted, #999999) !important;
+    opacity: 1;
+  }
+  :-ms-input-placeholder {
+    color: var(--color-text-muted, #999999) !important;
+    opacity: 1;
+  }
+  :-moz-placeholder {
+    color: var(--color-text-muted, #999999) !important;
+    opacity: 1;
+  }
+`;
+
 // Types
 interface MediaItem {
   id: number;
@@ -114,9 +138,10 @@ interface ColorPickerProps {
   value: string;
   onChange: (color: string) => void;
   allowTransparent?: boolean;
+  designSystem?: any;
 }
 
-const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allowTransparent = false }) => {
+const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allowTransparent = false, designSystem }) => {
   const [showPicker, setShowPicker] = useState(false);
   const [customColor, setCustomColor] = useState(value.startsWith('#') ? value : '#000000');
 
@@ -153,7 +178,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allow
 
   return (
     <div className="relative">
-      <label className="block text-sm font-medium text-gray-700 mb-2">
+      <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
         {label}
       </label>
       <div className="flex items-center gap-2">
@@ -164,7 +189,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allow
           style={{ backgroundColor: value === 'transparent' ? '#f3f4f6' : value }}
         >
           {value === 'transparent' && (
-            <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
+            <div className="w-full h-full flex items-center justify-center text-xs" style={{ color: designSystem?.textMuted || '#999999' }}>
               T
             </div>
           )}
@@ -175,13 +200,17 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allow
           onChange={(e) => onChange(e.target.value)}
           className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           placeholder="#000000 or transparent"
+          style={{ 
+            color: designSystem?.textPrimary || '#000000',
+            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+          }}
         />
       </div>
 
       {showPicker && (
-        <div className="absolute top-full left-0 mt-2 p-4 bg-white border border-gray-200 rounded-lg shadow-lg z-50 min-w-80">
+        <div className="absolute top-full left-0 mt-2 p-4 border border-gray-200 rounded-lg shadow-lg z-50 min-w-80" style={{ backgroundColor: designSystem?.backgroundPrimary || '#ffffff' }}>
           <div className="mb-4">
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Design System Colors</h4>
+            <h4 className="text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>Design System Colors</h4>
             <div className="grid grid-cols-4 gap-2">
               {presetColors.map((color) => (
                 <button
@@ -201,7 +230,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allow
                       backgroundPosition: color.value === 'transparent' ? '0 0, 0 4px, 4px -4px, -4px 0px' : 'auto'
                     }}
                   />
-                  <span className="text-xs text-gray-600 text-center leading-tight">
+                  <span className="text-xs text-center leading-tight" style={{ color: designSystem?.textSecondary || '#666666' }}>
                     {color.name}
                   </span>
                 </button>
@@ -210,7 +239,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allow
           </div>
 
           <div>
-            <h4 className="text-sm font-medium text-gray-700 mb-2">Custom Color</h4>
+            <h4 className="text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>Custom Color</h4>
             <div className="flex items-center gap-2">
               <input
                 type="color"
@@ -224,6 +253,10 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allow
                 onChange={handleCustomColorChange}
                 className="flex-1 px-3 py-2 border border-gray-300 rounded focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 placeholder="#000000"
+                style={{ 
+                  color: designSystem?.textPrimary || '#000000',
+                  backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                }}
               />
             </div>
           </div>
@@ -232,7 +265,8 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allow
             <button
               type="button"
               onClick={() => setShowPicker(false)}
-              className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800"
+              className="px-3 py-1 text-sm"
+              style={{ color: designSystem?.textSecondary || '#666666' }}
             >
               Close
             </button>
@@ -546,15 +580,21 @@ const HeroSectionsManager: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      <style dangerouslySetInnerHTML={{ __html: placeholderStyles }} />
+      
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Hero Sections</h2>
-          <p className="text-gray-600">Manage hero sections with advanced layouts and features</p>
+          <h2 className="text-2xl font-bold" style={{ color: designSystem?.textPrimary || '#000000' }}>Hero Sections</h2>
+          <p style={{ color: designSystem?.textSecondary || '#666666' }}>Manage hero sections with advanced layouts and features</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+          className="px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+          style={{ 
+            backgroundColor: designSystem?.primaryColor || '#5243E9',
+            color: '#ffffff'
+          }}
         >
           <Plus size={20} />
           Add Hero Section
@@ -573,7 +613,7 @@ const HeroSectionsManager: React.FC = () => {
       {/* Hero Sections List */}
       <div className="space-y-4">
         {heroSections.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8" style={{ color: designSystem?.textMuted || '#999999' }}>
             No hero sections found. Create your first hero section to get started.
           </div>
         ) : (
@@ -585,14 +625,15 @@ const HeroSectionsManager: React.FC = () => {
                   <div className="flex items-center space-x-4">
                     <button
                       onClick={() => hero.id && toggleExpanded(hero.id)}
-                      className="text-gray-400 hover:text-gray-600"
+                      style={{ color: designSystem?.textMuted || '#999999' }}
+                      className="hover:opacity-70"
                     >
                       {hero.id && expandedSections.has(hero.id) ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                     </button>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{hero.name || hero.headline}</h3>
-                      <p className="text-sm text-gray-600 mt-1">{hero.headline}</p>
-                      <div className="flex items-center space-x-4 text-sm text-gray-500 mt-1">
+                      <h3 className="font-semibold" style={{ color: designSystem?.textPrimary || '#000000' }}>{hero.name || hero.headline}</h3>
+                      <p className="text-sm mt-1" style={{ color: designSystem?.textSecondary || '#666666' }}>{hero.headline}</p>
+                      <div className="flex items-center space-x-4 text-sm mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
                         <span>Height: {hero.sectionHeight || '100vh'}</span>
                         <span>Layout: {getLayoutTypeDisplay(hero.layoutType)}</span>
                         {hero.visible ? (
@@ -612,13 +653,15 @@ const HeroSectionsManager: React.FC = () => {
                   <div className="flex items-center space-x-2">
                     <button
                       onClick={() => startEdit(hero)}
-                      className="text-blue-600 hover:text-blue-800 p-2 rounded-lg hover:bg-blue-50"
+                      className="p-2 rounded-lg hover:bg-blue-50"
+                      style={{ color: designSystem?.primaryColor || '#5243E9' }}
                     >
                       <Edit size={16} />
                     </button>
                     <button
                       onClick={() => hero.id && handleDelete(hero.id)}
-                      className="text-red-600 hover:text-red-800 p-2 rounded-lg hover:bg-red-50"
+                      className="p-2 rounded-lg hover:bg-red-50"
+                      style={{ color: designSystem?.errorColor || '#EF4444' }}
                     >
                       <Trash2 size={16} />
                     </button>
@@ -628,12 +671,12 @@ const HeroSectionsManager: React.FC = () => {
 
               {/* Expanded Details */}
               {hero.id && expandedSections.has(hero.id) && (
-                <div className="p-4 bg-gray-50 space-y-4">
+                <div className="p-4 space-y-4" style={{ backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {/* Basic Info */}
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Basic Information</h4>
-                      <div className="space-y-1 text-sm">
+                      <h4 className="font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>Basic Information</h4>
+                      <div className="space-y-1 text-sm" style={{ color: designSystem?.textSecondary || '#666666' }}>
                         {hero.tagline && <p><span className="font-medium">Tagline:</span> {hero.tagline}</p>}
                         {hero.subheading && <p><span className="font-medium">Subheading:</span> {hero.subheading}</p>}
                         <p><span className="font-medium">Text Alignment:</span> {hero.textAlignment}</p>
@@ -642,29 +685,29 @@ const HeroSectionsManager: React.FC = () => {
 
                     {/* CTA Information */}
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-2">CTA Buttons</h4>
-                      <div className="space-y-1 text-sm">
+                      <h4 className="font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>CTA Buttons</h4>
+                      <div className="space-y-1 text-sm" style={{ color: designSystem?.textSecondary || '#666666' }}>
                         {hero.ctaPrimary ? (
                           <p><span className="font-medium">Primary:</span> {hero.ctaPrimary.text}</p>
                         ) : (
-                          <p className="text-gray-500">No primary CTA</p>
+                          <p style={{ color: designSystem?.textMuted || '#999999' }}>No primary CTA</p>
                         )}
                         {hero.ctaSecondary ? (
                           <p><span className="font-medium">Secondary:</span> {hero.ctaSecondary.text}</p>
                         ) : (
-                          <p className="text-gray-500">No secondary CTA</p>
+                          <p style={{ color: designSystem?.textMuted || '#999999' }}>No secondary CTA</p>
                         )}
                       </div>
                     </div>
 
                     {/* Media & Background */}
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Media & Background</h4>
+                      <h4 className="font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>Media & Background</h4>
                       <div className="space-y-2">
                         {hero.mediaUrl ? (
                           <div className="space-y-1">
                             <div className="flex items-center space-x-2">
-                              <span className="text-sm font-medium">Media:</span>
+                              <span className="text-sm font-medium" style={{ color: designSystem?.textSecondary || '#666666' }}>Media:</span>
                               {hero.mediaType === 'image' && (
                                 <img 
                                   src={hero.mediaUrl} 
@@ -674,20 +717,20 @@ const HeroSectionsManager: React.FC = () => {
                               )}
                               {hero.mediaType === 'video' && (
                                 <div className="w-16 h-12 bg-gray-200 rounded border flex items-center justify-center">
-                                  <Video size={16} className="text-gray-500" />
+                                  <Video size={16} style={{ color: designSystem?.textMuted || '#999999' }} />
                                 </div>
                               )}
-                              <span className="text-sm text-gray-600 capitalize">{hero.mediaType}</span>
+                              <span className="text-sm capitalize" style={{ color: designSystem?.textSecondary || '#666666' }}>{hero.mediaType}</span>
                             </div>
-                            <div className="text-sm space-y-1">
+                            <div className="text-sm space-y-1" style={{ color: designSystem?.textSecondary || '#666666' }}>
                               <p><span className="font-medium">Height:</span> {hero.mediaHeight || '80vh'}</p>
                               <p><span className="font-medium">Position:</span> {hero.mediaPosition}</p>
                             </div>
                           </div>
                         ) : (
-                          <p className="text-sm text-gray-500">No media selected</p>
+                          <p className="text-sm" style={{ color: designSystem?.textMuted || '#999999' }}>No media selected</p>
                         )}
-                        <div className="text-sm">
+                        <div className="text-sm" style={{ color: designSystem?.textSecondary || '#666666' }}>
                         <p><span className="font-medium">Background:</span> {getBackgroundTypeDisplay(hero.backgroundType)}</p>
                         </div>
                       </div>
@@ -695,8 +738,8 @@ const HeroSectionsManager: React.FC = () => {
 
                     {/* Advanced Features */}
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Advanced Features</h4>
-                      <div className="space-y-1 text-sm">
+                      <h4 className="font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>Advanced Features</h4>
+                      <div className="space-y-1 text-sm" style={{ color: designSystem?.textSecondary || '#666666' }}>
                         <p><span className="font-medium">Typing Effect:</span> {hero.showTypingEffect ? 'Yes' : 'No'}</p>
                         <p><span className="font-medium">Background Animation:</span> {hero.enableBackgroundAnimation ? 'Yes' : 'No'}</p>
                         <p><span className="font-medium">Container Width:</span> {hero.containerMaxWidth}</p>
@@ -705,8 +748,8 @@ const HeroSectionsManager: React.FC = () => {
 
                     {/* Spacing */}
                     <div>
-                      <h4 className="font-medium text-gray-900 mb-2">Spacing</h4>
-                      <div className="space-y-1 text-sm">
+                      <h4 className="font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>Spacing</h4>
+                      <div className="space-y-1 text-sm" style={{ color: designSystem?.textSecondary || '#666666' }}>
                         <p><span className="font-medium">Padding Top:</span> {hero.paddingTop}px</p>
                         <p><span className="font-medium">Padding Bottom:</span> {hero.paddingBottom}px</p>
                       </div>
@@ -725,12 +768,13 @@ const HeroSectionsManager: React.FC = () => {
           <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-semibold">
+                <h3 className="text-xl font-semibold" style={{ color: designSystem?.textPrimary || '#000000' }}>
                   {editingHero ? 'Edit Hero Section' : 'Add New Hero Section'}
                 </h3>
                 <button
                   onClick={resetForm}
-                  className="text-gray-400 hover:text-gray-600"
+                  style={{ color: designSystem?.textMuted || '#999999' }}
+                  className="hover:opacity-70"
                 >
                   <X size={24} />
                 </button>
@@ -738,8 +782,8 @@ const HeroSectionsManager: React.FC = () => {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Basic Information */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>
+                  <h4 className="font-medium mb-4 flex items-center" style={{ color: designSystem?.textPrimary || '#000000' }}>
                     <Settings size={20} className="mr-2" />
                     Basic Information
                   </h4>
@@ -747,7 +791,7 @@ const HeroSectionsManager: React.FC = () => {
                   {/* Name and Section Height */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Section Name *
                       </label>
                       <input
@@ -756,12 +800,16 @@ const HeroSectionsManager: React.FC = () => {
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Enter a name to identify this hero section"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
                         required
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Section Height
                       </label>
                       <input
@@ -770,8 +818,12 @@ const HeroSectionsManager: React.FC = () => {
                         onChange={(e) => setFormData({ ...formData, sectionHeight: e.target.value })}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="e.g., 100vh, 80vh, 600px"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
                       />
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
                         Use CSS units: vh (viewport height), px (pixels), % (percentage)
                       </p>
                     </div>
@@ -779,13 +831,17 @@ const HeroSectionsManager: React.FC = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Layout Type
                       </label>
                       <select
                         value={formData.layoutType}
                         onChange={(e) => setFormData({ ...formData, layoutType: e.target.value as any })}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
                       >
                         <option value="split">Split Layout</option>
                         <option value="centered">Centered Layout</option>
@@ -794,13 +850,17 @@ const HeroSectionsManager: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Text Alignment
                       </label>
                       <select
                         value={formData.textAlignment}
                         onChange={(e) => setFormData({ ...formData, textAlignment: e.target.value as any })}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
                       >
                         <option value="left">Left</option>
                         <option value="center">Center</option>
@@ -810,7 +870,7 @@ const HeroSectionsManager: React.FC = () => {
                   </div>
 
                   <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                       Tagline
                     </label>
                     <input
@@ -819,11 +879,15 @@ const HeroSectionsManager: React.FC = () => {
                       onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
                       className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Optional badge or label"
+                      style={{ 
+                        color: designSystem?.textPrimary || '#000000',
+                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                      }}
                     />
                   </div>
 
                   <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                       Headline *
                     </label>
                     <input
@@ -832,12 +896,16 @@ const HeroSectionsManager: React.FC = () => {
                       onChange={(e) => setFormData({ ...formData, headline: e.target.value })}
                       className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Main title"
+                      style={{ 
+                        color: designSystem?.textPrimary || '#000000',
+                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                      }}
                       required
                     />
                   </div>
 
                   <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                       Subheading
                     </label>
                     <textarea
@@ -846,26 +914,34 @@ const HeroSectionsManager: React.FC = () => {
                       className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       rows={3}
                       placeholder="Supporting text"
+                      style={{ 
+                        color: designSystem?.textPrimary || '#000000',
+                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                      }}
                     />
                   </div>
                 </div>
 
                 {/* CTA References */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>
+                  <h4 className="font-medium mb-4 flex items-center" style={{ color: designSystem?.textPrimary || '#000000' }}>
                     <ExternalLink size={20} className="mr-2" />
                     CTA Buttons
-                    <span className="ml-2 text-xs text-gray-500">({availableCTAs.length} available)</span>
+                    <span className="ml-2 text-xs" style={{ color: designSystem?.textMuted || '#999999' }}>({availableCTAs.length} available)</span>
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Primary CTA
                       </label>
                       <select
                         value={formData.ctaPrimaryId || ''}
                         onChange={(e) => setFormData({ ...formData, ctaPrimaryId: e.target.value ? parseInt(e.target.value) : undefined })}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
                       >
                         <option value="">No primary CTA</option>
                         {availableCTAs.map(cta => (
@@ -875,13 +951,17 @@ const HeroSectionsManager: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Secondary CTA
                       </label>
                       <select
                         value={formData.ctaSecondaryId || ''}
                         onChange={(e) => setFormData({ ...formData, ctaSecondaryId: e.target.value ? parseInt(e.target.value) : undefined })}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
                       >
                         <option value="">No secondary CTA</option>
                         {availableCTAs.map(cta => (
@@ -893,8 +973,8 @@ const HeroSectionsManager: React.FC = () => {
                 </div>
 
                 {/* Media + Background */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>
+                  <h4 className="font-medium mb-4 flex items-center" style={{ color: designSystem?.textPrimary || '#000000' }}>
                     <Image size={20} className="mr-2" />
                     Media & Background
                   </h4>
@@ -902,9 +982,9 @@ const HeroSectionsManager: React.FC = () => {
                     <div className="space-y-4">
                       {/* Current Media Preview */}
                       {(formData.mediaUrl || formData.mediaItem) && (
-                        <div className="border border-gray-200 rounded-lg p-3 bg-white">
+                        <div className="border border-gray-200 rounded-lg p-3" style={{ backgroundColor: designSystem?.backgroundPrimary || '#ffffff' }}>
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-medium text-gray-700">Current Media</span>
+                            <span className="text-sm font-medium" style={{ color: designSystem?.textPrimary || '#000000' }}>Current Media</span>
                             <button
                               type="button"
                               onClick={() => setFormData({ 
@@ -928,12 +1008,12 @@ const HeroSectionsManager: React.FC = () => {
                           {formData.mediaType === 'video' && formData.mediaUrl && (
                             <div className="w-full h-32 bg-gray-200 rounded border flex items-center justify-center">
                               <div className="text-center">
-                                <Video size={24} className="text-gray-500 mx-auto mb-1" />
-                                <span className="text-sm text-gray-600">Video File</span>
+                                <Video size={24} className="mx-auto mb-1" style={{ color: designSystem?.textMuted || '#999999' }} />
+                                <span className="text-sm" style={{ color: designSystem?.textSecondary || '#666666' }}>Video File</span>
                               </div>
                             </div>
                           )}
-                          <p className="text-xs text-gray-500 mt-2 truncate">
+                          <p className="text-xs mt-2 truncate" style={{ color: designSystem?.textMuted || '#999999' }}>
                             {formData.mediaItem?.filename || 'Media file'}
                           </p>
                         </div>
@@ -957,13 +1037,17 @@ const HeroSectionsManager: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Media Type
                       </label>
                       <select
                         value={formData.mediaType}
                         onChange={(e) => setFormData({ ...formData, mediaType: e.target.value as any })}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
                       >
                         <option value="image">Image</option>
                         <option value="video">Video</option>
@@ -973,7 +1057,7 @@ const HeroSectionsManager: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Media Alt Text
                       </label>
                       <input
@@ -982,11 +1066,15 @@ const HeroSectionsManager: React.FC = () => {
                         onChange={(e) => setFormData({ ...formData, mediaAlt: e.target.value })}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="Alt text for accessibility"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Media Height
                       </label>
                       <input
@@ -995,20 +1083,28 @@ const HeroSectionsManager: React.FC = () => {
                         onChange={(e) => setFormData({ ...formData, mediaHeight: e.target.value })}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         placeholder="e.g., 80vh, 500px, auto"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
                       />
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
                         Use CSS units: vh (viewport height), px (pixels), % (percentage), or auto
                       </p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Media Position
                       </label>
                       <select
                         value={formData.mediaPosition}
                         onChange={(e) => setFormData({ ...formData, mediaPosition: e.target.value as any })}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
                       >
                         <option value="left">Left</option>
                         <option value="right">Right</option>
@@ -1016,13 +1112,17 @@ const HeroSectionsManager: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Background Type
                       </label>
                       <select
                         value={formData.backgroundType}
                         onChange={(e) => setFormData({ ...formData, backgroundType: e.target.value as any })}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
                       >
                         <option value="color">Solid Color</option>
                         <option value="gradient">Gradient</option>
@@ -1037,10 +1137,11 @@ const HeroSectionsManager: React.FC = () => {
                           label="Background Color"
                           value={formData.backgroundValue}
                           onChange={(color) => setFormData({ ...formData, backgroundValue: color })}
+                          designSystem={designSystem}
                         />
                       ) : formData.backgroundType === 'gradient' ? (
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                             Gradient CSS
                           </label>
                           <input
@@ -1049,8 +1150,12 @@ const HeroSectionsManager: React.FC = () => {
                             onChange={(e) => setFormData({ ...formData, backgroundValue: e.target.value })}
                             className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                            style={{ 
+                              color: designSystem?.textPrimary || '#000000',
+                              backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                            }}
                           />
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
                             Use CSS gradient syntax (e.g., linear-gradient, radial-gradient)
                           </p>
                         </div>
@@ -1058,9 +1163,9 @@ const HeroSectionsManager: React.FC = () => {
                         <div className="space-y-4">
                           {/* Current Background Media Preview */}
                           {(formData.backgroundValue || formData.backgroundMediaItem) && (
-                            <div className="border border-gray-200 rounded-lg p-3 bg-white">
+                            <div className="border border-gray-200 rounded-lg p-3" style={{ backgroundColor: designSystem?.backgroundPrimary || '#ffffff' }}>
                               <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm font-medium text-gray-700">
+                                <span className="text-sm font-medium" style={{ color: designSystem?.textPrimary || '#000000' }}>
                                   Current {formData.backgroundType === 'image' ? 'Background Image' : 'Background Video'}
                                 </span>
                                 <button
@@ -1086,12 +1191,12 @@ const HeroSectionsManager: React.FC = () => {
                               {formData.backgroundType === 'video' && formData.backgroundValue && (
                                 <div className="w-full h-32 bg-gray-200 rounded border flex items-center justify-center">
                                   <div className="text-center">
-                                    <Video size={24} className="text-gray-500 mx-auto mb-1" />
-                                    <span className="text-sm text-gray-600">Background Video</span>
+                                    <Video size={24} className="mx-auto mb-1" style={{ color: designSystem?.textMuted || '#999999' }} />
+                                    <span className="text-sm" style={{ color: designSystem?.textSecondary || '#666666' }}>Background Video</span>
                                   </div>
                                 </div>
                               )}
-                              <p className="text-xs text-gray-500 mt-2 truncate">
+                              <p className="text-xs mt-2 truncate" style={{ color: designSystem?.textMuted || '#999999' }}>
                                 {formData.backgroundMediaItem?.filename || 'Background media file'}
                               </p>
                             </div>
@@ -1119,8 +1224,8 @@ const HeroSectionsManager: React.FC = () => {
                 </div>
 
                 {/* Text Colors */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>
+                  <h4 className="font-medium mb-4 flex items-center" style={{ color: designSystem?.textPrimary || '#000000' }}>
                     <Palette size={20} className="mr-2" />
                     Text Colors
                   </h4>
@@ -1129,63 +1234,70 @@ const HeroSectionsManager: React.FC = () => {
                       label="Tagline Color"
                       value={formData.taglineColor}
                       onChange={(color) => setFormData({ ...formData, taglineColor: color })}
+                      designSystem={designSystem}
                     />
                     
                     <ColorPicker
                       label="Headline Color"
                       value={formData.headlineColor}
                       onChange={(color) => setFormData({ ...formData, headlineColor: color })}
+                      designSystem={designSystem}
                     />
                     
                     <ColorPicker
                       label="Subheading Color"
                       value={formData.subheadingColor}
                       onChange={(color) => setFormData({ ...formData, subheadingColor: color })}
+                      designSystem={designSystem}
                     />
                   </div>
                 </div>
 
                 {/* CTA Styling */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>
+                  <h4 className="font-medium mb-4 flex items-center" style={{ color: designSystem?.textPrimary || '#000000' }}>
                     <Zap size={20} className="mr-2" />
                     CTA Button Styling
                   </h4>
                   <div className="space-y-4">
                     {/* Primary CTA Colors */}
                     <div>
-                      <h5 className="text-sm font-medium text-gray-700 mb-3">Primary CTA Button</h5>
+                      <h5 className="text-sm font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>Primary CTA Button</h5>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <ColorPicker
                           label="Background Color"
                           value={formData.ctaPrimaryBgColor}
                           onChange={(color) => setFormData({ ...formData, ctaPrimaryBgColor: color })}
                           allowTransparent
+                          designSystem={designSystem}
                         />
                         
                         <ColorPicker
                           label="Text Color"
                           value={formData.ctaPrimaryTextColor}
                           onChange={(color) => setFormData({ ...formData, ctaPrimaryTextColor: color })}
+                          designSystem={designSystem}
                         />
                       </div>
                     </div>
 
                     {/* Secondary CTA Colors */}
                     <div>
-                      <h5 className="text-sm font-medium text-gray-700 mb-3">Secondary CTA Button</h5>
+                      <h5 className="text-sm font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>Secondary CTA Button</h5>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <ColorPicker
                           label="Background Color"
                           value={formData.ctaSecondaryBgColor}
                           onChange={(color) => setFormData({ ...formData, ctaSecondaryBgColor: color })}
                           allowTransparent
+                          designSystem={designSystem}
                         />
                         
                         <ColorPicker
                           label="Text Color"
                           value={formData.ctaSecondaryTextColor}
                           onChange={(color) => setFormData({ ...formData, ctaSecondaryTextColor: color })}
+                          designSystem={designSystem}
                         />
                       </div>
                     </div>
@@ -1193,8 +1305,8 @@ const HeroSectionsManager: React.FC = () => {
                 </div>
 
                 {/* Advanced Options */}
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-gray-900 mb-4 flex items-center">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>
+                  <h4 className="font-medium mb-4 flex items-center" style={{ color: designSystem?.textPrimary || '#000000' }}>
                     <Zap size={20} className="mr-2" />
                     Advanced Options
                   </h4>
@@ -1207,7 +1319,7 @@ const HeroSectionsManager: React.FC = () => {
                         onChange={(e) => setFormData({ ...formData, showTypingEffect: e.target.checked })}
                         className="mr-2"
                       />
-                      <label htmlFor="showTypingEffect" className="text-sm font-medium text-gray-700">
+                      <label htmlFor="showTypingEffect" className="text-sm font-medium" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Show Typing Effect
                       </label>
                     </div>
@@ -1220,19 +1332,23 @@ const HeroSectionsManager: React.FC = () => {
                         onChange={(e) => setFormData({ ...formData, enableBackgroundAnimation: e.target.checked })}
                         className="mr-2"
                       />
-                      <label htmlFor="enableBackgroundAnimation" className="text-sm font-medium text-gray-700">
+                      <label htmlFor="enableBackgroundAnimation" className="text-sm font-medium" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Enable Background Animation
                       </label>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Container Max Width
                       </label>
                       <select
                         value={formData.containerMaxWidth}
                         onChange={(e) => setFormData({ ...formData, containerMaxWidth: e.target.value as any })}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
                       >
                         <option value="xl">XL</option>
                         <option value="2xl">2XL</option>
@@ -1248,13 +1364,13 @@ const HeroSectionsManager: React.FC = () => {
                         onChange={(e) => setFormData({ ...formData, visible: e.target.checked })}
                         className="mr-2"
                       />
-                      <label htmlFor="visible" className="text-sm font-medium text-gray-700">
+                      <label htmlFor="visible" className="text-sm font-medium" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Visible
                       </label>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Padding Top (px)
                       </label>
                       <input
@@ -1264,11 +1380,15 @@ const HeroSectionsManager: React.FC = () => {
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         min="0"
                         max="300"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                         Padding Bottom (px)
                       </label>
                       <input
@@ -1278,12 +1398,16 @@ const HeroSectionsManager: React.FC = () => {
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         min="0"
                         max="300"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
                       />
                     </div>
                   </div>
 
                   <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
                       Custom Classes
                     </label>
                     <input
@@ -1292,6 +1416,10 @@ const HeroSectionsManager: React.FC = () => {
                       onChange={(e) => setFormData({ ...formData, customClasses: e.target.value })}
                       className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       placeholder="Tailwind or utility class overrides"
+                      style={{ 
+                        color: designSystem?.textPrimary || '#000000',
+                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                      }}
                     />
                   </div>
                 </div>
@@ -1301,14 +1429,22 @@ const HeroSectionsManager: React.FC = () => {
                   <button
                     type="button"
                     onClick={resetForm}
-                    className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                    className="px-4 py-2 rounded-lg transition-colors"
+                    style={{ 
+                      color: designSystem?.textSecondary || '#666666',
+                      backgroundColor: designSystem?.backgroundSecondary || '#f9fafb'
+                    }}
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50"
+                    className="px-4 py-2 rounded-lg flex items-center gap-2 transition-colors disabled:opacity-50"
+                    style={{ 
+                      backgroundColor: designSystem?.primaryColor || '#5243E9',
+                      color: '#ffffff'
+                    }}
                   >
                     <Save size={16} />
                     {isSubmitting ? 'Saving...' : 'Save Hero Section'}

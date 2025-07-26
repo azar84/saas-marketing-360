@@ -41,18 +41,16 @@ export function useAdminApi() {
   const get = useCallback(<T>(url: string) => apiCall<T>(url), [apiCall]);
   
   const post = useCallback(<T>(url: string, data: unknown) =>
-    fetch(url, {
+    apiCall<T>(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
-    }).then(res => res.json() as Promise<T>), []);
+    }), [apiCall]);
   
   const put = useCallback(<T>(url: string, data: unknown) =>
-    fetch(url, {
+    apiCall<T>(url, {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
-    }).then(res => res.json() as Promise<T>), []);
+    }), [apiCall]);
   
   const del = useCallback(<T>(url: string) => 
     apiCall<T>(url, { method: 'DELETE' }), [apiCall]);

@@ -267,6 +267,37 @@ export async function GET(request: NextRequest) {
             jsContent: true,
             isActive: true
           }
+        },
+        teamSection: {
+          select: {
+            id: true,
+            name: true,
+            heading: true,
+            subheading: true,
+            layoutType: true,
+            backgroundColor: true,
+            headingColor: true,
+            subheadingColor: true,
+            cardBackgroundColor: true,
+            photoBackgroundColor: true,
+            nameColor: true,
+            positionColor: true,
+            bioColor: true,
+            socialTextColor: true,
+            socialBackgroundColor: true,
+            paddingTop: true,
+            paddingBottom: true,
+            containerMaxWidth: true,
+            isActive: true,
+            teamMembers: {
+              where: {
+                isActive: true
+              },
+              orderBy: {
+                sortOrder: 'asc'
+              }
+            }
+          }
         }
       },
       orderBy: [
@@ -326,7 +357,8 @@ export async function POST(request: NextRequest) {
         faqCategoryId: validatedData.faqCategoryId,
         contactSectionId: validatedData.contactSectionId,
         formId: validatedData.formId,
-        htmlSectionId: validatedData.htmlSectionId
+        htmlSectionId: validatedData.htmlSectionId,
+        teamSectionId: validatedData.teamSectionId
       },
       include: {
         page: {

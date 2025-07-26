@@ -538,6 +538,7 @@ model PageSection {
   contactSectionId Int?
   formId           Int?
   htmlSectionId    Int?
+  teamSectionId    Int?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   scriptSectionId  Int?
@@ -554,6 +555,7 @@ model PageSection {
   page             Page             @relation(fields: [pageId], references: [id], onDelete: Cascade)
   pricingSection   PricingSection?  @relation(fields: [pricingSectionId], references: [id])
   script_sections  script_sections? @relation(fields: [scriptSectionId], references: [id])
+  teamSection      TeamSection?     @relation(fields: [teamSectionId], references: [id])
 
   @@map("page_sections")
 }
@@ -1162,6 +1164,56 @@ model header_sections {
   createdAt       DateTime      @default(now())
   updatedAt       DateTime
   page_sections   PageSection[]
+}
+
+model TeamSection {
+  id                    Int           @id @default(autoincrement())
+  name                  String
+  heading               String
+  subheading            String?
+  layoutType            String        @default("grid") // grid, staggered, cards, list
+  backgroundColor       String?       @default("#ffffff")
+  headingColor          String?       @default("#000000")
+  subheadingColor       String?       @default("#666666")
+  cardBackgroundColor   String?       @default("#ffffff")
+  photoBackgroundColor  String?       @default("#f3f4f6")
+  nameColor             String?       @default("#000000")
+  positionColor         String?       @default("#666666")
+  bioColor              String?       @default("#333333")
+  socialTextColor       String?       @default("#666666")
+  socialBackgroundColor String?       @default("#f3f4f6")
+  paddingTop            Int           @default(96)
+  paddingBottom         Int           @default(96)
+  containerMaxWidth     String        @default("xl")
+  isActive              Boolean       @default(true)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+  pageSections          PageSection[]
+  teamMembers           TeamMember[]
+
+  @@map("team_sections")
+}
+
+model TeamMember {
+  id              Int         @id @default(autoincrement())
+  teamSectionId   Int
+  name            String
+  position        String
+  bio             String?
+  photoUrl        String?
+  photoAlt        String?
+  email           String?
+  linkedinUrl     String?
+  twitterUrl      String?
+  githubUrl       String?
+  websiteUrl      String?
+  sortOrder       Int         @default(0)
+  isActive        Boolean     @default(true)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  teamSection     TeamSection @relation(fields: [teamSectionId], references: [id], onDelete: Cascade)
+
+  @@map("team_members")
 }
 
 model AdminUser {

@@ -196,8 +196,36 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(response);
     }
 
+    if (contentType === 'team-sections') {
+      // Fetch all team sections
+      const teamSections = await prisma.teamSection.findMany({
+        where: { isActive: true },
+        select: {
+          id: true,
+          name: true,
+          heading: true,
+          subheading: true,
+          layoutType: true,
+          isActive: true,
+          _count: {
+            select: {
+              teamMembers: true,
+              pageSections: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+
+      const response: ApiResponse = {
+        success: true,
+        data: teamSections
+      };
+      return NextResponse.json(response);
+    }
+
     // If no specific type, return all content types
-    const [heroSections, featureGroups, mediaSections, pricingSections, faqSections, forms, htmlSections] = await Promise.all([
+    const [heroSections, featureGroups, mediaSections, pricingSections, faqSections, forms, htmlSections, teamSections] = await Promise.all([
       (prisma.heroSection as any).findMany({
         where: { visible: true },
         select: {
@@ -315,6 +343,24 @@ export async function GET(request: NextRequest) {
           }
         },
         orderBy: { createdAt: 'desc' }
+      }),
+      prisma.teamSection.findMany({
+        where: { isActive: true },
+        select: {
+          id: true,
+          name: true,
+          heading: true,
+          subheading: true,
+          layoutType: true,
+          isActive: true,
+          _count: {
+            select: {
+              teamMembers: true,
+              pageSections: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' }
       })
     ]);
 
@@ -327,7 +373,8 @@ export async function GET(request: NextRequest) {
         pricingSections,
         faqSections,
         forms,
-        htmlSections
+        htmlSections,
+        teamSections
       }
     };
     return NextResponse.json(response);
