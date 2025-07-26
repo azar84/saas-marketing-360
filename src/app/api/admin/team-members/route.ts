@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
         photoUrl: body.photoUrl,
         photoAlt: body.photoAlt,
         email: body.email,
+        phone: body.phone,
         linkedinUrl: body.linkedinUrl,
         twitterUrl: body.twitterUrl,
         githubUrl: body.githubUrl,

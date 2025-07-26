@@ -8,7 +8,8 @@ import {
   Github, 
   Globe, 
   Mail,
-  ExternalLink 
+  ExternalLink,
+  Phone
 } from 'lucide-react';
 
 interface TeamMember {
@@ -19,6 +20,7 @@ interface TeamMember {
   photoUrl?: string;
   photoAlt?: string;
   email?: string;
+  phone?: string;
   linkedinUrl?: string;
   twitterUrl?: string;
   githubUrl?: string;
@@ -130,7 +132,7 @@ export default function TeamSection({
             target="_blank"
             rel="noopener noreferrer"
             className="p-2 rounded-full transition-colors"
-            style={{ 
+            style={{
               backgroundColor: socialBackgroundColor,
               color: socialTextColor
             }}
@@ -145,13 +147,58 @@ export default function TeamSection({
     );
   };
 
+  const renderContactInfo = (member: TeamMember) => {
+    const contactItems = [];
+    
+    if (member.email) {
+      contactItems.push(
+        <a
+          key="email"
+          href={`mailto:${member.email}`}
+          className="flex items-center space-x-3 text-base hover:opacity-80 transition-opacity font-medium"
+          style={{ color: socialTextColor }}
+        >
+          <Mail className="w-5 h-5" />
+          <span>{member.email}</span>
+        </a>
+      );
+    }
+    
+    if (member.phone) {
+      contactItems.push(
+        <a
+          key="phone"
+          href={`tel:${member.phone}`}
+          className="flex items-center space-x-3 text-base hover:opacity-80 transition-opacity font-medium"
+          style={{ color: socialTextColor }}
+        >
+          <Phone className="w-5 h-5" />
+          <span>{member.phone}</span>
+        </a>
+      );
+    }
+
+    if (contactItems.length === 0) return null;
+
+    return (
+      <div className="space-y-2">
+        {contactItems}
+      </div>
+    );
+  };
+
   const renderGridMember = (member: TeamMember, index: number) => (
     <motion.div
       key={member.id}
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 w-full max-w-sm p-2"
+      whileHover={{ 
+        y: -8,
+        scale: 1.02,
+        transition: { duration: 0.2 }
+      }}
+      className="rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 w-full max-w-sm p-2"
       style={{ backgroundColor: photoBackgroundColor }}
     >
       {/* Square Photo Section */}
@@ -178,12 +225,15 @@ export default function TeamSection({
           <div className="flex justify-between items-start mb-4">
             <div className="flex-1">
               <h3 className="text-lg font-bold mb-1" style={{ color: nameColor }}>{member.name}</h3>
-              <p className="text-sm" style={{ color: positionColor }}>{member.position}</p>
+              <p className="text-base" style={{ color: positionColor }}>{member.position}</p>
             </div>
             <div className="flex space-x-2 ml-3">
               {renderSocialLinks(member, 'grid')}
             </div>
           </div>
+          
+          {/* Contact Information */}
+          {renderContactInfo(member)}
           
           {/* Bio */}
           {member.bio && (
@@ -200,13 +250,18 @@ export default function TeamSection({
       initial={{ opacity: 0, x: index % 2 === 0 ? -50 : 50 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.6, delay: index * 0.2 }}
-      className={`flex items-center space-x-8 p-3 rounded-lg shadow-md ${
+      whileHover={{ 
+        y: -8,
+        scale: 1.02,
+        transition: { duration: 0.2 }
+      }}
+      className={`flex items-center space-x-8 p-3 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 ${
         index % 2 === 1 ? 'flex-row-reverse space-x-reverse' : ''
       }`}
       style={{ backgroundColor: photoBackgroundColor }}
     >
       <div className="flex-shrink-0">
-        <div className="w-48 h-48 rounded-full overflow-hidden p-2" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+        <div className="w-56 h-56 rounded-full overflow-hidden p-2" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
           {member.photoUrl ? (
             <img
               src={member.photoUrl}
@@ -224,6 +279,10 @@ export default function TeamSection({
         <div className="p-4">
           <h3 className="text-2xl font-bold mb-2" style={{ color: nameColor }}>{member.name}</h3>
           <p className="text-lg mb-4" style={{ color: positionColor }}>{member.position}</p>
+          
+          {/* Contact Information */}
+          {renderContactInfo(member)}
+          
           {member.bio && (
             <p className="leading-relaxed mb-4" style={{ color: bioColor }}>{member.bio}</p>
           )}
@@ -239,7 +298,12 @@ export default function TeamSection({
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5, delay: index * 0.1 }}
-      className="rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 w-full max-w-sm p-2"
+      whileHover={{ 
+        y: -8,
+        scale: 1.02,
+        transition: { duration: 0.2 }
+      }}
+      className="rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 w-full max-w-sm p-2"
       style={{ backgroundColor: photoBackgroundColor }}
     >
       {/* Square Photo Section */}
@@ -266,12 +330,15 @@ export default function TeamSection({
           <div className="flex justify-between items-start mb-4">
             <div className="flex-1">
               <h3 className="text-lg font-bold mb-1" style={{ color: nameColor }}>{member.name}</h3>
-              <p className="text-sm" style={{ color: positionColor }}>{member.position}</p>
+              <p className="text-base" style={{ color: positionColor }}>{member.position}</p>
             </div>
             <div className="flex space-x-2 ml-3">
-              {renderSocialLinks(member, 'cards')}
+              {renderSocialLinks(member, 'grid')}
             </div>
           </div>
+          
+          {/* Contact Information */}
+          {renderContactInfo(member)}
           
           {/* Bio */}
           {member.bio && (
@@ -288,11 +355,17 @@ export default function TeamSection({
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.4, delay: index * 0.1 }}
-      className="flex items-center space-x-6 p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-300"
+      whileHover={{ 
+        y: -4,
+        scale: 1.01,
+        transition: { duration: 0.2 }
+      }}
+      className="flex items-start space-x-8 p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
       style={{ backgroundColor: cardBackgroundColor }}
     >
+      {/* Photo Section */}
       <div className="flex-shrink-0">
-        <div className="w-20 h-20 rounded-full overflow-hidden p-1" style={{ backgroundColor: photoBackgroundColor }}>
+        <div className="w-40 h-40 rounded-full overflow-hidden shadow-md" style={{ backgroundColor: photoBackgroundColor }}>
           {member.photoUrl ? (
             <img
               src={member.photoUrl}
@@ -300,21 +373,35 @@ export default function TeamSection({
               className="w-full h-full object-cover rounded-full"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center text-6xl font-bold" style={{ color: 'var(--color-text-muted)' }}>
+            <div className="w-full h-full flex items-center justify-center text-7xl font-bold" style={{ color: 'var(--color-text-muted)' }}>
               {member.name.charAt(0).toUpperCase()}
             </div>
           )}
         </div>
       </div>
-      <div className="flex-1">
-        <h3 className="text-lg font-semibold mb-1" style={{ color: nameColor }}>{member.name}</h3>
-        <p className="mb-2" style={{ color: positionColor }}>{member.position}</p>
+
+      {/* Content Section */}
+      <div className="flex-1 min-w-0">
+        {/* Header with Name, Position, and Social Links */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-2xl font-bold mb-2" style={{ color: nameColor }}>{member.name}</h3>
+            <p className="text-lg font-medium mb-3" style={{ color: positionColor }}>{member.position}</p>
+          </div>
+          <div className="flex-shrink-0 ml-4">
+            {renderSocialLinks(member, 'list')}
+          </div>
+        </div>
+
+        {/* Contact Information */}
+        {renderContactInfo(member)}
+        
+        {/* Bio */}
         {member.bio && (
-          <p className="text-sm leading-relaxed" style={{ color: bioColor }}>{member.bio}</p>
+          <div className="mt-4">
+            <p className="text-base leading-relaxed" style={{ color: bioColor }}>{member.bio}</p>
+          </div>
         )}
-      </div>
-      <div className="flex-shrink-0">
-        {renderSocialLinks(member, 'list')}
       </div>
     </motion.div>
   );

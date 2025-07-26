@@ -1203,6 +1203,7 @@ model TeamMember {
   photoUrl        String?
   photoAlt        String?
   email           String?
+  phone           String?
   linkedinUrl     String?
   twitterUrl      String?
   githubUrl       String?

@@ -235,6 +235,7 @@ interface PageSection {
       photoUrl?: string;
       photoAlt?: string;
       email?: string;
+      phone?: string;
       linkedinUrl?: string;
       twitterUrl?: string;
       githubUrl?: string;

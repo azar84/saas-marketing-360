@@ -179,6 +179,7 @@ interface TeamMember {
   photoUrl?: string;
   photoAlt?: string;
   email?: string;
+  phone?: string;
   linkedinUrl?: string;
   twitterUrl?: string;
   githubUrl?: string;
@@ -221,6 +222,7 @@ interface TeamMemberFormData {
   photoUrl: string;
   photoAlt: string;
   email: string;
+  phone?: string;
   linkedinUrl: string;
   twitterUrl: string;
   githubUrl: string;
@@ -272,6 +274,7 @@ const TeamSectionsManager: React.FC = () => {
     photoUrl: '',
     photoAlt: '',
     email: '',
+    phone: '',
     linkedinUrl: '',
     twitterUrl: '',
     githubUrl: '',
@@ -349,6 +352,7 @@ const TeamSectionsManager: React.FC = () => {
       photoUrl: '',
       photoAlt: '',
       email: '',
+      phone: '',
       linkedinUrl: '',
       twitterUrl: '',
       githubUrl: '',
@@ -368,6 +372,7 @@ const TeamSectionsManager: React.FC = () => {
       photoUrl: '',
       photoAlt: '',
       email: '',
+      phone: '',
       linkedinUrl: '',
       twitterUrl: '',
       githubUrl: '',
@@ -482,6 +487,7 @@ const TeamSectionsManager: React.FC = () => {
       photoUrl: member.photoUrl || '',
       photoAlt: member.photoAlt || '',
       email: member.email || '',
+      phone: member.phone || '',
       linkedinUrl: member.linkedinUrl || '',
       twitterUrl: member.twitterUrl || '',
       githubUrl: member.githubUrl || '',
@@ -901,6 +907,24 @@ const TeamSectionsManager: React.FC = () => {
                   type="email"
                   value={memberFormData.email}
                   onChange={(e) => handleMemberInputChange('email', e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  style={{ 
+                    color: designSystem?.textPrimary || '#000000',
+                    backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                  }}
+                />
+              </div>
+              <div>
+                <label 
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: designSystem?.textPrimary || '#000000' }}
+                >
+                  Phone
+                </label>
+                <input
+                  type="tel"
+                  value={memberFormData.phone || ''}
+                  onChange={(e) => handleMemberInputChange('phone', e.target.value)}
                   className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   style={{ 
                     color: designSystem?.textPrimary || '#000000',
