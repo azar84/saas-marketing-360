@@ -574,14 +574,15 @@ const MediaSection: React.FC<MediaSectionProps> = ({
   };
 
   const getBackgroundStyle = () => {
+    const bgColor = backgroundColor || '#ffffff';
     switch (backgroundStyle) {
       case 'gradient':
         return {
-          background: `linear-gradient(135deg, ${backgroundColor} 0%, ${backgroundColor}80 100%)`
+          background: `linear-gradient(135deg, ${bgColor} 0%, ${bgColor}80 100%)`
         };
       case 'radial':
         return {
-          background: `radial-gradient(circle at center, ${backgroundColor} 0%, ${backgroundColor}80 100%)`
+          background: `radial-gradient(circle at center, ${bgColor} 0%, ${bgColor}80 100%)`
         };
       case 'none':
         return {
@@ -590,7 +591,7 @@ const MediaSection: React.FC<MediaSectionProps> = ({
       case 'solid':
       default:
         return {
-          backgroundColor
+          backgroundColor: bgColor
         };
     }
   };
@@ -738,10 +739,10 @@ const MediaSection: React.FC<MediaSectionProps> = ({
       data-animation-type={animationType}
       style={{
         ...getBackgroundStyle(),
-        color: textColor,
-        paddingTop: `${paddingTop}px`,
-        paddingBottom: `${paddingBottom}px`,
-        backgroundColor: backgroundStyle === 'none' ? 'transparent' : backgroundColor
+        color: textColor || '#000000',
+        paddingTop: `${paddingTop || 0}px`,
+        paddingBottom: `${paddingBottom || 0}px`,
+        backgroundColor: backgroundStyle === 'none' ? 'transparent' : (backgroundColor || '#ffffff')
       }}
     >
       <div className={`container mx-auto px-4 sm:px-6 lg:px-8 ${getContainerMaxWidth()}`}>
@@ -751,7 +752,7 @@ const MediaSection: React.FC<MediaSectionProps> = ({
             <div className={`${getAlignmentClass()}`}>
               {showBadge && badgeText && (
                 <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-6"
-                     style={{ backgroundColor: badgeColor, color: 'white' }}>
+                     style={{ backgroundColor: badgeColor || '#5243E9', color: 'white' }}>
                   {badgeText}
                 </div>
               )}
@@ -786,7 +787,7 @@ const MediaSection: React.FC<MediaSectionProps> = ({
             <div className={`${getAlignmentClass()} ${isMediaLeft ? 'lg:col-start-2' : ''}`}>
               {showBadge && badgeText && (
                 <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-6"
-                     style={{ backgroundColor: badgeColor, color: 'white' }}>
+                     style={{ backgroundColor: badgeColor || '#5243E9', color: 'white' }}>
                   {badgeText}
                 </div>
               )}
