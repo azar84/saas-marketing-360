@@ -30,12 +30,13 @@ interface TeamMember {
 }
 
 interface TeamSectionProps {
-  id: number;
-  name: string;
   heading: string;
   subheading?: string;
-  layoutType: 'grid' | 'staggered' | 'cards' | 'list';
+  layoutType: 'grid' | 'staggered' | 'list';
   backgroundColor?: string;
+  backgroundImage?: string;
+  backgroundSize?: string;
+  backgroundOverlay?: string;
   headingColor?: string;
   subheadingColor?: string;
   cardBackgroundColor?: string;
@@ -48,18 +49,18 @@ interface TeamSectionProps {
   paddingTop?: number;
   paddingBottom?: number;
   containerMaxWidth?: string;
-  isActive?: boolean;
   teamMembers: TeamMember[];
   className?: string;
 }
 
 export default function TeamSection({
-  id,
-  name,
   heading,
   subheading,
   layoutType = 'grid',
   backgroundColor = '#ffffff',
+  backgroundImage,
+  backgroundSize = 'cover',
+  backgroundOverlay = 'rgba(0,0,0,0.5)',
   headingColor = '#000000',
   subheadingColor = '#666666',
   cardBackgroundColor = '#ffffff',
@@ -72,7 +73,6 @@ export default function TeamSection({
   paddingTop = 96,
   paddingBottom = 96,
   containerMaxWidth = 'xl',
-  isActive = true,
   teamMembers = [],
   className = ''
 }: TeamSectionProps) {
@@ -99,13 +99,6 @@ export default function TeamSection({
         return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 justify-items-center';
       case 'staggered':
         return 'space-y-12';
-      case 'cards':
-        // Dynamic columns for cards layout
-        if (memberCount === 1) return 'grid grid-cols-1 gap-8 justify-items-center';
-        if (memberCount === 2) return 'grid grid-cols-1 md:grid-cols-2 gap-8 justify-items-center';
-        if (memberCount === 3) return 'grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center';
-        // For 4+ members, use responsive grid
-        return 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center';
       case 'list':
         return 'space-y-6';
       default:
@@ -292,63 +285,6 @@ export default function TeamSection({
     </motion.div>
   );
 
-  const renderCardMember = (member: TeamMember, index: number) => (
-    <motion.div
-      key={member.id}
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      whileHover={{ 
-        y: -8,
-        scale: 1.02,
-        transition: { duration: 0.2 }
-      }}
-      className="rounded-lg shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 w-full max-w-sm p-2"
-      style={{ backgroundColor: photoBackgroundColor }}
-    >
-      {/* Square Photo Section */}
-      <div className="mb-4">
-        <div className="aspect-square rounded-lg overflow-hidden" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
-          {member.photoUrl ? (
-            <img
-              src={member.photoUrl}
-              alt={member.photoAlt || member.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-6xl font-bold" style={{ color: 'var(--color-text-muted)' }}>
-              {member.name.charAt(0).toUpperCase()}
-            </div>
-          )}
-        </div>
-      </div>
-      
-      {/* Content Section */}
-      <div style={{ backgroundColor: cardBackgroundColor }} className="rounded-lg">
-        <div className="p-4">
-          {/* Name and Role with Social Icons */}
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex-1">
-              <h3 className="text-lg font-bold mb-1" style={{ color: nameColor }}>{member.name}</h3>
-              <p className="text-base" style={{ color: positionColor }}>{member.position}</p>
-            </div>
-            <div className="flex space-x-2 ml-3">
-              {renderSocialLinks(member, 'grid')}
-            </div>
-          </div>
-          
-          {/* Contact Information */}
-          {renderContactInfo(member)}
-          
-          {/* Bio */}
-          {member.bio && (
-            <p className="text-sm leading-relaxed" style={{ color: bioColor }}>{member.bio}</p>
-          )}
-        </div>
-      </div>
-    </motion.div>
-  );
-
   const renderListMember = (member: TeamMember, index: number) => (
     <motion.div
       key={member.id}
@@ -425,14 +361,6 @@ export default function TeamSection({
             {activeMembers.map((member, index) => renderStaggeredMember(member, index))}
           </div>
         );
-      case 'cards':
-        return (
-          <div className="flex justify-center">
-            <div className={getLayoutClasses(memberCount)}>
-              {activeMembers.map((member, index) => renderCardMember(member, index))}
-            </div>
-          </div>
-        );
       case 'list':
         return (
           <div className={getLayoutClasses(memberCount)}>
@@ -450,20 +378,33 @@ export default function TeamSection({
     }
   };
 
-  if (!isActive || teamMembers.length === 0) {
-    return null;
-  }
-
   return (
     <section
-      className={`${className}`}
-      style={{
-        backgroundColor,
-        paddingTop: `${paddingTop}px`,
-        paddingBottom: `${paddingBottom}px`
-      }}
+      className={`${className} relative`}
+              style={{
+          backgroundColor,
+          backgroundImage: backgroundImage ? `url(${backgroundImage})` : 'none',
+          backgroundSize: backgroundSize,
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          paddingTop: `${paddingTop}px`,
+          paddingBottom: `${paddingBottom}px`
+        }}
     >
-      <div className={`container mx-auto px-4 sm:px-6 lg:px-8 ${getContainerMaxWidth()}`}>
+              {/* Background Overlay */}
+        {backgroundOverlay && (
+          <div 
+            className="absolute inset-0"
+            style={{ 
+              backgroundColor: backgroundOverlay,
+              opacity: 0.1
+            }}
+          />
+        )}
+      
+      {/* Content */}
+      <div className={`container mx-auto px-4 sm:px-6 lg:px-8 ${getContainerMaxWidth()} relative z-10`}>
+        {/* Title and Description */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -471,13 +412,16 @@ export default function TeamSection({
           className="text-center mb-16"
         >
           <h2 
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-6"
+            className="text-4xl md:text-5xl font-bold mb-6"
             style={{ color: headingColor }}
           >
             {heading}
           </h2>
           {subheading && (
-            <p className="text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed" style={{ color: subheadingColor }}>
+            <p 
+              className="text-xl md:text-2xl max-w-3xl mx-auto"
+              style={{ color: subheadingColor }}
+            >
               {subheading}
             </p>
           )}
@@ -485,6 +429,8 @@ export default function TeamSection({
 
         {renderMembers()}
       </div>
+
+              {/* Layout content */}
     </section>
   );
 }

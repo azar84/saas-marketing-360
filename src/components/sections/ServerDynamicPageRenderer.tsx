@@ -212,8 +212,11 @@ interface PageSection {
     name: string;
     heading: string;
     subheading?: string;
-    layoutType: 'grid' | 'staggered' | 'cards' | 'list';
+    layoutType: 'grid' | 'staggered' | 'cards' | 'list' | 'modern';
     backgroundColor?: string;
+    backgroundImage?: string;
+    backgroundSize?: string;
+    backgroundOverlay?: string;
     headingColor?: string;
     subheadingColor?: string;
     cardBackgroundColor?: string;
@@ -939,6 +942,9 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
               subheading={section.teamSection.subheading}
               layoutType={section.teamSection.layoutType}
               backgroundColor={section.teamSection.backgroundColor}
+              backgroundImage={section.teamSection.backgroundImage}
+              backgroundSize={section.teamSection.backgroundSize}
+              backgroundOverlay={section.teamSection.backgroundOverlay}
               headingColor={section.teamSection.headingColor}
               subheadingColor={section.teamSection.subheadingColor}
               cardBackgroundColor={section.teamSection.cardBackgroundColor}

@@ -44,6 +44,15 @@ interface MediaLibraryManagerProps {
   onSelect?: (media: MediaItem | MediaItem[]) => void;
   onClose?: () => void;
   selectedMedia?: MediaItem | MediaItem[];
+  designSystem?: {
+    textPrimary?: string;
+    textSecondary?: string;
+    textMuted?: string;
+    backgroundPrimary?: string;
+    backgroundSecondary?: string;
+    primary?: string;
+    primaryLight?: string;
+  };
 }
 
 interface UploadProgress {
@@ -61,7 +70,8 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
   acceptedTypes = [],
   onSelect,
   onClose,
-  selectedMedia = allowMultiple ? [] : null
+  selectedMedia = allowMultiple ? [] : null,
+  designSystem
 }) => {
   const [media, setMedia] = useState<MediaItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -289,17 +299,27 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
       onClick={(e) => e.stopPropagation()}
     >
       <div 
-        className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl h-[90vh] overflow-hidden"
+        className="rounded-2xl shadow-2xl w-full max-w-6xl h-[90vh] overflow-hidden"
+        style={{ backgroundColor: designSystem?.backgroundPrimary || '#ffffff' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
+        <div 
+          className="p-6"
+          style={{ 
+            background: `linear-gradient(135deg, ${designSystem?.primaryLight || '#60a5fa'} 0%, ${designSystem?.primary || '#3b82f6'} 100%)`,
+            color: '#ffffff'
+          }}
+        >
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold mb-1">
                 {isSelectionMode ? 'Select Media' : 'Media Library'}
               </h2>
-              <p className="text-blue-100 text-sm">
+              <p 
+                className="text-sm"
+                style={{ color: 'rgba(255, 255, 255, 0.8)' }}
+              >
                 {media.length} {media.length === 1 ? 'item' : 'items'} available
               </p>
             </div>
@@ -308,7 +328,17 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
                 <button
                   type="button"
                   onClick={handleConfirmSelection}
-                  className="px-6 py-2.5 bg-white text-blue-600 rounded-lg hover:bg-blue-50 transition-colors font-medium shadow-sm"
+                  className="px-6 py-2.5 rounded-lg transition-colors font-medium shadow-sm"
+                  style={{
+                    backgroundColor: '#ffffff',
+                    color: designSystem?.primary || '#3b82f6'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = '#ffffff';
+                  }}
                 >
                   Select {allowMultiple && selectedItems.length > 1 
                     ? `${selectedItems.length} items` 
@@ -319,7 +349,17 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="p-2.5 hover:bg-blue-600 rounded-lg transition-colors"
+                  className="p-2.5 rounded-lg transition-colors"
+                  style={{ 
+                    color: '#ffffff',
+                    backgroundColor: 'transparent'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = 'transparent';
+                  }}
                   title="Close"
                 >
                   <X className="w-5 h-5" />
@@ -331,16 +371,41 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
 
         <div className="flex h-full">
           {/* Sidebar */}
-          <div className="w-80 border-r border-gray-200 bg-gray-50 p-4">
+          <div 
+            className="w-80 border-r p-4"
+            style={{ 
+              borderColor: designSystem?.textMuted || '#e5e7eb',
+              backgroundColor: designSystem?.backgroundSecondary || '#f9fafb'
+            }}
+          >
             {/* Upload Section */}
             <div className="mb-6">
-              <h3 className="font-semibold text-gray-900 mb-3">Upload Files</h3>
+              <h3 
+                className="font-semibold mb-3"
+                style={{ color: designSystem?.textPrimary || '#111827' }}
+              >
+                Upload Files
+              </h3>
               <div className="space-y-2">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
                   disabled={uploading}
-                  className="w-full flex items-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50"
+                  className="w-full flex items-center gap-2 px-4 py-3 rounded-lg transition-colors font-medium disabled:opacity-50"
+                  style={{
+                    backgroundColor: uploading ? '#9ca3af' : '#3b82f6',
+                    color: '#ffffff'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!uploading) {
+                      e.currentTarget.style.backgroundColor = '#2563eb';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!uploading) {
+                      e.currentTarget.style.backgroundColor = '#3b82f6';
+                    }
+                  }}
                 >
                   <Upload className="w-4 h-4" />
                   Choose Files
@@ -348,7 +413,18 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
                 <button
                   type="button"
                   onClick={() => setShowUrlImport(true)}
-                  className="w-full flex items-center gap-2 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                  className="w-full flex items-center gap-2 px-4 py-3 border rounded-lg transition-colors font-medium"
+                  style={{
+                    borderColor: designSystem?.textMuted || '#d1d5db',
+                    color: designSystem?.textSecondary || '#6b7280',
+                    backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.backgroundColor = designSystem?.backgroundSecondary || '#f9fafb';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.backgroundColor = designSystem?.backgroundPrimary || '#ffffff';
+                  }}
                 >
                   <Link className="w-4 h-4" />
                   Import from URL
@@ -358,14 +434,29 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
 
             {/* Filters */}
             <div>
-              <h3 className="font-semibold text-gray-900 mb-3">Filters</h3>
+              <h3 
+                className="font-semibold mb-3"
+                style={{ color: designSystem?.textPrimary || '#111827' }}
+              >
+                Filters
+              </h3>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">File Type</label>
+                  <label 
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: designSystem?.textPrimary || '#111827' }}
+                  >
+                    File Type
+                  </label>
                   <select
                     value={fileTypeFilter}
                     onChange={(e) => setFileTypeFilter(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                    style={{
+                      borderColor: designSystem?.textMuted || '#d1d5db',
+                      color: designSystem?.textPrimary || '#111827',
+                      backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                    }}
                   >
                     <option value="all">All Types</option>
                     <option value="image">Images</option>
@@ -381,41 +472,78 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
           {/* Main Content */}
           <div className="flex-1 flex flex-col">
             {/* Toolbar */}
-            <div className="p-4 border-b border-gray-200 bg-white">
+            <div 
+              className="p-4 border-b"
+              style={{ 
+                borderColor: designSystem?.textMuted || '#e5e7eb',
+                backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+              }}
+            >
               <div className="flex items-center gap-4">
                 <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/4 text-gray-400 w-4 h-4" />
+                  <Search 
+                    className="absolute left-3 top-1/2 transform -translate-y-1/4 w-4 h-4" 
+                    style={{ color: designSystem?.textMuted || '#9ca3af' }}
+                  />
                   <input
                     type="text"
                     placeholder="Search media files..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    style={{
+                      borderColor: designSystem?.textMuted || '#d1d5db',
+                      color: designSystem?.textPrimary || '#111827',
+                      backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                    }}
                   />
                 </div>
-                
-                <div className="flex items-center gap-1 border border-gray-300 rounded-lg">
+                <div className="flex items-center gap-2">
                   <button
                     type="button"
                     onClick={() => setViewMode('grid')}
-                    className={`p-2.5 transition-colors ${
-                      viewMode === 'grid' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'hover:bg-gray-50 text-gray-600'
+                    className={`p-2 rounded-lg transition-colors ${
+                      viewMode === 'grid' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'
                     }`}
+                    style={{
+                      backgroundColor: viewMode === 'grid' ? (designSystem?.backgroundSecondary || '#f3f4f6') : 'transparent',
+                      color: viewMode === 'grid' ? '#3b82f6' : (designSystem?.textMuted || '#9ca3af')
+                    }}
+                    onMouseEnter={(e) => {
+                      if (viewMode !== 'grid') {
+                        e.currentTarget.style.color = designSystem?.textSecondary || '#6b7280';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (viewMode !== 'grid') {
+                        e.currentTarget.style.color = designSystem?.textMuted || '#9ca3af';
+                      }
+                    }}
                   >
-                    <Grid className="w-4 h-4" />
+                    <Grid className="w-5 h-5" />
                   </button>
                   <button
                     type="button"
                     onClick={() => setViewMode('list')}
-                    className={`p-2.5 transition-colors ${
-                      viewMode === 'list' 
-                        ? 'bg-blue-500 text-white' 
-                        : 'hover:bg-gray-50 text-gray-600'
+                    className={`p-2 rounded-lg transition-colors ${
+                      viewMode === 'list' ? 'bg-blue-100 text-blue-600' : 'text-gray-400 hover:text-gray-600'
                     }`}
+                    style={{
+                      backgroundColor: viewMode === 'list' ? (designSystem?.backgroundSecondary || '#f3f4f6') : 'transparent',
+                      color: viewMode === 'list' ? '#3b82f6' : (designSystem?.textMuted || '#9ca3af')
+                    }}
+                    onMouseEnter={(e) => {
+                      if (viewMode !== 'list') {
+                        e.currentTarget.style.color = designSystem?.textSecondary || '#6b7280';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (viewMode !== 'list') {
+                        e.currentTarget.style.color = designSystem?.textMuted || '#9ca3af';
+                      }
+                    }}
                   >
-                    <List className="w-4 h-4" />
+                    <List className="w-5 h-5" />
                   </button>
                 </div>
               </div>
@@ -423,15 +551,41 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
 
             {/* Upload Progress */}
             {Object.keys(uploadProgress).length > 0 && (
-              <div className="p-4 bg-blue-50 border-b border-blue-200">
-                <h4 className="text-sm font-medium text-blue-900 mb-3">Uploading Files</h4>
+              <div 
+                className="p-4 border-b"
+                style={{ 
+                  backgroundColor: designSystem?.backgroundSecondary || '#eff6ff',
+                  borderColor: designSystem?.textMuted || '#bfdbfe'
+                }}
+              >
+                <h4 
+                  className="text-sm font-medium mb-3"
+                  style={{ color: designSystem?.textPrimary || '#1e40af' }}
+                >
+                  Uploading Files
+                </h4>
                 <div className="space-y-2 max-h-32 overflow-y-auto">
                   {Object.entries(uploadProgress).filter(([key, upload]) => upload && upload.file && upload.file.name).map(([key, upload]) => (
-                    <div key={key} className="bg-white p-3 rounded-lg border border-blue-200">
+                    <div 
+                      key={key} 
+                      className="p-3 rounded-lg border"
+                      style={{
+                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff',
+                        borderColor: designSystem?.textMuted || '#bfdbfe'
+                      }}
+                    >
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-gray-900">{upload.file?.name || 'Unknown file'}</span>
+                        <span 
+                          className="text-sm font-medium"
+                          style={{ color: designSystem?.textPrimary || '#111827' }}
+                        >
+                          {upload.file?.name || 'Unknown file'}
+                        </span>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs text-gray-600">
+                          <span 
+                            className="text-xs"
+                            style={{ color: designSystem?.textSecondary || '#6b7280' }}
+                          >
                             {upload.status === 'success' ? 'Complete' : 
                              upload.status === 'error' ? 'Failed' : 
                              `${Math.round(upload.progress)}%`}
@@ -440,7 +594,10 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
                           {upload.status === 'error' && <AlertCircle className="w-4 h-4 text-red-500" />}
                         </div>
                       </div>
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
+                        className="w-full rounded-full h-2"
+                        style={{ backgroundColor: designSystem?.textMuted || '#e5e7eb' }}
+                      >
                         <div 
                           className={`h-2 rounded-full transition-all duration-300 ${
                             upload.status === 'success' ? 'bg-green-500' :
@@ -462,17 +619,34 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
             <div 
               ref={dropZoneRef}
               className="flex-1 overflow-y-auto p-4 relative"
+              style={{ backgroundColor: designSystem?.backgroundPrimary || '#ffffff' }}
               onDrop={handleDrop}
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
             >
               {/* Drag Overlay */}
               {dragActive && (
-                <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center z-10">
-                  <div className="bg-white rounded-xl p-8 shadow-xl border-2 border-dashed border-blue-500">
+                <div className="absolute inset-0 flex items-center justify-center z-10" style={{ backgroundColor: 'rgba(59, 130, 246, 0.2)' }}>
+                  <div 
+                    className="rounded-xl p-8 shadow-xl border-2 border-dashed"
+                    style={{
+                      backgroundColor: designSystem?.backgroundPrimary || '#ffffff',
+                      borderColor: '#3b82f6'
+                    }}
+                  >
                     <CloudUpload className="w-12 h-12 text-blue-500 mx-auto mb-4" />
-                    <p className="text-lg font-semibold text-gray-900 text-center">Drop files here to upload</p>
-                    <p className="text-gray-600 text-center mt-1">Release to start uploading</p>
+                    <p 
+                      className="text-lg font-semibold text-center"
+                      style={{ color: designSystem?.textPrimary || '#111827' }}
+                    >
+                      Drop files here to upload
+                    </p>
+                    <p 
+                      className="text-center mt-1"
+                      style={{ color: designSystem?.textSecondary || '#6b7280' }}
+                    >
+                      Release to start uploading
+                    </p>
                   </div>
                 </div>
               )}
@@ -480,24 +654,50 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
               {loading ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center">
-                    <RefreshCw className="w-8 h-8 text-gray-400 animate-spin mx-auto mb-3" />
-                    <div className="text-gray-500">Loading media...</div>
+                    <RefreshCw 
+                      className="w-8 h-8 animate-spin mx-auto mb-3" 
+                      style={{ color: designSystem?.textMuted || '#9ca3af' }}
+                    />
+                    <div style={{ color: designSystem?.textSecondary || '#6b7280' }}>
+                      Loading media...
+                    </div>
                   </div>
                 </div>
               ) : media.length === 0 ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center max-w-md">
-                    <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Image className="w-12 h-12 text-gray-400" />
+                    <div 
+                      className="w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4"
+                      style={{ backgroundColor: designSystem?.backgroundSecondary || '#f3f4f6' }}
+                    >
+                      <Image 
+                        className="w-12 h-12" 
+                        style={{ color: designSystem?.textMuted || '#9ca3af' }}
+                      />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">No media files yet</h3>
-                    <p className="text-gray-600 mb-6">
+                    <h3 
+                      className="text-lg font-semibold mb-2"
+                      style={{ color: designSystem?.textPrimary || '#111827' }}
+                    >
+                      No media files yet
+                    </h3>
+                    <p 
+                      className="mb-6"
+                      style={{ color: designSystem?.textSecondary || '#6b7280' }}
+                    >
                       Upload your first files to get started. You can drag and drop files here or click the upload button.
                     </p>
                     <button
                       type="button"
                       onClick={() => fileInputRef.current?.click()}
-                      className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                      className="px-6 py-3 text-white rounded-lg transition-colors font-medium"
+                      style={{ backgroundColor: '#3b82f6' }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = '#2563eb';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = '#3b82f6';
+                      }}
                     >
                       Upload Files
                     </button>
@@ -513,14 +713,33 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
                         key={item.id}
                         className={`relative border-2 rounded-xl overflow-hidden cursor-pointer transition-all duration-200 group ${
                           isSelected 
-                            ? 'ring-2 ring-blue-500 bg-blue-50 border-blue-200' 
-                            : 'border-gray-200 hover:border-gray-300 hover:shadow-lg'
+                            ? 'ring-2 ring-blue-500' 
+                            : ''
                         }`}
+                        style={{
+                          borderColor: isSelected ? '#3b82f6' : (designSystem?.textMuted || '#e5e7eb'),
+                          backgroundColor: isSelected ? (designSystem?.backgroundSecondary || '#eff6ff') : (designSystem?.backgroundPrimary || '#ffffff')
+                        }}
+                        onMouseEnter={(e) => {
+                          if (!isSelected) {
+                            e.currentTarget.style.borderColor = designSystem?.textSecondary || '#d1d5db';
+                            e.currentTarget.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.1)';
+                          }
+                        }}
+                        onMouseLeave={(e) => {
+                          if (!isSelected) {
+                            e.currentTarget.style.borderColor = designSystem?.textMuted || '#e5e7eb';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }
+                        }}
                         onClick={() => isSelectionMode && handleItemSelect(item)}
                       >
                         {viewMode === 'grid' ? (
                           <>
-                            <div className="aspect-square bg-gray-100 flex items-center justify-center relative overflow-hidden">
+                            <div 
+                              className="aspect-square flex items-center justify-center relative overflow-hidden"
+                              style={{ backgroundColor: designSystem?.backgroundSecondary || '#f3f4f6' }}
+                            >
                               {item.fileType === 'image' ? (
                                 <img
                                   src={item.publicUrl}
@@ -533,7 +752,8 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
                                     const parent = target.parentElement;
                                     if (parent && !parent.querySelector('.fallback-icon')) {
                                       const fallback = document.createElement('div');
-                                      fallback.className = 'fallback-icon text-gray-400 flex items-center justify-center w-full h-full';
+                                      fallback.className = 'fallback-icon flex items-center justify-center w-full h-full';
+                                      fallback.style.color = designSystem?.textMuted || '#9ca3af';
                                       fallback.innerHTML = `
                                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -544,7 +764,7 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
                                   }}
                                 />
                               ) : (
-                                <div className="text-gray-400">
+                                <div style={{ color: designSystem?.textMuted || '#9ca3af' }}>
                                   {getFileTypeIcon(item.fileType)}
                                 </div>
                               )}
@@ -558,7 +778,16 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
                                       e.stopPropagation();
                                       window.open(item.publicUrl, '_blank');
                                     }}
-                                    className="p-2 bg-white rounded-full shadow-lg hover:bg-gray-50 transition-colors"
+                                    className="p-2 rounded-full shadow-lg transition-colors"
+                                    style={{
+                                      backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                                    }}
+                                    onMouseEnter={(e) => {
+                                      e.currentTarget.style.backgroundColor = designSystem?.backgroundSecondary || '#f9fafb';
+                                    }}
+                                    onMouseLeave={(e) => {
+                                      e.currentTarget.style.backgroundColor = designSystem?.backgroundPrimary || '#ffffff';
+                                    }}
                                     title="View"
                                   >
                                     <Eye className="w-4 h-4" />
@@ -570,7 +799,17 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
                                         e.stopPropagation();
                                         handleDelete(item.id);
                                       }}
-                                      className="p-2 bg-white rounded-full shadow-lg hover:bg-red-50 text-red-600 transition-colors"
+                                      className="p-2 rounded-full shadow-lg transition-colors"
+                                      style={{
+                                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff',
+                                        color: '#ef4444'
+                                      }}
+                                      onMouseEnter={(e) => {
+                                        e.currentTarget.style.backgroundColor = '#fef2f2';
+                                      }}
+                                      onMouseLeave={(e) => {
+                                        e.currentTarget.style.backgroundColor = designSystem?.backgroundPrimary || '#ffffff';
+                                      }}
                                       title="Delete"
                                     >
                                       <Trash2 className="w-4 h-4" />
@@ -581,12 +820,18 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
                             </div>
                             
                             <div className="p-3">
-                              <div className="text-sm font-medium text-gray-900 truncate mb-1">
-                                {item.title || item.filename || 'Untitled'}
+                              <div 
+                                className="text-sm font-medium truncate mb-1"
+                                style={{ color: designSystem?.textPrimary || '#111827' }}
+                              >
+                                {item.title || item.filename}
                               </div>
-                              <div className="text-xs text-gray-500 flex items-center justify-between">
-                                <span>{formatFileSize(item.fileSize || 0)}</span>
-                                <span>{formatDate(item.createdAt || new Date().toISOString())}</span>
+                              <div 
+                                className="text-xs flex items-center justify-between"
+                                style={{ color: designSystem?.textSecondary || '#6b7280' }}
+                              >
+                                <span>{item.fileType.toUpperCase()}</span>
+                                <span>{formatFileSize(item.fileSize)}</span>
                               </div>
                             </div>
                             
@@ -597,8 +842,12 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
                             )}
                           </>
                         ) : (
+                          // List View
                           <div className="flex items-center gap-4 p-4">
-                            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <div 
+                              className="w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0"
+                              style={{ backgroundColor: designSystem?.backgroundSecondary || '#f3f4f6' }}
+                            >
                               {item.fileType === 'image' ? (
                                 <img
                                   src={item.publicUrl}
@@ -611,7 +860,8 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
                                     const parent = target.parentElement;
                                     if (parent && !parent.querySelector('.fallback-icon')) {
                                       const fallback = document.createElement('div');
-                                      fallback.className = 'fallback-icon text-gray-400 flex items-center justify-center w-full h-full';
+                                      fallback.className = 'fallback-icon flex items-center justify-center w-full h-full';
+                                      fallback.style.color = designSystem?.textMuted || '#9ca3af';
                                       fallback.innerHTML = `
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -622,55 +872,75 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
                                   }}
                                 />
                               ) : (
-                                <div className="text-gray-400">
+                                <div style={{ color: designSystem?.textMuted || '#9ca3af' }}>
                                   {getFileTypeIcon(item.fileType)}
                                 </div>
                               )}
                             </div>
                             
                             <div className="flex-1 min-w-0">
-                              <div className="font-medium text-gray-900 truncate">
-                                {item.title || item.filename || 'Untitled'}
+                              <div 
+                                className="font-medium truncate"
+                                style={{ color: designSystem?.textPrimary || '#111827' }}
+                              >
+                                {item.title || item.filename}
                               </div>
-                              <div className="text-sm text-gray-500 flex items-center gap-4">
-                                <span>{formatFileSize(item.fileSize || 0)}</span>
-                                <span>{item.mimeType || 'Unknown type'}</span>
-                                <span>{formatDate(item.createdAt || new Date().toISOString())}</span>
+                              <div 
+                                className="text-sm flex items-center gap-4"
+                                style={{ color: designSystem?.textSecondary || '#6b7280' }}
+                              >
+                                <span>{item.fileType.toUpperCase()}</span>
+                                <span>{formatFileSize(item.fileSize)}</span>
+                                <span>{formatDate(item.createdAt)}</span>
                               </div>
                             </div>
                             
-                            {isSelectionMode && isSelected && (
-                              <div className="bg-blue-500 text-white rounded-full p-1.5">
-                                <Check className="w-4 h-4" />
-                              </div>
-                            )}
-                            
-                            {!isSelectionMode && (
-                              <div className="flex items-center gap-1">
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    window.open(item.publicUrl, '_blank');
-                                  }}
-                                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                                  title="View"
-                                >
-                                  <Eye className="w-4 h-4" />
-                                </button>
+                            <div className="flex items-center gap-2">
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  window.open(item.publicUrl, '_blank');
+                                }}
+                                className="p-2 rounded-lg transition-colors"
+                                style={{
+                                  color: designSystem?.textMuted || '#9ca3af',
+                                  backgroundColor: 'transparent'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = designSystem?.backgroundSecondary || '#f3f4f6';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = 'transparent';
+                                }}
+                                title="View"
+                              >
+                                <Eye className="w-4 h-4" />
+                              </button>
+                              {!isSelectionMode && (
                                 <button
                                   type="button"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     handleDelete(item.id);
                                   }}
-                                  className="p-2 hover:bg-red-50 rounded-lg text-red-600 transition-colors"
+                                  className="p-2 rounded-lg transition-colors"
+                                  style={{
+                                    color: '#ef4444',
+                                    backgroundColor: 'transparent'
+                                  }}
+                                  onMouseEnter={(e) => {
+                                    e.currentTarget.style.backgroundColor = '#fef2f2';
+                                  }}
+                                  onMouseLeave={(e) => {
+                                    e.currentTarget.style.backgroundColor = 'transparent';
+                                  }}
                                   title="Delete"
                                 >
                                   <Trash2 className="w-4 h-4" />
                                 </button>
-                              </div>
-                            )}
+                              )}
+                            </div>
                           </div>
                         )}
                       </div>
@@ -721,6 +991,7 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
             }}
             onClose={() => setShowUrlImport(false)}
             uploading={uploading}
+            designSystem={designSystem}
           />
         )}
       </div>
@@ -733,7 +1004,14 @@ const UrlImportModal: React.FC<{
   onImport: (data: any) => void;
   onClose: () => void;
   uploading: boolean;
-}> = ({ onImport, onClose, uploading }) => {
+  designSystem?: {
+    textPrimary?: string;
+    textSecondary?: string;
+    textMuted?: string;
+    backgroundPrimary?: string;
+    backgroundSecondary?: string;
+  };
+}> = ({ onImport, onClose, uploading, designSystem }) => {
   const [formData, setFormData] = useState({
     url: '',
     title: '',
@@ -756,71 +1034,122 @@ const UrlImportModal: React.FC<{
       onClick={(e) => e.stopPropagation()}
     >
       <div 
-        className="bg-white rounded-xl shadow-2xl w-full max-w-md"
+        className="rounded-xl shadow-2xl w-full max-w-md"
+        style={{ backgroundColor: designSystem?.backgroundPrimary || '#ffffff' }}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6 border-b border-gray-200">
+        <div 
+          className="p-6 border-b"
+          style={{ borderColor: designSystem?.textMuted || '#e5e7eb' }}
+        >
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900">Import from URL</h3>
+            <h3 
+              className="text-lg font-semibold"
+              style={{ color: designSystem?.textPrimary || '#111827' }}
+            >
+              Import from URL
+            </h3>
             <button
               type="button"
               onClick={onClose}
-              className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-1 rounded-lg transition-colors"
+              style={{ 
+                color: designSystem?.textMuted || '#9ca3af',
+                backgroundColor: 'transparent'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = designSystem?.backgroundSecondary || '#f3f4f6';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+              }}
             >
               <X className="w-5 h-5" />
             </button>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4" onClick={(e) => e.stopPropagation()}>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label 
+              className="block text-sm font-medium mb-2"
+              style={{ color: designSystem?.textPrimary || '#111827' }}
+            >
               File URL *
             </label>
             <input
               type="url"
               value={formData.url}
               onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                borderColor: designSystem?.textMuted || '#d1d5db',
+                color: designSystem?.textPrimary || '#111827',
+                backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+              }}
               placeholder="https://example.com/image.jpg"
               required
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label 
+              className="block text-sm font-medium mb-2"
+              style={{ color: designSystem?.textPrimary || '#111827' }}
+            >
               Title
             </label>
             <input
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                borderColor: designSystem?.textMuted || '#d1d5db',
+                color: designSystem?.textPrimary || '#111827',
+                backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+              }}
               placeholder="Optional title"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label 
+              className="block text-sm font-medium mb-2"
+              style={{ color: designSystem?.textPrimary || '#111827' }}
+            >
               Alt Text
             </label>
             <input
               type="text"
               value={formData.alt}
               onChange={(e) => setFormData({ ...formData, alt: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                borderColor: designSystem?.textMuted || '#d1d5db',
+                color: designSystem?.textPrimary || '#111827',
+                backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+              }}
               placeholder="Alternative text for accessibility"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label 
+              className="block text-sm font-medium mb-2"
+              style={{ color: designSystem?.textPrimary || '#111827' }}
+            >
               Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              style={{
+                borderColor: designSystem?.textMuted || '#d1d5db',
+                color: designSystem?.textPrimary || '#111827',
+                backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+              }}
               rows={3}
               placeholder="Optional description"
             />
@@ -830,14 +1159,38 @@ const UrlImportModal: React.FC<{
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              className="flex-1 px-4 py-2 border rounded-lg transition-colors"
+              style={{
+                borderColor: designSystem?.textMuted || '#d1d5db',
+                color: designSystem?.textSecondary || '#6b7280',
+                backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = designSystem?.backgroundSecondary || '#f9fafb';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = designSystem?.backgroundPrimary || '#ffffff';
+              }}
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={uploading}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="flex-1 px-4 py-2 text-white rounded-lg transition-colors disabled:opacity-50"
+              style={{
+                backgroundColor: uploading ? '#9ca3af' : '#3b82f6'
+              }}
+              onMouseEnter={(e) => {
+                if (!uploading) {
+                  e.currentTarget.style.backgroundColor = '#2563eb';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!uploading) {
+                  e.currentTarget.style.backgroundColor = '#3b82f6';
+                }
+              }}
             >
               {uploading ? 'Importing...' : 'Import'}
             </button>
@@ -849,3 +1202,4 @@ const UrlImportModal: React.FC<{
 };
 
 export default MediaLibraryManager;
+

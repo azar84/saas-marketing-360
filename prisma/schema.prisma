@@ -1171,8 +1171,11 @@ model TeamSection {
   name                  String
   heading               String
   subheading            String?
-  layoutType            String        @default("grid") // grid, staggered, cards, list
+  layoutType            String        @default("grid") // grid, staggered, list
   backgroundColor       String?       @default("#ffffff")
+  backgroundImage       String?
+  backgroundSize        String?       @default("cover") // cover, contain, auto, 100%, 200px
+  backgroundOverlay     String?
   headingColor          String?       @default("#000000")
   subheadingColor       String?       @default("#666666")
   cardBackgroundColor   String?       @default("#ffffff")

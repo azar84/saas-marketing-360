@@ -193,8 +193,11 @@ interface TeamSection {
   name: string;
   heading: string;
   subheading?: string;
-  layoutType: 'grid' | 'staggered' | 'cards' | 'list';
+  layoutType: 'grid' | 'staggered' | 'list';
   backgroundColor?: string;
+  backgroundImage?: string;
+  backgroundSize?: string;
+  backgroundOverlay?: string;
   headingColor?: string;
   subheadingColor?: string;
   cardBackgroundColor?: string;
@@ -252,6 +255,9 @@ const TeamSectionsManager: React.FC = () => {
     subheading: '',
     layoutType: 'grid',
     backgroundColor: '#ffffff',
+    backgroundImage: '',
+    backgroundSize: 'cover',
+    backgroundOverlay: '',
     headingColor: '#000000',
     subheadingColor: '#666666',
     cardBackgroundColor: '#ffffff',
@@ -325,6 +331,9 @@ const TeamSectionsManager: React.FC = () => {
       subheading: '',
       layoutType: 'grid',
       backgroundColor: '#ffffff',
+      backgroundImage: '',
+      backgroundSize: 'cover',
+      backgroundOverlay: '',
       headingColor: '#000000',
       subheadingColor: '#666666',
       cardBackgroundColor: '#ffffff',
@@ -384,34 +393,49 @@ const TeamSectionsManager: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setIsCreating(true);
+    setMessage(null);
+
     try {
+      let response;
       if (isEditing && editingId) {
-        const result = await api.put(`/api/admin/team-sections`, {
+        // Update existing team section
+        response = await api.put('/api/admin/team-sections', {
           id: editingId,
           ...formData
         }) as any;
-        if (result.success) {
-          await fetchTeamSections();
-          resetForm();
-          setMessage({ type: 'success', text: 'Team section updated successfully!' });
-        } else {
-          setMessage({ type: 'error', text: 'Failed to update team section' });
-        }
       } else {
-        const result = await api.post('/api/admin/team-sections', formData) as any;
-        if (result.success) {
-          await fetchTeamSections();
-          resetForm();
-          setMessage({ type: 'success', text: 'Team section created successfully!' });
-        } else {
-          setMessage({ type: 'error', text: 'Failed to create team section' });
-        }
+        // Create new team section
+        response = await api.post('/api/admin/team-sections', formData) as any;
+      }
+      
+      if (response.success) {
+        setMessage({ 
+          type: 'success', 
+          text: isEditing ? 'Team section updated successfully!' : 'Team section created successfully!' 
+        });
+        resetForm();
+        fetchTeamSections();
+      } else {
+        setMessage({ type: 'error', text: response.message || 'Failed to save team section' });
       }
     } catch (error) {
       console.error('Error saving team section:', error);
-      setMessage({ type: 'error', text: 'Error saving team section' });
+      setMessage({ type: 'error', text: 'Failed to save team section' });
+    } finally {
+      setIsCreating(false);
     }
+  };
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    // Prevent form submission if the target is within a MediaSelector
+    const target = e.target as HTMLElement;
+    if (target.closest('[data-media-selector]')) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+    handleSubmit(e);
   };
 
   const handleMemberSubmit = async (e: React.FormEvent) => {
@@ -461,6 +485,9 @@ const TeamSectionsManager: React.FC = () => {
       subheading: section.subheading || '',
       layoutType: section.layoutType || 'grid',
       backgroundColor: section.backgroundColor || '#ffffff',
+      backgroundImage: section.backgroundImage || '',
+      backgroundSize: section.backgroundSize || 'cover',
+      backgroundOverlay: section.backgroundOverlay || '',
       headingColor: section.headingColor || '#000000',
       subheadingColor: section.subheadingColor || '#666666',
       cardBackgroundColor: section.cardBackgroundColor || '#ffffff',
@@ -545,7 +572,6 @@ const TeamSectionsManager: React.FC = () => {
     const types = {
       grid: 'Grid Layout',
       staggered: 'Staggered Layout',
-      cards: 'Cards Layout',
       list: 'List Layout'
     };
     return types[layoutType as keyof typeof types] || layoutType;
@@ -597,7 +623,7 @@ const TeamSectionsManager: React.FC = () => {
           >
             {isEditing ? 'Edit Team Section' : 'Create New Team Section'}
           </h3>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleFormSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label 
@@ -663,28 +689,91 @@ const TeamSectionsManager: React.FC = () => {
                   Layout Type
                 </label>
                 <select
-                  value={formData.layoutType}
+                  value={formData.layoutType || 'grid'}
                   onChange={(e) => handleInputChange('layoutType', e.target.value)}
                   className="w-full p-2 border border-gray-300 rounded-md"
-                  style={{ 
+                  style={{
                     color: designSystem?.textPrimary || '#000000',
                     backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
                   }}
                 >
                   <option value="grid">Grid Layout</option>
                   <option value="staggered">Staggered Layout</option>
-                  <option value="cards">Cards Layout</option>
                   <option value="list">List Layout</option>
                 </select>
               </div>
-              <div>
-                <ColorPicker
-                  label="Background Color"
-                  value={formData.backgroundColor || '#ffffff'}
-                  onChange={(color) => handleInputChange('backgroundColor', color)}
-                  designSystem={designSystem}
-                />
-              </div>
+                              <div>
+                  <ColorPicker
+                    label="Background Color"
+                    value={formData.backgroundColor || '#ffffff'}
+                    onChange={(color) => handleInputChange('backgroundColor', color)}
+                    designSystem={designSystem}
+                  />
+                </div>
+                <div>
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: designSystem?.textPrimary || '#000000' }}
+                  >
+                    Background Image
+                  </label>
+                  <MediaSelector
+                    onChange={(media: any) => {
+                      if (media && !Array.isArray(media)) {
+                        handleInputChange('backgroundImage', media.publicUrl);
+                        handleInputChange('backgroundSize', media.width && media.height ? `${media.width}px ${media.height}px` : 'auto');
+                      }
+                    }}
+                    acceptedTypes={['image']}
+                    designSystem={designSystem || undefined}
+                  />
+                  {formData.backgroundImage && (
+                    <div className="mt-2">
+                      <img
+                        src={formData.backgroundImage}
+                        alt="Background preview"
+                        className="w-32 h-20 object-cover rounded-lg border"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleInputChange('backgroundImage', '')}
+                        className="mt-1 text-sm text-red-600 hover:text-red-800"
+                      >
+                        Remove Image
+                      </button>
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <label
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: designSystem?.textPrimary || '#000000' }}
+                  >
+                    Image Size
+                  </label>
+                  <select
+                    value={formData.backgroundSize || 'cover'}
+                    onChange={(e) => handleInputChange('backgroundSize', e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md"
+                    style={{
+                      color: designSystem?.textPrimary || '#000000',
+                      backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                    }}
+                  >
+                    <option value="cover">Cover (Fill entire section)</option>
+                    <option value="contain">Contain (Fit within section)</option>
+                    <option value="auto">Auto (Original size)</option>
+                  </select>
+                </div>
+                <div>
+                  <ColorPicker
+                    label="Background Overlay Color"
+                    value={formData.backgroundOverlay || ''}
+                    onChange={(color) => handleInputChange('backgroundOverlay', color)}
+                    allowTransparent={true}
+                    designSystem={designSystem}
+                  />
+                </div>
               <div>
                 <ColorPicker
                   label="Heading Color"
