@@ -103,11 +103,11 @@ const CronExpressionEditor = ({
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold">Edit Schedule</h3>
         <div className="flex gap-2">
-          <Button onClick={handleSave} size="sm" className="bg-blue-600 hover:bg-blue-700">
+          <Button onClick={handleSave} size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
             <Save className="w-4 h-4 mr-1" />
             Save
           </Button>
-          <Button onClick={onCancel} variant="outline" size="sm">
+          <Button onClick={onCancel} variant="outline" size="sm" className="text-gray-600 border-gray-200 hover:bg-gray-50">
             <X className="w-4 h-4 mr-1" />
             Cancel
           </Button>
@@ -304,8 +304,8 @@ export default function SchedulerManager() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Scheduler Management</h1>
-          <p className="text-gray-600">Manage automated tasks and schedules</p>
+          <h1 className="text-3xl font-bold text-gray-900">Scheduler Management</h1>
+          <p className="text-gray-600 mt-2">Manage automated tasks and schedules</p>
         </div>
         <div className="flex gap-2">
           {status?.isRunning ? (
@@ -314,12 +314,12 @@ export default function SchedulerManager() {
               Stop Scheduler
             </Button>
           ) : (
-            <Button onClick={() => handleSchedulerAction('start')} className="bg-green-600 hover:bg-green-700">
+            <Button onClick={() => handleSchedulerAction('start')} className="bg-green-600 hover:bg-green-700 text-white">
               <Play className="w-4 h-4 mr-2" />
               Start Scheduler
             </Button>
           )}
-          <Button onClick={fetchData} variant="outline">
+          <Button onClick={fetchData} variant="outline" className="text-gray-600 border-gray-200 hover:bg-gray-50">
             <RefreshCw className="w-4 h-4 mr-2" />
             Refresh
           </Button>
@@ -351,11 +351,18 @@ export default function SchedulerManager() {
       </Card>
 
       {/* Tasks List */}
-      <Card className="p-6">
-        <h2 className="text-xl font-semibold mb-4">Scheduled Tasks</h2>
-        <div className="space-y-4">
-          {tasks.map((task) => (
-            <div key={task.id} className="border border-gray-200 rounded-lg p-4">
+      <div className="space-y-4">
+        <h2 className="text-xl font-semibold text-gray-900">Scheduled Tasks</h2>
+        
+        {tasks.length === 0 ? (
+          <Card className="p-12 text-center">
+            <Clock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No scheduled tasks found</h3>
+            <p className="text-gray-600">Scheduled tasks will appear here.</p>
+          </Card>
+        ) : (
+          tasks.map((task) => (
+            <Card key={task.id} className="p-6 hover:shadow-lg transition-shadow">
               {editingTask === task.id ? (
                 <CronExpressionEditor
                   cronExpression={task.cronExpression}
@@ -363,10 +370,10 @@ export default function SchedulerManager() {
                   onCancel={() => setEditingTask(null)}
                 />
               ) : (
-                <div className="flex items-center justify-between">
+                <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-semibold">{task.name}</h3>
+                    <div className="flex items-center gap-3 mb-3">
+                      <h3 className="text-xl font-semibold text-gray-900">{task.name}</h3>
                       <span className={`flex items-center gap-1 text-sm ${getStatusColor(task.enabled)}`}>
                         {getStatusIcon(task.enabled)}
                         {task.enabled ? 'Enabled' : 'Disabled'}
@@ -384,15 +391,15 @@ export default function SchedulerManager() {
                       <div><strong>Next Run:</strong> {task.nextRun ? formatDate(task.nextRun) : 'Not scheduled'}</div>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-2 ml-4">
                     <Button
                       onClick={() => setEditingTask(task.id)}
                       variant="outline"
                       size="sm"
                       className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                      title="Edit schedule"
                     >
-                      <Edit className="w-4 h-4 mr-1" />
-                      Edit Schedule
+                      <Edit className="w-4 h-4" />
                     </Button>
                     <Button
                       onClick={() => handleTaskAction(task.id, 'trigger')}
@@ -400,32 +407,26 @@ export default function SchedulerManager() {
                       size="sm"
                       className="text-green-600 border-green-200 hover:bg-green-50"
                       disabled={task.isRunning}
+                      title="Run task now"
                     >
-                      <Play className="w-4 h-4 mr-1" />
-                      Run Now
+                      <Play className="w-4 h-4" />
                     </Button>
                     <Button
                       onClick={() => handleTaskAction(task.id, 'toggle')}
                       variant="outline"
                       size="sm"
                       className={task.enabled ? 'text-red-600 border-red-200 hover:bg-red-50' : 'text-green-600 border-green-200 hover:bg-green-50'}
+                      title={task.enabled ? 'Disable task' : 'Enable task'}
                     >
-                      {task.enabled ? 'Disable' : 'Enable'}
+                      {task.enabled ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
                     </Button>
                   </div>
                 </div>
               )}
-            </div>
-          ))}
-          
-          {tasks.length === 0 && (
-            <div className="text-center py-8 text-gray-500">
-              <Clock className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-              <p>No scheduled tasks found</p>
-            </div>
-          )}
-        </div>
-      </Card>
+            </Card>
+          ))
+        )}
+      </div>
     </div>
   );
 } 
