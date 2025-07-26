@@ -526,6 +526,9 @@ const HeroSectionsManager: React.FC = () => {
       mediaPosition: hero.mediaPosition,
       backgroundType: hero.backgroundType,
       backgroundValue: hero.backgroundValue,
+      backgroundImage: hero.backgroundImage || '',
+      backgroundSize: hero.backgroundSize || 'cover',
+      backgroundOverlay: hero.backgroundOverlay || '',
       backgroundMediaItem: hero.backgroundMediaItem,
       taglineColor: hero.taglineColor,
       headlineColor: hero.headlineColor,
@@ -1151,8 +1154,7 @@ const HeroSectionsManager: React.FC = () => {
                           if (media && !Array.isArray(media)) {
                             setFormData(prev => ({ 
                               ...prev, 
-                              backgroundImage: media.publicUrl,
-                              backgroundSize: media.width && media.height ? `${media.width}px ${media.width}px` : 'cover'
+                              backgroundImage: media.publicUrl
                             }));
                           }
                         }}
@@ -1198,8 +1200,22 @@ const HeroSectionsManager: React.FC = () => {
                     </div>
 
                     <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="block text-sm font-medium" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                          Background Overlay
+                        </label>
+                        {formData.backgroundOverlay && (
+                          <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, backgroundOverlay: '' }))}
+                            className="text-sm text-red-600 hover:text-red-800 px-2 py-1 rounded hover:bg-red-50"
+                          >
+                            Clear Overlay
+                          </button>
+                        )}
+                      </div>
                       <ColorPicker
-                        label="Background Overlay"
+                        label=""
                         value={formData.backgroundOverlay || ''}
                         onChange={(color) => setFormData(prev => ({ ...prev, backgroundOverlay: color }))}
                         allowTransparent={true}

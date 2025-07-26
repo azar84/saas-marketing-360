@@ -197,6 +197,9 @@ const HomeHeroManager: React.FC = () => {
           const heroData = {
             ...result.data,
             backgroundColor: result.data.backgroundColor || '#FFFFFF',
+            backgroundImage: result.data.backgroundImage || '',
+            backgroundSize: result.data.backgroundSize || 'cover',
+            backgroundOverlay: result.data.backgroundOverlay || '',
             trustIndicators: result.data.trustIndicators || []
           };
           setHeroData(heroData);
@@ -602,8 +605,7 @@ const HomeHeroManager: React.FC = () => {
                         if (media && !Array.isArray(media)) {
                           setHeroData(prev => ({ 
                             ...prev, 
-                            backgroundImage: media.publicUrl,
-                            backgroundSize: media.width && media.height ? `${media.width}px ${media.height}px` : 'cover'
+                            backgroundImage: media.publicUrl
                           }));
                         }
                       }}
