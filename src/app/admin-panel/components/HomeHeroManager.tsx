@@ -944,14 +944,6 @@ const HomeHeroManager: React.FC = () => {
         )}
       </div>
     );
-  } catch (error) {
-    console.error('Error rendering HomeHeroManager:', error);
-    return (
-      <div className="flex items-center justify-center py-12 text-red-600">
-        <p>Failed to load Home Page Hero section.</p>
-      </div>
-    );
-  }
-};
+  };
 
 export default HomeHeroManager; 
