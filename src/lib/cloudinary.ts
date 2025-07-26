@@ -23,10 +23,11 @@ export async function getCloudinaryConfig() {
       };
     }
     
-    throw new Error('Cloudinary not configured in site settings or environment variables');
+    // Return null instead of throwing error - let the calling function handle it
+    return null;
   } catch (error) {
     console.error('Error getting Cloudinary config:', error);
-    throw new Error('Cloudinary configuration not found');
+    return null;
   }
 }
 
@@ -34,6 +35,12 @@ export async function getCloudinaryConfig() {
 export async function configureCloudinary() {
   try {
     const config = await getCloudinaryConfig();
+    
+    if (!config) {
+      console.warn('Cloudinary not configured - media uploads will be disabled');
+      return false;
+    }
+    
     cloudinary.config(config);
     return true;
   } catch (error) {
@@ -42,8 +49,8 @@ export async function configureCloudinary() {
   }
 }
 
-// Initialize Cloudinary configuration
-configureCloudinary().catch(console.error);
+// Don't initialize Cloudinary configuration at module level
+// It will be configured when needed
 
 export interface CloudinaryUploadResult {
   public_id: string;
@@ -67,7 +74,11 @@ export const uploadToCloudinary = async (
 ): Promise<CloudinaryUploadResult> => {
   try {
     // Ensure Cloudinary is configured
-    await configureCloudinary();
+    const isConfigured = await configureCloudinary();
+    
+    if (!isConfigured) {
+      throw new Error('Cloudinary is not configured. Please configure Cloudinary in site settings or environment variables.');
+    }
 
     // Convert File to buffer if needed
     let buffer: Buffer;
@@ -109,7 +120,12 @@ export const uploadToCloudinary = async (
 export const deleteFromCloudinary = async (public_id: string): Promise<void> => {
   try {
     // Ensure Cloudinary is configured
-    await configureCloudinary();
+    const isConfigured = await configureCloudinary();
+    
+    if (!isConfigured) {
+      console.warn('Cloudinary is not configured - skipping delete operation');
+      return;
+    }
     
     await cloudinary.uploader.destroy(public_id);
   } catch (error) {
@@ -122,8 +138,18 @@ export const getCloudinaryUrl = (public_id: string, options: {
   transformation?: any[];
   format?: string;
 } = {}): string => {
-  return cloudinary.url(public_id, {
-    secure: true,
-    ...options,
-  });
+  // This function doesn't need configuration check as it just generates URLs
+  // But we should ensure Cloudinary is configured for consistency
+  try {
+    // Note: This is a synchronous operation, so we can't await configureCloudinary
+    // The URL generation should work even without full configuration
+    return cloudinary.url(public_id, {
+      secure: true,
+      ...options,
+    });
+  } catch (error) {
+    console.error('Error generating Cloudinary URL:', error);
+    // Return a fallback URL or the original public_id
+    return public_id;
+  }
 }; 
