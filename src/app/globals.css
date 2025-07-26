@@ -1,5 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&display=swap');
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @theme {
   --font-family-sans: 'Manrope', system-ui, sans-serif;
@@ -103,9 +105,8 @@ html {
 
 @media (prefers-color-scheme: dark) {
   .glass {
-    background: rgba(30, 42, 59, 0.8);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(39, 54, 75, 0.5);
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 }
 
@@ -167,85 +168,106 @@ html {
   animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-/* Custom gradient utilities */
 .bg-gradient-radial {
-  background-image: var(--gradient-radial);
+  background: radial-gradient(ellipse at center, var(--tw-gradient-stops));
 }
 
-/* Checkerboard pattern for transparent colors */
 .bg-checkerboard {
   background-image: 
-    linear-gradient(45deg, #ccc 25%, transparent 25%), 
-    linear-gradient(-45deg, #ccc 25%, transparent 25%), 
-    linear-gradient(45deg, transparent 75%, #ccc 75%), 
-    linear-gradient(-45deg, transparent 75%, #ccc 75%);
-  background-size: 8px 8px;
-  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+    linear-gradient(45deg, #f0f0f0 25%, transparent 25%), 
+    linear-gradient(-45deg, #f0f0f0 25%, transparent 25%), 
+    linear-gradient(45deg, transparent 75%, #f0f0f0 75%), 
+    linear-gradient(-45deg, transparent 75%, #f0f0f0 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
 }
 
-/* Safari Form Elements Fix - Remove default appearance */
+/* Custom form styles */
 input[type="radio"],
-input[type="checkbox"],
-select {
+input[type="checkbox"] {
+  appearance: none;
   -webkit-appearance: none;
   -moz-appearance: none;
-  appearance: none;
+  width: 1.2em;
+  height: 1.2em;
+  border: 2px solid #d1d5db;
+  border-radius: 0.25em;
+  margin-right: 0.5em;
+  position: relative;
+  cursor: pointer;
 }
 
-/* Remove shadows specifically from form section elements */
 .form-section button,
-.form-section input,
-.form-section textarea,
-.form-section select {
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-  -moz-box-shadow: none !important;
-  filter: none !important;
+.form-section input[type="submit"] {
+  background: var(--color-primary);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
 }
 
 .form-section button:focus,
-.form-section input:focus,
-.form-section textarea:focus,
-.form-section select:focus,
+.form-section input[type="submit"]:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 .form-section button:hover,
-.form-section input:hover,
-.form-section textarea:hover,
-.form-section select:hover {
-  box-shadow: none !important;
-  -webkit-box-shadow: none !important;
-  -moz-box-shadow: none !important;
+.form-section input[type="submit"]:hover {
+  background: var(--color-primary-dark);
+  transform: translateY(-1px);
 }
 
-/* Ensure radio buttons work properly when using sr-only class */
-input[type="radio"].sr-only {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
-  opacity: 0 !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  appearance: none !important;
-}
-
-/* Ensure checkboxes work properly when using sr-only class */
+/* Screen reader only styles */
+input[type="radio"].sr-only,
 input[type="checkbox"].sr-only {
-  position: absolute !important;
-  width: 1px !important;
-  height: 1px !important;
-  padding: 0 !important;
-  margin: -1px !important;
-  overflow: hidden !important;
-  clip: rect(0, 0, 0, 0) !important;
-  white-space: nowrap !important;
-  border: 0 !important;
-  opacity: 0 !important;
-  -webkit-appearance: none !important;
-  -moz-appearance: none !important;
-  appearance: none !important;
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+input[type="checkbox"]:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+input[type="checkbox"]:checked::after {
+  content: '✓';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 0.8em;
+  font-weight: bold;
+}
+
+input[type="radio"] {
+  border-radius: 50%;
+}
+
+input[type="radio"]:checked {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+input[type="radio"]:checked::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 0.4em;
+  height: 0.4em;
+  background-color: white;
+  border-radius: 50%;
 } 
