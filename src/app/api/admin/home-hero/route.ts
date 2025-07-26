@@ -157,7 +157,9 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
+    console.log('PUT request body:', body);
     const { id, ...updateData } = body;
+    console.log('Update data:', updateData);
 
     // If no ID provided or ID is null, create a new hero instead of updating
     if (!id || id === null) {
@@ -200,6 +202,9 @@ export async function PUT(request: NextRequest) {
         heading: homeHero.headline,
         subheading: homeHero.subheading,
         backgroundColor: homeHero.backgroundColor,
+        backgroundImage: homeHero.backgroundImage,
+        backgroundSize: homeHero.backgroundSize,
+        backgroundOverlay: homeHero.backgroundOverlay,
         primaryCtaId: homeHero.ctaPrimaryId,
         secondaryCtaId: homeHero.ctaSecondaryId,
         isActive: homeHero.isActive,
@@ -221,6 +226,9 @@ export async function PUT(request: NextRequest) {
         ...(updateData.heading !== undefined && { headline: updateData.heading }),  // Map heading -> headline
         ...(updateData.subheading !== undefined && { subheading: updateData.subheading }),
         ...(updateData.backgroundColor !== undefined && { backgroundColor: updateData.backgroundColor }),
+        ...(updateData.backgroundImage !== undefined && { backgroundImage: updateData.backgroundImage }),
+        ...(updateData.backgroundSize !== undefined && { backgroundSize: updateData.backgroundSize }),
+        ...(updateData.backgroundOverlay !== undefined && { backgroundOverlay: updateData.backgroundOverlay }),
         ...(updateData.primaryCtaId !== undefined && { ctaPrimaryId: updateData.primaryCtaId }),     // Store CTA ID
         ...(updateData.secondaryCtaId !== undefined && { ctaSecondaryId: updateData.secondaryCtaId }), // Store CTA ID
         ...(updateData.animationType !== undefined && { animationType: updateData.animationType }),
@@ -237,6 +245,9 @@ export async function PUT(request: NextRequest) {
       heading: homeHero.headline,
       subheading: homeHero.subheading,
       backgroundColor: homeHero.backgroundColor,
+      backgroundImage: homeHero.backgroundImage,
+      backgroundSize: homeHero.backgroundSize,
+      backgroundOverlay: homeHero.backgroundOverlay,
       primaryCtaId: homeHero.ctaPrimaryId,
       secondaryCtaId: homeHero.ctaSecondaryId,
       isActive: homeHero.isActive,
