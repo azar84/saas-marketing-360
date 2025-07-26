@@ -99,6 +99,9 @@ export async function POST(request: NextRequest) {
         headline: body.heading || body.headline, // Accept both heading and headline
         subheading: body.subheading || null,
         backgroundColor: body.backgroundColor || '#FFFFFF',
+        backgroundImage: body.backgroundImage || null,
+        backgroundSize: body.backgroundSize || 'cover',
+        backgroundOverlay: body.backgroundOverlay || null,
         ctaPrimaryId: body.primaryCtaId || null,     // Store CTA ID
         ctaSecondaryId: body.secondaryCtaId || null, // Store CTA ID
         ctaPrimaryText: body.ctaPrimaryText || null,
@@ -164,6 +167,9 @@ export async function PUT(request: NextRequest) {
           headline: updateData.heading || 'Welcome to Our Platform',  // Map heading -> headline
           subheading: updateData.subheading || null,
           backgroundColor: updateData.backgroundColor || '#FFFFFF',
+          backgroundImage: updateData.backgroundImage || null,
+          backgroundSize: updateData.backgroundSize || 'cover',
+          backgroundOverlay: updateData.backgroundOverlay || null,
           ctaPrimaryId: updateData.primaryCtaId || null,     // Store CTA ID
           ctaSecondaryId: updateData.secondaryCtaId || null, // Store CTA ID
           ctaPrimaryText: null,    // These will be fetched from CTA table when needed

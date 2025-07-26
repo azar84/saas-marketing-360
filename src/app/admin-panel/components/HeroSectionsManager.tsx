@@ -84,6 +84,9 @@ interface HeroSection {
   mediaPosition: 'left' | 'right';
   backgroundType: 'color' | 'gradient' | 'image' | 'video';
   backgroundValue: string;
+  backgroundImage?: string;
+  backgroundSize?: string;
+  backgroundOverlay?: string;
   backgroundMediaItem?: MediaItem;
   // Text Colors
   taglineColor: string;
@@ -311,6 +314,9 @@ const HeroSectionsManager: React.FC = () => {
     mediaPosition: 'right',
     backgroundType: 'color',
     backgroundValue: themeDefaults.backgroundPrimary,
+    backgroundImage: '',
+    backgroundSize: 'cover',
+    backgroundOverlay: '',
     backgroundMediaItem: undefined,
     taglineColor: themeDefaults.primaryColor,
     headlineColor: themeDefaults.textPrimary,
@@ -1129,6 +1135,76 @@ const HeroSectionsManager: React.FC = () => {
                         <option value="image">Background Image</option>
                         <option value="video">Background Video</option>
                       </select>
+                    </div>
+
+                    {/* Background Image Fields */}
+                    <div>
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                        Background Image
+                      </label>
+                      <p className="text-xs mb-2" style={{ color: designSystem?.textMuted || '#999999' }}>
+                        Add a background image that will overlay on top of the background color/gradient.
+                      </p>
+                      
+                      <MediaSelector
+                        onChange={(media: any) => {
+                          if (media && !Array.isArray(media)) {
+                            setFormData(prev => ({ 
+                              ...prev, 
+                              backgroundImage: media.publicUrl,
+                              backgroundSize: media.width && media.height ? `${media.width}px ${media.width}px` : 'cover'
+                            }));
+                          }
+                        }}
+                        acceptedTypes={['image']}
+                        designSystem={designSystem || undefined}
+                      />
+                      
+                      {formData.backgroundImage && (
+                        <div className="mt-2">
+                          <img
+                            src={formData.backgroundImage}
+                            alt="Background preview"
+                            className="w-32 h-20 object-cover rounded-lg border"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setFormData(prev => ({ ...prev, backgroundImage: '' }))}
+                            className="mt-1 text-sm text-red-600 hover:text-red-800"
+                          >
+                            Remove Image
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                        Image Size
+                      </label>
+                      <select
+                        value={formData.backgroundSize || 'cover'}
+                        onChange={(e) => setFormData(prev => ({ ...prev, backgroundSize: e.target.value }))}
+                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
+                      >
+                        <option value="cover">Cover (Fill entire section)</option>
+                        <option value="contain">Contain (Fit within section)</option>
+                        <option value="auto">Auto (Original size)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <ColorPicker
+                        label="Background Overlay"
+                        value={formData.backgroundOverlay || ''}
+                        onChange={(color) => setFormData(prev => ({ ...prev, backgroundOverlay: color }))}
+                        allowTransparent={true}
+                        designSystem={designSystem}
+                      />
                     </div>
 
                     <div>

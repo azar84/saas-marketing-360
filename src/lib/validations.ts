@@ -206,6 +206,9 @@ export const CreateHeroSectionSchema = z.object({
   mediaPosition: HeroMediaPositionEnum.default('right'),
   backgroundType: HeroBackgroundTypeEnum.default('color'),
   backgroundValue: z.string().max(500).default('#FFFFFF'),
+  backgroundImage: z.string().max(500).optional(),
+  backgroundSize: z.string().max(50).default('cover'),
+  backgroundOverlay: z.string().max(100).optional(),
   
   // Text Colors
   taglineColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#5243E9'),

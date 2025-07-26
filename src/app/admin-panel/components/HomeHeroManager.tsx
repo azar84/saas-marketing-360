@@ -73,6 +73,9 @@ interface HomeHeroData {
   heading: string;
   subheading: string;
   backgroundColor: string;
+  backgroundImage?: string;
+  backgroundSize?: string;
+  backgroundOverlay?: string;
   primaryCtaId: number | null;
   secondaryCtaId: number | null;
   isActive: boolean;
@@ -91,6 +94,9 @@ const HomeHeroManager: React.FC = () => {
     heading: 'Automate Conversations, Capture Leads, Serve Customers — All Without Code',
     subheading: 'Deploy intelligent assistants to SMS, WhatsApp, and your website in minutes. Transform customer support while you focus on growth.',
     backgroundColor: '#FFFFFF',
+    backgroundImage: '',
+    backgroundSize: 'cover',
+    backgroundOverlay: '',
     primaryCtaId: null,
     secondaryCtaId: null,
     isActive: true,
@@ -579,6 +585,141 @@ const HomeHeroManager: React.FC = () => {
                           }}
                         />
                       </div>
+                    </div>
+                  </div>
+
+                  {/* Background Image */}
+                  <div>
+                    <label className="block text-sm font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      Background Image
+                    </label>
+                    <p className="text-xs mb-4" style={{ color: designSystem?.textMuted || '#999999' }}>
+                      Add a background image to your hero section. This will overlay on top of the background color.
+                    </p>
+                    
+                    <MediaSelector
+                      onChange={(media: any) => {
+                        if (media && !Array.isArray(media)) {
+                          setHeroData(prev => ({ 
+                            ...prev, 
+                            backgroundImage: media.publicUrl,
+                            backgroundSize: media.width && media.height ? `${media.width}px ${media.height}px` : 'cover'
+                          }));
+                        }
+                      }}
+                      acceptedTypes={['image']}
+                      designSystem={designSystem || undefined}
+                    />
+                    
+                    {heroData.backgroundImage && (
+                      <div className="mt-4">
+                        <img
+                          src={heroData.backgroundImage}
+                          alt="Background preview"
+                          className="w-32 h-20 object-cover rounded-lg border"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setHeroData(prev => ({ ...prev, backgroundImage: '' }))}
+                          className="mt-2 text-sm text-red-600 hover:text-red-800"
+                        >
+                          Remove Image
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Background Image Size */}
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      Image Size
+                    </label>
+                    <select
+                      value={heroData.backgroundSize || 'cover'}
+                      onChange={(e) => setHeroData(prev => ({ ...prev, backgroundSize: e.target.value }))}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      style={{ 
+                        color: designSystem?.textPrimary || '#000000',
+                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                      }}
+                    >
+                      <option value="cover">Cover (Fill entire section)</option>
+                      <option value="contain">Contain (Fit within section)</option>
+                      <option value="auto">Auto (Original size)</option>
+                    </select>
+                  </div>
+
+                  {/* Background Overlay */}
+                  <div>
+                    <label className="block text-sm font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      Background Overlay
+                    </label>
+                    <p className="text-xs mb-4" style={{ color: designSystem?.textMuted || '#999999' }}>
+                      Add a color overlay on top of the background image for better text readability.
+                    </p>
+                    
+                    {/* Design System Color Palette for Overlay */}
+                    <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 mb-4">
+                      {getDesignSystemColors().map((colorOption) => (
+                        <div
+                          key={colorOption.name}
+                          className={`cursor-pointer text-center ${
+                            heroData.backgroundOverlay === colorOption.value
+                              ? 'ring-2 ring-blue-500 ring-offset-2 rounded-lg'
+                              : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 rounded-lg'
+                          }`}
+                          onClick={() => setHeroData(prev => ({ ...prev, backgroundOverlay: colorOption.value }))}
+                        >
+                          <div
+                            className="w-12 h-12 rounded-lg shadow-sm border border-gray-200 mb-1 relative"
+                            style={{ backgroundColor: colorOption.value }}
+                          >
+                            {heroData.backgroundOverlay === colorOption.value && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-3 h-3 bg-white rounded-full border-2 border-blue-500" />
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-xs block truncate" style={{ color: designSystem?.textSecondary || '#666666' }}>
+                            {colorOption.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Custom Overlay Color Input */}
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-12 h-12 border-2 border-gray-300 rounded-lg cursor-pointer relative overflow-hidden"
+                        style={{ backgroundColor: heroData.backgroundOverlay || 'transparent' }}
+                      >
+                        <input
+                          type="color"
+                          value={heroData.backgroundOverlay || '#000000'}
+                          onChange={(e) => setHeroData(prev => ({ ...prev, backgroundOverlay: e.target.value }))}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={heroData.backgroundOverlay || ''}
+                          onChange={(e) => setHeroData(prev => ({ ...prev, backgroundOverlay: e.target.value }))}
+                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent font-mono text-sm"
+                          placeholder="rgba(0,0,0,0.5) or transparent"
+                          style={{ 
+                            color: designSystem?.textPrimary || '#000000',
+                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          }}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setHeroData(prev => ({ ...prev, backgroundOverlay: '' }))}
+                        className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
+                      >
+                        Clear
+                      </button>
                     </div>
                   </div>
                 </div>

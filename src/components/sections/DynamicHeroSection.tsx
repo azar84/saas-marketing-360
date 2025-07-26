@@ -43,6 +43,9 @@ interface HeroSectionData {
   mediaPosition: string;
   backgroundType: string;
   backgroundValue: string;
+  backgroundImage?: string;
+  backgroundSize?: string;
+  backgroundOverlay?: string;
   showTypingEffect: boolean;
   enableBackgroundAnimation: boolean;
   customClasses?: string;
@@ -81,6 +84,9 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
     mediaPosition,
     backgroundType,
     backgroundValue,
+    backgroundImage,
+    backgroundSize,
+    backgroundOverlay,
     showTypingEffect,
     enableBackgroundAnimation,
     customClasses,
@@ -128,22 +134,37 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
 
   // Get background styles
   const getBackgroundStyles = () => {
-    switch (backgroundType) {
-      case 'gradient':
-        return { background: backgroundValue };
-      case 'image':
-        return { 
-          backgroundImage: `url(${backgroundValue})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        };
-      case 'video':
-        return { backgroundColor: '#000' }; // Fallback for video
-      case 'color':
-      default:
-        return { backgroundColor: backgroundValue };
+    const baseStyles: React.CSSProperties = {};
+    
+    // Handle background image if provided
+    if (backgroundImage) {
+      baseStyles.backgroundImage = `url(${backgroundImage})`;
+      baseStyles.backgroundSize = backgroundSize || 'cover';
+      baseStyles.backgroundPosition = 'center';
+      baseStyles.backgroundRepeat = 'no-repeat';
+    } else {
+      // Fallback to background type
+      switch (backgroundType) {
+        case 'gradient':
+          baseStyles.background = backgroundValue;
+          break;
+        case 'image':
+          baseStyles.backgroundImage = `url(${backgroundValue})`;
+          baseStyles.backgroundSize = 'cover';
+          baseStyles.backgroundPosition = 'center';
+          baseStyles.backgroundRepeat = 'no-repeat';
+          break;
+        case 'video':
+          baseStyles.backgroundColor = '#000';
+          break;
+        case 'color':
+        default:
+          baseStyles.backgroundColor = backgroundValue;
+          break;
+      }
     }
+    
+    return baseStyles;
   };
 
   // Determine if text should be light or dark based on background
@@ -688,6 +709,17 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
         marginTop: '-3vh'
       }}
     >
+      {/* Background Overlay */}
+      {backgroundOverlay && (
+        <div 
+          className="absolute inset-0"
+          style={{ 
+            backgroundColor: backgroundOverlay,
+            opacity: 0.1
+          }}
+        />
+      )}
+
       {/* Background Animation */}
       {enableBackgroundAnimation && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">

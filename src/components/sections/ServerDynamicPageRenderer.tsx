@@ -40,6 +40,9 @@ interface PageSection {
     mediaPosition: string;
     backgroundType: string;
     backgroundValue: string;
+    backgroundImage?: string;
+    backgroundSize?: string;
+    backgroundOverlay?: string;
     showTypingEffect: boolean;
     enableBackgroundAnimation: boolean;
     customClasses?: string;
@@ -212,7 +215,7 @@ interface PageSection {
     name: string;
     heading: string;
     subheading?: string;
-    layoutType: 'grid' | 'staggered' | 'cards' | 'list' | 'modern';
+    layoutType: 'grid' | 'staggered' | 'list';
     backgroundColor?: string;
     backgroundImage?: string;
     backgroundSize?: string;
@@ -936,8 +939,6 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
           return wrapWithSectionDiv(
             <TeamSection 
               key={section.id} 
-              id={section.teamSection.id}
-              name={section.teamSection.name}
               heading={section.teamSection.heading}
               subheading={section.teamSection.subheading}
               layoutType={section.teamSection.layoutType}
@@ -957,7 +958,6 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
               paddingTop={section.teamSection.paddingTop}
               paddingBottom={section.teamSection.paddingBottom}
               containerMaxWidth={section.teamSection.containerMaxWidth}
-              isActive={section.teamSection.isActive}
               teamMembers={section.teamSection.teamMembers}
             />
           );

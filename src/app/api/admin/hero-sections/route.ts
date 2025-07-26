@@ -98,6 +98,9 @@ export async function POST(request: NextRequest) {
         mediaPosition: validatedData.mediaPosition || 'right',
         backgroundType: validatedData.backgroundType || 'color',
         backgroundValue: validatedData.backgroundValue || '#FFFFFF',
+        backgroundImage: validatedData.backgroundImage || null,
+        backgroundSize: validatedData.backgroundSize || 'cover',
+        backgroundOverlay: validatedData.backgroundOverlay || null,
         // Text Colors
         taglineColor: validatedData.taglineColor || '#000000',
         headlineColor: validatedData.headlineColor || '#000000',
@@ -236,6 +239,9 @@ export async function PUT(request: NextRequest) {
     if (validatedData.mediaPosition !== undefined) updateData.mediaPosition = validatedData.mediaPosition;
     if (validatedData.backgroundType !== undefined) updateData.backgroundType = validatedData.backgroundType;
     if (validatedData.backgroundValue !== undefined) updateData.backgroundValue = validatedData.backgroundValue;
+    if (validatedData.backgroundImage !== undefined) updateData.backgroundImage = validatedData.backgroundImage;
+    if (validatedData.backgroundSize !== undefined) updateData.backgroundSize = validatedData.backgroundSize;
+    if (validatedData.backgroundOverlay !== undefined) updateData.backgroundOverlay = validatedData.backgroundOverlay;
     // Text Colors
     if (validatedData.taglineColor !== undefined) updateData.taglineColor = validatedData.taglineColor;
     if (validatedData.headlineColor !== undefined) updateData.headlineColor = validatedData.headlineColor;
