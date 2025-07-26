@@ -762,8 +762,10 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
   className = '' 
 }) => {
   const sections = await fetchPageSections(pageSlug);
+  console.log('Found sections for page:', pageSlug, sections);
   const companyName = await fetchCompanyName();
   const homeHeroData = await fetchHomeHeroData(); // Fetch home hero data server-side
+  console.log('Home hero data:', homeHeroData);
 
   const generateSectionId = (section: PageSection, index: number) => {
     const sectionType = section.sectionType.toLowerCase();
