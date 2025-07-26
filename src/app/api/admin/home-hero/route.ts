@@ -62,7 +62,7 @@ export async function GET() {
         autoplay: false,
         loop: false
       },
-      trustIndicators: [                    // Default trust indicators since DB doesn't have them
+      trustIndicators: homeHero.trustIndicators ? JSON.parse(homeHero.trustIndicators) : [
         { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
         { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
         { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
@@ -108,7 +108,12 @@ export async function POST(request: NextRequest) {
         mediaUrl: body.mediaUrl || null,
         animationType: body.animationType || 'conversation',
         animationData: body.animationData ? JSON.stringify(body.animationData) : null,
-        isActive: true
+        isActive: true,
+        trustIndicators: JSON.stringify(body.trustIndicators || [
+          { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
+          { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
+          { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
+        ])
       }
     });
 
@@ -123,11 +128,7 @@ export async function POST(request: NextRequest) {
       isActive: homeHero.isActive,
       animationType: homeHero.animationType || 'conversation',
       animationData: homeHero.animationData ? JSON.parse(homeHero.animationData) : body.animationData,
-      trustIndicators: body.trustIndicators || [
-        { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
-        { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
-        { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
-      ]
+      trustIndicators: homeHero.trustIndicators ? JSON.parse(homeHero.trustIndicators) : body.trustIndicators
     };
 
     return NextResponse.json({
@@ -172,7 +173,12 @@ export async function PUT(request: NextRequest) {
           mediaUrl: null,
           animationType: updateData.animationType || 'video',
           animationData: updateData.animationData ? JSON.stringify(updateData.animationData) : null,
-          isActive: updateData.isActive !== undefined ? updateData.isActive : true
+          isActive: updateData.isActive !== undefined ? updateData.isActive : true,
+          trustIndicators: JSON.stringify(updateData.trustIndicators || [
+            { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
+            { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
+            { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
+          ])
         }
       });
 
@@ -187,11 +193,7 @@ export async function PUT(request: NextRequest) {
         isActive: homeHero.isActive,
         animationType: homeHero.animationType || 'video',
         animationData: homeHero.animationData ? JSON.parse(homeHero.animationData) : updateData.animationData,
-        trustIndicators: updateData.trustIndicators || [
-          { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
-          { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
-          { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
-        ]
+        trustIndicators: homeHero.trustIndicators ? JSON.parse(homeHero.trustIndicators) : updateData.trustIndicators
       };
 
       return NextResponse.json({
@@ -212,6 +214,7 @@ export async function PUT(request: NextRequest) {
         ...(updateData.animationType !== undefined && { animationType: updateData.animationType }),
         ...(updateData.animationData !== undefined && { animationData: JSON.stringify(updateData.animationData) }),
         ...(updateData.isActive !== undefined && { isActive: updateData.isActive }),
+        ...(updateData.trustIndicators !== undefined && { trustIndicators: JSON.stringify(updateData.trustIndicators) }),
         updatedAt: new Date()
       }
     });
@@ -227,11 +230,11 @@ export async function PUT(request: NextRequest) {
       isActive: homeHero.isActive,
       animationType: homeHero.animationType || 'conversation',
       animationData: homeHero.animationData ? JSON.parse(homeHero.animationData) : updateData.animationData,
-      trustIndicators: updateData.trustIndicators || [
+      trustIndicators: homeHero.trustIndicators ? JSON.parse(homeHero.trustIndicators) : (updateData.trustIndicators || [
         { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
         { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
         { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
-      ]
+      ])
     };
 
     return NextResponse.json({

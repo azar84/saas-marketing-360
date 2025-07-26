@@ -435,6 +435,7 @@ model HomePageHero {
   // Animation configuration
   animationType    String?  @default("conversation") // conversation, video, html, script, image, none
   animationData    String?  // JSON string for animation configuration
+  trustIndicators  String?  // JSON string for trust indicators configuration
   isActive         Boolean  @default(true)
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
