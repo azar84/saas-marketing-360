@@ -117,6 +117,7 @@ interface PageSection {
     mediaType: string;
     layoutType: string;
     badgeText?: string;
+    badgeColor?: string;
     isActive: boolean;
     position: number;
     alignment: string;
@@ -772,6 +773,7 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
               mediaType={section.mediaSection.mediaType}
               layoutType={section.mediaSection.layoutType}
               badgeText={section.mediaSection.badgeText}
+              badgeColor={section.mediaSection.badgeColor}
               isActive={section.mediaSection.isActive}
               position={section.mediaSection.position}
               alignment={section.mediaSection.alignment}
