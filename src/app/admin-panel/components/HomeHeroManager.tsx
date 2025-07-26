@@ -120,217 +120,210 @@ interface HomeHeroData {
 }
 
 const HomeHeroManager: React.FC = () => {
-  console.log('🚀 HomeHeroManager component is being rendered!');
-  
-  try {
-    const { designSystem } = useDesignSystem();
-  
-    const [heroData, setHeroData] = useState<HomeHeroData>({
-      heading: 'Automate Conversations, Capture Leads, Serve Customers — All Without Code',
-      subheading: 'Deploy intelligent assistants to SMS, WhatsApp, and your website in minutes. Transform customer support while you focus on growth.',
-      backgroundColor: '#FFFFFF',
-      primaryCtaId: null,
-      secondaryCtaId: null,
-      isActive: true,
-      trustIndicators: [],
-      animationType: 'conversation',
-      animationData: {
-        conversationFlow: [
-          {
-            type: 'user',
-            message: "Hi! Can I return a product if I'm outside Canada?",
-            delay: 1000
-          },
-          {
-            type: 'typing',
-            delay: 2000
-          },
-          {
-            type: 'ai',
-            message: "Yes! Returns are accepted within 30 days globally. Need help creating a return label?",
-            delay: 3500
-          },
-          {
-            type: 'user',
-            message: "That would be great! My order number is #SK-2024-001",
-            delay: 6000
-          },
-          {
-            type: 'typing',
-            delay: 7000
-          },
-          {
-            type: 'ai',
-            message: "Perfect! I've generated your return label and sent it to your email. You'll also receive tracking updates. Anything else I can help with?",
-            delay: 8500
-          }
-        ]
-      }
-    });
+  const { designSystem } = useDesignSystem();
 
-    const [availableCTAs, setAvailableCTAs] = useState<CTAButton[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [saving, setSaving] = useState(false);
-    const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
-    const [previewMode, setPreviewMode] = useState(false);
-
-    // Get design system colors for color picker
-    const getDesignSystemColors = () => {
-      if (!designSystem) return [];
-      
-      return [
-        { name: 'Primary', value: designSystem.primaryColor, description: 'Main brand color' },
-        { name: 'Primary Light', value: designSystem.primaryColorLight, description: 'Light primary variant' },
-        { name: 'Primary Dark', value: designSystem.primaryColorDark, description: 'Dark primary variant' },
-        { name: 'Secondary', value: designSystem.secondaryColor, description: 'Secondary brand color' },
-        { name: 'Accent', value: designSystem.accentColor, description: 'Accent color' },
-        { name: 'Success', value: designSystem.successColor, description: 'Success state color' },
-        { name: 'Warning', value: designSystem.warningColor, description: 'Warning state color' },
-        { name: 'Error', value: designSystem.errorColor, description: 'Error state color' },
-        { name: 'Info', value: designSystem.infoColor, description: 'Info state color' },
-        { name: 'Background Primary', value: designSystem.backgroundPrimary, description: 'Primary background' },
-        { name: 'Background Secondary', value: designSystem.backgroundSecondary, description: 'Secondary background' },
-        { name: 'Background Dark', value: designSystem.backgroundDark, description: 'Dark background' },
-        { name: 'Gray Light', value: designSystem.grayLight, description: 'Light gray' },
-        { name: 'Gray Medium', value: designSystem.grayMedium, description: 'Medium gray' },
-        { name: 'Gray Dark', value: designSystem.grayDark, description: 'Dark gray' }
-      ];
-    };
-
-    // Fetch hero data and available CTAs on component mount
-    useEffect(() => {
-      fetchHeroData();
-      fetchAvailableCTAs();
-    }, []);
-
-    const fetchAvailableCTAs = async () => {
-      try {
-        const response = await fetch('/api/admin/cta-buttons');
-        if (response.ok) {
-          const result = await response.json();
-          if (result.success && result.data) {
-            setAvailableCTAs(result.data.filter((cta: CTAButton) => cta.isActive));
-          }
+  const [heroData, setHeroData] = useState<HomeHeroData>({
+    heading: 'Automate Conversations, Capture Leads, Serve Customers — All Without Code',
+    subheading: 'Deploy intelligent assistants to SMS, WhatsApp, and your website in minutes. Transform customer support while you focus on growth.',
+    backgroundColor: '#FFFFFF',
+    primaryCtaId: null,
+    secondaryCtaId: null,
+    isActive: true,
+    trustIndicators: [],
+    animationType: 'conversation',
+    animationData: {
+      conversationFlow: [
+        {
+          type: 'user',
+          message: "Hi! Can I return a product if I'm outside Canada?",
+          delay: 1000
+        },
+        {
+          type: 'typing',
+          delay: 2000
+        },
+        {
+          type: 'ai',
+          message: "Yes! Returns are accepted within 30 days globally. Need help creating a return label?",
+          delay: 3500
+        },
+        {
+          type: 'user',
+          message: "That would be great! My order number is #SK-2024-001",
+          delay: 6000
+        },
+        {
+          type: 'typing',
+          delay: 7000
+        },
+        {
+          type: 'ai',
+          message: "Perfect! I've generated your return label and sent it to your email. You'll also receive tracking updates. Anything else I can help with?",
+          delay: 8500
         }
-      } catch (error) {
-        console.error('Error fetching CTAs:', error);
-      }
-    };
+      ]
+    }
+  });
 
-    const fetchHeroData = async () => {
-      setLoading(true);
-      try {
-        console.log('🔍 Fetching hero data...');
-        const response = await fetch('/api/admin/home-hero');
-        if (response.ok) {
-          const result = await response.json();
-          console.log('📦 API Response:', result);
-          // Handle the new API response format
-          if (result.success && result.data) {
-            // Ensure trustIndicators is always an array and backgroundColor has a default
-            const heroData = {
-              ...result.data,
-              backgroundColor: result.data.backgroundColor || '#FFFFFF',
-              trustIndicators: result.data.trustIndicators || []
-            };
-            console.log('🎯 Setting hero data:', heroData);
-            console.log('🎯 Trust indicators count:', heroData.trustIndicators.length);
-            setHeroData(heroData);
-          } else {
-            throw new Error(result.message || 'Failed to fetch hero data');
-          }
+  const [availableCTAs, setAvailableCTAs] = useState<CTAButton[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
+  const [previewMode, setPreviewMode] = useState(false);
+
+  // Get design system colors for color picker
+  const getDesignSystemColors = () => {
+    if (!designSystem) return [];
+    
+    return [
+      { name: 'Primary', value: designSystem.primaryColor, description: 'Main brand color' },
+      { name: 'Primary Light', value: designSystem.primaryColorLight, description: 'Light primary variant' },
+      { name: 'Primary Dark', value: designSystem.primaryColorDark, description: 'Dark primary variant' },
+      { name: 'Secondary', value: designSystem.secondaryColor, description: 'Secondary brand color' },
+      { name: 'Accent', value: designSystem.accentColor, description: 'Accent color' },
+      { name: 'Success', value: designSystem.successColor, description: 'Success state color' },
+      { name: 'Warning', value: designSystem.warningColor, description: 'Warning state color' },
+      { name: 'Error', value: designSystem.errorColor, description: 'Error state color' },
+      { name: 'Info', value: designSystem.infoColor, description: 'Info state color' },
+      { name: 'Background Primary', value: designSystem.backgroundPrimary, description: 'Primary background' },
+      { name: 'Background Secondary', value: designSystem.backgroundSecondary, description: 'Secondary background' },
+      { name: 'Background Dark', value: designSystem.backgroundDark, description: 'Dark background' },
+      { name: 'Gray Light', value: designSystem.grayLight, description: 'Light gray' },
+      { name: 'Gray Medium', value: designSystem.grayMedium, description: 'Medium gray' },
+      { name: 'Gray Dark', value: designSystem.grayDark, description: 'Dark gray' }
+    ];
+  };
+
+  // Fetch hero data and available CTAs on component mount
+  useEffect(() => {
+    fetchHeroData();
+    fetchAvailableCTAs();
+  }, []);
+
+  const fetchAvailableCTAs = async () => {
+    try {
+      const response = await fetch('/api/admin/cta-buttons');
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success && result.data) {
+          setAvailableCTAs(result.data.filter((cta: CTAButton) => cta.isActive));
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching CTAs:', error);
+    }
+  };
+
+  const fetchHeroData = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/admin/home-hero');
+      if (response.ok) {
+        const result = await response.json();
+        // Handle the new API response format
+        if (result.success && result.data) {
+          // Ensure trustIndicators is always an array and backgroundColor has a default
+          const heroData = {
+            ...result.data,
+            backgroundColor: result.data.backgroundColor || '#FFFFFF',
+            trustIndicators: result.data.trustIndicators || []
+          };
+          setHeroData(heroData);
         } else {
-          throw new Error('Failed to fetch hero data');
+          throw new Error(result.message || 'Failed to fetch hero data');
         }
-      } catch (error) {
-        console.error('Error fetching hero data:', error);
-        setMessage({ type: 'error', text: 'Failed to load hero data' });
-      } finally {
-        setLoading(false);
+      } else {
+        throw new Error('Failed to fetch hero data');
       }
-    };
+    } catch (error) {
+      console.error('Error fetching hero data:', error);
+      setMessage({ type: 'error', text: 'Failed to load hero data' });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const handleSave = async () => {
-      setSaving(true);
-      try {
-        const response = await fetch('/api/admin/home-hero', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(heroData)
-        });
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const response = await fetch('/api/admin/home-hero', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(heroData)
+      });
 
-        if (response.ok) {
-          const result = await response.json();
-          // Handle the new API response format
-          if (result.success && result.data) {
-            // Ensure trustIndicators is always an array
-            const heroData = {
-              ...result.data,
-              trustIndicators: result.data.trustIndicators || []
-            };
-            setHeroData(heroData);
-            setMessage({ type: 'success', text: result.message || 'Hero section updated successfully!' });
-          } else {
-            throw new Error(result.message || 'Failed to save');
-          }
+      if (response.ok) {
+        const result = await response.json();
+        // Handle the new API response format
+        if (result.success && result.data) {
+          // Ensure trustIndicators is always an array
+          const heroData = {
+            ...result.data,
+            trustIndicators: result.data.trustIndicators || []
+          };
+          setHeroData(heroData);
+          setMessage({ type: 'success', text: result.message || 'Hero section updated successfully!' });
         } else {
-          const errorResult = await response.json();
-          throw new Error(errorResult.message || 'Failed to save');
+          throw new Error(result.message || 'Failed to save');
         }
-      } catch (error) {
-        console.error('Error saving hero data:', error);
-        setMessage({ 
-          type: 'error', 
-          text: error instanceof Error ? error.message : 'Failed to save hero section' 
-        });
-      } finally {
-        setSaving(false);
+      } else {
+        const errorResult = await response.json();
+        throw new Error(errorResult.message || 'Failed to save');
       }
-    };
+    } catch (error) {
+      console.error('Error saving hero data:', error);
+      setMessage({ 
+        type: 'error', 
+        text: error instanceof Error ? error.message : 'Failed to save hero section' 
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
 
-    const handleReset = () => {
-      fetchHeroData();
-      setMessage(null);
-    };
+  const handleReset = () => {
+    fetchHeroData();
+    setMessage(null);
+  };
 
-    const addTrustIndicator = () => {
-      const newIndicator: TrustIndicator = {
-        iconName: 'Star',
-        text: 'New Feature',
-        sortOrder: (heroData.trustIndicators || []).length,
-        isVisible: true
-      };
-      setHeroData(prev => ({
-        ...prev,
-        trustIndicators: [...(prev.trustIndicators || []), newIndicator]
-      }));
+  const addTrustIndicator = () => {
+    const newIndicator: TrustIndicator = {
+      iconName: 'Star',
+      text: 'New Feature',
+      sortOrder: (heroData.trustIndicators || []).length,
+      isVisible: true
     };
+    setHeroData(prev => ({
+      ...prev,
+      trustIndicators: [...(prev.trustIndicators || []), newIndicator]
+    }));
+  };
 
-    const removeTrustIndicator = (index: number) => {
-      setHeroData(prev => ({
-        ...prev,
-        trustIndicators: (prev.trustIndicators || []).filter((_, i) => i !== index)
-      }));
-    };
+  const removeTrustIndicator = (index: number) => {
+    setHeroData(prev => ({
+      ...prev,
+      trustIndicators: (prev.trustIndicators || []).filter((_, i) => i !== index)
+    }));
+  };
 
-    const updateTrustIndicator = (index: number, field: keyof TrustIndicator, value: any) => {
-      setHeroData(prev => ({
-        ...prev,
-        trustIndicators: (prev.trustIndicators || []).map((indicator, i) => 
-          i === index ? { ...indicator, [field]: value } : indicator
-        )
-      }));
-    };
+  const updateTrustIndicator = (index: number, field: keyof TrustIndicator, value: any) => {
+    setHeroData(prev => ({
+      ...prev,
+      trustIndicators: (prev.trustIndicators || []).map((indicator, i) => 
+        i === index ? { ...indicator, [field]: value } : indicator
+      )
+    }));
+  };
 
-    const getIconComponent = (iconName: string) => {
-      const iconData = availableIcons.find(icon => icon.name === iconName);
-      return iconData ? iconData.icon : Shield;
-    };
+  const getIconComponent = (iconName: string) => {
+    const iconData = availableIcons.find(icon => icon.name === iconName);
+    return iconData ? iconData.icon : Shield;
+  };
 
-    const getSelectedCTA = (ctaId: number | null) => {
-      if (!ctaId) return null;
-      return availableCTAs.find(cta => cta.id === ctaId) || null;
-    };
+  const getSelectedCTA = (ctaId: number | null) => {
+    if (!ctaId) return null;
+    return availableCTAs.find(cta => cta.id === ctaId) || null;
+  };
 
     // Auto-hide messages after 3 seconds
     useEffect(() => {
