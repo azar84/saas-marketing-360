@@ -11,7 +11,6 @@ export async function generateMetadata(): Promise<Metadata> {
   }
 
   const companyName = siteSettings?.footerCompanyName || 'Your Company';
-  const baseUrl = siteSettings?.baseUrl || 'https://yourcompany.com';
 
   return {
     title: `${companyName} - Admin Panel`,
@@ -19,17 +18,6 @@ export async function generateMetadata(): Promise<Metadata> {
     robots: {
       index: false,
       follow: false,
-    },
-    openGraph: {
-      title: `${companyName} - Admin Panel`,
-      description: `Admin panel for ${companyName}`,
-      url: `${baseUrl}/admin-panel`,
-      siteName: `${companyName} Admin`,
-    },
-    twitter: {
-      card: "summary",
-      title: `${companyName} - Admin Panel`,
-      description: `Admin panel for ${companyName}`,
     },
   };
 }
