@@ -317,7 +317,7 @@ const MediaSectionsManager: React.FC = () => {
   };
 
   // Get icon component for display
-  const getIconComponent = (iconName: string) => {
+  const getIconComponent = (iconName: string | undefined | null) => {
     // Safety check for non-string values
     if (!iconName || typeof iconName !== 'string') {
       return MessageSquare;
@@ -329,7 +329,12 @@ const MediaSectionsManager: React.FC = () => {
       
       // Return a component that renders the universal icon
       const IconComponent = (props: any) => {
-        return renderIcon(iconName, props);
+        try {
+          return renderIcon(iconName, props);
+        } catch (error) {
+          console.warn(`Failed to render icon ${iconName}:`, error);
+          return null;
+        }
       };
       return IconComponent;
     }
@@ -361,7 +366,7 @@ const MediaSectionsManager: React.FC = () => {
   };
 
   // Get icon category color
-  const getIconCategoryColor = (iconName: string) => {
+  const getIconCategoryColor = (iconName: string | undefined | null) => {
     // Safety check for non-string values
     if (!iconName || typeof iconName !== 'string') {
       return 'text-gray-600';
@@ -717,9 +722,13 @@ const MediaSectionsManager: React.FC = () => {
                           const IconComponent = getIconComponent(feature.icon);
                           return (
                             <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-                              <IconComponent 
-                                className={`w-4 h-4 ${getIconCategoryColor(feature.icon)}`}
-                              />
+                              {IconComponent ? (
+                                <IconComponent 
+                                  className={`w-4 h-4 ${getIconCategoryColor(feature.icon)}`}
+                                />
+                              ) : (
+                                <div className="w-4 h-4 bg-gray-300 rounded" />
+                              )}
                               <span className="text-sm text-gray-700">{feature.label}</span>
                             </div>
                           );
@@ -1048,7 +1057,11 @@ const MediaSectionsManager: React.FC = () => {
                           
                           <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
                             <div className="flex items-center gap-2">
-                              <IconComponent className={`w-4 h-4 ${getIconCategoryColor(feature.icon)}`} />
+                              {IconComponent ? (
+                                <IconComponent className={`w-4 h-4 ${getIconCategoryColor(feature.icon)}`} />
+                              ) : (
+                                <div className="w-4 h-4 bg-gray-300 rounded" />
+                              )}
                               <span className="text-sm text-gray-600">{feature.label || 'Preview'}</span>
                             </div>
                             
