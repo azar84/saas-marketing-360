@@ -820,12 +820,38 @@ const HtmlSectionsManager: React.FC = () => {
                                         editor.fire('change'); // Trigger change event
                                       }
                                     };
+
+                                    // Helper function to remove all spacing classes
+                                    const removeAllSpacing = () => {
+                                      const selectedNode = editor.selection.getNode();
+                                      if (selectedNode.nodeType === 1) {
+                                        const allSpacingClasses = [
+                                          'no-margin', 'margin-xs', 'margin-sm', 'margin-md', 'margin-lg', 'margin-xl', 'margin-2xl', 
+                                          'margin-top-xs', 'margin-top-sm', 'margin-top-md', 'margin-top-lg', 'margin-top-xl', 'margin-top-2xl', 
+                                          'margin-bottom-xs', 'margin-bottom-sm', 'margin-bottom-md', 'margin-bottom-lg', 'margin-bottom-xl', 'margin-bottom-2xl', 
+                                          'margin-left-xs', 'margin-left-sm', 'margin-left-md', 'margin-left-lg', 'margin-left-xl', 'margin-left-2xl', 
+                                          'margin-right-xs', 'margin-right-sm', 'margin-right-md', 'margin-right-lg', 'margin-right-xl', 'margin-right-2xl',
+                                          'no-padding', 'padding-xs', 'padding-sm', 'padding-md', 'padding-lg', 'padding-xl', 'padding-2xl', 
+                                          'padding-top-xs', 'padding-top-sm', 'padding-top-md', 'padding-top-lg', 'padding-top-xl', 'padding-top-2xl', 
+                                          'padding-bottom-xs', 'padding-bottom-sm', 'padding-bottom-md', 'padding-bottom-lg', 'padding-bottom-xl', 'padding-bottom-2xl', 
+                                          'padding-left-xs', 'padding-left-sm', 'padding-left-md', 'padding-left-lg', 'padding-left-xl', 'padding-left-2xl', 
+                                          'padding-right-xs', 'padding-right-sm', 'padding-right-md', 'padding-right-lg', 'padding-right-xl', 'padding-right-2xl'
+                                        ];
+                                        
+                                        allSpacingClasses.forEach(cls => selectedNode.classList.remove(cls));
+                                        
+                                        console.log('Removed all spacing classes from element:', selectedNode.outerHTML);
+                                        editor.fire('change'); // Trigger change event
+                                      }
+                                    };
                                     
                                     // Add spacing controls to toolbar
                                     editor.ui.registry.addMenuButton('spacing-controls', {
                                       text: 'Spacing',
                                       fetch: function (callback) {
                                         const items = [
+                                          { type: 'menuitem', text: 'Remove All Spacing', onAction: removeAllSpacing },
+                                          { type: 'separator' },
                                           {
                                             type: 'menuitem',
                                             text: 'Margins',
@@ -864,12 +890,12 @@ const HtmlSectionsManager: React.FC = () => {
                                             text: 'Top Margin',
                                             getSubmenuItems: function () {
                                               return [
-                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-top-xs') },
-                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-top-sm') },
-                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-top-md') },
-                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-top-lg') },
-                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-top-xl') },
-                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-top-2xl') }
+                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('margin-top-xs', 'margin') },
+                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('margin-top-sm', 'margin') },
+                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('margin-top-md', 'margin') },
+                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('margin-top-lg', 'margin') },
+                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('margin-top-xl', 'margin') },
+                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('margin-top-2xl', 'margin') }
                                               ];
                                             }
                                           },
@@ -878,12 +904,12 @@ const HtmlSectionsManager: React.FC = () => {
                                             text: 'Bottom Margin',
                                             getSubmenuItems: function () {
                                               return [
-                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-bottom-xs') },
-                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-bottom-sm') },
-                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-bottom-md') },
-                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-bottom-lg') },
-                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-bottom-xl') },
-                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-bottom-2xl') }
+                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('margin-bottom-xs', 'margin') },
+                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('margin-bottom-sm', 'margin') },
+                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('margin-bottom-md', 'margin') },
+                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('margin-bottom-lg', 'margin') },
+                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('margin-bottom-xl', 'margin') },
+                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('margin-bottom-2xl', 'margin') }
                                               ];
                                             }
                                           },
@@ -892,12 +918,12 @@ const HtmlSectionsManager: React.FC = () => {
                                             text: 'Left Margin',
                                             getSubmenuItems: function () {
                                               return [
-                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-left-xs') },
-                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-left-sm') },
-                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-left-md') },
-                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-left-lg') },
-                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-left-xl') },
-                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-left-2xl') }
+                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('margin-left-xs', 'margin') },
+                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('margin-left-sm', 'margin') },
+                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('margin-left-md', 'margin') },
+                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('margin-left-lg', 'margin') },
+                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('margin-left-xl', 'margin') },
+                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('margin-left-2xl', 'margin') }
                                               ];
                                             }
                                           },
@@ -906,12 +932,12 @@ const HtmlSectionsManager: React.FC = () => {
                                             text: 'Right Margin',
                                             getSubmenuItems: function () {
                                               return [
-                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-right-xs') },
-                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-right-sm') },
-                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-right-md') },
-                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-right-lg') },
-                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-right-xl') },
-                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-right-2xl') }
+                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('margin-right-xs', 'margin') },
+                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('margin-right-sm', 'margin') },
+                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('margin-right-md', 'margin') },
+                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('margin-right-lg', 'margin') },
+                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('margin-right-xl', 'margin') },
+                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('margin-right-2xl', 'margin') }
                                               ];
                                             }
                                           }
@@ -944,7 +970,7 @@ const HtmlSectionsManager: React.FC = () => {
                                 </div>
                               </div>
                               <div className="mt-2 text-xs text-gray-600">
-                                <strong>Tip:</strong> Select text or elements first, then apply spacing. Use the "Debug HTML" button to see the generated code. Spacing classes are now available on the frontend where your HTML sections are displayed.
+                                <strong>Tip:</strong> Select text or elements first, then apply spacing. Use "Remove All Spacing" to clear all spacing classes. Use the "Debug HTML" button to see the generated code. Spacing classes are now available on the frontend where your HTML sections are displayed.
                               </div>
                               {showMediaLibrary && (
                                 <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-blue-700">
