@@ -573,10 +573,6 @@ const HtmlSectionsManager: React.FC = () => {
                 {editingSection ? 'Edit HTML Section' : 'Create HTML Section'}
               </h3>
               <div className="flex items-center gap-4">
-                {/* Debug info */}
-                <div className="text-xs text-gray-500">
-                  Modal: {showForm ? 'Visible' : 'Hidden'}
-                </div>
                 <button
                   onClick={resetForm}
                   className="text-gray-500 hover:text-gray-700"
@@ -990,10 +986,6 @@ const HtmlSectionsManager: React.FC = () => {
                   <Save className="w-4 h-4" />
                   {editingSection ? 'Update Section' : 'Create Section'}
                 </button>
-                {/* Debug info */}
-                <div className="text-xs text-gray-500">
-                  Editing: {editingSection ? 'Yes' : 'No'} | Media Modal: {showMediaLibrary ? 'Open' : 'Closed'}
-                </div>
               </div>
             </form>
           </div>
