@@ -650,7 +650,7 @@ const HtmlSectionsManager: React.FC = () => {
                                 onEditorChange={(content) => setFormData({...formData, htmlContent: content})}
                                 init={{
                                   ...tinymceConfig,
-                                  setup: (editor) => {
+                                  setup: (editor: any) => {
                                     console.log('TinyMCE API Key:', process.env.NEXT_PUBLIC_TINYMCE_API_KEY || process.env.TINYMCE_API_KEY);
                                     console.log('TinyMCE Editor Setup Complete');
                                   }
