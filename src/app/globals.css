@@ -243,6 +243,80 @@ html {
   font-weight: 600;
 }
 
+/* Spacing Classes for HTML Sections */
+.html-section-content .margin-xs { margin: 0.25rem !important; }
+.html-section-content .margin-sm { margin: 0.5rem !important; }
+.html-section-content .margin-md { margin: 1rem !important; }
+.html-section-content .margin-lg { margin: 1.5rem !important; }
+.html-section-content .margin-xl { margin: 2rem !important; }
+.html-section-content .margin-2xl { margin: 3rem !important; }
+
+.html-section-content .margin-top-xs { margin-top: 0.25rem !important; }
+.html-section-content .margin-top-sm { margin-top: 0.5rem !important; }
+.html-section-content .margin-top-md { margin-top: 1rem !important; }
+.html-section-content .margin-top-lg { margin-top: 1.5rem !important; }
+.html-section-content .margin-top-xl { margin-top: 2rem !important; }
+.html-section-content .margin-top-2xl { margin-top: 3rem !important; }
+
+.html-section-content .margin-bottom-xs { margin-bottom: 0.25rem !important; }
+.html-section-content .margin-bottom-sm { margin-bottom: 0.5rem !important; }
+.html-section-content .margin-bottom-md { margin-bottom: 1rem !important; }
+.html-section-content .margin-bottom-lg { margin-bottom: 1.5rem !important; }
+.html-section-content .margin-bottom-xl { margin-bottom: 2rem !important; }
+.html-section-content .margin-bottom-2xl { margin-bottom: 3rem !important; }
+
+.html-section-content .margin-left-xs { margin-left: 0.25rem !important; }
+.html-section-content .margin-left-sm { margin-left: 0.5rem !important; }
+.html-section-content .margin-left-md { margin-left: 1rem !important; }
+.html-section-content .margin-left-lg { margin-left: 1.5rem !important; }
+.html-section-content .margin-left-xl { margin-left: 2rem !important; }
+.html-section-content .margin-left-2xl { margin-left: 3rem !important; }
+
+.html-section-content .margin-right-xs { margin-right: 0.25rem !important; }
+.html-section-content .margin-right-sm { margin-right: 0.5rem !important; }
+.html-section-content .margin-right-md { margin-right: 1rem !important; }
+.html-section-content .margin-right-lg { margin-right: 1.5rem !important; }
+.html-section-content .margin-right-xl { margin-right: 2rem !important; }
+.html-section-content .margin-right-2xl { margin-right: 3rem !important; }
+
+.html-section-content .padding-xs { padding: 0.25rem !important; }
+.html-section-content .padding-sm { padding: 0.5rem !important; }
+.html-section-content .padding-md { padding: 1rem !important; }
+.html-section-content .padding-lg { padding: 1.5rem !important; }
+.html-section-content .padding-xl { padding: 2rem !important; }
+.html-section-content .padding-2xl { padding: 3rem !important; }
+
+.html-section-content .padding-top-xs { padding-top: 0.25rem !important; }
+.html-section-content .padding-top-sm { padding-top: 0.5rem !important; }
+.html-section-content .padding-top-md { padding-top: 1rem !important; }
+.html-section-content .padding-top-lg { padding-top: 1.5rem !important; }
+.html-section-content .padding-top-xl { padding-top: 2rem !important; }
+.html-section-content .padding-top-2xl { padding-top: 3rem !important; }
+
+.html-section-content .padding-bottom-xs { padding-bottom: 0.25rem !important; }
+.html-section-content .padding-bottom-sm { padding-bottom: 0.5rem !important; }
+.html-section-content .padding-bottom-md { padding-bottom: 1rem !important; }
+.html-section-content .padding-bottom-lg { padding-bottom: 1.5rem !important; }
+.html-section-content .padding-bottom-xl { padding-bottom: 2rem !important; }
+.html-section-content .padding-bottom-2xl { padding-bottom: 3rem !important; }
+
+.html-section-content .padding-left-xs { padding-left: 0.25rem !important; }
+.html-section-content .padding-left-sm { padding-left: 0.5rem !important; }
+.html-section-content .padding-left-md { padding-left: 1rem !important; }
+.html-section-content .padding-left-lg { padding-left: 1.5rem !important; }
+.html-section-content .padding-left-xl { padding-left: 2rem !important; }
+.html-section-content .padding-left-2xl { padding-left: 3rem !important; }
+
+.html-section-content .padding-right-xs { padding-right: 0.25rem !important; }
+.html-section-content .padding-right-sm { padding-right: 0.5rem !important; }
+.html-section-content .padding-right-md { padding-right: 1rem !important; }
+.html-section-content .padding-right-lg { padding-right: 1.5rem !important; }
+.html-section-content .padding-right-xl { padding-right: 2rem !important; }
+.html-section-content .padding-right-2xl { padding-right: 3rem !important; }
+
+.html-section-content .no-margin { margin: 0 !important; }
+.html-section-content .no-padding { padding: 0 !important; }
+
 /* Responsive TinyMCE */
 @media (max-width: 768px) {
   .tox .tox-toolbar {

@@ -105,6 +105,70 @@ const HtmlSectionsManager: React.FC = () => {
       'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
       'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
     ],
+    formats: {
+      'margin-xs': { block: 'div', classes: 'margin-xs' },
+      'margin-sm': { block: 'div', classes: 'margin-sm' },
+      'margin-md': { block: 'div', classes: 'margin-md' },
+      'margin-lg': { block: 'div', classes: 'margin-lg' },
+      'margin-xl': { block: 'div', classes: 'margin-xl' },
+      'margin-2xl': { block: 'div', classes: 'margin-2xl' },
+      'margin-top-xs': { block: 'div', classes: 'margin-top-xs' },
+      'margin-top-sm': { block: 'div', classes: 'margin-top-sm' },
+      'margin-top-md': { block: 'div', classes: 'margin-top-md' },
+      'margin-top-lg': { block: 'div', classes: 'margin-top-lg' },
+      'margin-top-xl': { block: 'div', classes: 'margin-top-xl' },
+      'margin-top-2xl': { block: 'div', classes: 'margin-top-2xl' },
+      'margin-bottom-xs': { block: 'div', classes: 'margin-bottom-xs' },
+      'margin-bottom-sm': { block: 'div', classes: 'margin-bottom-sm' },
+      'margin-bottom-md': { block: 'div', classes: 'margin-bottom-md' },
+      'margin-bottom-lg': { block: 'div', classes: 'margin-bottom-lg' },
+      'margin-bottom-xl': { block: 'div', classes: 'margin-bottom-xl' },
+      'margin-bottom-2xl': { block: 'div', classes: 'margin-bottom-2xl' },
+      'margin-left-xs': { block: 'div', classes: 'margin-left-xs' },
+      'margin-left-sm': { block: 'div', classes: 'margin-left-sm' },
+      'margin-left-md': { block: 'div', classes: 'margin-left-md' },
+      'margin-left-lg': { block: 'div', classes: 'margin-left-lg' },
+      'margin-left-xl': { block: 'div', classes: 'margin-left-xl' },
+      'margin-left-2xl': { block: 'div', classes: 'margin-left-2xl' },
+      'margin-right-xs': { block: 'div', classes: 'margin-right-xs' },
+      'margin-right-sm': { block: 'div', classes: 'margin-right-sm' },
+      'margin-right-md': { block: 'div', classes: 'margin-right-md' },
+      'margin-right-lg': { block: 'div', classes: 'margin-right-lg' },
+      'margin-right-xl': { block: 'div', classes: 'margin-right-xl' },
+      'margin-right-2xl': { block: 'div', classes: 'margin-right-2xl' },
+      'padding-xs': { block: 'div', classes: 'padding-xs' },
+      'padding-sm': { block: 'div', classes: 'padding-sm' },
+      'padding-md': { block: 'div', classes: 'padding-md' },
+      'padding-lg': { block: 'div', classes: 'padding-lg' },
+      'padding-xl': { block: 'div', classes: 'padding-xl' },
+      'padding-2xl': { block: 'div', classes: 'padding-2xl' },
+      'padding-top-xs': { block: 'div', classes: 'padding-top-xs' },
+      'padding-top-sm': { block: 'div', classes: 'padding-top-sm' },
+      'padding-top-md': { block: 'div', classes: 'padding-top-md' },
+      'padding-top-lg': { block: 'div', classes: 'padding-top-lg' },
+      'padding-top-xl': { block: 'div', classes: 'padding-top-xl' },
+      'padding-top-2xl': { block: 'div', classes: 'padding-top-2xl' },
+      'padding-bottom-xs': { block: 'div', classes: 'padding-bottom-xs' },
+      'padding-bottom-sm': { block: 'div', classes: 'padding-bottom-sm' },
+      'padding-bottom-md': { block: 'div', classes: 'padding-bottom-md' },
+      'padding-bottom-lg': { block: 'div', classes: 'padding-bottom-lg' },
+      'padding-bottom-xl': { block: 'div', classes: 'padding-bottom-xl' },
+      'padding-bottom-2xl': { block: 'div', classes: 'padding-bottom-2xl' },
+      'padding-left-xs': { block: 'div', classes: 'padding-left-xs' },
+      'padding-left-sm': { block: 'div', classes: 'padding-left-sm' },
+      'padding-left-md': { block: 'div', classes: 'padding-left-md' },
+      'padding-left-lg': { block: 'div', classes: 'padding-left-lg' },
+      'padding-left-xl': { block: 'div', classes: 'padding-left-xl' },
+      'padding-left-2xl': { block: 'div', classes: 'padding-left-2xl' },
+      'padding-right-xs': { block: 'div', classes: 'padding-right-xs' },
+      'padding-right-sm': { block: 'div', classes: 'padding-right-sm' },
+      'padding-right-md': { block: 'div', classes: 'padding-right-md' },
+      'padding-right-lg': { block: 'div', classes: 'padding-right-lg' },
+      'padding-right-xl': { block: 'div', classes: 'padding-right-xl' },
+      'padding-right-2xl': { block: 'div', classes: 'padding-right-2xl' },
+      'no-margin': { block: 'div', classes: 'no-margin' },
+      'no-padding': { block: 'div', classes: 'no-padding' }
+    },
     toolbar: 'undo redo | formatselect | bold italic underline strikethrough | ' +
       'alignleft aligncenter alignright alignjustify | ' +
       'bullist numlist outdent indent | ' +
@@ -708,6 +772,17 @@ const HtmlSectionsManager: React.FC = () => {
                         {previewMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         {previewMode ? 'Hide Preview' : 'Show Preview'}
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          console.log('Current HTML Content:', formData.htmlContent);
+                          alert('Check browser console for HTML content');
+                        }}
+                        className="flex items-center gap-2 px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+                      >
+                        <Code className="w-4 h-4" />
+                        Debug HTML
+                      </button>
                     </div>
 
                     {/* Code Editor */}
@@ -729,6 +804,23 @@ const HtmlSectionsManager: React.FC = () => {
                                     console.log('TinyMCE API Key:', process.env.NEXT_PUBLIC_TINYMCE_API_KEY || process.env.TINYMCE_API_KEY);
                                     console.log('TinyMCE Editor Setup Complete');
                                     
+                                    // Helper function to apply spacing classes
+                                    const applySpacingClass = (className: string, type: 'margin' | 'padding') => {
+                                      const selectedNode = editor.selection.getNode();
+                                      if (selectedNode.nodeType === 1) {
+                                        // Remove all existing spacing classes of the same type
+                                        const allClasses = type === 'margin' 
+                                          ? ['no-margin', 'margin-xs', 'margin-sm', 'margin-md', 'margin-lg', 'margin-xl', 'margin-2xl', 'margin-top-xs', 'margin-top-sm', 'margin-top-md', 'margin-top-lg', 'margin-top-xl', 'margin-top-2xl', 'margin-bottom-xs', 'margin-bottom-sm', 'margin-bottom-md', 'margin-bottom-lg', 'margin-bottom-xl', 'margin-bottom-2xl', 'margin-left-xs', 'margin-left-sm', 'margin-left-md', 'margin-left-lg', 'margin-left-xl', 'margin-left-2xl', 'margin-right-xs', 'margin-right-sm', 'margin-right-md', 'margin-right-lg', 'margin-right-xl', 'margin-right-2xl']
+                                          : ['no-padding', 'padding-xs', 'padding-sm', 'padding-md', 'padding-lg', 'padding-xl', 'padding-2xl', 'padding-top-xs', 'padding-top-sm', 'padding-top-md', 'padding-top-lg', 'padding-top-xl', 'padding-top-2xl', 'padding-bottom-xs', 'padding-bottom-sm', 'padding-bottom-md', 'padding-bottom-lg', 'padding-bottom-xl', 'padding-bottom-2xl', 'padding-left-xs', 'padding-left-sm', 'padding-left-md', 'padding-left-lg', 'padding-left-xl', 'padding-left-2xl', 'padding-right-xs', 'padding-right-sm', 'padding-right-md', 'padding-right-lg', 'padding-right-xl', 'padding-right-2xl'];
+                                        
+                                        allClasses.forEach(cls => selectedNode.classList.remove(cls));
+                                        selectedNode.classList.add(className);
+                                        
+                                        console.log(`Applied ${className} to element:`, selectedNode.outerHTML);
+                                        editor.fire('change'); // Trigger change event
+                                      }
+                                    };
+                                    
                                     // Add spacing controls to toolbar
                                     editor.ui.registry.addMenuButton('spacing-controls', {
                                       text: 'Spacing',
@@ -739,14 +831,14 @@ const HtmlSectionsManager: React.FC = () => {
                                             text: 'Margins',
                                             getSubmenuItems: function () {
                                               return [
-                                                { type: 'menuitem', text: 'No Margin', onAction: () => editor.execCommand('mceToggleFormat', false, 'no-margin') },
+                                                { type: 'menuitem', text: 'No Margin', onAction: () => applySpacingClass('no-margin', 'margin') },
                                                 { type: 'separator' },
-                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-xs') },
-                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-sm') },
-                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-md') },
-                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-lg') },
-                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-xl') },
-                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-2xl') }
+                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('margin-xs', 'margin') },
+                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('margin-sm', 'margin') },
+                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('margin-md', 'margin') },
+                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('margin-lg', 'margin') },
+                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('margin-xl', 'margin') },
+                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('margin-2xl', 'margin') }
                                               ];
                                             }
                                           },
@@ -755,14 +847,14 @@ const HtmlSectionsManager: React.FC = () => {
                                             text: 'Padding',
                                             getSubmenuItems: function () {
                                               return [
-                                                { type: 'menuitem', text: 'No Padding', onAction: () => editor.execCommand('mceToggleFormat', false, 'no-padding') },
+                                                { type: 'menuitem', text: 'No Padding', onAction: () => applySpacingClass('no-padding', 'padding') },
                                                 { type: 'separator' },
-                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'padding-xs') },
-                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'padding-sm') },
-                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'padding-md') },
-                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'padding-lg') },
-                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'padding-xl') },
-                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'padding-2xl') }
+                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('padding-xs', 'padding') },
+                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('padding-sm', 'padding') },
+                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('padding-md', 'padding') },
+                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('padding-lg', 'padding') },
+                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('padding-xl', 'padding') },
+                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('padding-2xl', 'padding') }
                                               ];
                                             }
                                           },
@@ -850,6 +942,9 @@ const HtmlSectionsManager: React.FC = () => {
                                   <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
                                   <span>Click the <strong>spacing</strong> button to add margins and padding</span>
                                 </div>
+                              </div>
+                              <div className="mt-2 text-xs text-gray-600">
+                                <strong>Tip:</strong> Select text or elements first, then apply spacing. Use the "Debug HTML" button to see the generated code. Spacing classes are now available on the frontend where your HTML sections are displayed.
                               </div>
                               {showMediaLibrary && (
                                 <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-blue-700">

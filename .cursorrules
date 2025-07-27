@@ -1,0 +1,22 @@
+# Cursor Rules for saas_cms project
+
+## Git Operations
+- NEVER commit or push code to GitHub without explicit user instruction
+- Always ask for permission before making any git commits or pushes
+- When suggesting changes, ask if the user wants them committed
+- Only use git commands when specifically instructed by the user
+
+## Code Changes
+- Focus on the current codebase and avoid general answers
+- Use design system color tokens instead of hardcoded colors
+- Prefer CLI commands over graphical interface instructions
+- Don't automatically start development servers
+
+## Deployment
+- Don't push to Heroku until explicitly asked
+- Use Docker Hub container for deployment instead of Render
+- Don't use containers during development
+
+## GitHub Management
+- Use GitHub CLI for repository and workflow tasks
+- Never push to GitHub without explicit user instructions 
