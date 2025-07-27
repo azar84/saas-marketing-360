@@ -9,6 +9,7 @@ import ScriptInjector from "../components/layout/ScriptInjector";
 import GlobalJavaScriptInjector from "../components/layout/GlobalJavaScriptInjector";
 import "../lib/init"; // Initialize server configuration
 import "./globals.css";
+import { prisma } from "@/lib/db";
 
 // Force dynamic rendering to prevent static generation issues
 export const dynamic = 'force-dynamic';
@@ -21,33 +22,45 @@ const manrope = Manrope({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
+  // Fetch site settings for dynamic metadata
+  let siteSettings = null;
+  try {
+    siteSettings = await prisma.siteSettings.findFirst();
+  } catch (error) {
+    console.warn('Failed to fetch site settings for metadata:', error);
+  }
+
+  const companyName = siteSettings?.footerCompanyName || 'Your Company';
+  const companyDescription = siteSettings?.footerCompanyDescription || 'Your company description and value proposition.';
+  const baseUrl = siteSettings?.baseUrl || 'https://yourcompany.com';
+
   return {
-    title: "Your Company - Your Company Description",
-    description: "Your company description and value proposition.",
+    title: `${companyName} - ${companyDescription}`,
+    description: companyDescription,
     keywords: "your, company, keywords",
-    authors: [{ name: "Your Company" }],
-    creator: "Your Company",
-    publisher: "Your Company",
+    authors: [{ name: companyName }],
+    creator: companyName,
+    publisher: companyName,
     formatDetection: {
       email: false,
       address: false,
       telephone: false,
     },
-    metadataBase: new URL("https://yourcompany.com"),
+    metadataBase: new URL(baseUrl),
     alternates: {
       canonical: "/",
     },
     openGraph: {
-      title: "Your Company - Your Company Description",
-      description: "Your company description and value proposition.",
-      url: "https://yourcompany.com",
-      siteName: "Your Company",
+      title: `${companyName} - ${companyDescription}`,
+      description: companyDescription,
+      url: baseUrl,
+      siteName: companyName,
       images: [
         {
           url: "/og-image.jpg",
           width: 1200,
           height: 630,
-          alt: "Your Company - Your Company Description",
+          alt: `${companyName} - ${companyDescription}`,
         },
       ],
       locale: "en_US",
@@ -55,8 +68,8 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: "Your Company - Your Company Description",
-      description: "Your company description and value proposition.",
+      title: `${companyName} - ${companyDescription}`,
+      description: companyDescription,
       images: ["/og-image.jpg"],
       creator: "@yourcompany",
     },
