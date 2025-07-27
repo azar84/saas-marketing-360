@@ -106,14 +106,25 @@ const HtmlSectionsManager: React.FC = () => {
       'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
     ],
 
-    toolbar: 'undo redo | formatselect | bold italic underline strikethrough | ' +
+    toolbar: 'undo redo | styles | bold italic underline strikethrough | ' +
       'alignleft aligncenter alignright alignjustify | ' +
       'bullist numlist outdent indent | ' +
       'link image media | ' +
-      'forecolor backcolor | ' +
       'spacing-controls | ' +
       'removeformat | help',
     block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Blockquote=blockquote; Preformatted=pre; Code=code',
+    style_formats: [
+      {title: 'Paragraph', block: 'p'},
+      {title: 'Heading 1', block: 'h1'},
+      {title: 'Heading 2', block: 'h2'},
+      {title: 'Heading 3', block: 'h3'},
+      {title: 'Heading 4', block: 'h4'},
+      {title: 'Heading 5', block: 'h5'},
+      {title: 'Heading 6', block: 'h6'},
+      {title: 'Blockquote', block: 'blockquote'},
+      {title: 'Preformatted', block: 'pre'},
+      {title: 'Code', block: 'code'}
+    ],
     link_list: [
       {title: 'Home', value: '/'},
       {title: 'About', value: '/about'},
@@ -125,12 +136,9 @@ const HtmlSectionsManager: React.FC = () => {
     automatic_uploads: true,
     file_picker_types: 'image',
     file_picker_callback: function (callback: (value: string, meta?: any) => void, value: string, meta: any) {
-      console.log('File picker callback triggered', { value, meta });
-      
       // Store callback and open media library
       setMediaCallback(() => callback);
       setShowMediaLibrary(true);
-      console.log('Media library should be opening...');
     },
     media_live_embeds: true,
     media_alt_source: false,
@@ -254,13 +262,9 @@ const HtmlSectionsManager: React.FC = () => {
       const url = '/api/admin/html-sections';
       const method = editingSection ? 'PUT' : 'POST';
       
-      const requestData = editingSection 
-        ? { ...formData, id: editingSection.id }
-        : formData;
-      
-      console.log('Submitting form data:', requestData);
-      console.log('URL:', url);
-      console.log('Method:', method);
+                  const requestData = editingSection 
+      ? { ...formData, id: editingSection.id }
+      : formData;
       
       const response = await fetch(url, {
         method,
@@ -270,8 +274,6 @@ const HtmlSectionsManager: React.FC = () => {
         body: JSON.stringify(requestData),
       });
 
-      console.log('Response status:', response.status);
-      
       if (!response.ok) {
         const errorText = await response.text();
         console.error('Response error:', errorText);
@@ -279,7 +281,6 @@ const HtmlSectionsManager: React.FC = () => {
       }
 
       const result = await response.json();
-      console.log('Success response:', result);
 
       await fetchHtmlSections();
       resetForm();
@@ -291,7 +292,6 @@ const HtmlSectionsManager: React.FC = () => {
   };
 
   const handleEdit = (section: HtmlSection) => {
-    console.log('Editing section:', section);
     setEditingSection(section);
     setFormData({
       name: section.name,
@@ -303,7 +303,6 @@ const HtmlSectionsManager: React.FC = () => {
       sortOrder: section.sortOrder
     });
     setShowForm(true);
-    console.log('Form should be visible now');
   };
 
   const handleDelete = async (id: number) => {
@@ -369,11 +368,9 @@ const HtmlSectionsManager: React.FC = () => {
   const fetchMediaItems = async () => {
     try {
       setMediaLoading(true);
-      console.log('Fetching media items...');
       
       // Use the correct API endpoint
       const endpoint = '/api/admin/media-library?page=1&limit=50&fileType=image';
-      console.log('Using endpoint:', endpoint);
       
       const response = await fetch(endpoint);
       if (!response.ok) {
@@ -381,7 +378,6 @@ const HtmlSectionsManager: React.FC = () => {
       }
       
       const data = await response.json();
-      console.log('API response:', data);
       
       if (!data.success) {
         throw new Error(data.message || 'API request failed');
@@ -389,9 +385,7 @@ const HtmlSectionsManager: React.FC = () => {
       
       // Extract media items from the correct response structure
       const media = data.data?.items || [];
-      console.log('Extracted media items:', media);
       
-      console.log('Setting media items:', media);
       setMediaItems(media);
       
     } catch (error) {
@@ -403,15 +397,11 @@ const HtmlSectionsManager: React.FC = () => {
   };
 
   const handleMediaSelect = (selectedMedia: any) => {
-    console.log('Media selected:', selectedMedia);
-    console.log('Media callback exists:', !!mediaCallback);
-    
     if (mediaCallback && selectedMedia) {
       // Handle both single and multiple selections
       const mediaItem = Array.isArray(selectedMedia) ? selectedMedia[0] : selectedMedia;
       
       if (mediaItem && mediaItem.publicUrl) {
-        console.log('Calling media callback with:', mediaItem.publicUrl);
         mediaCallback(mediaItem.publicUrl, { 
           title: mediaItem.title || mediaItem.filename,
           alt: mediaItem.alt || mediaItem.title || mediaItem.filename
@@ -506,16 +496,8 @@ const HtmlSectionsManager: React.FC = () => {
                       </button>
                       <button
                         onClick={() => handleDelete(section.id)}
-                        className={`p-2 ${
-                          getUsageCount(section) > 0 
-                            ? 'text-gray-400 cursor-not-allowed' 
-                            : 'text-gray-600 hover:text-red-600'
-                        }`}
-                        disabled={getUsageCount(section) > 0}
-                        title={getUsageCount(section) > 0 
-                          ? `Cannot delete: This section is used in ${getUsageCount(section)} page(s). Remove it from Page Builder first.` 
-                          : 'Delete HTML section'
-                        }
+                        className="p-2 text-gray-600 hover:text-red-600"
+                        title="Delete HTML section"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -529,27 +511,21 @@ const HtmlSectionsManager: React.FC = () => {
                     </div>
                     
                     {getUsageCount(section) > 0 && (
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span>Used in:</span>
-                          {getUsagePages(section).map((page, index) => (
-                            <span key={page.id} className="inline-flex items-center gap-1">
-                              <a 
-                                href={`/${page.slug}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-700"
-                              >
-                                {page.title}
-                              </a>
-                              {index < getUsagePages(section).length - 1 && <span>,</span>}
-                            </span>
-                          ))}
-                        </div>
-                        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-2 text-yellow-800 text-xs">
-                          <strong>⚠️ Cannot delete:</strong> This section is being used in {getUsageCount(section)} page(s). 
-                          Go to <strong>Page Builder</strong> and remove this section from the pages first, then come back to delete it.
-                        </div>
+                      <div className="flex items-center gap-2">
+                        <span>Used in:</span>
+                        {getUsagePages(section).map((page, index) => (
+                          <span key={page.id} className="inline-flex items-center gap-1">
+                            <a 
+                              href={`/${page.slug}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-700"
+                            >
+                              {page.title}
+                            </a>
+                            {index < getUsagePages(section).length - 1 && <span>,</span>}
+                          </span>
+                        ))}
                       </div>
                     )}
                   </div>
@@ -733,7 +709,6 @@ const HtmlSectionsManager: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => {
-                          console.log('Current HTML Content:', formData.htmlContent);
                           alert('Check browser console for HTML content');
                         }}
                         className="flex items-center gap-2 px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
@@ -759,8 +734,6 @@ const HtmlSectionsManager: React.FC = () => {
                                 init={{
                                   ...tinymceConfig,
                                   setup: (editor: any) => {
-                                    console.log('TinyMCE API Key:', process.env.NEXT_PUBLIC_TINYMCE_API_KEY || process.env.TINYMCE_API_KEY);
-                                    console.log('TinyMCE Editor Setup Complete');
                                     
                                     // Helper function to apply spacing classes
                                     const applySpacingClass = (className: string, type: 'margin' | 'padding') => {
@@ -774,7 +747,6 @@ const HtmlSectionsManager: React.FC = () => {
                                         allClasses.forEach(cls => selectedNode.classList.remove(cls));
                                         selectedNode.classList.add(className);
                                         
-                                        console.log(`Applied ${className} to element:`, selectedNode.outerHTML);
                                         editor.fire('change'); // Trigger change event
                                       }
                                     };
@@ -798,7 +770,6 @@ const HtmlSectionsManager: React.FC = () => {
                                         
                                         allSpacingClasses.forEach(cls => selectedNode.classList.remove(cls));
                                         
-                                        console.log('Removed all spacing classes from element:', selectedNode.outerHTML);
                                         editor.fire('change'); // Trigger change event
                                       }
                                     };
