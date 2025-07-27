@@ -124,7 +124,7 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
             }
             
             // Check if it's a React element/component object
-            if (typeof component === 'object' && component !== null && component.$$typeof) {
+            if (typeof component === 'object' && component !== null && (component as any).$$typeof) {
               return true;
             }
             
@@ -175,7 +175,7 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
           }
           
           // Check if it's a React element/component object
-          if (typeof component === 'object' && component !== null && component.$$typeof) {
+          if (typeof component === 'object' && component !== null && (component as any).$$typeof) {
             return true;
           }
           
@@ -283,7 +283,7 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
                  // Extra validation before rendering
                  if (typeof CurrentIcon === 'function') {
                    return <CurrentIcon className="w-5 h-5 flex-shrink-0" style={{ color: textSecondary }} />;
-                 } else if (typeof CurrentIcon === 'object' && CurrentIcon !== null && CurrentIcon.$$typeof) {
+                 } else if (typeof CurrentIcon === 'object' && CurrentIcon !== null && (CurrentIcon as any).$$typeof) {
                    return <CurrentIcon className="w-5 h-5 flex-shrink-0" style={{ color: textSecondary }} />;
                  }
                }
@@ -436,7 +436,7 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
                                  if (typeof result.component === 'function') {
                                    const IconComponent = result.component;
                                    return <IconComponent className="w-6 h-6" style={{ color: textSecondary }} />;
-                                 } else if (typeof result.component === 'object' && result.component !== null && result.component.$$typeof) {
+                                 } else if (typeof result.component === 'object' && result.component !== null && (result.component as any).$$typeof) {
                                    return <result.component className="w-6 h-6" style={{ color: textSecondary }} />;
                                  }
                                }
@@ -485,7 +485,7 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
                                if (typeof result.component === 'function') {
                                  const IconComponent = result.component;
                                  return <IconComponent className="w-6 h-6 flex-shrink-0" style={{ color: textSecondary }} />;
-                               } else if (typeof result.component === 'object' && result.component !== null && result.component.$$typeof) {
+                               } else if (typeof result.component === 'object' && result.component !== null && (result.component as any).$$typeof) {
                                  return <result.component className="w-6 h-6 flex-shrink-0" style={{ color: textSecondary }} />;
                                }
                              }
