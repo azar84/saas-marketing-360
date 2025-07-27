@@ -36,10 +36,17 @@ import {
   Wifi,
   Lock
 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import MediaSelector from '@/components/ui/MediaSelector';
 import { IconPicker } from '@/components/ui';
 import { useDesignSystem } from '@/hooks/useDesignSystem';
 import { renderIcon } from '@/lib/iconUtils';
+
+// Dynamically import TinyMCE to avoid SSR issues
+const Editor = dynamic(() => import('@tinymce/tinymce-react').then(mod => ({ default: mod.Editor })), {
+  ssr: false,
+  loading: () => <div className="h-32 bg-gray-100 animate-pulse rounded-lg"></div>
+});
 
 // Types
 interface MediaItem {
@@ -149,6 +156,138 @@ const MediaSectionsManager: React.FC = () => {
     isActive: true,
     features: []
   });
+
+
+
+  // TinyMCE editor configuration for subheading
+  const tinymceConfig = {
+    height: 200,
+    width: '100%',
+    menubar: false,
+    statusbar: false,
+    placeholder: 'Enter your subheading content here...',
+    plugins: [
+      'advlist', 'autolink', 'lists', 'link', 'charmap', 'preview',
+      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+      'insertdatetime', 'table', 'code', 'help'
+    ],
+    toolbar: 'undo redo | styles | bold italic underline strikethrough | ' +
+      'alignleft aligncenter alignright alignjustify | ' +
+      'bullist numlist outdent indent | ' +
+      'link | ' +
+      'spacing-controls | ' +
+      'removeformat | help',
+    block_formats: 'Paragraph=p; Heading 1=h1; Heading 2=h2; Heading 3=h3; Heading 4=h4; Heading 5=h5; Heading 6=h6; Blockquote=blockquote; Preformatted=pre; Code=code',
+    style_formats: [
+      {title: 'Paragraph', block: 'p'},
+      {title: 'Heading 1', block: 'h1'},
+      {title: 'Heading 2', block: 'h2'},
+      {title: 'Heading 3', block: 'h3'},
+      {title: 'Heading 4', block: 'h4'},
+      {title: 'Heading 5', block: 'h5'},
+      {title: 'Heading 6', block: 'h6'},
+      {title: 'Blockquote', block: 'blockquote'},
+      {title: 'Preformatted', block: 'pre'},
+      {title: 'Code', block: 'code'}
+    ],
+    link_list: [
+      {title: 'Home', value: '/'},
+      {title: 'About', value: '/about'},
+      {title: 'Contact', value: '/contact'},
+      {title: 'Pricing', value: '/pricing'},
+      {title: 'FAQ', value: '/faq'}
+    ],
+    content_style: `
+      body { font-family: 'Manrope', system-ui, sans-serif; font-size: 14px; line-height: 1.6; color: #374151; }
+      h1, h2, h3, h4, h5, h6 { font-weight: 600; margin-bottom: 0.5rem; color: #1f2937; }
+      h1 { font-size: 1.875rem; }
+      h2 { font-size: 1.5rem; }
+      h3 { font-size: 1.25rem; }
+      h4 { font-size: 1.125rem; }
+      h5 { font-size: 1rem; }
+      h6 { font-size: 0.875rem; }
+      ul, ol { padding-left: 1.5rem; margin-bottom: 0.75rem; }
+      li { margin-bottom: 0.25rem; }
+      blockquote { border-left: 4px solid #5243E9; padding-left: 1rem; margin: 1rem 0; font-style: italic; color: #6b7280; }
+      a { color: #5243E9; text-decoration: underline; }
+      a:hover { color: #4338CA; }
+
+      
+      /* Spacing Classes */
+      .margin-xs { margin: 0.25rem !important; }
+      .margin-sm { margin: 0.5rem !important; }
+      .margin-md { margin: 1rem !important; }
+      .margin-lg { margin: 1.5rem !important; }
+      .margin-xl { margin: 2rem !important; }
+      .margin-2xl { margin: 3rem !important; }
+      
+      .margin-top-xs { margin-top: 0.25rem !important; }
+      .margin-top-sm { margin-top: 0.5rem !important; }
+      .margin-top-md { margin-top: 1rem !important; }
+      .margin-top-lg { margin-top: 1.5rem !important; }
+      .margin-top-xl { margin-top: 2rem !important; }
+      .margin-top-2xl { margin-top: 3rem !important; }
+      
+      .margin-bottom-xs { margin-bottom: 0.25rem !important; }
+      .margin-bottom-sm { margin-bottom: 0.5rem !important; }
+      .margin-bottom-md { margin-bottom: 1rem !important; }
+      .margin-bottom-lg { margin-bottom: 1.5rem !important; }
+      .margin-bottom-xl { margin-bottom: 2rem !important; }
+      .margin-bottom-2xl { margin-bottom: 3rem !important; }
+      
+      .margin-left-xs { margin-left: 0.25rem !important; }
+      .margin-left-sm { margin-left: 0.5rem !important; }
+      .margin-left-md { margin-left: 1rem !important; }
+      .margin-left-lg { margin-left: 1.5rem !important; }
+      .margin-left-xl { margin-left: 2rem !important; }
+      .margin-left-2xl { margin-left: 3rem !important; }
+      
+      .margin-right-xs { margin-right: 0.25rem !important; }
+      .margin-right-sm { margin-right: 0.5rem !important; }
+      .margin-right-md { margin-right: 1rem !important; }
+      .margin-right-lg { margin-right: 1.5rem !important; }
+      .margin-right-xl { margin-right: 2rem !important; }
+      .margin-right-2xl { margin-right: 3rem !important; }
+      
+      .padding-xs { padding: 0.25rem !important; }
+      .padding-sm { padding: 0.5rem !important; }
+      .padding-md { padding: 1rem !important; }
+      .padding-lg { padding: 1.5rem !important; }
+      .padding-xl { padding: 2rem !important; }
+      .padding-2xl { padding: 3rem !important; }
+      
+      .padding-top-xs { padding-top: 0.25rem !important; }
+      .padding-top-sm { padding-top: 0.5rem !important; }
+      .padding-top-md { padding-top: 1rem !important; }
+      .padding-top-lg { padding-top: 1.5rem !important; }
+      .padding-top-xl { padding-top: 2rem !important; }
+      .padding-top-2xl { padding-top: 3rem !important; }
+      
+      .padding-bottom-xs { padding-bottom: 0.25rem !important; }
+      .padding-bottom-sm { padding-bottom: 0.5rem !important; }
+      .padding-bottom-md { padding-bottom: 1rem !important; }
+      .padding-bottom-lg { padding-bottom: 1.5rem !important; }
+      .padding-bottom-xl { padding-bottom: 2rem !important; }
+      .padding-bottom-2xl { padding-bottom: 3rem !important; }
+      
+      .padding-left-xs { padding-left: 0.25rem !important; }
+      .padding-left-sm { padding-left: 0.5rem !important; }
+      .padding-left-md { padding-left: 1rem !important; }
+      .padding-left-lg { padding-left: 1.5rem !important; }
+      .padding-left-xl { padding-left: 2rem !important; }
+      .padding-left-2xl { padding-left: 3rem !important; }
+      
+      .padding-right-xs { padding-right: 0.25rem !important; }
+      .padding-right-sm { padding-right: 0.5rem !important; }
+      .padding-right-md { padding-right: 1rem !important; }
+      .padding-right-lg { padding-right: 1.5rem !important; }
+      .padding-right-xl { padding-right: 2rem !important; }
+      .padding-right-2xl { padding-right: 3rem !important; }
+      
+      .no-margin { margin: 0 !important; }
+      .no-padding { padding: 0 !important; }
+    `
+  };
 
   // Get design system colors for color picker
   const getDesignSystemColors = () => {
@@ -579,6 +718,8 @@ const MediaSectionsManager: React.FC = () => {
     return match ? match[1] : null;
   };
 
+
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -803,19 +944,245 @@ const MediaSectionsManager: React.FC = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Subheading
+                    Subheading (Rich Text Editor)
                   </label>
-                  <div className="relative">
-                    <textarea
+                  <div className="border border-gray-300 rounded-lg w-full">
+                    <Editor
+                      apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY || process.env.TINYMCE_API_KEY}
                       value={formData.subheading}
-                      onChange={(e) => setFormData({ ...formData, subheading: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-16"
-                      rows={3}
-                      maxLength={1200}
+                      onEditorChange={(content) => setFormData({...formData, subheading: content})}
+                      init={{
+                        ...tinymceConfig,
+                        setup: (editor: any) => {
+                          
+                          // Character count validation
+                          editor.on('keydown', (e: any) => {
+                            const content = editor.getContent();
+                            const charCount = content.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim().length;
+                            
+                            // Allow backspace, delete, arrow keys, etc.
+                            if (e.keyCode === 8 || e.keyCode === 46 || e.keyCode === 37 || e.keyCode === 38 || e.keyCode === 39 || e.keyCode === 40) {
+                              return;
+                            }
+                            
+                            // Prevent typing if character limit is reached
+                            if (charCount >= 1200) {
+                              e.preventDefault();
+                              return false;
+                            }
+                          });
+                          
+                          // Helper function to apply spacing classes
+                          const applySpacingClass = (className: string, type: 'margin' | 'padding') => {
+                            const selectedNode = editor.selection.getNode();
+                            if (selectedNode.nodeType === 1) {
+                              // Remove all existing spacing classes of the same type
+                              const allClasses = type === 'margin' 
+                                ? ['no-margin', 'margin-xs', 'margin-sm', 'margin-md', 'margin-lg', 'margin-xl', 'margin-2xl', 'margin-top-xs', 'margin-top-sm', 'margin-top-md', 'margin-top-lg', 'margin-top-xl', 'margin-top-2xl', 'margin-bottom-xs', 'margin-bottom-sm', 'margin-bottom-md', 'margin-bottom-lg', 'margin-bottom-xl', 'margin-bottom-2xl', 'margin-left-xs', 'margin-left-sm', 'margin-left-md', 'margin-left-lg', 'margin-left-xl', 'margin-left-2xl', 'margin-right-xs', 'margin-right-sm', 'margin-right-md', 'margin-right-lg', 'margin-right-xl', 'margin-right-2xl']
+                                : ['no-padding', 'padding-xs', 'padding-sm', 'padding-md', 'padding-lg', 'padding-xl', 'padding-2xl', 'padding-top-xs', 'padding-top-sm', 'padding-top-md', 'padding-top-lg', 'padding-top-xl', 'padding-top-2xl', 'padding-bottom-xs', 'padding-bottom-sm', 'padding-bottom-md', 'padding-bottom-lg', 'padding-bottom-xl', 'padding-bottom-2xl', 'padding-left-xs', 'padding-left-sm', 'padding-left-md', 'padding-left-lg', 'padding-left-xl', 'padding-left-2xl', 'padding-right-xs', 'padding-right-sm', 'padding-right-md', 'padding-right-lg', 'padding-right-xl', 'padding-right-2xl'];
+                              
+                              allClasses.forEach(cls => selectedNode.classList.remove(cls));
+                              selectedNode.classList.add(className);
+                              
+                              editor.fire('change'); // Trigger change event
+                            }
+                          };
+
+                          // Helper function to remove all spacing classes
+                          const removeAllSpacing = () => {
+                            const selectedNode = editor.selection.getNode();
+                            if (selectedNode.nodeType === 1) {
+                              const allSpacingClasses = [
+                                'no-margin', 'margin-xs', 'margin-sm', 'margin-md', 'margin-lg', 'margin-xl', 'margin-2xl', 
+                                'margin-top-xs', 'margin-top-sm', 'margin-top-md', 'margin-top-lg', 'margin-top-xl', 'margin-top-2xl', 
+                                'margin-bottom-xs', 'margin-bottom-sm', 'margin-bottom-md', 'margin-bottom-lg', 'margin-bottom-xl', 'margin-bottom-2xl', 
+                                'margin-left-xs', 'margin-left-sm', 'margin-left-md', 'margin-left-lg', 'margin-left-xl', 'margin-left-2xl', 
+                                'margin-right-xs', 'margin-right-sm', 'margin-right-md', 'margin-right-lg', 'margin-right-xl', 'margin-right-2xl',
+                                'no-padding', 'padding-xs', 'padding-sm', 'padding-md', 'padding-lg', 'padding-xl', 'padding-2xl', 
+                                'padding-top-xs', 'padding-top-sm', 'padding-top-md', 'padding-top-lg', 'padding-top-xl', 'padding-top-2xl', 
+                                'padding-bottom-xs', 'padding-bottom-sm', 'padding-bottom-md', 'padding-bottom-lg', 'padding-bottom-xl', 'padding-bottom-2xl', 
+                                'padding-left-xs', 'padding-left-sm', 'padding-left-md', 'padding-left-lg', 'padding-left-xl', 'padding-left-2xl', 
+                                'padding-right-xs', 'padding-right-sm', 'padding-right-md', 'padding-right-lg', 'padding-right-xl', 'padding-right-2xl'
+                              ];
+                              
+                              allSpacingClasses.forEach(cls => selectedNode.classList.remove(cls));
+                              
+                              editor.fire('change'); // Trigger change event
+                            }
+                          };
+                          
+                          // Add spacing controls to toolbar
+                          editor.ui.registry.addMenuButton('spacing-controls', {
+                            text: 'Spacing',
+                            fetch: function (callback: any) {
+                              const items = [
+                                { type: 'menuitem', text: 'Remove All Spacing', onAction: removeAllSpacing },
+                                { type: 'separator' },
+                                {
+                                  type: 'menuitem',
+                                  text: 'Margins',
+                                  getSubmenuItems: function () {
+                                    return [
+                                      { type: 'menuitem', text: 'No Margin', onAction: () => applySpacingClass('no-margin', 'margin') },
+                                      { type: 'separator' },
+                                      { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('margin-xs', 'margin') },
+                                      { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('margin-sm', 'margin') },
+                                      { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('margin-md', 'margin') },
+                                      { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('margin-lg', 'margin') },
+                                      { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('margin-xl', 'margin') },
+                                      { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('margin-2xl', 'margin') }
+                                    ];
+                                  }
+                                },
+                                {
+                                  type: 'menuitem',
+                                  text: 'Padding',
+                                  getSubmenuItems: function () {
+                                    return [
+                                      { type: 'menuitem', text: 'No Padding', onAction: () => applySpacingClass('no-padding', 'padding') },
+                                      { type: 'separator' },
+                                      { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('padding-xs', 'padding') },
+                                      { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('padding-sm', 'padding') },
+                                      { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('padding-md', 'padding') },
+                                      { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('padding-lg', 'padding') },
+                                      { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('padding-xl', 'padding') },
+                                      { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('padding-2xl', 'padding') }
+                                    ];
+                                  }
+                                },
+                                { type: 'separator' },
+                                {
+                                  type: 'menuitem',
+                                  text: 'Top Margin',
+                                  getSubmenuItems: function () {
+                                    return [
+                                      { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('margin-top-xs', 'margin') },
+                                      { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('margin-top-sm', 'margin') },
+                                      { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('margin-top-md', 'margin') },
+                                      { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('margin-top-lg', 'margin') },
+                                      { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('margin-top-xl', 'margin') },
+                                      { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('margin-top-2xl', 'margin') }
+                                    ];
+                                  }
+                                },
+                                {
+                                  type: 'menuitem',
+                                  text: 'Bottom Margin',
+                                  getSubmenuItems: function () {
+                                    return [
+                                      { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('margin-bottom-xs', 'margin') },
+                                      { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('margin-bottom-sm', 'margin') },
+                                      { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('margin-bottom-md', 'margin') },
+                                      { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('margin-bottom-lg', 'margin') },
+                                      { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('margin-bottom-xl', 'margin') },
+                                      { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('margin-bottom-2xl', 'margin') }
+                                    ];
+                                  }
+                                },
+                                {
+                                  type: 'menuitem',
+                                  text: 'Left Margin',
+                                  getSubmenuItems: function () {
+                                    return [
+                                      { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('margin-left-xs', 'margin') },
+                                      { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('margin-left-sm', 'margin') },
+                                      { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('margin-left-md', 'margin') },
+                                      { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('margin-left-lg', 'margin') },
+                                      { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('margin-left-xl', 'margin') },
+                                      { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('margin-left-2xl', 'margin') }
+                                    ];
+                                  }
+                                },
+                                {
+                                  type: 'menuitem',
+                                  text: 'Right Margin',
+                                  getSubmenuItems: function () {
+                                    return [
+                                      { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('margin-right-xs', 'margin') },
+                                      { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('margin-right-sm', 'margin') },
+                                      { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('margin-right-md', 'margin') },
+                                      { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('margin-right-lg', 'margin') },
+                                      { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('margin-right-xl', 'margin') },
+                                      { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('margin-right-2xl', 'margin') }
+                                    ];
+                                  }
+                                },
+                                { type: 'separator' },
+                                {
+                                  type: 'menuitem',
+                                  text: 'Top Padding',
+                                  getSubmenuItems: function () {
+                                    return [
+                                      { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('padding-top-xs', 'padding') },
+                                      { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('padding-top-sm', 'padding') },
+                                      { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('padding-top-md', 'padding') },
+                                      { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('padding-top-lg', 'padding') },
+                                      { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('padding-top-xl', 'padding') },
+                                      { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('padding-top-2xl', 'padding') }
+                                    ];
+                                  }
+                                },
+                                {
+                                  type: 'menuitem',
+                                  text: 'Bottom Padding',
+                                  getSubmenuItems: function () {
+                                    return [
+                                      { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('padding-bottom-xs', 'padding') },
+                                      { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('padding-bottom-sm', 'padding') },
+                                      { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('padding-bottom-md', 'padding') },
+                                      { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('padding-bottom-lg', 'padding') },
+                                      { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('padding-bottom-xl', 'padding') },
+                                      { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('padding-bottom-2xl', 'padding') }
+                                    ];
+                                  }
+                                },
+                                {
+                                  type: 'menuitem',
+                                  text: 'Left Padding',
+                                  getSubmenuItems: function () {
+                                    return [
+                                      { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('padding-left-xs', 'padding') },
+                                      { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('padding-left-sm', 'padding') },
+                                      { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('padding-left-md', 'padding') },
+                                      { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('padding-left-lg', 'padding') },
+                                      { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('padding-left-xl', 'padding') },
+                                      { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('padding-left-2xl', 'padding') }
+                                    ];
+                                  }
+                                },
+                                {
+                                  type: 'menuitem',
+                                  text: 'Right Padding',
+                                  getSubmenuItems: function () {
+                                    return [
+                                      { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => applySpacingClass('padding-right-xs', 'padding') },
+                                      { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => applySpacingClass('padding-right-sm', 'padding') },
+                                      { type: 'menuitem', text: 'Medium (1rem)', onAction: () => applySpacingClass('padding-right-md', 'padding') },
+                                      { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => applySpacingClass('padding-right-lg', 'padding') },
+                                      { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => applySpacingClass('padding-right-xl', 'padding') },
+                                      { type: 'menuitem', text: '2XL (3rem)', onAction: () => applySpacingClass('padding-right-2xl', 'padding') }
+                                    ];
+                                  }
+                                }
+                              ];
+                              callback(items);
+                            }
+                          });
+                        }
+                      }}
                     />
-                    <div className="absolute bottom-2 right-2 text-xs text-gray-500">
-                      {(formData.subheading?.length || 0)}/1200
-                    </div>
+                  </div>
+                  <div className={`mt-2 text-xs ${
+                    (formData.subheading?.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim().length || 0) > 1200 
+                      ? 'text-red-500' 
+                      : (formData.subheading?.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim().length || 0) > 1000 
+                        ? 'text-orange-500' 
+                        : 'text-gray-500'
+                  }`}>
+                    Character count: {(formData.subheading?.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim().length || 0)}/1200
+                    {(formData.subheading?.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim().length || 0) > 1200 && (
+                      <span className="ml-2 font-medium">(Limit exceeded!)</span>
+                    )}
                   </div>
                 </div>
               </div>

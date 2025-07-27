@@ -357,7 +357,12 @@ export const CreateMediaSectionSchema = z.object({
   badgeText: z.string().max(100).optional(),
   badgeColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#5243E9'),
   headline: z.string().min(1, 'Headline is required').max(200),
-  subheading: z.string().max(1200).optional(),
+  subheading: z.string().optional().refine((val) => {
+    if (!val) return true;
+    // Count characters the same way as frontend (strip HTML tags and &nbsp;)
+    const charCount = val.replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim().length;
+    return charCount <= 1200;
+  }, { message: 'Subheading must be 1200 characters or less (excluding HTML formatting)' }),
   alignment: AlignmentEnum.default('left'),
   mediaType: MediaTypeEnum.default('image'),
   mediaUrl: z.string().max(500).optional(),

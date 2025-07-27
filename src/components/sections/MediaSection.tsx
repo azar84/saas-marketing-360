@@ -769,9 +769,10 @@ const MediaSection: React.FC<MediaSectionProps> = ({
                 {headline}
               </h2>
               {subheading && (
-                <p className="text-lg sm:text-xl opacity-90 max-w-3xl mx-auto mb-8">
-                  {subheading}
-                </p>
+                <div 
+                  className="text-lg sm:text-xl opacity-90 max-w-3xl mx-auto mb-8"
+                  dangerouslySetInnerHTML={{ __html: subheading }}
+                />
               )}
               {showCtaButton && ctaText && ctaUrl && (
                 <div className="mb-8">
@@ -804,9 +805,10 @@ const MediaSection: React.FC<MediaSectionProps> = ({
                 {headline}
               </h2>
               {subheading && (
-                <p className="text-lg sm:text-xl opacity-90 mb-8">
-                  {subheading}
-                </p>
+                <div 
+                  className="text-lg sm:text-xl opacity-90 mb-8"
+                  dangerouslySetInnerHTML={{ __html: subheading }}
+                />
               )}
               {showCtaButton && ctaText && ctaUrl && (
                 <div className="mb-8">
