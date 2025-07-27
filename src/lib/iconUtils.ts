@@ -22,7 +22,13 @@ const iconLibraries: IconLibraries = {
  * Get icon component from icon string (format: "library:iconName")
  */
 export const getIconComponent = (iconString: string): React.ComponentType<any> | null => {
-  if (!iconString || !iconString.includes(':')) {
+  // Safety check for non-string values
+  if (!iconString || typeof iconString !== 'string') {
+    console.warn(`Invalid icon string: ${iconString}`);
+    return null;
+  }
+  
+  if (!iconString.includes(':')) {
     // Fallback to Lucide if no library specified
     return (LucideIcons as any)[iconString] || null;
   }
@@ -45,6 +51,12 @@ export const renderIcon = (
   iconString: string, 
   props: React.ComponentProps<'svg'> = {}
 ): React.ReactElement | null => {
+  // Safety check for non-string values
+  if (!iconString || typeof iconString !== 'string') {
+    console.warn(`Invalid icon string: ${iconString}`);
+    return null;
+  }
+  
   const IconComponent = getIconComponent(iconString);
   
   if (!IconComponent) {

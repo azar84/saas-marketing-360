@@ -318,8 +318,13 @@ const MediaSectionsManager: React.FC = () => {
 
   // Get icon component for display
   const getIconComponent = (iconName: string) => {
+    // Safety check for non-string values
+    if (!iconName || typeof iconName !== 'string') {
+      return MessageSquare;
+    }
+    
     // Handle new universal icon format (library:iconName)
-    if (iconName && iconName.includes(':')) {
+    if (iconName.includes(':')) {
       const [library, icon] = iconName.split(':');
       
       // Return a component that renders the universal icon
@@ -357,6 +362,11 @@ const MediaSectionsManager: React.FC = () => {
 
   // Get icon category color
   const getIconCategoryColor = (iconName: string) => {
+    // Safety check for non-string values
+    if (!iconName || typeof iconName !== 'string') {
+      return 'text-gray-600';
+    }
+    
     // Map icons to their categories
     const iconCategories: { [key: string]: string } = {
       MessageSquare: 'communication',
@@ -753,13 +763,19 @@ const MediaSectionsManager: React.FC = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Headline *
                     </label>
-                    <input
-                      type="text"
-                      value={formData.headline}
-                      onChange={(e) => setFormData({ ...formData, headline: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      required
-                    />
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={formData.headline}
+                        onChange={(e) => setFormData({ ...formData, headline: e.target.value })}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-16"
+                        required
+                        maxLength={200}
+                      />
+                      <div className="absolute top-1/2 right-2 transform -translate-y-1/2 text-xs text-gray-500">
+                        {(formData.headline?.length || 0)}/200
+                      </div>
+                    </div>
                   </div>
                   
                   <div>
@@ -780,12 +796,18 @@ const MediaSectionsManager: React.FC = () => {
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Subheading
                   </label>
-                  <textarea
-                    value={formData.subheading}
-                    onChange={(e) => setFormData({ ...formData, subheading: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    rows={3}
-                  />
+                  <div className="relative">
+                    <textarea
+                      value={formData.subheading}
+                      onChange={(e) => setFormData({ ...formData, subheading: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-16"
+                      rows={3}
+                      maxLength={1200}
+                    />
+                    <div className="absolute bottom-2 right-2 text-xs text-gray-500">
+                      {(formData.subheading?.length || 0)}/1200
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -991,7 +1013,7 @@ const MediaSectionsManager: React.FC = () => {
                               <div onClick={(e) => e.stopPropagation()}>
                                 <IconPicker
                                   value={feature.icon}
-                                  onChange={(iconName, iconComponent, library) => updateFeature(index, 'icon', iconName)}
+                                  onChange={(iconName) => updateFeature(index, 'icon', iconName)}
                                   placeholder="Select icon"
                                   className="w-full"
                                 />

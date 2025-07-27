@@ -357,7 +357,7 @@ export const CreateMediaSectionSchema = z.object({
   badgeText: z.string().max(100).optional(),
   badgeColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#5243E9'),
   headline: z.string().min(1, 'Headline is required').max(200),
-  subheading: z.string().max(500).optional(),
+  subheading: z.string().max(1200).optional(),
   alignment: AlignmentEnum.default('left'),
   mediaType: MediaTypeEnum.default('image'),
   mediaUrl: z.string().max(500).optional(),
