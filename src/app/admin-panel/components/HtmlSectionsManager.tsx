@@ -110,6 +110,7 @@ const HtmlSectionsManager: React.FC = () => {
       'bullist numlist outdent indent | ' +
       'link image media | ' +
       'forecolor backcolor | ' +
+      'spacing-controls | ' +
       'removeformat | help',
     link_list: [
       {title: 'Home', value: '/'},
@@ -150,6 +151,80 @@ const HtmlSectionsManager: React.FC = () => {
       img { max-width: 100%; height: auto; border-radius: 0.375rem; margin: 0.5rem 0; }
       video { max-width: 100%; border-radius: 0.375rem; margin: 0.5rem 0; }
       iframe { max-width: 100%; border-radius: 0.375rem; margin: 0.5rem 0; }
+      
+      /* Spacing Classes */
+      .margin-xs { margin: 0.25rem !important; }
+      .margin-sm { margin: 0.5rem !important; }
+      .margin-md { margin: 1rem !important; }
+      .margin-lg { margin: 1.5rem !important; }
+      .margin-xl { margin: 2rem !important; }
+      .margin-2xl { margin: 3rem !important; }
+      
+      .margin-top-xs { margin-top: 0.25rem !important; }
+      .margin-top-sm { margin-top: 0.5rem !important; }
+      .margin-top-md { margin-top: 1rem !important; }
+      .margin-top-lg { margin-top: 1.5rem !important; }
+      .margin-top-xl { margin-top: 2rem !important; }
+      .margin-top-2xl { margin-top: 3rem !important; }
+      
+      .margin-bottom-xs { margin-bottom: 0.25rem !important; }
+      .margin-bottom-sm { margin-bottom: 0.5rem !important; }
+      .margin-bottom-md { margin-bottom: 1rem !important; }
+      .margin-bottom-lg { margin-bottom: 1.5rem !important; }
+      .margin-bottom-xl { margin-bottom: 2rem !important; }
+      .margin-bottom-2xl { margin-bottom: 3rem !important; }
+      
+      .margin-left-xs { margin-left: 0.25rem !important; }
+      .margin-left-sm { margin-left: 0.5rem !important; }
+      .margin-left-md { margin-left: 1rem !important; }
+      .margin-left-lg { margin-left: 1.5rem !important; }
+      .margin-left-xl { margin-left: 2rem !important; }
+      .margin-left-2xl { margin-left: 3rem !important; }
+      
+      .margin-right-xs { margin-right: 0.25rem !important; }
+      .margin-right-sm { margin-right: 0.5rem !important; }
+      .margin-right-md { margin-right: 1rem !important; }
+      .margin-right-lg { margin-right: 1.5rem !important; }
+      .margin-right-xl { margin-right: 2rem !important; }
+      .margin-right-2xl { margin-right: 3rem !important; }
+      
+      .padding-xs { padding: 0.25rem !important; }
+      .padding-sm { padding: 0.5rem !important; }
+      .padding-md { padding: 1rem !important; }
+      .padding-lg { padding: 1.5rem !important; }
+      .padding-xl { padding: 2rem !important; }
+      .padding-2xl { padding: 3rem !important; }
+      
+      .padding-top-xs { padding-top: 0.25rem !important; }
+      .padding-top-sm { padding-top: 0.5rem !important; }
+      .padding-top-md { padding-top: 1rem !important; }
+      .padding-top-lg { padding-top: 1.5rem !important; }
+      .padding-top-xl { padding-top: 2rem !important; }
+      .padding-top-2xl { padding-top: 3rem !important; }
+      
+      .padding-bottom-xs { padding-bottom: 0.25rem !important; }
+      .padding-bottom-sm { padding-bottom: 0.5rem !important; }
+      .padding-bottom-md { padding-bottom: 1rem !important; }
+      .padding-bottom-lg { padding-bottom: 1.5rem !important; }
+      .padding-bottom-xl { padding-bottom: 2rem !important; }
+      .padding-bottom-2xl { padding-bottom: 3rem !important; }
+      
+      .padding-left-xs { padding-left: 0.25rem !important; }
+      .padding-left-sm { padding-left: 0.5rem !important; }
+      .padding-left-md { padding-left: 1rem !important; }
+      .padding-left-lg { padding-left: 1.5rem !important; }
+      .padding-left-xl { padding-left: 2rem !important; }
+      .padding-left-2xl { padding-left: 3rem !important; }
+      
+      .padding-right-xs { padding-right: 0.25rem !important; }
+      .padding-right-sm { padding-right: 0.5rem !important; }
+      .padding-right-md { padding-right: 1rem !important; }
+      .padding-right-lg { padding-right: 1.5rem !important; }
+      .padding-right-xl { padding-right: 2rem !important; }
+      .padding-right-2xl { padding-right: 3rem !important; }
+      
+      .no-margin { margin: 0 !important; }
+      .no-padding { padding: 0 !important; }
     `
   };
 
@@ -653,6 +728,105 @@ const HtmlSectionsManager: React.FC = () => {
                                   setup: (editor: any) => {
                                     console.log('TinyMCE API Key:', process.env.NEXT_PUBLIC_TINYMCE_API_KEY || process.env.TINYMCE_API_KEY);
                                     console.log('TinyMCE Editor Setup Complete');
+                                    
+                                    // Add spacing controls to toolbar
+                                    editor.ui.registry.addMenuButton('spacing-controls', {
+                                      text: 'Spacing',
+                                      fetch: function (callback) {
+                                        const items = [
+                                          {
+                                            type: 'menuitem',
+                                            text: 'Margins',
+                                            getSubmenuItems: function () {
+                                              return [
+                                                { type: 'menuitem', text: 'No Margin', onAction: () => editor.execCommand('mceToggleFormat', false, 'no-margin') },
+                                                { type: 'separator' },
+                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-xs') },
+                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-sm') },
+                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-md') },
+                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-lg') },
+                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-xl') },
+                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-2xl') }
+                                              ];
+                                            }
+                                          },
+                                          {
+                                            type: 'menuitem',
+                                            text: 'Padding',
+                                            getSubmenuItems: function () {
+                                              return [
+                                                { type: 'menuitem', text: 'No Padding', onAction: () => editor.execCommand('mceToggleFormat', false, 'no-padding') },
+                                                { type: 'separator' },
+                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'padding-xs') },
+                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'padding-sm') },
+                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'padding-md') },
+                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'padding-lg') },
+                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'padding-xl') },
+                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'padding-2xl') }
+                                              ];
+                                            }
+                                          },
+                                          { type: 'separator' },
+                                          {
+                                            type: 'menuitem',
+                                            text: 'Top Margin',
+                                            getSubmenuItems: function () {
+                                              return [
+                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-top-xs') },
+                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-top-sm') },
+                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-top-md') },
+                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-top-lg') },
+                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-top-xl') },
+                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-top-2xl') }
+                                              ];
+                                            }
+                                          },
+                                          {
+                                            type: 'menuitem',
+                                            text: 'Bottom Margin',
+                                            getSubmenuItems: function () {
+                                              return [
+                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-bottom-xs') },
+                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-bottom-sm') },
+                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-bottom-md') },
+                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-bottom-lg') },
+                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-bottom-xl') },
+                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-bottom-2xl') }
+                                              ];
+                                            }
+                                          },
+                                          {
+                                            type: 'menuitem',
+                                            text: 'Left Margin',
+                                            getSubmenuItems: function () {
+                                              return [
+                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-left-xs') },
+                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-left-sm') },
+                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-left-md') },
+                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-left-lg') },
+                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-left-xl') },
+                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-left-2xl') }
+                                              ];
+                                            }
+                                          },
+                                          {
+                                            type: 'menuitem',
+                                            text: 'Right Margin',
+                                            getSubmenuItems: function () {
+                                              return [
+                                                { type: 'menuitem', text: 'Extra Small (0.25rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-right-xs') },
+                                                { type: 'menuitem', text: 'Small (0.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-right-sm') },
+                                                { type: 'menuitem', text: 'Medium (1rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-right-md') },
+                                                { type: 'menuitem', text: 'Large (1.5rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-right-lg') },
+                                                { type: 'menuitem', text: 'Extra Large (2rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-right-xl') },
+                                                { type: 'menuitem', text: '2XL (3rem)', onAction: () => editor.execCommand('mceToggleFormat', false, 'margin-right-2xl') }
+                                              ];
+                                            }
+                                          }
+                                        ];
+                                        callback(items);
+                                      }
+                                    });
                                   }
                                 }}
                               />
@@ -671,6 +845,10 @@ const HtmlSectionsManager: React.FC = () => {
                                 <div className="flex items-center gap-1">
                                   <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
                                   <span>Click the <strong>media</strong> button to embed videos/iframes</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <span className="w-2 h-2 bg-orange-500 rounded-full"></span>
+                                  <span>Click the <strong>spacing</strong> button to add margins and padding</span>
                                 </div>
                               </div>
                               {showMediaLibrary && (
