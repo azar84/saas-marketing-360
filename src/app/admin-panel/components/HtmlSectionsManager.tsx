@@ -96,7 +96,7 @@ const HtmlSectionsManager: React.FC = () => {
 
   // TinyMCE editor configuration
   const tinymceConfig = {
-    height: 400,
+    height: 300,
     width: '100%',
     menubar: false,
     placeholder: 'Start typing your content here...',
@@ -569,7 +569,7 @@ const HtmlSectionsManager: React.FC = () => {
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full h-[95vh] flex flex-col">
+          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] flex flex-col">
             <div className="flex items-center justify-between p-6 border-b">
               <h3 className="text-xl font-semibold">
                 {editingSection ? 'Edit HTML Section' : 'Create HTML Section'}
@@ -831,9 +831,9 @@ const HtmlSectionsManager: React.FC = () => {
                                 }}
                               />
                             </div>
-                            <div className="text-xs text-gray-500 mt-2 space-y-1">
-                              <p>Use the rich text editor to create formatted content. The content will be automatically converted to HTML.</p>
-                              <div className="flex flex-wrap gap-4 mt-2">
+                            <div className="text-xs text-gray-500 mt-2">
+                              <p className="mb-2">Use the rich text editor to create formatted content. The content will be automatically converted to HTML.</p>
+                              <div className="flex flex-wrap gap-3">
                                 <div className="flex items-center gap-1">
                                   <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
                                   <span>Click the <strong>link</strong> button to add URLs</span>
@@ -868,7 +868,7 @@ const HtmlSectionsManager: React.FC = () => {
                             <textarea
                               value={formData.htmlContent}
                               onChange={(e) => setFormData({...formData, htmlContent: e.target.value})}
-                              className="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                              className="w-full h-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
                               placeholder="<div>Your HTML content here...</div>"
                               required
                             />
@@ -883,7 +883,7 @@ const HtmlSectionsManager: React.FC = () => {
                             <textarea
                               value={formData.cssContent}
                               onChange={(e) => setFormData({...formData, cssContent: e.target.value})}
-                              className="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                              className="w-full h-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
                               placeholder=".my-class { color: blue; }"
                             />
                           </div>
@@ -897,7 +897,7 @@ const HtmlSectionsManager: React.FC = () => {
                             <textarea
                               value={formData.jsContent}
                               onChange={(e) => setFormData({...formData, jsContent: e.target.value})}
-                              className="w-full h-64 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                              className="w-full h-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
                               placeholder="console.log('Hello World!');"
                             />
                           </div>
@@ -910,7 +910,7 @@ const HtmlSectionsManager: React.FC = () => {
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             Preview
                           </label>
-                          <div className="border border-gray-300 rounded-lg p-4 h-96 overflow-y-auto bg-gray-50">
+                          <div className="border border-gray-300 rounded-lg p-4 h-64 overflow-y-auto bg-gray-50">
                             <style dangerouslySetInnerHTML={{ __html: formData.cssContent }} />
                             <div dangerouslySetInnerHTML={{ __html: formData.htmlContent }} />
                             {formData.jsContent && (
