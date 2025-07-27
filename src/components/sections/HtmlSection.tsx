@@ -74,7 +74,7 @@ const HtmlSection: React.FC<HtmlSectionProps> = ({ htmlSection, className = '' }
 
   return (
     <div 
-      className={className}
+      className={`html-section-content ${className}`}
       data-html-section-id={htmlSection.id}
       dangerouslySetInnerHTML={{ __html: htmlSection.htmlContent }}
     />

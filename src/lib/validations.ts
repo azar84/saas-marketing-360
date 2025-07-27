@@ -549,7 +549,7 @@ export const CreatePageSectionSchema = z.object({
   heroSectionId: z.number().int().positive().nullable().optional(),
   featureGroupId: z.number().int().positive().nullable().optional(),
   mediaSectionId: z.number().int().positive().nullable().optional(),
-  pricingSectionId: z.number().int().positive().optional(),
+  pricingSectionId: z.number().int().positive().nullable().optional(),
   faqSectionId: z.number().int().positive().nullable().optional(),
   faqCategoryId: z.number().int().positive().nullable().optional(),
   contactSectionId: z.number().int().positive().nullable().optional(),

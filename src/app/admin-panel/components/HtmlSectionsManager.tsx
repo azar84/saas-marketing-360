@@ -16,8 +16,20 @@ import {
   Copy,
   FileText,
   Palette,
-  Settings
+  Settings,
+  Type,
+  Image as ImageIcon,
+  Check
 } from 'lucide-react';
+import dynamic from 'next/dynamic';
+import { createPortal } from 'react-dom';
+import MediaLibraryManager from './MediaLibraryManager';
+
+// Dynamically import TinyMCE to avoid SSR issues
+const Editor = dynamic(() => import('@tinymce/tinymce-react').then(mod => ({ default: mod.Editor })), {
+  ssr: false,
+  loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>
+});
 
 interface HtmlSection {
   id: number;
@@ -66,8 +78,12 @@ const HtmlSectionsManager: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [editingSection, setEditingSection] = useState<HtmlSection | null>(null);
-  const [activeTab, setActiveTab] = useState<'html' | 'css' | 'js'>('html');
+  const [activeTab, setActiveTab] = useState<'rich-text' | 'html' | 'css' | 'js'>('rich-text');
   const [previewMode, setPreviewMode] = useState(false);
+  const [showMediaLibrary, setShowMediaLibrary] = useState(false);
+  const [mediaCallback, setMediaCallback] = useState<((url: string, meta: any) => void) | null>(null);
+  const [mediaItems, setMediaItems] = useState<any[]>([]);
+  const [mediaLoading, setMediaLoading] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     name: '',
     description: '',
@@ -77,6 +93,65 @@ const HtmlSectionsManager: React.FC = () => {
     isActive: true,
     sortOrder: 0
   });
+
+  // TinyMCE editor configuration
+  const tinymceConfig = {
+    height: 400,
+    width: '100%',
+    menubar: false,
+    placeholder: 'Start typing your content here...',
+    plugins: [
+      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+    ],
+    toolbar: 'undo redo | formatselect | bold italic underline strikethrough | ' +
+      'alignleft aligncenter alignright alignjustify | ' +
+      'bullist numlist outdent indent | ' +
+      'link image media | ' +
+      'forecolor backcolor | ' +
+      'removeformat | help',
+    link_list: [
+      {title: 'Home', value: '/'},
+      {title: 'About', value: '/about'},
+      {title: 'Contact', value: '/contact'},
+      {title: 'Pricing', value: '/pricing'},
+      {title: 'FAQ', value: '/faq'}
+    ],
+    image_title: true,
+    automatic_uploads: true,
+    file_picker_types: 'image',
+    file_picker_callback: function (callback, value, meta) {
+      console.log('File picker callback triggered', { value, meta });
+      
+      // Store callback and open media library
+      setMediaCallback(() => callback);
+      setShowMediaLibrary(true);
+      console.log('Media library should be opening...');
+    },
+    media_live_embeds: true,
+    media_alt_source: false,
+    media_poster: false,
+    media_dimensions: false,
+    content_style: `
+      body { font-family: 'Manrope', system-ui, sans-serif; font-size: 14px; line-height: 1.6; color: #374151; }
+      h1, h2, h3, h4, h5, h6 { font-weight: 600; margin-bottom: 0.5rem; color: #1f2937; }
+      h1 { font-size: 1.875rem; }
+      h2 { font-size: 1.5rem; }
+      h3 { font-size: 1.25rem; }
+      h4 { font-size: 1.125rem; }
+      h5 { font-size: 1rem; }
+      h6 { font-size: 0.875rem; }
+      ul, ol { padding-left: 1.5rem; margin-bottom: 0.75rem; }
+      li { margin-bottom: 0.25rem; }
+      blockquote { border-left: 4px solid #5243E9; padding-left: 1rem; margin: 1rem 0; font-style: italic; color: #6b7280; }
+      a { color: #5243E9; text-decoration: underline; }
+      a:hover { color: #4338CA; }
+      img { max-width: 100%; height: auto; border-radius: 0.375rem; margin: 0.5rem 0; }
+      video { max-width: 100%; border-radius: 0.375rem; margin: 0.5rem 0; }
+      iframe { max-width: 100%; border-radius: 0.375rem; margin: 0.5rem 0; }
+    `
+  };
 
   useEffect(() => {
     fetchHtmlSections();
@@ -99,32 +174,47 @@ const HtmlSectionsManager: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const url = editingSection 
-        ? `/api/admin/html-sections` 
-        : '/api/admin/html-sections';
-      
+      const url = '/api/admin/html-sections';
       const method = editingSection ? 'PUT' : 'POST';
-      const payload = editingSection 
+      
+      const requestData = editingSection 
         ? { ...formData, id: editingSection.id }
         : formData;
-
+      
+      console.log('Submitting form data:', requestData);
+      console.log('URL:', url);
+      console.log('Method:', method);
+      
       const response = await fetch(url, {
         method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
       });
 
-      if (!response.ok) throw new Error('Failed to save HTML section');
+      console.log('Response status:', response.status);
       
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Response error:', errorText);
+        throw new Error(`Failed to save HTML section: ${response.status} - ${errorText}`);
+      }
+
+      const result = await response.json();
+      console.log('Success response:', result);
+
       await fetchHtmlSections();
       resetForm();
-      setError(null);
+      setShowForm(false);
     } catch (err) {
+      console.error('Submit error:', err);
       setError(err instanceof Error ? err.message : 'Failed to save HTML section');
     }
   };
 
   const handleEdit = (section: HtmlSection) => {
+    console.log('Editing section:', section);
     setEditingSection(section);
     setFormData({
       name: section.name,
@@ -136,6 +226,7 @@ const HtmlSectionsManager: React.FC = () => {
       sortOrder: section.sortOrder
     });
     setShowForm(true);
+    console.log('Form should be visible now');
   };
 
   const handleDelete = async (id: number) => {
@@ -143,16 +234,12 @@ const HtmlSectionsManager: React.FC = () => {
     
     try {
       const response = await fetch(`/api/admin/html-sections?id=${id}`, {
-        method: 'DELETE'
+        method: 'DELETE',
       });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to delete HTML section');
-      }
-      
+
+      if (!response.ok) throw new Error('Failed to delete HTML section');
+
       await fetchHtmlSections();
-      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete HTML section');
     }
@@ -169,9 +256,9 @@ const HtmlSectionsManager: React.FC = () => {
       sortOrder: 0
     });
     setEditingSection(null);
-    setShowForm(false);
-    setActiveTab('html');
+    setActiveTab('rich-text');
     setPreviewMode(false);
+    setShowForm(false);
   };
 
   const copyToClipboard = (content: string) => {
@@ -183,19 +270,83 @@ const HtmlSectionsManager: React.FC = () => {
   };
 
   const getUsagePages = (section: HtmlSection) => {
-    const pages = [
-      ...section.pageHtmlSections.map(p => p.page),
-      ...section.pageSections.map(p => p.page)
-    ];
-    // Remove duplicates
-    return pages.filter((page, index, self) => 
-      index === self.findIndex(p => p.id === page.id)
-    );
+    const pages = new Map();
+    
+    section.pageHtmlSections.forEach(item => {
+      pages.set(item.page.id, item.page);
+    });
+    
+    section.pageSections.forEach(item => {
+      pages.set(item.page.id, item.page);
+    });
+    
+    return Array.from(pages.values());
+  };
+
+  const fetchMediaItems = async () => {
+    try {
+      setMediaLoading(true);
+      console.log('Fetching media items...');
+      
+      // Use the correct API endpoint
+      const endpoint = '/api/admin/media-library?page=1&limit=50&fileType=image';
+      console.log('Using endpoint:', endpoint);
+      
+      const response = await fetch(endpoint);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('API response:', data);
+      
+      if (!data.success) {
+        throw new Error(data.message || 'API request failed');
+      }
+      
+      // Extract media items from the correct response structure
+      const media = data.data?.items || [];
+      console.log('Extracted media items:', media);
+      
+      console.log('Setting media items:', media);
+      setMediaItems(media);
+      
+    } catch (error) {
+      console.error('Failed to fetch media:', error);
+      setMediaItems([]);
+    } finally {
+      setMediaLoading(false);
+    }
+  };
+
+  const handleMediaSelect = (selectedMedia: any) => {
+    console.log('Media selected:', selectedMedia);
+    console.log('Media callback exists:', !!mediaCallback);
+    
+    if (mediaCallback && selectedMedia) {
+      // Handle both single and multiple selections
+      const mediaItem = Array.isArray(selectedMedia) ? selectedMedia[0] : selectedMedia;
+      
+      if (mediaItem && mediaItem.publicUrl) {
+        console.log('Calling media callback with:', mediaItem.publicUrl);
+        mediaCallback(mediaItem.publicUrl, { 
+          title: mediaItem.title || mediaItem.filename,
+          alt: mediaItem.alt || mediaItem.title || mediaItem.filename
+        });
+      } else {
+        console.error('Invalid media item:', mediaItem);
+      }
+    } else {
+      console.error('No media callback or selected media');
+    }
+    
+    setShowMediaLibrary(false);
+    setMediaCallback(null);
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center p-8">
+      <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -342,23 +493,29 @@ const HtmlSectionsManager: React.FC = () => {
 
       {/* Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full h-[95vh] flex flex-col">
             <div className="flex items-center justify-between p-6 border-b">
               <h3 className="text-xl font-semibold">
                 {editingSection ? 'Edit HTML Section' : 'Create HTML Section'}
               </h3>
-              <button
-                onClick={resetForm}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <X className="w-6 h-6" />
-              </button>
+              <div className="flex items-center gap-4">
+                {/* Debug info */}
+                <div className="text-xs text-gray-500">
+                  Modal: {showForm ? 'Visible' : 'Hidden'}
+                </div>
+                <button
+                  onClick={resetForm}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="flex flex-col h-full">
-              <div className="flex-1 overflow-y-auto">
-                <div className="p-6 space-y-6">
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="space-y-6">
                   {/* Basic Information */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -420,6 +577,18 @@ const HtmlSectionsManager: React.FC = () => {
                       <div className="flex border-b">
                         <button
                           type="button"
+                          onClick={() => setActiveTab('rich-text')}
+                          className={`px-4 py-2 font-medium text-sm ${
+                            activeTab === 'rich-text'
+                              ? 'border-b-2 border-blue-600 text-blue-600'
+                              : 'text-gray-600 hover:text-gray-800'
+                          }`}
+                        >
+                          <Type className="w-4 h-4 inline mr-2" />
+                          Rich Text Editor
+                        </button>
+                        <button
+                          type="button"
                           onClick={() => setActiveTab('html')}
                           className={`px-4 py-2 font-medium text-sm ${
                             activeTab === 'html'
@@ -467,8 +636,52 @@ const HtmlSectionsManager: React.FC = () => {
                     </div>
 
                     {/* Code Editor */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                      <div>
+                    <div className="grid grid-cols-1 gap-4">
+                      <div className="w-full">
+                        {activeTab === 'rich-text' && (
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Rich Text Content *
+                            </label>
+                            <div className="border border-gray-300 rounded-lg w-full">
+                              <Editor
+                                apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY || process.env.TINYMCE_API_KEY}
+                                value={formData.htmlContent}
+                                onEditorChange={(content) => setFormData({...formData, htmlContent: content})}
+                                init={{
+                                  ...tinymceConfig,
+                                  setup: (editor) => {
+                                    console.log('TinyMCE API Key:', process.env.NEXT_PUBLIC_TINYMCE_API_KEY || process.env.TINYMCE_API_KEY);
+                                    console.log('TinyMCE Editor Setup Complete');
+                                  }
+                                }}
+                              />
+                            </div>
+                            <div className="text-xs text-gray-500 mt-2 space-y-1">
+                              <p>Use the rich text editor to create formatted content. The content will be automatically converted to HTML.</p>
+                              <div className="flex flex-wrap gap-4 mt-2">
+                                <div className="flex items-center gap-1">
+                                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                  <span>Click the <strong>link</strong> button to add URLs</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                                  <span>Click the <strong>image</strong> button to add media from your library</span>
+                                </div>
+                                <div className="flex items-center gap-1">
+                                  <span className="w-2 h-2 bg-purple-500 rounded-full"></span>
+                                  <span>Click the <strong>media</strong> button to embed videos/iframes</span>
+                                </div>
+                              </div>
+                              {showMediaLibrary && (
+                                <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-blue-700">
+                                  Media library is open - select an image and click "Confirm Selection"
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        )}
+
                         {activeTab === 'html' && (
                           <div>
                             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -515,14 +728,16 @@ const HtmlSectionsManager: React.FC = () => {
 
                       {/* Preview */}
                       {previewMode && (
-                        <div>
+                        <div className="w-full">
                           <label className="block text-sm font-medium text-gray-700 mb-2">
                             Preview
                           </label>
-                          <div className="border border-gray-300 rounded-lg p-4 h-64 overflow-auto bg-gray-50">
-                            <div 
-                              dangerouslySetInnerHTML={{ __html: formData.htmlContent }}
-                            />
+                          <div className="border border-gray-300 rounded-lg p-4 h-96 overflow-y-auto bg-gray-50">
+                            <style dangerouslySetInnerHTML={{ __html: formData.cssContent }} />
+                            <div dangerouslySetInnerHTML={{ __html: formData.htmlContent }} />
+                            {formData.jsContent && (
+                              <script dangerouslySetInnerHTML={{ __html: formData.jsContent }} />
+                            )}
                           </div>
                         </div>
                       )}
@@ -532,7 +747,7 @@ const HtmlSectionsManager: React.FC = () => {
               </div>
 
               {/* Form Actions */}
-              <div className="flex justify-end gap-3 p-6 border-t bg-gray-50">
+              <div className="flex justify-end gap-3 p-6 border-t bg-gray-50 flex-shrink-0">
                 <button
                   type="button"
                   onClick={resetForm}
@@ -547,10 +762,28 @@ const HtmlSectionsManager: React.FC = () => {
                   <Save className="w-4 h-4" />
                   {editingSection ? 'Update Section' : 'Create Section'}
                 </button>
+                {/* Debug info */}
+                <div className="text-xs text-gray-500">
+                  Editing: {editingSection ? 'Yes' : 'No'} | Media Modal: {showMediaLibrary ? 'Open' : 'Closed'}
+                </div>
               </div>
             </form>
           </div>
         </div>
+      )}
+
+      {/* Media Library Modal */}
+      {showMediaLibrary && typeof window !== 'undefined' && createPortal(
+        <div className="fixed inset-0 z-[9999]">
+          <MediaLibraryManager
+            isSelectionMode={true}
+            onSelect={handleMediaSelect}
+            onClose={() => setShowMediaLibrary(false)}
+            allowMultiple={false}
+            acceptedTypes={['image']}
+          />
+        </div>,
+        document.body
       )}
     </div>
   );
