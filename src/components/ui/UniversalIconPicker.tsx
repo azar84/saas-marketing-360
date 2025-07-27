@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, Grid, List, X, Check, Filter } from 'lucide-react';
 import * as LucideIcons from 'lucide-react';
@@ -8,6 +8,36 @@ import * as FaIcons from 'react-icons/fa';
 import * as MdIcons from 'react-icons/md';
 import * as IoIcons from 'react-icons/io';
 import * as BiIcons from 'react-icons/bi';
+
+// Error boundary component to catch Lucide React errors
+class IconErrorBoundary extends React.Component<
+  { children: React.ReactNode; fallback?: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode; fallback?: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    // Update state so the next render will show the fallback UI
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    // Silently catch the error - don't log it to avoid console spam
+    // The error is likely the Lucide "string.replace is not a function" issue
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // Return fallback or null
+      return this.props.fallback || null;
+    }
+
+    return this.props.children;
+  }
+}
 
 interface IconLibrary {
   name: string;
@@ -40,7 +70,7 @@ interface UniversalIconPickerProps {
   backgroundSecondary?: string;
 }
 
-const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
+const UniversalIconPickerInner: React.FC<UniversalIconPickerProps> = ({
   value,
   onChange,
   placeholder = "Search icons...",
@@ -56,14 +86,46 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedLibrary, setSelectedLibrary] = useState<string>('all');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+
+  // Debounce search term for better performance
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 150);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+
+
+  // Safe Lucide icons loader
+  const safeLucideIcons = useMemo(() => {
+    const safeIcons: { [key: string]: React.ComponentType<any> } = {};
+    
+    Object.entries(LucideIcons).forEach(([iconName, IconComponent]) => {
+      // Only include icons that are actually functions and have safe names
+      if (
+        typeof iconName === 'string' && 
+        typeof IconComponent === 'function' &&
+        iconName.length > 0 &&
+        !['default', 'createLucideIcon', 'Icon'].includes(iconName)
+      ) {
+        // Just store the original component - we'll handle errors in the ErrorBoundary
+        safeIcons[iconName] = IconComponent as React.ComponentType<any>;
+      }
+    });
+    
+    return safeIcons;
+  }, []);
 
   // Define available icon libraries
   const iconLibraries: IconLibrary[] = useMemo(() => [
     {
       name: 'lucide',
-      icons: LucideIcons as any,
+      icons: safeLucideIcons,
       prefix: 'lucide',
       description: 'Beautiful & consistent icons'
     },
@@ -93,9 +155,77 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
     }
   ], []);
 
+  // Enhanced search function with fuzzy matching
+  const matchesSearchTerm = (iconName: string, searchTerm: string): boolean => {
+    const name = iconName.toLowerCase();
+    const term = searchTerm.toLowerCase().trim();
+    
+    if (!term) return false;
+    
+    // Exact match
+    if (name === term) return true;
+    
+    // Contains match
+    if (name.includes(term)) return true;
+    
+    // Starts with match
+    if (name.startsWith(term)) return true;
+    
+    // Word boundary match (for camelCase or PascalCase icons)
+    const words = name.split(/(?=[A-Z])|[-_\s]+/).filter(Boolean);
+    if (words.some(word => word.toLowerCase().startsWith(term))) return true;
+    
+    // Fuzzy match - check if all characters of search term exist in order
+    let termIndex = 0;
+    for (let i = 0; i < name.length && termIndex < term.length; i++) {
+      if (name[i] === term[termIndex]) {
+        termIndex++;
+      }
+    }
+    
+    return termIndex === term.length;
+  };
+
+  // Calculate relevance score for better sorting
+  const getRelevanceScore = (iconName: string, searchTerm: string): number => {
+    const name = iconName.toLowerCase();
+    const term = searchTerm.toLowerCase().trim();
+    
+    if (!term) return 0;
+    
+    let score = 0;
+    
+    // Exact match gets highest score
+    if (name === term) score += 100;
+    
+    // Starts with search term gets high score
+    if (name.startsWith(term)) score += 80;
+    
+    // Contains search term gets medium score
+    if (name.includes(term)) score += 60;
+    
+    // Word boundary match (for camelCase)
+    const words = name.split(/(?=[A-Z])|[-_\s]+/).filter(Boolean);
+    if (words.some(word => word.toLowerCase().startsWith(term))) score += 40;
+    
+    // Shorter names get slight bonus (more likely to be what user wants)
+    score += Math.max(0, 20 - name.length);
+    
+    // Fuzzy match gets lower score
+    let termIndex = 0;
+    for (let i = 0; i < name.length && termIndex < term.length; i++) {
+      if (name[i] === term[termIndex]) {
+        termIndex++;
+      }
+    }
+    if (termIndex === term.length) score += 20;
+    
+    return score;
+  };
+
   // Search across all libraries
   const searchResults = useMemo(() => {
-    if (!searchTerm) {
+    if (!debouncedSearchTerm) {
       // If no search term, show popular icons from all libraries
       const popularIcons: IconResult[] = [];
       
@@ -104,33 +234,24 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
         // Take first 20 icons from each library as "popular"
         const popularFromLibrary = iconNames
           .filter(iconName => {
-            // Safety check: ensure iconName is a string
-            if (typeof iconName !== 'string') return false;
+            // Basic validation for icon names
+            if (typeof iconName !== 'string' || iconName.length === 0) {
+              return false;
+            }
             
             // Skip common non-component properties
-            if (iconName.startsWith('__') || iconName === 'default' || iconName === 'prototype' || iconName === 'constructor') {
+            const invalidNames = ['default', 'prototype', 'constructor', 'length', 'name', 'toString', 'valueOf', 'hasOwnProperty'];
+            if (invalidNames.includes(iconName)) {
               return false;
             }
             
             // Safety check: ensure the component exists and is valid
             const component = library.icons[iconName];
-            
-            // More robust React component validation
-            if (!component) return false;
-            
-            // Check if it's a function (functional component)
-            if (typeof component === 'function') {
-              return true;
+            if (!component || (typeof component !== 'function' && !(typeof component === 'object' && component !== null))) {
+              return false;
             }
             
-            // Check if it's a React element/component object
-            if (typeof component === 'object' && component !== null && (component as any).$$typeof) {
-              return true;
-            }
-            
-            // Log problematic components for debugging
-            console.warn(`Skipping invalid icon component: ${iconName} in ${library.name}`, typeof component);
-            return false;
+
             
             return true;
           })
@@ -153,37 +274,30 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
     
     iconLibraries.forEach(library => {
       const iconNames = Object.keys(library.icons);
+      
       const matchingIcons = iconNames
         .filter(iconName => {
-          // Safety check: ensure iconName is a string
-          if (typeof iconName !== 'string') return false;
+          // Basic validation for icon names
+          if (typeof iconName !== 'string' || iconName.length === 0) {
+            return false;
+          }
           
           // Skip common non-component properties
-          if (iconName.startsWith('__') || iconName === 'default' || iconName === 'prototype' || iconName === 'constructor') {
+          const invalidNames = ['default', 'prototype', 'constructor', 'length', 'name', 'toString', 'valueOf', 'hasOwnProperty'];
+          if (invalidNames.includes(iconName)) {
             return false;
           }
           
           // Safety check: ensure the component exists and is valid
           const component = library.icons[iconName];
-          
-          // More robust React component validation
-          if (!component) return false;
-          
-          // Check if it's a function (functional component)
-          if (typeof component === 'function') {
-            return true;
+          if (!component || (typeof component !== 'function' && !(typeof component === 'object' && component !== null))) {
+            return false;
           }
           
-          // Check if it's a React element/component object
-          if (typeof component === 'object' && component !== null && (component as any).$$typeof) {
-            return true;
-          }
+
           
-          // Log problematic components for debugging
-          console.warn(`Skipping invalid icon component: ${iconName} in ${library.name}`, typeof component);
-          return false;
-          
-          return iconName.toLowerCase().includes(searchTerm.toLowerCase());
+          // Check if it matches the search term
+          return matchesSearchTerm(iconName, debouncedSearchTerm);
         })
         .map(iconName => ({
           name: iconName,
@@ -196,19 +310,21 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
       results.push(...matchingIcons);
     });
 
-    // Sort by relevance (exact matches first, then alphabetical)
+    // Sort by relevance with improved scoring
     return results
+      .map(result => ({
+        ...result,
+        score: getRelevanceScore(result.name, debouncedSearchTerm)
+      }))
       .sort((a, b) => {
-        const aExact = a.name.toLowerCase() === searchTerm.toLowerCase();
-        const bExact = b.name.toLowerCase() === searchTerm.toLowerCase();
+        // Sort by score first (higher score = more relevant)
+        if (a.score !== b.score) return b.score - a.score;
         
-        if (aExact && !bExact) return -1;
-        if (!aExact && bExact) return 1;
-        
+        // Then by alphabetical order
         return a.name.localeCompare(b.name);
       })
-      .slice(0, 200); // Limit search results
-  }, [searchTerm, iconLibraries]);
+      .slice(0, 300); // Increased limit for better search results
+  }, [debouncedSearchTerm, iconLibraries]);
 
   // Filter by selected library if not "all"
   const filteredResults = useMemo(() => {
@@ -277,22 +393,22 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
         }}
       >
         <div className="flex items-center space-x-2 min-w-0 flex-1">
-                     {CurrentIcon && showPreview && (() => {
-             try {
-               if (CurrentIcon) {
-                 // Extra validation before rendering
-                 if (typeof CurrentIcon === 'function') {
-                   return <CurrentIcon className="w-5 h-5 flex-shrink-0" style={{ color: textSecondary }} />;
-                 } else if (typeof CurrentIcon === 'object' && CurrentIcon !== null && (CurrentIcon as any).$$typeof) {
-                   const IconComponent = CurrentIcon as React.ComponentType<any>;
-                   return <IconComponent className="w-5 h-5 flex-shrink-0" style={{ color: textSecondary }} />;
-                 }
-               }
-             } catch (error) {
-               console.warn('Failed to render current icon:', error, 'Component type:', typeof CurrentIcon);
-             }
-             return <div className="w-5 h-5 flex-shrink-0 bg-gray-300 rounded" />;
-           })()}
+                               {CurrentIcon && showPreview && (
+            <IconErrorBoundary fallback={<div className="w-5 h-5 flex-shrink-0 bg-gray-300 rounded" />}>
+              {(() => {
+                if (CurrentIcon) {
+                  // Extra validation before rendering
+                  if (typeof CurrentIcon === 'function') {
+                    return <CurrentIcon className="w-5 h-5 flex-shrink-0" style={{ color: textSecondary }} />;
+                  } else if (typeof CurrentIcon === 'object' && CurrentIcon !== null && (CurrentIcon as any).$$typeof) {
+                    const IconComponent = CurrentIcon as React.ComponentType<any>;
+                    return <IconComponent className="w-5 h-5 flex-shrink-0" style={{ color: textSecondary }} />;
+                  }
+                }
+                return <div className="w-5 h-5 flex-shrink-0 bg-gray-300 rounded" />;
+              })()}
+            </IconErrorBoundary>
+          )}
           <span className="truncate text-sm" style={{ color: textPrimary }}>
             {value ? value.split(':')[1] : placeholder}
           </span>
@@ -430,23 +546,21 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
                         title={`${result.name} (${result.libraryName})`}
                       >
                         <div className="relative">
-                                                     {(() => {
-                             try {
-                               if (result.component) {
-                                 // Extra validation before rendering
-                                 if (typeof result.component === 'function') {
-                                   const IconComponent = result.component;
-                                   return <IconComponent className="w-6 h-6" style={{ color: textSecondary }} />;
-                                 } else if (typeof result.component === 'object' && result.component !== null && (result.component as any).$$typeof) {
-                                   const IconComponent = result.component as React.ComponentType<any>;
-                                   return <IconComponent className="w-6 h-6" style={{ color: textSecondary }} />;
-                                 }
-                               }
-                             } catch (error) {
-                               console.warn(`Failed to render icon ${result.name} from ${result.library}:`, error, 'Component type:', typeof result.component);
-                             }
-                             return <div className="w-6 h-6 bg-gray-300 rounded" />;
-                           })()}
+                                                                             <IconErrorBoundary fallback={<div className="w-6 h-6 bg-gray-300 rounded" />}>
+                          {(() => {
+                            if (result.component) {
+                              // Extra validation before rendering
+                              if (typeof result.component === 'function') {
+                                const IconComponent = result.component;
+                                return <IconComponent className="w-6 h-6" style={{ color: textSecondary }} />;
+                              } else if (typeof result.component === 'object' && result.component !== null && (result.component as any).$$typeof) {
+                                const IconComponent = result.component as React.ComponentType<any>;
+                                return <IconComponent className="w-6 h-6" style={{ color: textSecondary }} />;
+                              }
+                            }
+                            return <div className="w-6 h-6 bg-gray-300 rounded" />;
+                          })()}
+                        </IconErrorBoundary>
                           {isSelected && (
                             <Check className="absolute -top-1 -right-1 w-3 h-3 text-blue-500 bg-white rounded-full" />
                           )}
@@ -480,23 +594,21 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
                         whileHover={{ x: 2 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                                                 {(() => {
-                           try {
-                             if (result.component) {
-                               // Extra validation before rendering
-                               if (typeof result.component === 'function') {
-                                 const IconComponent = result.component;
-                                 return <IconComponent className="w-6 h-6 flex-shrink-0" style={{ color: textSecondary }} />;
-                               } else if (typeof result.component === 'object' && result.component !== null && (result.component as any).$$typeof) {
-                                 const IconComponent = result.component as React.ComponentType<any>;
-                                 return <IconComponent className="w-6 h-6 flex-shrink-0" style={{ color: textSecondary }} />;
-                               }
-                             }
-                           } catch (error) {
-                             console.warn(`Failed to render icon ${result.name} from ${result.library}:`, error, 'Component type:', typeof result.component);
-                           }
-                           return <div className="w-6 h-6 flex-shrink-0 bg-gray-300 rounded" />;
-                         })()}
+                                                                         <IconErrorBoundary fallback={<div className="w-6 h-6 flex-shrink-0 bg-gray-300 rounded" />}>
+                          {(() => {
+                            if (result.component) {
+                              // Extra validation before rendering
+                              if (typeof result.component === 'function') {
+                                const IconComponent = result.component;
+                                return <IconComponent className="w-6 h-6 flex-shrink-0" style={{ color: textSecondary }} />;
+                              } else if (typeof result.component === 'object' && result.component !== null && (result.component as any).$$typeof) {
+                                const IconComponent = result.component as React.ComponentType<any>;
+                                return <IconComponent className="w-6 h-6 flex-shrink-0" style={{ color: textSecondary }} />;
+                              }
+                            }
+                            return <div className="w-6 h-6 flex-shrink-0 bg-gray-300 rounded" />;
+                          })()}
+                        </IconErrorBoundary>
                         <div className="flex-1 text-left">
                           <span className="text-sm font-medium block" style={{ color: textPrimary }}>{result.name}</span>
                           <span className="text-xs" style={{ color: textMuted }}>{result.libraryName}</span>
@@ -524,6 +636,19 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
         )}
       </AnimatePresence>
     </div>
+  );
+};
+
+// Wrap the entire component with an error boundary
+const UniversalIconPicker: React.FC<UniversalIconPickerProps> = (props) => {
+  return (
+    <IconErrorBoundary fallback={
+      <div className="w-full p-4 text-center text-gray-500">
+        <div className="text-sm">Icon picker temporarily unavailable</div>
+      </div>
+    }>
+      <UniversalIconPickerInner {...props} />
+    </IconErrorBoundary>
   );
 };
 

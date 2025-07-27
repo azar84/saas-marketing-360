@@ -469,7 +469,7 @@ const MediaSectionsManager: React.FC = () => {
       // Return a component that renders the universal icon
       const IconComponent = (props: any) => {
         try {
-          return renderIcon(iconName, props);
+        return renderIcon(iconName, props);
         } catch (error) {
           console.warn(`Failed to render icon ${iconName}:`, error);
           return null;
@@ -864,9 +864,9 @@ const MediaSectionsManager: React.FC = () => {
                           return (
                             <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
                               {IconComponent ? (
-                                <IconComponent 
-                                  className={`w-4 h-4 ${getIconCategoryColor(feature.icon)}`}
-                                />
+                              <IconComponent 
+                                className={`w-4 h-4 ${getIconCategoryColor(feature.icon)}`}
+                              />
                               ) : (
                                 <div className="w-4 h-4 bg-gray-300 rounded" />
                               )}
@@ -914,14 +914,14 @@ const MediaSectionsManager: React.FC = () => {
                       Headline *
                     </label>
                     <div className="relative">
-                      <input
-                        type="text"
-                        value={formData.headline}
-                        onChange={(e) => setFormData({ ...formData, headline: e.target.value })}
+                    <input
+                      type="text"
+                      value={formData.headline}
+                      onChange={(e) => setFormData({ ...formData, headline: e.target.value })}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-16"
-                        required
+                      required
                         maxLength={200}
-                      />
+                    />
                       <div className="absolute top-1/2 right-2 transform -translate-y-1/2 text-xs text-gray-500">
                         {(formData.headline?.length || 0)}/200
                       </div>
@@ -949,7 +949,7 @@ const MediaSectionsManager: React.FC = () => {
                   <div className="border border-gray-300 rounded-lg w-full">
                     <Editor
                       apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY || process.env.TINYMCE_API_KEY}
-                      value={formData.subheading}
+                    value={formData.subheading}
                       onEditorChange={(content) => setFormData({...formData, subheading: content})}
                       init={{
                         ...tinymceConfig,
@@ -1425,7 +1425,7 @@ const MediaSectionsManager: React.FC = () => {
                           <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
                             <div className="flex items-center gap-2">
                               {IconComponent ? (
-                                <IconComponent className={`w-4 h-4 ${getIconCategoryColor(feature.icon)}`} />
+                              <IconComponent className={`w-4 h-4 ${getIconCategoryColor(feature.icon)}`} />
                               ) : (
                                 <div className="w-4 h-4 bg-gray-300 rounded" />
                               )}
