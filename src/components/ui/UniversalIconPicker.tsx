@@ -102,13 +102,46 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
       iconLibraries.forEach(library => {
         const iconNames = Object.keys(library.icons);
         // Take first 20 icons from each library as "popular"
-        const popularFromLibrary = iconNames.slice(0, 20).map(iconName => ({
-          name: iconName,
-          component: library.icons[iconName],
-          library: library.name,
-          libraryName: library.description,
-          fullName: `${library.name}:${iconName}`
-        }));
+        const popularFromLibrary = iconNames
+          .filter(iconName => {
+            // Safety check: ensure iconName is a string
+            if (typeof iconName !== 'string') return false;
+            
+            // Skip common non-component properties
+            if (iconName.startsWith('__') || iconName === 'default' || iconName === 'prototype' || iconName === 'constructor') {
+              return false;
+            }
+            
+            // Safety check: ensure the component exists and is valid
+            const component = library.icons[iconName];
+            
+            // More robust React component validation
+            if (!component) return false;
+            
+            // Check if it's a function (functional component)
+            if (typeof component === 'function') {
+              return true;
+            }
+            
+            // Check if it's a React element/component object
+            if (typeof component === 'object' && component !== null && component.$$typeof) {
+              return true;
+            }
+            
+            // Log problematic components for debugging
+            console.warn(`Skipping invalid icon component: ${iconName} in ${library.name}`, typeof component);
+            return false;
+            
+            return true;
+          })
+          .slice(0, 20)
+          .map(iconName => ({
+            name: iconName,
+            component: library.icons[iconName],
+            library: library.name,
+            libraryName: library.description,
+            fullName: `${library.name}:${iconName}`
+          }));
         popularIcons.push(...popularFromLibrary);
       });
       
@@ -121,9 +154,37 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
     iconLibraries.forEach(library => {
       const iconNames = Object.keys(library.icons);
       const matchingIcons = iconNames
-        .filter(iconName => 
-          iconName.toLowerCase().includes(searchTerm.toLowerCase())
-        )
+        .filter(iconName => {
+          // Safety check: ensure iconName is a string
+          if (typeof iconName !== 'string') return false;
+          
+          // Skip common non-component properties
+          if (iconName.startsWith('__') || iconName === 'default' || iconName === 'prototype' || iconName === 'constructor') {
+            return false;
+          }
+          
+          // Safety check: ensure the component exists and is valid
+          const component = library.icons[iconName];
+          
+          // More robust React component validation
+          if (!component) return false;
+          
+          // Check if it's a function (functional component)
+          if (typeof component === 'function') {
+            return true;
+          }
+          
+          // Check if it's a React element/component object
+          if (typeof component === 'object' && component !== null && component.$$typeof) {
+            return true;
+          }
+          
+          // Log problematic components for debugging
+          console.warn(`Skipping invalid icon component: ${iconName} in ${library.name}`, typeof component);
+          return false;
+          
+          return iconName.toLowerCase().includes(searchTerm.toLowerCase());
+        })
         .map(iconName => ({
           name: iconName,
           component: library.icons[iconName],
@@ -159,11 +220,25 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
 
   // Get current selected icon component
   const getCurrentIconComponent = () => {
-    if (!value) return null;
+    if (!value || typeof value !== 'string') return null;
     
-    const [library, iconName] = value.split(':');
-    const libraryData = iconLibraries.find(lib => lib.name === library);
-    return libraryData?.icons[iconName] || null;
+    try {
+      const [library, iconName] = value.split(':');
+      if (!library || !iconName || typeof iconName !== 'string') return null;
+      
+      const libraryData = iconLibraries.find(lib => lib.name === library);
+      const component = libraryData?.icons[iconName];
+      
+      // Safety check to ensure the component is valid
+      if (component && (typeof component === 'function' || (typeof component === 'object' && component.$$typeof))) {
+        return component;
+      }
+      
+      return null;
+    } catch (error) {
+      console.warn('Error getting current icon component:', error);
+      return null;
+    }
   };
 
   const handleIconSelect = (result: IconResult) => {
@@ -202,9 +277,21 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
         }}
       >
         <div className="flex items-center space-x-2 min-w-0 flex-1">
-          {CurrentIcon && showPreview && (
-            <CurrentIcon className="w-5 h-5 flex-shrink-0" style={{ color: textSecondary }} />
-          )}
+                     {CurrentIcon && showPreview && (() => {
+             try {
+               if (CurrentIcon) {
+                 // Extra validation before rendering
+                 if (typeof CurrentIcon === 'function') {
+                   return <CurrentIcon className="w-5 h-5 flex-shrink-0" style={{ color: textSecondary }} />;
+                 } else if (typeof CurrentIcon === 'object' && CurrentIcon !== null && CurrentIcon.$$typeof) {
+                   return <CurrentIcon className="w-5 h-5 flex-shrink-0" style={{ color: textSecondary }} />;
+                 }
+               }
+             } catch (error) {
+               console.warn('Failed to render current icon:', error, 'Component type:', typeof CurrentIcon);
+             }
+             return <div className="w-5 h-5 flex-shrink-0 bg-gray-300 rounded" />;
+           })()}
           <span className="truncate text-sm" style={{ color: textPrimary }}>
             {value ? value.split(':')[1] : placeholder}
           </span>
@@ -342,7 +429,22 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
                         title={`${result.name} (${result.libraryName})`}
                       >
                         <div className="relative">
-                          <result.component className="w-6 h-6" style={{ color: textSecondary }} />
+                                                     {(() => {
+                             try {
+                               if (result.component) {
+                                 // Extra validation before rendering
+                                 if (typeof result.component === 'function') {
+                                   const IconComponent = result.component;
+                                   return <IconComponent className="w-6 h-6" style={{ color: textSecondary }} />;
+                                 } else if (typeof result.component === 'object' && result.component !== null && result.component.$$typeof) {
+                                   return <result.component className="w-6 h-6" style={{ color: textSecondary }} />;
+                                 }
+                               }
+                             } catch (error) {
+                               console.warn(`Failed to render icon ${result.name} from ${result.library}:`, error, 'Component type:', typeof result.component);
+                             }
+                             return <div className="w-6 h-6 bg-gray-300 rounded" />;
+                           })()}
                           {isSelected && (
                             <Check className="absolute -top-1 -right-1 w-3 h-3 text-blue-500 bg-white rounded-full" />
                           )}
@@ -376,7 +478,22 @@ const UniversalIconPicker: React.FC<UniversalIconPickerProps> = ({
                         whileHover={{ x: 2 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        <result.component className="w-6 h-6 flex-shrink-0" style={{ color: textSecondary }} />
+                                                 {(() => {
+                           try {
+                             if (result.component) {
+                               // Extra validation before rendering
+                               if (typeof result.component === 'function') {
+                                 const IconComponent = result.component;
+                                 return <IconComponent className="w-6 h-6 flex-shrink-0" style={{ color: textSecondary }} />;
+                               } else if (typeof result.component === 'object' && result.component !== null && result.component.$$typeof) {
+                                 return <result.component className="w-6 h-6 flex-shrink-0" style={{ color: textSecondary }} />;
+                               }
+                             }
+                           } catch (error) {
+                             console.warn(`Failed to render icon ${result.name} from ${result.library}:`, error, 'Component type:', typeof result.component);
+                           }
+                           return <div className="w-6 h-6 flex-shrink-0 bg-gray-300 rounded" />;
+                         })()}
                         <div className="flex-1 text-left">
                           <span className="text-sm font-medium block" style={{ color: textPrimary }}>{result.name}</span>
                           <span className="text-xs" style={{ color: textMuted }}>{result.libraryName}</span>
