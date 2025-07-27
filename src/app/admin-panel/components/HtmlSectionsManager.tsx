@@ -121,7 +121,7 @@ const HtmlSectionsManager: React.FC = () => {
     image_title: true,
     automatic_uploads: true,
     file_picker_types: 'image',
-    file_picker_callback: function (callback, value, meta) {
+    file_picker_callback: function (callback: (value: string, meta?: any) => void, value: string, meta: any) {
       console.log('File picker callback triggered', { value, meta });
       
       // Store callback and open media library
