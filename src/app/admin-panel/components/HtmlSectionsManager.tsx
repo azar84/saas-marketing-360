@@ -376,7 +376,13 @@ const HtmlSectionsManager: React.FC = () => {
         method: 'DELETE',
       });
 
-      if (!response.ok) throw new Error('Failed to delete HTML section');
+      if (!response.ok) {
+        const errorData = await response.json();
+        if (errorData.error && errorData.error.includes('being used in pages')) {
+          throw new Error('Cannot delete: This HTML section is being used in one or more pages. Please remove it from the Page Builder first, then try deleting again.');
+        }
+        throw new Error(errorData.error || 'Failed to delete HTML section');
+      }
 
       await fetchHtmlSections();
     } catch (err) {
@@ -562,8 +568,16 @@ const HtmlSectionsManager: React.FC = () => {
                       </button>
                       <button
                         onClick={() => handleDelete(section.id)}
-                        className="p-2 text-gray-600 hover:text-red-600"
+                        className={`p-2 ${
+                          getUsageCount(section) > 0 
+                            ? 'text-gray-400 cursor-not-allowed' 
+                            : 'text-gray-600 hover:text-red-600'
+                        }`}
                         disabled={getUsageCount(section) > 0}
+                        title={getUsageCount(section) > 0 
+                          ? `Cannot delete: This section is used in ${getUsageCount(section)} page(s). Remove it from Page Builder first.` 
+                          : 'Delete HTML section'
+                        }
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -577,21 +591,27 @@ const HtmlSectionsManager: React.FC = () => {
                     </div>
                     
                     {getUsageCount(section) > 0 && (
-                      <div className="flex items-center gap-2">
-                        <span>Used in:</span>
-                        {getUsagePages(section).map((page, index) => (
-                          <span key={page.id} className="inline-flex items-center gap-1">
-                            <a 
-                              href={`/${page.slug}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-700"
-                            >
-                              {page.title}
-                            </a>
-                            {index < getUsagePages(section).length - 1 && <span>,</span>}
-                          </span>
-                        ))}
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span>Used in:</span>
+                          {getUsagePages(section).map((page, index) => (
+                            <span key={page.id} className="inline-flex items-center gap-1">
+                              <a 
+                                href={`/${page.slug}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-700"
+                              >
+                                {page.title}
+                              </a>
+                              {index < getUsagePages(section).length - 1 && <span>,</span>}
+                            </span>
+                          ))}
+                        </div>
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-md p-2 text-yellow-800 text-xs">
+                          <strong>⚠️ Cannot delete:</strong> This section is being used in {getUsageCount(section)} page(s). 
+                          Go to <strong>Page Builder</strong> and remove this section from the pages first, then come back to delete it.
+                        </div>
                       </div>
                     )}
                   </div>
@@ -848,7 +868,7 @@ const HtmlSectionsManager: React.FC = () => {
                                     // Add spacing controls to toolbar
                                     editor.ui.registry.addMenuButton('spacing-controls', {
                                       text: 'Spacing',
-                                      fetch: function (callback) {
+                                      fetch: function (callback: any) {
                                         const items = [
                                           { type: 'menuitem', text: 'Remove All Spacing', onAction: removeAllSpacing },
                                           { type: 'separator' },
