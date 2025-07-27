@@ -1137,7 +1137,7 @@ export default function ConfigurablePricingManager() {
                   <div className="flex-shrink-0">
                     <IconPicker
                       value={newFeatureType.icon}
-                      onChange={(iconName, iconComponent, library) => setNewFeatureType({ ...newFeatureType, icon: iconName })}
+                      onChange={(iconName) => setNewFeatureType({ ...newFeatureType, icon: iconName })}
                       placeholder="Select an icon"
                     />
                   </div>
@@ -1225,7 +1225,7 @@ export default function ConfigurablePricingManager() {
                             <div className="flex-shrink-0">
                               <IconPicker
                                 value={editFeatureTypeData?.icon || 'Settings'}
-                                onChange={(iconName, iconComponent, library) => setEditFeatureTypeData({...editFeatureTypeData, icon: iconName })}
+                                onChange={(iconName) => setEditFeatureTypeData({...editFeatureTypeData, icon: iconName })}
                                 placeholder="Select an icon"
                               />
                             </div>
