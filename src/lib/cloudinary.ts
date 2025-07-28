@@ -4,9 +4,28 @@ import { prisma } from './db';
 // Function to get Cloudinary config from database or environment
 export async function getCloudinaryConfig() {
   try {
+    console.log('Getting Cloudinary configuration...');
+    
+    // Test database connection first
+    try {
+      await prisma.$connect();
+      console.log('Database connection successful');
+    } catch (dbError) {
+      console.error('Database connection failed:', dbError);
+      throw new Error('Database connection failed');
+    }
+    
     const settings = await prisma.siteSettings.findFirst();
+    console.log('Site settings loaded:', {
+      hasSettings: !!settings,
+      cloudinaryEnabled: settings?.cloudinaryEnabled,
+      hasCloudName: !!settings?.cloudinaryCloudName,
+      hasApiKey: !!settings?.cloudinaryApiKey,
+      hasApiSecret: !!settings?.cloudinaryApiSecret
+    });
     
     if (settings?.cloudinaryEnabled && settings.cloudinaryCloudName && settings.cloudinaryApiKey && settings.cloudinaryApiSecret) {
+      console.log('Using database Cloudinary configuration');
       return {
         cloud_name: settings.cloudinaryCloudName,
         api_key: settings.cloudinaryApiKey,
@@ -15,7 +34,9 @@ export async function getCloudinaryConfig() {
     }
     
     // Fallback to environment variables
+    console.log('Checking environment variables...');
     if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+      console.log('Using environment variable Cloudinary configuration');
       return {
         cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
         api_key: process.env.CLOUDINARY_API_KEY,
@@ -23,6 +44,7 @@ export async function getCloudinaryConfig() {
       };
     }
     
+    console.log('No Cloudinary configuration found');
     // Return null instead of throwing error - let the calling function handle it
     return null;
   } catch (error) {
@@ -41,7 +63,34 @@ export async function configureCloudinary() {
       return false;
     }
     
+    // Validate the configuration
+    if (!config.cloud_name || !config.api_key || !config.api_secret) {
+      console.error('Invalid Cloudinary configuration - missing required fields');
+      return false;
+    }
+    
+    // Configure Cloudinary
     cloudinary.config(config);
+    
+    // Test the configuration by making a simple API call
+    try {
+      // This is a lightweight test to verify credentials
+      await new Promise((resolve, reject) => {
+        cloudinary.api.ping((error, result) => {
+          if (error) {
+            console.error('Cloudinary ping failed:', error);
+            reject(error);
+          } else {
+            console.log('Cloudinary configuration verified successfully');
+            resolve(result);
+          }
+        });
+      });
+    } catch (pingError) {
+      console.error('Cloudinary configuration test failed:', pingError);
+      return false;
+    }
+    
     return true;
   } catch (error) {
     console.error('Failed to configure Cloudinary:', error);
@@ -73,6 +122,8 @@ export const uploadToCloudinary = async (
   } = {}
 ): Promise<CloudinaryUploadResult> => {
   try {
+    console.log('Starting Cloudinary upload...');
+    
     // Ensure Cloudinary is configured
     const isConfigured = await configureCloudinary();
     
@@ -83,11 +134,25 @@ export const uploadToCloudinary = async (
     // Convert File to buffer if needed
     let buffer: Buffer;
     if (file instanceof File) {
+      console.log('Converting File to buffer...');
       const arrayBuffer = await file.arrayBuffer();
       buffer = Buffer.from(arrayBuffer);
+      console.log(`File converted to buffer, size: ${buffer.length} bytes`);
     } else {
       buffer = file;
+      console.log(`Using provided buffer, size: ${buffer.length} bytes`);
     }
+
+    // Validate buffer
+    if (!buffer || buffer.length === 0) {
+      throw new Error('Empty file buffer provided');
+    }
+
+    console.log('Uploading to Cloudinary with options:', {
+      folder: options.folder || 'yourcompany',
+      resource_type: options.resource_type || 'auto',
+      public_id: options.public_id
+    });
 
     // Upload to Cloudinary
     const result = await new Promise<CloudinaryUploadResult>((resolve, reject) => {
@@ -100,8 +165,14 @@ export const uploadToCloudinary = async (
         },
         (error, result) => {
           if (error) {
+            console.error('Cloudinary upload stream error:', error);
             reject(error);
           } else {
+            console.log('Cloudinary upload successful:', {
+              public_id: result?.public_id,
+              secure_url: result?.secure_url,
+              bytes: result?.bytes
+            });
             resolve(result as CloudinaryUploadResult);
           }
         }
@@ -113,6 +184,24 @@ export const uploadToCloudinary = async (
     return result;
   } catch (error) {
     console.error('Cloudinary upload error:', error);
+    
+    // Provide more specific error messages
+    if (error instanceof Error) {
+      if (error.message.includes('not configured')) {
+        throw new Error('Cloudinary is not configured. Please configure Cloudinary in site settings or environment variables.');
+      } else if (error.message.includes('Invalid API key')) {
+        throw new Error('Invalid Cloudinary API key. Please check your credentials.');
+      } else if (error.message.includes('Invalid signature')) {
+        throw new Error('Invalid Cloudinary API secret. Please check your credentials.');
+      } else if (error.message.includes('Cloud name')) {
+        throw new Error('Invalid Cloudinary cloud name. Please check your configuration.');
+      } else if (error.message.includes('Empty file buffer')) {
+        throw new Error('The uploaded file is empty or corrupted.');
+      } else {
+        throw new Error(`Cloudinary upload failed: ${error.message}`);
+      }
+    }
+    
     throw new Error('Failed to upload file to Cloudinary');
   }
 };

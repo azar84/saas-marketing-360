@@ -379,7 +379,11 @@ const MediaSectionsManager: React.FC = () => {
                     <button
                       key={color.name}
                       type="button"
-                      onClick={() => handlePresetClick(color.value)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handlePresetClick(color.value);
+                      }}
                       className="w-8 h-8 rounded border border-gray-300 hover:border-gray-400 transition-colors"
                       style={{ backgroundColor: color.value }}
                       title={color.name}
@@ -394,6 +398,11 @@ const MediaSectionsManager: React.FC = () => {
                   type="color"
                   value={customColor}
                   onChange={handleCustomColorChange}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                    }
+                  }}
                   className="w-full h-10 border border-gray-300 rounded"
                 />
               </div>
@@ -401,7 +410,11 @@ const MediaSectionsManager: React.FC = () => {
               <div className="flex justify-end">
                 <button
                   type="button"
-                  onClick={() => setShowPicker(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setShowPicker(false);
+                  }}
                   className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
                 >
                   Close

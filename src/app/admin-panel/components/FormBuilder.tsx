@@ -268,6 +268,11 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, desig
             type="color"
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+              }
+            }}
             className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           />
         </div>
@@ -309,7 +314,9 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, desig
               <button
                 key={index}
                 type="button"
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
                   onChange(color.value);
                   setShowPalette(false);
                 }}

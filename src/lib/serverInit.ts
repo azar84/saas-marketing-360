@@ -9,8 +9,24 @@ export async function initializeServerConfig() {
   try {
     console.log('🚀 Initializing server configuration...');
     
+    // Test database connection
+    try {
+      await prisma.$connect();
+      console.log('✅ Database connection established');
+    } catch (dbError) {
+      console.error('❌ Database connection failed:', dbError);
+      throw new Error('Database connection failed during server initialization');
+    }
+    
     // Load site settings from database
     const settings = await prisma.siteSettings.findFirst();
+    console.log('📊 Site settings loaded:', {
+      hasSettings: !!settings,
+      cloudinaryEnabled: settings?.cloudinaryEnabled,
+      hasCloudName: !!settings?.cloudinaryCloudName,
+      hasApiKey: !!settings?.cloudinaryApiKey,
+      hasApiSecret: !!settings?.cloudinaryApiSecret
+    });
     
     if (settings?.cloudinaryEnabled && settings.cloudinaryCloudName && settings.cloudinaryApiKey && settings.cloudinaryApiSecret) {
       // Set Cloudinary environment variables from database
@@ -21,8 +37,39 @@ export async function initializeServerConfig() {
       console.log('✅ Cloudinary configuration loaded from database');
       console.log(`   Cloud Name: ${settings.cloudinaryCloudName}`);
       console.log(`   API Key: ${settings.cloudinaryApiKey.substring(0, 8)}...`);
+      
+      // Test Cloudinary configuration immediately
+      try {
+        const { configureCloudinary } = await import('./cloudinary');
+        const isConfigured = await configureCloudinary();
+        if (isConfigured) {
+          console.log('✅ Cloudinary configuration verified successfully');
+        } else {
+          console.error('❌ Cloudinary configuration verification failed');
+        }
+      } catch (cloudinaryError) {
+        console.error('❌ Failed to verify Cloudinary configuration:', cloudinaryError);
+      }
     } else {
       console.log('⚠️  Cloudinary not configured in database, using environment variables if available');
+      
+      // Test environment variables if available
+      if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+        console.log('✅ Cloudinary environment variables found');
+        try {
+          const { configureCloudinary } = await import('./cloudinary');
+          const isConfigured = await configureCloudinary();
+          if (isConfigured) {
+            console.log('✅ Cloudinary configuration verified successfully');
+          } else {
+            console.error('❌ Cloudinary configuration verification failed');
+          }
+        } catch (cloudinaryError) {
+          console.error('❌ Failed to verify Cloudinary configuration:', cloudinaryError);
+        }
+      } else {
+        console.log('⚠️  No Cloudinary environment variables found');
+      }
     }
     
     // Load other configurations as needed

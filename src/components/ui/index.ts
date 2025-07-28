@@ -14,4 +14,5 @@ export { default as ManagerCard } from './ManagerCard';
 // Export icon utilities
 export * from '../../lib/iconUtils';
 export { default as ErrorBoundary } from './ErrorBoundary';
-export { default as MediaSelector } from './MediaSelector'; 
+export { default as MediaSelector } from './MediaSelector';
+export { ColorPicker } from './ColorPicker'; 

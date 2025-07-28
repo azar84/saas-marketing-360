@@ -42,7 +42,7 @@ import {
   Link,
   Palette
 } from 'lucide-react';
-import { Button, Input, IconPicker } from '@/components/ui';
+import { Button, Input, IconPicker, ColorPicker } from '@/components/ui';
 import { useDesignSystem } from '@/hooks/useDesignSystem';
 import { renderIcon } from '@/lib/iconUtils';
 
@@ -184,99 +184,7 @@ const FeatureGroupsManager: React.FC = () => {
     ];
   };
 
-  // Color Picker Component
-  const ColorPicker: React.FC<{
-    label: string;
-    value: string;
-    onChange: (color: string) => void;
-  }> = ({ label, value, onChange }) => {
-    const [showPicker, setShowPicker] = useState(false);
-    const [customColor, setCustomColor] = useState(value.startsWith('#') ? value : '#000000');
-    const designSystemColors = getDesignSystemColors();
 
-    const presetColors = [
-      ...designSystemColors,
-      { name: 'White', value: '#FFFFFF', description: 'White' },
-      { name: 'Black', value: '#000000', description: 'Black' },
-    ];
-
-    const handlePresetClick = (color: string) => {
-      onChange(color);
-      setShowPicker(false);
-    };
-
-    const handleCustomColorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newColor = e.target.value;
-      setCustomColor(newColor);
-      onChange(newColor);
-    };
-
-    return (
-      <div className="relative">
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {label}
-        </label>
-        <div className="flex items-center">
-          <div className="w-12 h-12 rounded-lg border border-gray-300 flex items-center justify-center">
-            <div
-              style={{ backgroundColor: value }}
-              className="w-8 h-8 rounded-lg"
-            ></div>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowPicker(!showPicker)}
-            className="text-gray-500 hover:text-gray-700 ml-2"
-          >
-            <Palette className="w-4 h-4" />
-          </Button>
-        </div>
-
-        {showPicker && (
-          <div className="absolute top-full left-0 z-50 mt-2 p-4 bg-white border border-gray-300 rounded-lg shadow-lg min-w-64">
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-2">Design System Colors</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {designSystemColors.map((color) => (
-                    <button
-                      key={color.name}
-                      type="button"
-                      onClick={() => handlePresetClick(color.value)}
-                      className="w-8 h-8 rounded border border-gray-300 hover:border-gray-400 transition-colors"
-                      style={{ backgroundColor: color.value }}
-                      title={color.name}
-                    />
-                  ))}
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-2">Custom Color</label>
-                <input
-                  type="color"
-                  value={customColor}
-                  onChange={handleCustomColorChange}
-                  className="w-full h-10 border border-gray-300 rounded"
-                />
-              </div>
-              
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={() => setShowPicker(false)}
-                  className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
 
   const getIconComponent = (iconName: string) => {
     // Use the universal renderIcon utility
@@ -657,13 +565,11 @@ const FeatureGroupsManager: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Background Color
-                </label>
                 <ColorPicker
                   label="Background Color"
-                  value={formData.backgroundColor}
+                  value={formData.backgroundColor || '#ffffff'}
                   onChange={(color) => setFormData({ ...formData, backgroundColor: color })}
+                  designSystemColors={getDesignSystemColors()}
                 />
               </div>
             </div>

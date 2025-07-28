@@ -219,6 +219,7 @@ export async function PUT(request: NextRequest) {
         ...(validatedData.heading !== undefined && { name: validatedData.heading }),  // Map heading -> name in DB
         ...(validatedData.subheading !== undefined && { description: validatedData.subheading }),  // Map subheading -> description
         ...(validatedData.layoutType !== undefined && { layoutType: validatedData.layoutType }),
+        ...(validatedData.backgroundColor !== undefined && { backgroundColor: validatedData.backgroundColor }),
         ...(validatedData.isActive !== undefined && { isActive: validatedData.isActive }),
         updatedAt: new Date()
       } as any,

@@ -161,54 +161,88 @@ export async function POST(request: NextRequest) {
 
 // Handle file upload
 async function handleFileUpload(request: NextRequest) {
-  const formData = await request.formData();
-  const file = formData.get('file') as File;
-  
-  if (!file) {
-    const response: ApiResponse = {
-      success: false,
-      message: 'No file provided'
-    };
-    return NextResponse.json(response, { status: 400 });
-  }
+  try {
+    console.log('📁 Starting file upload process...');
+    
+    const formData = await request.formData();
+    const file = formData.get('file') as File;
+    
+    console.log('📄 File received:', {
+      name: file?.name,
+      size: file?.size,
+      type: file?.type,
+      lastModified: file?.lastModified
+    });
+    
+    if (!file) {
+      console.error('❌ No file provided in request');
+      const response: ApiResponse = {
+        success: false,
+        message: 'No file provided'
+      };
+      return NextResponse.json(response, { status: 400 });
+    }
 
-  // Validate file
-  const maxSize = 50 * 1024 * 1024; // 50MB
-  if (file.size > maxSize) {
-    const response: ApiResponse = {
-      success: false,
-      message: 'File size exceeds 50MB limit'
-    };
-    return NextResponse.json(response, { status: 400 });
-  }
+    // Validate file
+    const maxSize = 50 * 1024 * 1024; // 50MB
+    if (file.size > maxSize) {
+      console.error('❌ File size exceeds limit:', file.size, 'bytes');
+      const response: ApiResponse = {
+        success: false,
+        message: 'File size exceeds 50MB limit'
+      };
+      return NextResponse.json(response, { status: 400 });
+    }
 
-  // Get file info
-  const filename = file.name;
-  const mimeType = file.type;
-  const fileSize = file.size;
-  
-  // Determine file type
-  let fileType = 'other';
-  let resourceType: 'image' | 'video' | 'raw' = 'raw';
-  if (mimeType.startsWith('image/')) {
-    fileType = 'image';
-    resourceType = 'image';
-  } else if (mimeType.startsWith('video/')) {
-    fileType = 'video';
-    resourceType = 'video';
-  } else if (mimeType.startsWith('audio/')) {
-    fileType = 'audio';
-    resourceType = 'raw';
-  } else if (mimeType.includes('pdf') || mimeType.includes('document') || mimeType.includes('text')) {
-    fileType = 'document';
-    resourceType = 'raw';
-  }
+    // Get file info
+    const filename = file.name;
+    const mimeType = file.type;
+    const fileSize = file.size;
+    
+    console.log('📋 File details:', {
+      filename,
+      mimeType,
+      fileSize,
+      maxSize
+    });
+    
+    // Determine file type
+    let fileType = 'other';
+    let resourceType: 'image' | 'video' | 'raw' = 'raw';
+    if (mimeType.startsWith('image/')) {
+      fileType = 'image';
+      resourceType = 'image';
+    } else if (mimeType.startsWith('video/')) {
+      fileType = 'video';
+      resourceType = 'video';
+    } else if (mimeType.startsWith('audio/')) {
+      fileType = 'audio';
+      resourceType = 'raw';
+    } else if (mimeType.includes('pdf') || mimeType.includes('document') || mimeType.includes('text')) {
+      fileType = 'document';
+      resourceType = 'raw';
+    }
+    
+    console.log('🏷️  File type determined:', {
+      fileType,
+      resourceType
+    });
 
   try {
+    console.log('☁️  Starting Cloudinary upload...');
+    
     // Upload to Cloudinary
     const cloudinaryResult = await uploadToCloudinary(file, {
       folder: 'yourcompany/media',
       resource_type: resourceType,
+    });
+    
+    console.log('✅ Cloudinary upload successful:', {
+      public_id: cloudinaryResult.public_id,
+      secure_url: cloudinaryResult.secure_url,
+      bytes: cloudinaryResult.bytes,
+      width: cloudinaryResult.width,
+      height: cloudinaryResult.height
     });
 
     // Get optional metadata from form
@@ -241,7 +275,10 @@ async function handleFileUpload(request: NextRequest) {
       isPublic: true
     };
 
+    console.log('💾 Creating database record...');
+    
     const validatedData = validateAndTransform(CreateMediaLibrarySchema, mediaData);
+    console.log('✅ Data validation successful');
 
     const mediaItem = await prisma.mediaLibrary.create({
       data: validatedData,
@@ -255,6 +292,12 @@ async function handleFileUpload(request: NextRequest) {
         }
       }
     });
+    
+    console.log('✅ Database record created:', {
+      id: mediaItem.id,
+      filename: mediaItem.filename,
+      publicUrl: mediaItem.publicUrl
+    });
 
     const response: ApiResponse = {
       success: true,
@@ -262,15 +305,50 @@ async function handleFileUpload(request: NextRequest) {
       message: 'File uploaded successfully'
     };
 
+    console.log('✅ File upload completed successfully');
     return NextResponse.json(response);
   } catch (error) {
-    console.error('Cloudinary upload error:', error);
+    console.error('❌ Cloudinary upload error:', error);
+    
+    let errorMessage = 'Failed to upload file to Cloudinary';
+    let statusCode = 500;
+    
+    if (error instanceof Error) {
+      if (error.message.includes('not configured')) {
+        errorMessage = 'Cloudinary is not configured. Please configure Cloudinary in site settings.';
+        statusCode = 400;
+      } else if (error.message.includes('Invalid API key')) {
+        errorMessage = 'Invalid Cloudinary API key. Please check your credentials in site settings.';
+        statusCode = 400;
+      } else if (error.message.includes('Invalid signature')) {
+        errorMessage = 'Invalid Cloudinary API secret. Please check your credentials in site settings.';
+        statusCode = 400;
+      } else if (error.message.includes('Cloud name')) {
+        errorMessage = 'Invalid Cloudinary cloud name. Please check your configuration in site settings.';
+        statusCode = 400;
+      } else if (error.message.includes('Empty file buffer')) {
+        errorMessage = 'The uploaded file is empty or corrupted.';
+        statusCode = 400;
+      } else {
+        errorMessage = `Upload failed: ${error.message}`;
+      }
+    }
+    
     const response: ApiResponse = {
       success: false,
-      message: 'Failed to upload file to Cloudinary'
+      message: errorMessage
     };
-    return NextResponse.json(response, { status: 500 });
+    return NextResponse.json(response, { status: statusCode });
   }
+} catch (outerError) {
+  console.error('❌ File upload process error:', outerError);
+  
+  const response: ApiResponse = {
+    success: false,
+    message: 'An unexpected error occurred during file upload'
+  };
+  return NextResponse.json(response, { status: 500 });
+}
 }
 
 // Handle URL import
