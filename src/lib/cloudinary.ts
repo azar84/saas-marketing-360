@@ -103,7 +103,7 @@ export interface CloudinaryUploadResult {
 }
 
 export const uploadToCloudinary = async (
-  file: File | Buffer,
+  file: any, // Changed from File | Buffer to any to handle both browser File and Node.js Buffer
   options: {
     folder?: string;
     public_id?: string;
@@ -123,14 +123,18 @@ export const uploadToCloudinary = async (
 
     // Convert File to buffer if needed
     let buffer: Buffer;
-    if (file instanceof File) {
+    if (file && typeof file.arrayBuffer === 'function') {
+      // This is a browser File object
       console.log('Converting File to buffer...');
       const arrayBuffer = await file.arrayBuffer();
       buffer = Buffer.from(arrayBuffer);
       console.log(`File converted to buffer, size: ${buffer.length} bytes`);
-    } else {
+    } else if (Buffer.isBuffer(file)) {
+      // This is already a Buffer
       buffer = file;
       console.log(`Using provided buffer, size: ${buffer.length} bytes`);
+    } else {
+      throw new Error('Invalid file type provided');
     }
 
     // Validate buffer
