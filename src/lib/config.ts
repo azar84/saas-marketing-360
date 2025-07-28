@@ -14,8 +14,6 @@ const envSchema = z.object({
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
   
-
-  
   // Google Analytics (optional)
   NEXT_PUBLIC_GA_ID: z.string().optional(),
   

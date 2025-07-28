@@ -41,6 +41,14 @@ interface PageSection {
     mediaPosition: string;
     backgroundType: string;
     backgroundValue: string;
+    // Color configurations
+    taglineColor?: string;
+    headlineColor?: string;
+    subheadingColor?: string;
+    ctaPrimaryBgColor?: string;
+    ctaPrimaryTextColor?: string;
+    ctaSecondaryBgColor?: string;
+    ctaSecondaryTextColor?: string;
     showTypingEffect: boolean;
     enableBackgroundAnimation: boolean;
     customClasses?: string;

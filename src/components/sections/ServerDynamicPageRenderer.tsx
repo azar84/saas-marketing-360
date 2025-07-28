@@ -43,6 +43,14 @@ interface PageSection {
     backgroundImage?: string;
     backgroundSize?: string;
     backgroundOverlay?: string;
+    // Color configurations
+    taglineColor?: string;
+    headlineColor?: string;
+    subheadingColor?: string;
+    ctaPrimaryBgColor?: string;
+    ctaPrimaryTextColor?: string;
+    ctaSecondaryBgColor?: string;
+    ctaSecondaryTextColor?: string;
     showTypingEffect: boolean;
     enableBackgroundAnimation: boolean;
     customClasses?: string;

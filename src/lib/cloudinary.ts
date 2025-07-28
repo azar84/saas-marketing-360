@@ -1,10 +1,10 @@
 import { v2 as cloudinary } from 'cloudinary';
 import { prisma } from './db';
 
-// Function to get Cloudinary config from database or environment
+// Function to get Cloudinary config from database
 export async function getCloudinaryConfig() {
   try {
-    console.log('Getting Cloudinary configuration...');
+    console.log('Getting Cloudinary configuration from database...');
     
     // Test database connection first
     try {
@@ -12,9 +12,10 @@ export async function getCloudinaryConfig() {
       console.log('Database connection successful');
     } catch (dbError) {
       console.error('Database connection failed:', dbError);
-      throw new Error('Database connection failed');
+      throw new Error('Database connection failed - cannot retrieve Cloudinary configuration');
     }
     
+    // Get settings from database
     const settings = await prisma.siteSettings.findFirst();
     console.log('Site settings loaded:', {
       hasSettings: !!settings,
@@ -33,23 +34,12 @@ export async function getCloudinaryConfig() {
       };
     }
     
-    // Fallback to environment variables
-    console.log('Checking environment variables...');
-    if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
-      console.log('Using environment variable Cloudinary configuration');
-      return {
-        cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-        api_key: process.env.CLOUDINARY_API_KEY,
-        api_secret: process.env.CLOUDINARY_API_SECRET,
-      };
-    }
-    
-    console.log('No Cloudinary configuration found');
-    // Return null instead of throwing error - let the calling function handle it
+    console.log('No Cloudinary configuration found in database');
+    console.log('Please configure Cloudinary in the admin panel under Site Settings');
     return null;
   } catch (error) {
-    console.error('Error getting Cloudinary config:', error);
-    return null;
+    console.error('Error getting Cloudinary config from database:', error);
+    throw new Error('Failed to retrieve Cloudinary configuration from database');
   }
 }
 

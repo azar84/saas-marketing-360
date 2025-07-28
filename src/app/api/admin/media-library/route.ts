@@ -137,24 +137,46 @@ export async function GET(request: NextRequest) {
 // POST - Create new media item (upload or URL import)
 export async function POST(request: NextRequest) {
   try {
+    console.log('📤 Starting media library POST request...');
     const contentType = request.headers.get('content-type') || '';
+    console.log('📋 Content-Type:', contentType);
     
     if (contentType.includes('multipart/form-data')) {
       // Handle file upload
+      console.log('📁 Handling file upload...');
       return handleFileUpload(request);
     } else {
       // Handle URL import
+      console.log('🔗 Handling URL import...');
       return handleUrlImport(request);
     }
   } catch (error) {
-    console.error('Failed to create media item:', error);
+    console.error('❌ Failed to create media item:', error);
+    
+    // Provide more detailed error information
+    let errorMessage = 'Failed to create media item';
+    let statusCode = 500;
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      
+      // Handle specific error types
+      if (error.message.includes('Cloudinary is not configured')) {
+        statusCode = 400;
+        errorMessage = 'Cloudinary is not configured. Please configure Cloudinary in site settings or environment variables.';
+      } else if (error.message.includes('Database connection failed')) {
+        statusCode = 500;
+        errorMessage = 'Database connection failed. Please check your database configuration.';
+      } else if (error.message.includes('Validation failed')) {
+        statusCode = 400;
+      }
+    }
     
     const response: ApiResponse = {
       success: false,
-      message: error instanceof Error ? error.message : 'Failed to create media item'
+      message: errorMessage
     };
     
-    const statusCode = error instanceof Error && error.message.includes('Validation failed') ? 400 : 500;
     return NextResponse.json(response, { status: statusCode });
   }
 }

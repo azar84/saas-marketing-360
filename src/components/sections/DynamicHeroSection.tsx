@@ -46,6 +46,14 @@ interface HeroSectionData {
   backgroundImage?: string;
   backgroundSize?: string;
   backgroundOverlay?: string;
+  // Color configurations
+  taglineColor?: string;
+  headlineColor?: string;
+  subheadingColor?: string;
+  ctaPrimaryBgColor?: string;
+  ctaPrimaryTextColor?: string;
+  ctaSecondaryBgColor?: string;
+  ctaSecondaryTextColor?: string;
   showTypingEffect: boolean;
   enableBackgroundAnimation: boolean;
   customClasses?: string;
@@ -87,6 +95,14 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
     backgroundImage,
     backgroundSize,
     backgroundOverlay,
+    // Color configurations
+    taglineColor,
+    headlineColor,
+    subheadingColor,
+    ctaPrimaryBgColor,
+    ctaPrimaryTextColor,
+    ctaSecondaryBgColor,
+    ctaSecondaryTextColor,
     showTypingEffect,
     enableBackgroundAnimation,
     customClasses,
@@ -200,9 +216,18 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
   };
 
   // Get button style classes - modern, clean design
-  const getButtonClasses = (buttonType: 'primary' | 'secondary', style: string) => {
+  const getButtonClasses = (buttonType: 'primary' | 'secondary', style: string, customColors?: {
+    backgroundColor?: string;
+    textColor?: string;
+  }) => {
     const buttonSizes = getButtonSizeClasses(true);
     const baseClasses = `${buttonSizes.padding} ${buttonSizes.text} rounded-xl font-medium transition-all duration-300 hover:transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 backdrop-blur-sm`;
+    
+    // If custom colors are provided, use them
+    if (customColors) {
+      const { backgroundColor, textColor } = customColors;
+      return `${baseClasses} hover:opacity-90 shadow-lg`;
+    }
     
     // Use smart design system colors based on background
     const smartTextColor = getTextColor();
@@ -366,7 +391,14 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
             href={ctaPrimary.url}
             target={ctaPrimary.target}
             id={ctaPrimary.customId}
-            className={`inline-flex items-center gap-2.5 ${getButtonClasses('primary', safeStyle)}`}
+            className={`inline-flex items-center gap-2.5 ${getButtonClasses('primary', safeStyle, {
+              backgroundColor: ctaPrimaryBgColor,
+              textColor: ctaPrimaryTextColor
+            })}`}
+            style={{
+              backgroundColor: ctaPrimaryBgColor || undefined,
+              color: ctaPrimaryTextColor || undefined
+            }}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={ctaEvents.onClick ? (e) => {
@@ -408,7 +440,14 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
             key="primary"
             type="button"
             id={ctaPrimary.customId}
-            className={`inline-flex items-center gap-2.5 ${getButtonClasses('primary', safeStyle)}`}
+            className={`inline-flex items-center gap-2.5 ${getButtonClasses('primary', safeStyle, {
+              backgroundColor: ctaPrimaryBgColor,
+              textColor: ctaPrimaryTextColor
+            })}`}
+            style={{
+              backgroundColor: ctaPrimaryBgColor || undefined,
+              color: ctaPrimaryTextColor || undefined
+            }}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={ctaEvents.onClick ? (e) => {
@@ -459,7 +498,14 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
             href={ctaSecondary.url}
             target={ctaSecondary.target}
             id={ctaSecondary.customId}
-            className={`inline-flex items-center gap-2.5 ${getButtonClasses('secondary', safeStyle)}`}
+            className={`inline-flex items-center gap-2.5 ${getButtonClasses('secondary', safeStyle, {
+              backgroundColor: ctaSecondaryBgColor,
+              textColor: ctaSecondaryTextColor
+            })}`}
+            style={{
+              backgroundColor: ctaSecondaryBgColor || undefined,
+              color: ctaSecondaryTextColor || undefined
+            }}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={ctaEvents.onClick ? (e) => {
@@ -501,7 +547,14 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
             key="secondary"
             type="button"
             id={ctaSecondary.customId}
-            className={`inline-flex items-center gap-2.5 ${getButtonClasses('secondary', safeStyle)}`}
+            className={`inline-flex items-center gap-2.5 ${getButtonClasses('secondary', safeStyle, {
+              backgroundColor: ctaSecondaryBgColor,
+              textColor: ctaSecondaryTextColor
+            })}`}
+            style={{
+              backgroundColor: ctaSecondaryBgColor || undefined,
+              color: ctaSecondaryTextColor || undefined
+            }}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={ctaEvents.onClick ? (e) => {
@@ -552,12 +605,12 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
 
   // Layout-specific rendering
   const renderContent = () => {
-    const smartTextColor = getTextColor(); // Smart design system color calculation
     const textAlign = getTextAlignment();
     
     const titleElement = (
       <motion.h1 
-        className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 lg:mb-6 leading-tight ${textAlign} ${smartTextColor}`}
+        className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 lg:mb-6 leading-tight ${textAlign}`}
+        style={{ color: headlineColor || '#1F2937' }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -568,7 +621,8 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
 
     const subtitleElement = (overrideSubtitle || subheading) ? (
       <motion.p 
-        className={`text-lg sm:text-xl lg:text-2xl xl:text-3xl mb-6 lg:mb-8 ${textAlign} max-w-4xl leading-relaxed ${textAlignment === 'center' ? 'mx-auto' : ''} ${smartTextColor === 'text-white' ? 'text-white/90' : 'text-gray-600'}`}
+        className={`text-lg sm:text-xl lg:text-2xl xl:text-3xl mb-6 lg:mb-8 ${textAlign} max-w-4xl leading-relaxed ${textAlignment === 'center' ? 'mx-auto' : ''}`}
+        style={{ color: subheadingColor || '#6B7280' }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
@@ -579,7 +633,12 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
 
     const taglineElement = tagline ? (
       <motion.div 
-        className={`inline-block px-3 py-1.5 lg:px-4 lg:py-2 rounded-full ${smartTextColor === 'text-white' ? 'bg-white/15 border-white/25' : 'bg-gray-100 border-gray-200'} backdrop-blur-sm border text-xs lg:text-sm font-medium mb-4 lg:mb-6 ${smartTextColor}`}
+        className={`inline-block px-3 py-1.5 lg:px-4 lg:py-2 rounded-full backdrop-blur-sm border text-xs lg:text-sm font-medium mb-4 lg:mb-6`}
+        style={{ 
+          color: taglineColor || '#5243E9',
+          backgroundColor: `${taglineColor || '#5243E9'}15`,
+          borderColor: `${taglineColor || '#5243E9'}25`
+        }}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4 }}
