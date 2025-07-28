@@ -69,10 +69,10 @@ export async function GET() {
       success: true,
       message: 'Cloudinary is properly configured',
       details: {
-        cloudinaryEnabled: settings.cloudinaryEnabled,
-        hasCloudName: !!settings.cloudinaryCloudName,
-        hasApiKey: !!settings.cloudinaryApiKey,
-        hasApiSecret: !!settings.cloudinaryApiSecret
+        cloudinaryEnabled: settings!.cloudinaryEnabled,
+        hasCloudName: !!settings!.cloudinaryCloudName,
+        hasApiKey: !!settings!.cloudinaryApiKey,
+        hasApiSecret: !!settings!.cloudinaryApiSecret
       }
     });
 

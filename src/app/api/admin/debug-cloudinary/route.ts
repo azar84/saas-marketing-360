@@ -11,13 +11,13 @@ export async function GET() {
       timestamp: new Date().toISOString(),
       database: {
         connected: false,
-        settings: null,
-        error: null
+        settings: null as any,
+        error: null as string | null
       },
       cloudinary: {
         configured: false,
-        config: null,
-        error: null
+        config: null as any,
+        error: null as string | null
       },
       environmentVariables: {
         hasDatabaseUrl: !!process.env.DATABASE_URL
