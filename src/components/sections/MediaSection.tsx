@@ -812,9 +812,89 @@ const MediaSection: React.FC<MediaSectionProps> = ({
 
   return (
     <>
-      {/* Inject button styles for CTAs */}
+      {/* Inject button styles for CTAs and TinyMCE content styles */}
       <style dangerouslySetInnerHTML={{ 
         __html: `
+          /* TinyMCE Content Styles */
+          .prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+            font-weight: 600;
+            line-height: 1.25;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+          }
+          .prose h1 { font-size: 2.25em; }
+          .prose h2 { font-size: 1.875em; }
+          .prose h3 { font-size: 1.5em; }
+          .prose h4 { font-size: 1.25em; }
+          .prose h5 { font-size: 1.125em; }
+          .prose h6 { font-size: 1em; }
+          
+          .prose p {
+            margin-top: 1.25em;
+            margin-bottom: 1.25em;
+            line-height: 1.75;
+          }
+          
+          .prose ul, .prose ol {
+            margin-top: 1.25em;
+            margin-bottom: 1.25em;
+            padding-left: 1.625em;
+          }
+          
+          .prose li {
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+          }
+          
+          .prose ul {
+            list-style-type: disc;
+          }
+          
+          .prose ol {
+            list-style-type: decimal;
+          }
+          
+          .prose blockquote {
+            font-style: italic;
+            border-left: 4px solid #e5e7eb;
+            padding-left: 1em;
+            margin: 1.5em 0;
+          }
+          
+          .prose strong {
+            font-weight: 600;
+          }
+          
+          .prose em {
+            font-style: italic;
+          }
+          
+          .prose code {
+            background-color: #f3f4f6;
+            padding: 0.125em 0.25em;
+            border-radius: 0.25em;
+            font-size: 0.875em;
+          }
+          
+          .prose pre {
+            background-color: #1f2937;
+            color: #f9fafb;
+            padding: 1em;
+            border-radius: 0.5em;
+            overflow-x: auto;
+            margin: 1.5em 0;
+          }
+          
+          .prose a {
+            color: var(--color-primary, #5243E9);
+            text-decoration: underline;
+          }
+          
+          .prose a:hover {
+            color: var(--color-primary-dark, #4338CA);
+          }
+          
+          /* Button Styles */
           .btn-primary {
             background-color: var(--color-primary);
             color: white;
@@ -938,7 +1018,8 @@ const MediaSection: React.FC<MediaSectionProps> = ({
               </h2>
               {subheading && (
                 <div 
-                  className="text-lg sm:text-xl opacity-90 max-w-3xl mx-auto mb-8"
+                  className="text-lg sm:text-xl opacity-90 max-w-3xl mx-auto mb-8 prose prose-lg max-w-none"
+                  style={{ color: textColor || designSystem?.textSecondary || '#666666' }}
                   dangerouslySetInnerHTML={{ __html: subheading }}
                 />
               )}
@@ -964,7 +1045,8 @@ const MediaSection: React.FC<MediaSectionProps> = ({
               </h2>
               {subheading && (
                 <div 
-                  className="text-lg sm:text-xl opacity-90 mb-8"
+                  className="text-lg sm:text-xl opacity-90 mb-8 prose prose-lg max-w-none"
+                  style={{ color: textColor || designSystem?.textSecondary || '#666666' }}
                   dangerouslySetInnerHTML={{ __html: subheading }}
                 />
               )}

@@ -285,48 +285,84 @@ const MediaSectionsManager: React.FC = () => {
     `
   };
 
-  // Get design system colors for color picker
-  const getDesignSystemColors = () => {
-    if (!designSystem) return [];
-    
-    return [
-      { name: 'Primary', value: designSystem.primaryColor, description: 'Main brand color' },
-      { name: 'Primary Light', value: designSystem.primaryColorLight, description: 'Light primary variant' },
-      { name: 'Primary Dark', value: designSystem.primaryColorDark, description: 'Dark primary variant' },
-      { name: 'Secondary', value: designSystem.secondaryColor, description: 'Secondary brand color' },
-      { name: 'Accent', value: designSystem.accentColor, description: 'Accent color' },
-      { name: 'Success', value: designSystem.successColor, description: 'Success state color' },
-      { name: 'Warning', value: designSystem.warningColor, description: 'Warning state color' },
-      { name: 'Error', value: designSystem.errorColor, description: 'Error state color' },
-      { name: 'Info', value: designSystem.infoColor, description: 'Info state color' },
-      { name: 'Background Primary', value: designSystem.backgroundPrimary, description: 'Primary background' },
-      { name: 'Background Secondary', value: designSystem.backgroundSecondary, description: 'Secondary background' },
-      { name: 'Background Dark', value: designSystem.backgroundDark, description: 'Dark background' },
-      { name: 'Gray Light', value: designSystem.grayLight, description: 'Light gray' },
-      { name: 'Gray Medium', value: designSystem.grayMedium, description: 'Medium gray' },
-      { name: 'Gray Dark', value: designSystem.grayDark, description: 'Dark gray' }
-    ];
-  };
-
-  // Color Picker Component
-  const ColorPicker: React.FC<{
+  // Color Picker Component (copied from HeroSectionsManager)
+  interface ColorPickerProps {
     label: string;
     value: string;
     onChange: (color: string) => void;
     allowTransparent?: boolean;
-  }> = ({ label, value, onChange, allowTransparent = false }) => {
+    designSystem?: any;
+  }
+
+  const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allowTransparent = false, designSystem }) => {
     const [showPicker, setShowPicker] = useState(false);
     const [customColor, setCustomColor] = useState(value.startsWith('#') ? value : '#000000');
-    const designSystemColors = getDesignSystemColors();
 
-    const presetColors = [
-      ...designSystemColors,
-      { name: 'White', value: '#FFFFFF', description: 'White' },
-      { name: 'Black', value: '#000000', description: 'Black' },
-    ];
+    // Generate dynamic preset colors from design system
+    const getPresetColors = () => {
+      if (!designSystem) {
+        // Fallback colors if design system isn't loaded
+        return [
+          { name: 'Primary', value: '#5243E9' },
+          { name: 'Secondary', value: '#7C3AED' },
+          { name: 'Accent', value: '#10B981' },
+          { name: 'Success', value: '#059669' },
+          { name: 'Warning', value: '#D97706' },
+          { name: 'Error', value: '#DC2626' },
+          { name: 'Info', value: '#3B82F6' },
+          { name: 'White', value: '#FFFFFF' },
+          { name: 'Black', value: '#000000' },
+          { name: 'Gray Light', value: '#F3F4F6' },
+          { name: 'Gray Medium', value: '#9CA3AF' },
+          { name: 'Gray Dark', value: '#374151' },
+          { name: 'Background Primary', value: '#FFFFFF' },
+          { name: 'Background Secondary', value: '#F6F8FC' },
+          { name: 'Background Dark', value: '#1F2937' },
+          { name: 'Text Primary', value: '#1F2937' },
+          { name: 'Text Secondary', value: '#6B7280' },
+          { name: 'Text Muted', value: '#9CA3AF' },
+        ];
+      }
+
+      return [
+        // Brand Colors
+        { name: 'Primary', value: designSystem.primaryColor },
+        { name: 'Primary Light', value: designSystem.primaryColorLight },
+        { name: 'Primary Dark', value: designSystem.primaryColorDark },
+        { name: 'Secondary', value: designSystem.secondaryColor },
+        { name: 'Accent', value: designSystem.accentColor },
+        
+        // Semantic Colors
+        { name: 'Success', value: designSystem.successColor },
+        { name: 'Warning', value: designSystem.warningColor },
+        { name: 'Error', value: designSystem.errorColor },
+        { name: 'Info', value: designSystem.infoColor },
+        
+        // Neutral Colors
+        { name: 'Gray Light', value: designSystem.grayLight },
+        { name: 'Gray Medium', value: designSystem.grayMedium },
+        { name: 'Gray Dark', value: designSystem.grayDark },
+        
+        // Background Colors
+        { name: 'Background Primary', value: designSystem.backgroundPrimary },
+        { name: 'Background Secondary', value: designSystem.backgroundSecondary },
+        { name: 'Background Dark', value: designSystem.backgroundDark },
+        
+        // Text Colors
+        { name: 'Text Primary', value: designSystem.textPrimary },
+        { name: 'Text Secondary', value: designSystem.textSecondary },
+        { name: 'Text Muted', value: designSystem.textMuted },
+        
+        // Common Colors
+        { name: 'White', value: '#FFFFFF' },
+        { name: 'Black', value: '#000000' },
+      ];
+    };
+
+    const presetColors = getPresetColors();
 
     if (allowTransparent) {
-      presetColors.push({ name: 'Transparent', value: 'transparent', description: 'Transparent' });
+      presetColors.push({ name: 'Transparent', value: 'transparent' });
     }
 
     const handlePresetClick = (color: string) => {
@@ -342,80 +378,84 @@ const MediaSectionsManager: React.FC = () => {
 
     return (
       <div className="relative">
-        <label className="block text-sm font-medium text-gray-700 mb-1">
+        <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
           {label}
         </label>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={() => setShowPicker(!showPicker)}
-            className="w-10 h-10 rounded-lg border-2 border-gray-300 flex items-center justify-center hover:border-gray-400 transition-colors"
-            style={{ backgroundColor: value }}
+            className="w-10 h-10 border-2 border-gray-300 rounded-lg shadow-sm hover:border-gray-400 transition-colors"
+            style={{ backgroundColor: value === 'transparent' ? '#f3f4f6' : value }}
           >
             {value === 'transparent' && (
-              <div className="w-full h-full bg-checkerboard rounded-lg" />
+              <div className="w-full h-full flex items-center justify-center text-xs" style={{ color: designSystem?.textMuted || '#999999' }}>
+                T
+              </div>
             )}
           </button>
           <input
             type="text"
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm font-mono"
-            placeholder="#000000"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            placeholder="#000000 or transparent"
+            style={{ 
+              color: designSystem?.textPrimary || '#000000',
+              backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+            }}
           />
         </div>
 
         {showPicker && (
-          <div className="absolute top-full left-0 z-50 mt-2 p-4 bg-white border border-gray-300 rounded-lg shadow-lg min-w-64">
-            <div className="space-y-3">
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-2">Design System Colors</label>
-                <div className="grid grid-cols-4 gap-2">
-                  {designSystemColors.map((color) => (
-                    <button
-                      key={color.name}
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        handlePresetClick(color.value);
+          <div className="absolute top-full left-0 mt-2 p-4 border border-gray-200 rounded-lg shadow-lg z-50 min-w-80 max-h-96 overflow-y-auto" style={{ backgroundColor: designSystem?.backgroundPrimary || '#ffffff' }}>
+            <div className="mb-4">
+              <h4 className="text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>Design System Colors</h4>
+              <div className="grid grid-cols-4 gap-2">
+                {presetColors.map((color) => (
+                  <button
+                    key={color.name}
+                    type="button"
+                    onClick={() => handlePresetClick(color.value)}
+                    className="flex flex-col items-center p-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <div
+                      className="w-8 h-8 border border-gray-300 rounded mb-1"
+                      style={{ 
+                        backgroundColor: color.value === 'transparent' ? '#f3f4f6' : color.value,
+                        backgroundImage: color.value === 'transparent' ? 
+                          'linear-gradient(45deg, #ccc 25%, transparent 25%), linear-gradient(-45deg, #ccc 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #ccc 75%), linear-gradient(-45deg, transparent 75%, #ccc 75%)' : 
+                          'none',
+                        backgroundSize: color.value === 'transparent' ? '8px 8px' : 'auto',
+                        backgroundPosition: color.value === 'transparent' ? '0 0, 0 4px, 4px -4px, -4px 0px' : 'auto'
                       }}
-                      className="w-8 h-8 rounded border border-gray-300 hover:border-gray-400 transition-colors"
-                      style={{ backgroundColor: color.value }}
-                      title={color.name}
                     />
-                  ))}
-                </div>
+                    <span className="text-xs text-center" style={{ color: designSystem?.textSecondary || '#666666' }}>
+                      {color.name}
+                    </span>
+                  </button>
+                ))}
               </div>
-              
-              <div>
-                <label className="block text-xs font-medium text-gray-700 mb-2">Custom Color</label>
-                <input
-                  type="color"
-                  value={customColor}
-                  onChange={handleCustomColorChange}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                    }
-                  }}
-                  className="w-full h-10 border border-gray-300 rounded"
-                />
-              </div>
-              
-              <div className="flex justify-end">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setShowPicker(false);
-                  }}
-                  className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
-                >
-                  Close
-                </button>
-              </div>
+            </div>
+            
+            <div className="mb-4">
+              <h4 className="text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>Custom Color</h4>
+              <input
+                type="color"
+                value={customColor}
+                onChange={handleCustomColorChange}
+                className="w-full h-10 border border-gray-300 rounded"
+              />
+            </div>
+            
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setShowPicker(false)}
+                className="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+              >
+                Close
+              </button>
             </div>
           </div>
         )}
@@ -1236,6 +1276,7 @@ const MediaSectionsManager: React.FC = () => {
                         value={formData.badgeColor}
                         onChange={(color) => setFormData({ ...formData, badgeColor: color })}
                         allowTransparent={false}
+                        designSystem={designSystem}
                       />
                     </div>
                   </div>
@@ -1428,6 +1469,7 @@ const MediaSectionsManager: React.FC = () => {
                                 value={feature.color}
                                 onChange={(color) => updateFeature(index, 'color', color)}
                                 allowTransparent={false}
+                                designSystem={designSystem}
                               />
                             </div>
                           </div>
@@ -1597,21 +1639,23 @@ const MediaSectionsManager: React.FC = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
-                    <ColorPicker
-                      label="Background Color"
-                      value={formData.backgroundColor}
-                      onChange={(color) => setFormData({ ...formData, backgroundColor: color })}
-                      allowTransparent={true}
-                    />
+                                          <ColorPicker
+                        label="Background Color"
+                        value={formData.backgroundColor}
+                        onChange={(color) => setFormData({ ...formData, backgroundColor: color })}
+                        allowTransparent={true}
+                        designSystem={designSystem}
+                      />
                   </div>
                   
                   <div>
-                    <ColorPicker
-                      label="Text Color"
-                      value={formData.textColor}
-                      onChange={(color) => setFormData({ ...formData, textColor: color })}
-                      allowTransparent={false}
-                    />
+                                          <ColorPicker
+                        label="Text Color"
+                        value={formData.textColor}
+                        onChange={(color) => setFormData({ ...formData, textColor: color })}
+                        allowTransparent={false}
+                        designSystem={designSystem}
+                      />
                   </div>
                   
                   <div>
