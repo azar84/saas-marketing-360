@@ -562,6 +562,7 @@ export default function ClientHeader({
                         fontFamily: 'var(--font-family-sans)',
                       }}
                       onClick={ctaEvents.onClick ? (e) => {
+                        e.preventDefault(); // Prevent navigation when there's a JavaScript event
                         executeCTAEvent(ctaEvents.onClick, e, e.currentTarget);
                       } : undefined}
                       onMouseOver={ctaEvents.onMouseOver ? (e) => {
@@ -912,6 +913,7 @@ export default function ClientHeader({
                             onClick={(e) => {
                               setIsMenuOpen(false);
                               if (ctaEvents.onClick) {
+                                e.preventDefault(); // Prevent navigation when there's a JavaScript event
                                 executeCTAEvent(ctaEvents.onClick, e, e.currentTarget);
                               }
                             }}
