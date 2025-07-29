@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
+import ClientDesignSystemProvider from "./components/ClientDesignSystemProvider";
 
 export async function generateMetadata(): Promise<Metadata> {
   // Fetch site settings for dynamic metadata
@@ -27,5 +28,9 @@ export default function AdminPanelLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  return (
+    <ClientDesignSystemProvider>
+      {children}
+    </ClientDesignSystemProvider>
+  );
 } 

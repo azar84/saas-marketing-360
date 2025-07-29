@@ -98,9 +98,7 @@ interface MediaSection {
   mediaPosition: 'left' | 'right';
   showBadge: boolean;
   showCtaButton: boolean;
-  ctaText?: string;
-  ctaUrl?: string;
-  ctaStyle: 'primary' | 'secondary' | 'link';
+  ctaId?: number;
   enableScrollAnimations: boolean;
   animationType: 'fade' | 'slide' | 'zoom' | 'none' | 'pulse' | 'rotate';
   backgroundStyle: 'solid' | 'gradient' | 'radial' | 'none';
@@ -142,9 +140,7 @@ const MediaSectionsManager: React.FC = () => {
     mediaPosition: 'right',
     showBadge: true,
     showCtaButton: false,
-    ctaText: '',
-    ctaUrl: '',
-    ctaStyle: 'primary',
+    ctaId: undefined,
     enableScrollAnimations: false,
     animationType: 'none',
     backgroundStyle: 'solid',
@@ -689,9 +685,7 @@ const MediaSectionsManager: React.FC = () => {
       mediaPosition: 'right',
       showBadge: true,
       showCtaButton: false,
-      ctaText: '',
-      ctaUrl: '',
-      ctaStyle: 'primary',
+      ctaId: undefined,
       enableScrollAnimations: false,
       animationType: 'none',
       backgroundStyle: 'solid',
@@ -709,7 +703,10 @@ const MediaSectionsManager: React.FC = () => {
 
   // Start editing
   const startEdit = (section: MediaSection) => {
-    setFormData({ ...section });
+    setFormData({ 
+      ...section,
+      ctaId: section.ctaId || undefined
+    });
     setEditingSection(section);
     setIsFormOpen(true);
   };
@@ -1486,16 +1483,19 @@ const MediaSectionsManager: React.FC = () => {
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Select CTA from Library
                       </label>
-                      <select
-                        value=""
+                                            <select
+                        value={formData.ctaId || ""}
                         onChange={(e) => {
                           const selectedCTA = availableCTAs.find(cta => cta.id === parseInt(e.target.value));
                           if (selectedCTA) {
                             setFormData({
                               ...formData,
-                              ctaText: selectedCTA.text,
-                              ctaUrl: selectedCTA.url,
-                              ctaStyle: selectedCTA.style as 'primary' | 'secondary' | 'link'
+                              ctaId: selectedCTA.id
+                            });
+                          } else {
+                            setFormData({
+                              ...formData,
+                              ctaId: undefined
                             });
                           }
                         }}
@@ -1513,49 +1513,10 @@ const MediaSectionsManager: React.FC = () => {
                       </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          CTA Text
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.ctaText}
-                          onChange={(e) => setFormData({ ...formData, ctaText: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        />
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          CTA URL
-                        </label>
-                        <input
-                          type="text"
-                          value={formData.ctaUrl}
-                          onChange={(e) => setFormData({ ...formData, ctaUrl: e.target.value })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          placeholder="https://example.com, /page, or #section"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                          Enter a full URL, relative path, or anchor link (e.g., #pricing, #contact)
-                        </p>
-                      </div>
-                      
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          CTA Style
-                        </label>
-                        <select
-                          value={formData.ctaStyle}
-                          onChange={(e) => setFormData({ ...formData, ctaStyle: e.target.value as any })}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                        >
-                          <option value="primary">Primary</option>
-                          <option value="secondary">Secondary</option>
-                          <option value="link">Link</option>
-                        </select>
-                      </div>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-600">
+                        The selected CTA will use the styling and configuration set in the CTA Manager.
+                      </p>
                     </div>
                   </div>
                 )}

@@ -13,22 +13,21 @@ const dynamicButtonStyles = `
     border: none;
   }
   .btn-primary:hover:not(:disabled) {
-    background-color: var(--color-primary-light, var(--color-primary));
+    background-color: var(--color-primary-light);
     transform: scale(1.02);
   }
   .btn-primary:active:not(:disabled) {
-    background-color: var(--color-primary-dark, var(--color-primary));
+    background-color: var(--color-primary-dark);
     transform: scale(0.98);
   }
 
   .btn-secondary {
-    background-color: var(--color-bg-secondary, #EEE7F9);
-    color: var(--color-primary);
-    border: 1px solid var(--color-primary);
+    background-color: var(--color-secondary);
+    color: white;
+    border: 1px solid var(--color-secondary);
   }
   .btn-secondary:hover:not(:disabled) {
-    background-color: var(--color-primary-light, var(--color-primary));
-    color: white;
+    background-color: var(--color-secondary-dark);
     transform: scale(1.02);
   }
 
@@ -38,7 +37,7 @@ const dynamicButtonStyles = `
     border: none;
   }
   .btn-accent:hover:not(:disabled) {
-    background-color: var(--color-accent-dark, var(--color-accent));
+    background-color: var(--color-accent-dark);
     transform: scale(1.02);
   }
 
@@ -48,7 +47,7 @@ const dynamicButtonStyles = `
     border: 1px solid transparent;
   }
   .btn-ghost:hover:not(:disabled) {
-    background-color: var(--color-primary-light, rgba(99, 102, 241, 0.1));
+    background-color: var(--color-primary-light);
     opacity: 0.1;
     transform: scale(1.02);
   }
@@ -59,7 +58,7 @@ const dynamicButtonStyles = `
     border: none;
   }
   .btn-destructive:hover:not(:disabled) {
-    background-color: var(--color-error-dark, var(--color-error));
+    background-color: var(--color-error-dark);
     transform: scale(1.02);
   }
 
@@ -69,7 +68,7 @@ const dynamicButtonStyles = `
     border: none;
   }
   .btn-success:hover:not(:disabled) {
-    background-color: var(--color-success-dark, var(--color-success));
+    background-color: var(--color-success-dark);
     transform: scale(1.02);
   }
 
@@ -79,7 +78,7 @@ const dynamicButtonStyles = `
     border: none;
   }
   .btn-info:hover:not(:disabled) {
-    background-color: var(--color-info-dark, var(--color-info));
+    background-color: var(--color-info-dark);
     transform: scale(1.02);
   }
 
@@ -89,7 +88,7 @@ const dynamicButtonStyles = `
     border: 2px solid var(--color-primary);
   }
   .btn-outline:hover:not(:disabled) {
-    background-color: var(--color-primary-light, rgba(99, 102, 241, 0.1));
+    background-color: var(--color-primary-light);
     transform: scale(1.02);
   }
 

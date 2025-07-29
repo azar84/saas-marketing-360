@@ -137,9 +137,16 @@ interface PageSection {
     mediaPosition: string;
     showBadge: boolean;
     showCtaButton: boolean;
-    ctaText?: string;
-    ctaUrl?: string;
-    ctaStyle: string;
+    ctaId?: number;
+    cta?: {
+      id: number;
+      text: string;
+      url: string;
+      icon?: string;
+      style: string;
+      target: string;
+      isActive: boolean;
+    };
     enableScrollAnimations: boolean;
     animationType: string;
     backgroundStyle: string;
@@ -311,7 +318,8 @@ async function fetchPageSections(pageSlug: string): Promise<PageSection[]> {
               orderBy: {
                 sortOrder: 'asc'
               }
-            }
+            },
+            cta: true
           }
         },
         pricingSection: true,
@@ -837,8 +845,8 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
       case 'media':
         if (section.mediaSection) {
           return wrapWithSectionDiv(
-            <MediaSection 
-              key={section.id} 
+            <MediaSection
+              key={section.id}
               id={section.mediaSection.id}
               headline={section.mediaSection.headline}
               subheading={section.mediaSection.subheading}
@@ -854,9 +862,8 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
               mediaPosition={section.mediaSection.mediaPosition}
               showBadge={section.mediaSection.showBadge}
               showCtaButton={section.mediaSection.showCtaButton}
-              ctaText={section.mediaSection.ctaText}
-              ctaUrl={section.mediaSection.ctaUrl}
-              ctaStyle={section.mediaSection.ctaStyle}
+              ctaId={section.mediaSection.ctaId}
+              cta={section.mediaSection.cta}
               enableScrollAnimations={section.mediaSection.enableScrollAnimations}
               animationType={section.mediaSection.animationType}
               backgroundStyle={section.mediaSection.backgroundStyle}

@@ -255,9 +255,7 @@ model MediaSection {
   mediaPosition          String                @default("right")
   showBadge              Boolean               @default(true)
   showCtaButton          Boolean               @default(false)
-  ctaText                String?
-  ctaUrl                 String?
-  ctaStyle               String                @default("primary")
+  ctaId                  Int?
   enableScrollAnimations Boolean               @default(false)
   animationType          String                @default("none")
   backgroundStyle        String                @default("solid")
@@ -271,6 +269,7 @@ model MediaSection {
   updatedAt              DateTime              @updatedAt
   features               MediaSectionFeature[]
   pageSections           PageSection[]
+  cta                    CTA?                  @relation("MediaSectionCTA", fields: [ctaId], references: [id])
 
   @@map("media_sections")
 }
@@ -395,6 +394,7 @@ model CTA {
   heroSecondary     HeroSection[]  @relation("HeroSecondaryCTA")
   homeHeroPrimary   HomePageHero[] @relation("HomeHeroPrimaryCTA")
   homeHeroSecondary HomePageHero[] @relation("HomeHeroSecondaryCTA")
+  mediaSection      MediaSection[] @relation("MediaSectionCTA")
 
   @@map("ctas")
 }

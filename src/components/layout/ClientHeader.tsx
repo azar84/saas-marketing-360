@@ -155,13 +155,12 @@ export default function ClientHeader({
             transform: scale(1.02);
           }
           .btn-secondary {
-            background-color: var(--color-bg-secondary, #EEE7F9);
-            color: var(--color-primary);
-            border: 1px solid var(--color-primary);
+            background-color: var(--color-secondary, #7C3AED);
+            color: white;
+            border: 1px solid var(--color-secondary, #7C3AED);
           }
           .btn-secondary:hover {
-            background-color: var(--color-primary-light, var(--color-primary));
-            color: white;
+            background-color: var(--color-secondary-dark, var(--color-secondary));
             transform: scale(1.02);
           }
           .btn-accent {

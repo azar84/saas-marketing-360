@@ -145,9 +145,18 @@ export async function GET(request: NextRequest) {
             mediaPosition: true,
             showBadge: true,
             showCtaButton: true,
-            ctaText: true,
-            ctaUrl: true,
-            ctaStyle: true,
+            ctaId: true,
+            cta: {
+              select: {
+                id: true,
+                text: true,
+                url: true,
+                icon: true,
+                style: true,
+                target: true,
+                isActive: true
+              }
+            },
             enableScrollAnimations: true,
             animationType: true,
             backgroundStyle: true,
@@ -467,9 +476,18 @@ export async function POST(request: NextRequest) {
             mediaPosition: true,
             showBadge: true,
             showCtaButton: true,
-            ctaText: true,
-            ctaUrl: true,
-            ctaStyle: true,
+            ctaId: true,
+            cta: {
+              select: {
+                id: true,
+                text: true,
+                url: true,
+                icon: true,
+                style: true,
+                target: true,
+                isActive: true
+              }
+            },
             enableScrollAnimations: true,
             animationType: true,
             backgroundStyle: true,
@@ -715,9 +733,18 @@ export async function PUT(request: NextRequest) {
             mediaPosition: true,
             showBadge: true,
             showCtaButton: true,
-            ctaText: true,
-            ctaUrl: true,
-            ctaStyle: true,
+            ctaId: true,
+            cta: {
+              select: {
+                id: true,
+                text: true,
+                url: true,
+                icon: true,
+                style: true,
+                target: true,
+                isActive: true
+              }
+            },
             enableScrollAnimations: true,
             animationType: true,
             backgroundStyle: true,

@@ -420,7 +420,7 @@ const HeaderManager = () => {
                   <h5 className="font-medium text-gray-900">{cta.text}</h5>
                   <span className={`px-2 py-1 text-xs rounded-full ${
                     cta.style === 'primary' ? 'bg-blue-100 text-blue-800' :
-                    cta.style === 'secondary' ? 'bg-gray-100 text-gray-800' :
+                    cta.style === 'secondary' ? 'bg-purple-100 text-purple-800' :
                     cta.style === 'outline' ? 'bg-white text-gray-800 border border-gray-300' :
                     'bg-gray-50 text-gray-600'
                   }`}>

@@ -1211,21 +1211,20 @@ const DesignSystemManager: React.FC = () => {
                       Primary Button
                     </button>
                     <button
-                      className="px-6 py-3 rounded-lg font-medium border-2 transition-all duration-300 hover:shadow-lg bg-transparent"
+                      className="px-6 py-3 rounded-lg font-medium transition-all duration-300 hover:shadow-lg"
                       style={{
-                        borderColor: 'var(--color-primary)',
-                        color: 'var(--color-primary)',
+                        backgroundColor: 'var(--color-secondary)',
+                        color: '#FFFFFF',
                         borderRadius: designSystem.borderRadiusMd,
-                        backgroundColor: 'transparent'
+                        boxShadow: designSystem.shadowMd,
+                        border: '1px solid var(--color-secondary)'
                       }}
                       onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = 'var(--color-primary)';
-                        e.currentTarget.style.color = '#FFFFFF';
+                        e.currentTarget.style.backgroundColor = 'var(--color-secondary-dark)';
                         e.currentTarget.style.transform = 'translateY(-1px)';
                       }}
                       onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = 'transparent';
-                        e.currentTarget.style.color = 'var(--color-primary)';
+                        e.currentTarget.style.backgroundColor = 'var(--color-secondary)';
                         e.currentTarget.style.transform = 'translateY(0)';
                       }}
                     >

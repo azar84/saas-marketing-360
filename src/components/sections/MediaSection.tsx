@@ -139,7 +139,8 @@ import {
   GitCommit,
   GitMerge
 } from 'lucide-react';
-import { renderIcon } from '@/lib/iconUtils';
+import { renderIcon, getIconComponent } from '@/lib/iconUtils';
+import { useDesignSystem } from '@/hooks/useDesignSystem';
 
 interface MediaSectionFeature {
   id: number;
@@ -166,9 +167,16 @@ interface MediaSectionProps {
   mediaPosition: string;
   showBadge: boolean;
   showCtaButton: boolean;
-  ctaText?: string;
-  ctaUrl?: string;
-  ctaStyle: string;
+  ctaId?: number;
+  cta?: {
+    id: number;
+    text: string;
+    url: string;
+    icon?: string;
+    style: string;
+    target: string;
+    isActive: boolean;
+  };
   enableScrollAnimations: boolean;
   animationType: string;
   backgroundStyle: string;
@@ -189,14 +197,13 @@ const MediaSection: React.FC<MediaSectionProps> = ({
   mediaType,
   layoutType,
   badgeText,
-  badgeColor = '#5243E9',
+  badgeColor,
   alignment,
   mediaSize,
   showBadge,
   showCtaButton,
-  ctaText,
-  ctaUrl,
-  ctaStyle,
+  ctaId,
+  cta,
   backgroundStyle,
   backgroundColor,
   textColor,
@@ -209,6 +216,7 @@ const MediaSection: React.FC<MediaSectionProps> = ({
   enableScrollAnimations,
   animationType
 }) => {
+  const { designSystem } = useDesignSystem();
   // Available icons mapping
   const availableIcons: { [key: string]: React.ComponentType<any> } = {
     MessageSquare,
@@ -561,20 +569,39 @@ const MediaSection: React.FC<MediaSectionProps> = ({
     }
   };
 
-  const getCtaButtonClass = () => {
-    switch (ctaStyle) {
-      case 'secondary': 
-        return 'bg-gray-200 text-gray-800 hover:bg-gray-300 border border-gray-300';
-      case 'link': 
-        return 'bg-transparent text-blue-600 hover:text-blue-800 underline border-none';
-      case 'primary':
-      default: 
-        return 'bg-blue-600 text-white hover:bg-blue-700 border border-blue-600';
+  const renderCTA = () => {
+    if (!showCtaButton || !cta || !cta.isActive) {
+      return null;
     }
+
+    const IconComponent = cta.icon ? getIconComponent(cta.icon) : null;
+
+    return (
+      <div className="mb-8">
+        <a
+          href={cta.url}
+          target={cta.target}
+          className={`inline-flex items-center px-6 py-3 rounded-lg font-semibold transition-all duration-200 select-none relative overflow-hidden btn-${cta.style}`}
+          style={{
+            fontSize: 'var(--font-size-base)',
+            fontWeight: 'var(--font-weight-medium)',
+            fontFamily: 'var(--font-family-sans)',
+          }}
+        >
+          {IconComponent && <IconComponent className="w-4 h-4 mr-2" />}
+          {cta.text}
+          {cta.target === '_blank' && <ArrowRight className="ml-2 w-4 h-4" />}
+        </a>
+      </div>
+    );
   };
 
   const getBackgroundStyle = () => {
-    const bgColor = backgroundColor || '#ffffff';
+    const getDesignSystemColor = (colorKey: string, fallback: string) => {
+      return designSystem?.[colorKey as keyof typeof designSystem] || fallback;
+    };
+    
+    const bgColor = backgroundColor || getDesignSystemColor('backgroundPrimary', '#ffffff');
     switch (backgroundStyle) {
       case 'gradient':
         return {
@@ -726,7 +753,8 @@ const MediaSection: React.FC<MediaSectionProps> = ({
                 animationType={animationType}
                 index={i}
               >
-                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center bg-gray-100">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center"
+                     style={{ backgroundColor: designSystem?.grayLight || '#F3F4F6' }}>
                   <IconComponent className="w-4 h-4" style={{ color: feature.color }} />
                 </div>
                 <span className="text-sm font-medium" style={{ color: textColor }}>
@@ -743,17 +771,117 @@ const MediaSection: React.FC<MediaSectionProps> = ({
   const isStacked = layoutType === 'stacked';
 
   return (
-    <section
-      className={`py-24 ${className} ${enableScrollAnimations ? 'scroll-animation' : ''}`}
-      data-animation-type={animationType}
-      style={{
-        ...getBackgroundStyle(),
-        color: textColor || '#000000',
-        paddingTop: `${paddingTop || 0}px`,
-        paddingBottom: `${paddingBottom || 0}px`,
-        backgroundColor: backgroundStyle === 'none' ? 'transparent' : (backgroundColor || '#ffffff')
-      }}
-    >
+    <>
+      {/* Inject button styles for CTAs */}
+      <style dangerouslySetInnerHTML={{ 
+        __html: `
+          .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+          }
+          .btn-primary:hover:not(:disabled) {
+            background-color: var(--color-primary-light, var(--color-primary));
+            transform: scale(1.02);
+          }
+          .btn-primary:active:not(:disabled) {
+            background-color: var(--color-primary-dark, var(--color-primary));
+            transform: scale(0.98);
+          }
+
+          .btn-secondary {
+            background-color: var(--color-secondary, #7C3AED);
+            color: white;
+            border: 1px solid var(--color-secondary, #7C3AED);
+          }
+          .btn-secondary:hover:not(:disabled) {
+            background-color: var(--color-secondary-dark, var(--color-secondary));
+            transform: scale(1.02);
+          }
+
+          .btn-accent {
+            background-color: var(--color-accent);
+            color: white;
+            border: none;
+          }
+          .btn-accent:hover:not(:disabled) {
+            background-color: var(--color-accent-dark, var(--color-accent));
+            transform: scale(1.02);
+          }
+
+          .btn-ghost {
+            background-color: transparent;
+            color: var(--color-text-primary);
+            border: 1px solid transparent;
+          }
+          .btn-ghost:hover:not(:disabled) {
+            background-color: var(--color-primary-light, rgba(99, 102, 241, 0.1));
+            opacity: 0.1;
+            transform: scale(1.02);
+          }
+
+          .btn-destructive {
+            background-color: var(--color-error);
+            color: white;
+            border: none;
+          }
+          .btn-destructive:hover:not(:disabled) {
+            background-color: var(--color-error-dark, var(--color-error));
+            transform: scale(1.02);
+          }
+
+          .btn-success {
+            background-color: var(--color-success);
+            color: white;
+            border: none;
+          }
+          .btn-success:hover:not(:disabled) {
+            background-color: var(--color-success-dark, var(--color-success));
+            transform: scale(1.02);
+          }
+
+          .btn-info {
+            background-color: var(--color-info);
+            color: white;
+            border: none;
+          }
+          .btn-info:hover:not(:disabled) {
+            background-color: var(--color-info-dark, var(--color-info));
+            transform: scale(1.02);
+          }
+
+          .btn-outline {
+            background-color: transparent;
+            color: var(--color-primary);
+            border: 2px solid var(--color-primary);
+          }
+          .btn-outline:hover:not(:disabled) {
+            background-color: var(--color-primary-light, rgba(99, 102, 241, 0.1));
+            transform: scale(1.02);
+          }
+
+          .btn-muted {
+            background-color: var(--color-bg-secondary);
+            color: var(--color-text-muted);
+            border: 1px solid var(--color-border-medium);
+            cursor: not-allowed;
+            opacity: 0.5;
+          }
+        `
+      }} />
+      
+      <section
+        className={`py-24 ${className} ${enableScrollAnimations ? 'scroll-animation' : ''}`}
+        data-animation-type={animationType}
+        style={{
+          ...getBackgroundStyle(),
+          color: textColor || designSystem?.textPrimary || '#000000',
+          paddingTop: `${paddingTop || 0}px`,
+          paddingBottom: `${paddingBottom || 0}px`,
+          backgroundColor: backgroundStyle === 'none' ? 'transparent' : (backgroundColor || designSystem?.backgroundPrimary || '#ffffff')
+        }}
+      >
+
       <div className={`container mx-auto px-4 sm:px-6 lg:px-8 ${getContainerMaxWidth()}`}>
         {isStacked ? (
           // Stacked layout
@@ -761,7 +889,7 @@ const MediaSection: React.FC<MediaSectionProps> = ({
             <div className={`${getAlignmentClass()}`}>
               {showBadge && badgeText && (
                 <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-6"
-                     style={{ backgroundColor: badgeColor || '#5243E9', color: 'white' }}>
+                     style={{ backgroundColor: badgeColor || designSystem?.primaryColor || '#5243E9', color: 'white' }}>
                   {badgeText}
                 </div>
               )}
@@ -774,17 +902,7 @@ const MediaSection: React.FC<MediaSectionProps> = ({
                   dangerouslySetInnerHTML={{ __html: subheading }}
                 />
               )}
-              {showCtaButton && ctaText && ctaUrl && (
-                <div className="mb-8">
-                  <a
-                    href={ctaUrl}
-                    className={`inline-flex items-center px-6 py-3 rounded-lg font-semibold transition-colors ${getCtaButtonClass()}`}
-                  >
-                    {ctaText}
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </a>
-                </div>
-              )}
+              {renderCTA()}
               {renderFeatures()}
             </div>
             <div className="flex justify-center">
@@ -797,7 +915,7 @@ const MediaSection: React.FC<MediaSectionProps> = ({
             <div className={`${getAlignmentClass()} ${isMediaLeft ? 'lg:col-start-2' : ''}`}>
               {showBadge && badgeText && (
                 <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium mb-6"
-                     style={{ backgroundColor: badgeColor || '#5243E9', color: 'white' }}>
+                     style={{ backgroundColor: badgeColor || designSystem?.primaryColor || '#5243E9', color: 'white' }}>
                   {badgeText}
                 </div>
               )}
@@ -810,17 +928,7 @@ const MediaSection: React.FC<MediaSectionProps> = ({
                   dangerouslySetInnerHTML={{ __html: subheading }}
                 />
               )}
-              {showCtaButton && ctaText && ctaUrl && (
-                <div className="mb-8">
-                  <a
-                    href={ctaUrl}
-                    className={`inline-flex items-center px-6 py-3 rounded-lg font-semibold transition-colors ${getCtaButtonClass()}`}
-                  >
-                    {ctaText}
-                    <ArrowRight className="ml-2 w-4 h-4" />
-                  </a>
-                </div>
-              )}
+              {renderCTA()}
               {renderFeatures()}
             </div>
             <div className={`${isMediaLeft ? 'lg:col-start-1' : ''}`}>
@@ -830,6 +938,7 @@ const MediaSection: React.FC<MediaSectionProps> = ({
         )}
       </div>
     </section>
+    </>
   );
 };
 

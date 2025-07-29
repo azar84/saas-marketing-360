@@ -112,9 +112,16 @@ interface PageSection {
     mediaPosition: string;
     showBadge: boolean;
     showCtaButton: boolean;
-    ctaText?: string;
-    ctaUrl?: string;
-    ctaStyle: string;
+    ctaId?: number;
+    cta?: {
+      id: number;
+      text: string;
+      url: string;
+      icon?: string;
+      style: string;
+      target: string;
+      isActive: boolean;
+    };
     enableScrollAnimations: boolean;
     animationType: string;
     backgroundStyle: string;

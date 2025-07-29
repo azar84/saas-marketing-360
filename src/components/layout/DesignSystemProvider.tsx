@@ -92,6 +92,22 @@ const applyDesignSystemToRoot = (ds: DesignSystem) => {
   root.style.setProperty('--color-error-dark', ds.errorColor);
   root.style.setProperty('--color-info-dark', ds.infoColor);
   
+  // Create darker variants for better hover effects
+  const darkenColor = (color: string, amount: number = 0.2) => {
+    // Simple darkening function - you might want to use a proper color library
+    const hex = color.replace('#', '');
+    const r = Math.max(0, parseInt(hex.substr(0, 2), 16) - Math.floor(255 * amount));
+    const g = Math.max(0, parseInt(hex.substr(2, 2), 16) - Math.floor(255 * amount));
+    const b = Math.max(0, parseInt(hex.substr(4, 2), 16) - Math.floor(255 * amount));
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+  
+  root.style.setProperty('--color-secondary-dark', darkenColor(ds.secondaryColor));
+  root.style.setProperty('--color-accent-dark', darkenColor(ds.accentColor));
+  root.style.setProperty('--color-success-dark', darkenColor(ds.successColor));
+  root.style.setProperty('--color-error-dark', darkenColor(ds.errorColor));
+  root.style.setProperty('--color-info-dark', darkenColor(ds.infoColor));
+  
   // Typography (override existing font families and add weights)
   root.style.setProperty('--font-family-sans', ds.fontFamily);
   root.style.setProperty('--font-family-mono', ds.fontFamilyMono);

@@ -17,7 +17,8 @@ export async function GET(request: NextRequest) {
       include: {
         features: {
           orderBy: { sortOrder: 'asc' }
-        }
+        },
+        cta: true
       },
       orderBy: [
         { position: 'asc' },
@@ -64,7 +65,8 @@ export async function POST(request: NextRequest) {
       include: {
         features: {
           orderBy: { sortOrder: 'asc' }
-        }
+        },
+        cta: true
       }
     });
 
@@ -118,7 +120,8 @@ export async function PUT(request: NextRequest) {
       include: {
         features: {
           orderBy: { sortOrder: 'asc' }
-        }
+        },
+        cta: true
       }
       });
 
@@ -146,7 +149,8 @@ export async function PUT(request: NextRequest) {
           include: {
             features: {
               orderBy: { sortOrder: 'asc' }
-            }
+            },
+            cta: true
           }
         });
       }

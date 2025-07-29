@@ -84,7 +84,8 @@ export async function getPageWithSections(slug: string) {
             include: {
               features: {
                 orderBy: { sortOrder: 'asc' }
-              }
+              },
+              cta: true
             }
           },
           pricingSection: true,
