@@ -462,6 +462,11 @@ const HeroSectionsManager: React.FC = () => {
       const method = editingHero ? 'PUT' : 'POST';
       const data = editingHero ? { ...formData, id: editingHero.id } : formData;
 
+      // Debug: Log the data being sent
+      console.log('Submitting hero section data:', data);
+      console.log('CTA Primary ID:', data.ctaPrimaryId, 'Type:', typeof data.ctaPrimaryId);
+      console.log('CTA Secondary ID:', data.ctaSecondaryId, 'Type:', typeof data.ctaSecondaryId);
+
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -989,7 +994,13 @@ const HeroSectionsManager: React.FC = () => {
                       </label>
                       <select
                         value={formData.ctaPrimaryId || ''}
-                        onChange={(e) => setFormData({ ...formData, ctaPrimaryId: e.target.value ? parseInt(e.target.value) : null })}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setFormData({ 
+                            ...formData, 
+                            ctaPrimaryId: value && value !== '' ? parseInt(value) : null 
+                          });
+                        }}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         style={{ 
                           color: designSystem?.textPrimary || '#000000',
@@ -1009,7 +1020,13 @@ const HeroSectionsManager: React.FC = () => {
                       </label>
                       <select
                         value={formData.ctaSecondaryId || ''}
-                        onChange={(e) => setFormData({ ...formData, ctaSecondaryId: e.target.value ? parseInt(e.target.value) : null })}
+                        onChange={(e) => {
+                          const value = e.target.value;
+                          setFormData({ 
+                            ...formData, 
+                            ctaSecondaryId: value && value !== '' ? parseInt(value) : null 
+                          });
+                        }}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         style={{ 
                           color: designSystem?.textPrimary || '#000000',
