@@ -74,8 +74,8 @@ interface HeroSection {
   headline: string;
   subheading?: string;
   textAlignment: 'left' | 'center' | 'right';
-  ctaPrimaryId?: number;
-  ctaSecondaryId?: number;
+  ctaPrimaryId?: number | null;
+  ctaSecondaryId?: number | null;
   mediaUrl?: string;
   mediaItem?: MediaItem;
   mediaType: 'image' | 'video' | 'animation' | '3d';
@@ -350,8 +350,8 @@ const HeroSectionsManager: React.FC = () => {
     headline: '',
     subheading: '',
     textAlignment: 'left',
-    ctaPrimaryId: undefined,
-    ctaSecondaryId: undefined,
+    ctaPrimaryId: null,
+    ctaSecondaryId: null,
     mediaUrl: '',
     mediaItem: undefined,
     mediaType: 'image',
@@ -522,8 +522,8 @@ const HeroSectionsManager: React.FC = () => {
       headline: '',
       subheading: '',
       textAlignment: 'left',
-      ctaPrimaryId: undefined,
-      ctaSecondaryId: undefined,
+      ctaPrimaryId: null,
+      ctaSecondaryId: null,
       mediaUrl: '',
       mediaItem: undefined,
       mediaType: 'image',
@@ -989,7 +989,7 @@ const HeroSectionsManager: React.FC = () => {
                       </label>
                       <select
                         value={formData.ctaPrimaryId || ''}
-                        onChange={(e) => setFormData({ ...formData, ctaPrimaryId: e.target.value ? parseInt(e.target.value) : undefined })}
+                        onChange={(e) => setFormData({ ...formData, ctaPrimaryId: e.target.value ? parseInt(e.target.value) : null })}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         style={{ 
                           color: designSystem?.textPrimary || '#000000',
@@ -1009,7 +1009,7 @@ const HeroSectionsManager: React.FC = () => {
                       </label>
                       <select
                         value={formData.ctaSecondaryId || ''}
-                        onChange={(e) => setFormData({ ...formData, ctaSecondaryId: e.target.value ? parseInt(e.target.value) : undefined })}
+                        onChange={(e) => setFormData({ ...formData, ctaSecondaryId: e.target.value ? parseInt(e.target.value) : null })}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         style={{ 
                           color: designSystem?.textPrimary || '#000000',
