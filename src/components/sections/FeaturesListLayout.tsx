@@ -307,7 +307,7 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
         </div>
 
         {/* Animation Container - starts below heading */}
-        <div className="relative min-h-screen">
+        <div className="relative min-h-screen py-12">
           {/* Full Width Animation Layer - positioned absolutely to extend beyond container */}
           <div className="absolute inset-0 pointer-events-none" style={{ left: '-50vw', width: '200vw', top: '0' }}>
             {/* Full Width Background Gradient Animation */}

@@ -40,13 +40,13 @@ const FeaturesGridLayout: React.FC<FeaturesGridLayoutProps> = ({
 
   return (
     <section 
-      className="w-full min-h-screen flex items-center justify-center"
+      className="w-full min-h-screen flex items-center justify-center py-20"
       style={{ 
         backgroundColor: backgroundColor
       }}
     >
       {/* Elementor Container */}
-      <div className="elementor-container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl">
+      <div className="elementor-container mx-auto px-4 sm:px-6 lg:px-8 max-w-6xl py-8">
         <div className="elementor-column elementor-col-100">
           <div className="elementor-widget-wrap">
             
