@@ -141,6 +141,7 @@ import {
 } from 'lucide-react';
 import { renderIcon, getIconComponent } from '@/lib/iconUtils';
 import { useDesignSystem } from '@/hooks/useDesignSystem';
+import { applyCTAEvents, executeCTAEvent, CTAWithEvents } from '@/lib/utils';
 
 interface MediaSectionFeature {
   id: number;
@@ -176,6 +177,16 @@ interface MediaSectionProps {
     style: string;
     target: string;
     isActive: boolean;
+    customId?: string;
+    onClickEvent?: string;
+    onHoverEvent?: string;
+    onMouseOutEvent?: string;
+    onFocusEvent?: string;
+    onBlurEvent?: string;
+    onKeyDownEvent?: string;
+    onKeyUpEvent?: string;
+    onTouchStartEvent?: string;
+    onTouchEndEvent?: string;
   };
   enableScrollAnimations: boolean;
   animationType: string;
@@ -575,18 +586,47 @@ const MediaSection: React.FC<MediaSectionProps> = ({
     }
 
     const IconComponent = cta.icon ? getIconComponent(cta.icon) : null;
+    const ctaEvents = applyCTAEvents(cta as CTAWithEvents);
 
     return (
       <div className="mb-8">
         <a
           href={cta.url}
           target={cta.target}
+          id={cta.customId}
           className={`inline-flex items-center px-6 py-3 rounded-lg font-semibold transition-all duration-200 select-none relative overflow-hidden btn-${cta.style}`}
           style={{
             fontSize: 'var(--font-size-base)',
             fontWeight: 'var(--font-weight-medium)',
             fontFamily: 'var(--font-family-sans)',
           }}
+          onClick={ctaEvents.onClick ? (e) => {
+            executeCTAEvent(ctaEvents.onClick, e, e.currentTarget);
+          } : undefined}
+          onMouseOver={ctaEvents.onMouseOver ? (e) => {
+            executeCTAEvent(ctaEvents.onMouseOver, e, e.currentTarget);
+          } : undefined}
+          onMouseOut={ctaEvents.onMouseOut ? (e) => {
+            executeCTAEvent(ctaEvents.onMouseOut, e, e.currentTarget);
+          } : undefined}
+          onFocus={ctaEvents.onFocus ? (e) => {
+            executeCTAEvent(ctaEvents.onFocus, e, e.currentTarget);
+          } : undefined}
+          onBlur={ctaEvents.onBlur ? (e) => {
+            executeCTAEvent(ctaEvents.onBlur, e, e.currentTarget);
+          } : undefined}
+          onKeyDown={ctaEvents.onKeyDown ? (e) => {
+            executeCTAEvent(ctaEvents.onKeyDown, e, e.currentTarget);
+          } : undefined}
+          onKeyUp={ctaEvents.onKeyUp ? (e) => {
+            executeCTAEvent(ctaEvents.onKeyUp, e, e.currentTarget);
+          } : undefined}
+          onTouchStart={ctaEvents.onTouchStart ? (e) => {
+            executeCTAEvent(ctaEvents.onTouchStart, e, e.currentTarget);
+          } : undefined}
+          onTouchEnd={ctaEvents.onTouchEnd ? (e) => {
+            executeCTAEvent(ctaEvents.onTouchEnd, e, e.currentTarget);
+          } : undefined}
         >
           {IconComponent && <IconComponent className="w-4 h-4 mr-2" />}
           {cta.text}
