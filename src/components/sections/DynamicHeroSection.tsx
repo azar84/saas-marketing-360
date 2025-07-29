@@ -166,7 +166,7 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
           break;
         case 'image':
           baseStyles.backgroundImage = `url(${backgroundValue})`;
-          baseStyles.backgroundSize = 'cover';
+          baseStyles.backgroundSize = backgroundSize || 'cover';
           baseStyles.backgroundPosition = 'center';
           baseStyles.backgroundRepeat = 'no-repeat';
           break;

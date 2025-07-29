@@ -84,7 +84,6 @@ interface HeroSection {
   mediaPosition: 'left' | 'right';
   backgroundType: 'color' | 'gradient' | 'image' | 'video';
   backgroundValue: string;
-  backgroundImage?: string;
   backgroundSize?: string;
   backgroundOverlay?: string;
   backgroundMediaItem?: MediaItem;
@@ -148,21 +147,68 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allow
   const [showPicker, setShowPicker] = useState(false);
   const [customColor, setCustomColor] = useState(value.startsWith('#') ? value : '#000000');
 
-  const presetColors = [
-    { name: 'Primary', value: DESIGN_SYSTEM_COLORS.primary },
-    { name: 'Secondary', value: DESIGN_SYSTEM_COLORS.secondary },
-    { name: 'Accent', value: DESIGN_SYSTEM_COLORS.accent },
-    { name: 'Success', value: DESIGN_SYSTEM_COLORS.success },
-    { name: 'Warning', value: DESIGN_SYSTEM_COLORS.warning },
-    { name: 'Error', value: DESIGN_SYSTEM_COLORS.error },
-    { name: 'White', value: DESIGN_SYSTEM_COLORS.white },
-    { name: 'Black', value: DESIGN_SYSTEM_COLORS.black },
-    { name: 'Gray 100', value: DESIGN_SYSTEM_COLORS.gray[100] },
-    { name: 'Gray 300', value: DESIGN_SYSTEM_COLORS.gray[300] },
-    { name: 'Gray 500', value: DESIGN_SYSTEM_COLORS.gray[500] },
-    { name: 'Gray 700', value: DESIGN_SYSTEM_COLORS.gray[700] },
-    { name: 'Gray 900', value: DESIGN_SYSTEM_COLORS.gray[900] },
-  ];
+  // Generate dynamic preset colors from design system
+  const getPresetColors = () => {
+    if (!designSystem) {
+      // Fallback colors if design system isn't loaded
+      return [
+        { name: 'Primary', value: '#5243E9' },
+        { name: 'Secondary', value: '#7C3AED' },
+        { name: 'Accent', value: '#10B981' },
+        { name: 'Success', value: '#059669' },
+        { name: 'Warning', value: '#D97706' },
+        { name: 'Error', value: '#DC2626' },
+        { name: 'Info', value: '#3B82F6' },
+        { name: 'White', value: '#FFFFFF' },
+        { name: 'Black', value: '#000000' },
+        { name: 'Gray Light', value: '#F3F4F6' },
+        { name: 'Gray Medium', value: '#9CA3AF' },
+        { name: 'Gray Dark', value: '#374151' },
+        { name: 'Background Primary', value: '#FFFFFF' },
+        { name: 'Background Secondary', value: '#F6F8FC' },
+        { name: 'Background Dark', value: '#1F2937' },
+        { name: 'Text Primary', value: '#1F2937' },
+        { name: 'Text Secondary', value: '#6B7280' },
+        { name: 'Text Muted', value: '#9CA3AF' },
+      ];
+    }
+
+    return [
+      // Brand Colors
+      { name: 'Primary', value: designSystem.primaryColor },
+      { name: 'Primary Light', value: designSystem.primaryColorLight },
+      { name: 'Primary Dark', value: designSystem.primaryColorDark },
+      { name: 'Secondary', value: designSystem.secondaryColor },
+      { name: 'Accent', value: designSystem.accentColor },
+      
+      // Semantic Colors
+      { name: 'Success', value: designSystem.successColor },
+      { name: 'Warning', value: designSystem.warningColor },
+      { name: 'Error', value: designSystem.errorColor },
+      { name: 'Info', value: designSystem.infoColor },
+      
+      // Neutral Colors
+      { name: 'Gray Light', value: designSystem.grayLight },
+      { name: 'Gray Medium', value: designSystem.grayMedium },
+      { name: 'Gray Dark', value: designSystem.grayDark },
+      
+      // Background Colors
+      { name: 'Background Primary', value: designSystem.backgroundPrimary },
+      { name: 'Background Secondary', value: designSystem.backgroundSecondary },
+      { name: 'Background Dark', value: designSystem.backgroundDark },
+      
+      // Text Colors
+      { name: 'Text Primary', value: designSystem.textPrimary },
+      { name: 'Text Secondary', value: designSystem.textSecondary },
+      { name: 'Text Muted', value: designSystem.textMuted },
+      
+      // Common Colors
+      { name: 'White', value: '#FFFFFF' },
+      { name: 'Black', value: '#000000' },
+    ];
+  };
+
+  const presetColors = getPresetColors();
 
   if (allowTransparent) {
     presetColors.push({ name: 'Transparent', value: 'transparent' });
@@ -211,7 +257,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allow
       </div>
 
       {showPicker && (
-        <div className="absolute top-full left-0 mt-2 p-4 border border-gray-200 rounded-lg shadow-lg z-50 min-w-80" style={{ backgroundColor: designSystem?.backgroundPrimary || '#ffffff' }}>
+        <div className="absolute top-full left-0 mt-2 p-4 border border-gray-200 rounded-lg shadow-lg z-50 min-w-80 max-h-96 overflow-y-auto" style={{ backgroundColor: designSystem?.backgroundPrimary || '#ffffff' }}>
           <div className="mb-4">
             <h4 className="text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>Design System Colors</h4>
             <div className="grid grid-cols-4 gap-2">
@@ -314,7 +360,6 @@ const HeroSectionsManager: React.FC = () => {
     mediaPosition: 'right',
     backgroundType: 'color',
     backgroundValue: themeDefaults.backgroundPrimary,
-    backgroundImage: '',
     backgroundSize: 'cover',
     backgroundOverlay: '',
     backgroundMediaItem: undefined,
@@ -526,7 +571,6 @@ const HeroSectionsManager: React.FC = () => {
       mediaPosition: hero.mediaPosition,
       backgroundType: hero.backgroundType,
       backgroundValue: hero.backgroundValue,
-      backgroundImage: hero.backgroundImage || '',
       backgroundSize: hero.backgroundSize || 'cover',
       backgroundOverlay: hero.backgroundOverlay || '',
       backgroundMediaItem: hero.backgroundMediaItem,
@@ -572,8 +616,8 @@ const HeroSectionsManager: React.FC = () => {
     const types = {
       color: 'Solid Color',
       gradient: 'Gradient',
-      image: 'Background Image',
-      video: 'Background Video'
+      image: 'Image',
+      video: 'Video'
     };
     return types[backgroundType as keyof typeof types] || backgroundType;
   };
@@ -1126,7 +1170,7 @@ const HeroSectionsManager: React.FC = () => {
                       </label>
                       <select
                         value={formData.backgroundType}
-                        onChange={(e) => setFormData({ ...formData, backgroundType: e.target.value as any })}
+                        onChange={(e) => setFormData(prev => ({ ...prev, backgroundType: e.target.value as 'color' | 'gradient' | 'image' | 'video' }))}
                         className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         style={{ 
                           color: designSystem?.textPrimary || '#000000',
@@ -1135,49 +1179,9 @@ const HeroSectionsManager: React.FC = () => {
                       >
                         <option value="color">Solid Color</option>
                         <option value="gradient">Gradient</option>
-                        <option value="image">Background Image</option>
-                        <option value="video">Background Video</option>
+                        <option value="image">Image</option>
+                        <option value="video">Video</option>
                       </select>
-                    </div>
-
-                    {/* Background Image Fields */}
-                    <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
-                        Background Image
-                      </label>
-                      <p className="text-xs mb-2" style={{ color: designSystem?.textMuted || '#999999' }}>
-                        Add a background image that will overlay on top of the background color/gradient.
-                      </p>
-                      
-                      <MediaSelector
-                        onChange={(media: any) => {
-                          if (media && !Array.isArray(media)) {
-                            setFormData(prev => ({ 
-                              ...prev, 
-                              backgroundImage: media.publicUrl
-                            }));
-                          }
-                        }}
-                        acceptedTypes={['image']}
-                        designSystem={designSystem || undefined}
-                      />
-                      
-                      {formData.backgroundImage && (
-                        <div className="mt-2">
-                          <img
-                            src={formData.backgroundImage}
-                            alt="Background preview"
-                            className="w-32 h-20 object-cover rounded-lg border"
-                          />
-                          <button
-                            type="button"
-                            onClick={() => setFormData(prev => ({ ...prev, backgroundImage: '' }))}
-                            className="mt-1 text-sm text-red-600 hover:text-red-800"
-                          >
-                            Remove Image
-                          </button>
-                        </div>
-                      )}
                     </div>
 
                     <div>
@@ -1258,7 +1262,7 @@ const HeroSectionsManager: React.FC = () => {
                             <div className="border border-gray-200 rounded-lg p-3" style={{ backgroundColor: designSystem?.backgroundPrimary || '#ffffff' }}>
                               <div className="flex items-center justify-between mb-2">
                                 <span className="text-sm font-medium" style={{ color: designSystem?.textPrimary || '#000000' }}>
-                                  Current {formData.backgroundType === 'image' ? 'Background Image' : 'Background Video'}
+                                  Current {formData.backgroundType === 'image' ? 'Image' : 'Video'}
                                 </span>
                                 <button
                                   type="button"
@@ -1268,7 +1272,7 @@ const HeroSectionsManager: React.FC = () => {
                                     backgroundValue: ''
                                   })}
                                   className="text-red-600 hover:text-red-800 p-1 rounded hover:bg-red-50"
-                                  title="Remove background media"
+                                  title="Remove media"
                                 >
                                   <Trash2 size={16} />
                                 </button>
@@ -1284,18 +1288,18 @@ const HeroSectionsManager: React.FC = () => {
                                 <div className="w-full h-32 bg-gray-200 rounded border flex items-center justify-center">
                                   <div className="text-center">
                                     <Video size={24} className="mx-auto mb-1" style={{ color: designSystem?.textMuted || '#999999' }} />
-                                    <span className="text-sm" style={{ color: designSystem?.textSecondary || '#666666' }}>Background Video</span>
+                                    <span className="text-sm" style={{ color: designSystem?.textSecondary || '#666666' }}>Video</span>
                                   </div>
                                 </div>
                               )}
                               <p className="text-xs mt-2 truncate" style={{ color: designSystem?.textMuted || '#999999' }}>
-                                {formData.backgroundMediaItem?.filename || 'Background media file'}
+                                {formData.backgroundMediaItem?.filename || 'Media file'}
                               </p>
                             </div>
                           )}
 
                         <MediaSelector
-                            label={`Select New ${formData.backgroundType === 'image' ? 'Background Image' : 'Background Video'}`}
+                            label={`Select New ${formData.backgroundType === 'image' ? 'Image' : 'Video'}`}
                             value={null}
                           onChange={(media) => {
                             const mediaItem = Array.isArray(media) ? media[0] : media;

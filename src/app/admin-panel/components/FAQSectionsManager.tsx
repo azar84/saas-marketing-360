@@ -48,15 +48,33 @@ interface FAQSectionCategory {
 
 // Theme color options for hero background
 const THEME_COLORS = [
+  // Brand Colors
   { name: 'Primary', value: 'var(--color-primary)', key: 'primaryColor' },
+  { name: 'Primary Light', value: 'var(--color-primary-light)', key: 'primaryColorLight' },
+  { name: 'Primary Dark', value: 'var(--color-primary-dark)', key: 'primaryColorDark' },
   { name: 'Secondary', value: 'var(--color-secondary)', key: 'secondaryColor' },
   { name: 'Accent', value: 'var(--color-accent)', key: 'accentColor' },
+  
+  // Semantic Colors
   { name: 'Success', value: 'var(--color-success)', key: 'successColor' },
   { name: 'Warning', value: 'var(--color-warning)', key: 'warningColor' },
   { name: 'Error', value: 'var(--color-error)', key: 'errorColor' },
   { name: 'Info', value: 'var(--color-info)', key: 'infoColor' },
+  
+  // Neutral Colors
+  { name: 'Gray Light', value: 'var(--color-gray-light)', key: 'grayLight' },
+  { name: 'Gray Medium', value: 'var(--color-gray-medium)', key: 'grayMedium' },
   { name: 'Gray Dark', value: 'var(--color-gray-dark)', key: 'grayDark' },
+  
+  // Background Colors
+  { name: 'Background Primary', value: 'var(--color-bg-primary)', key: 'backgroundPrimary' },
+  { name: 'Background Secondary', value: 'var(--color-bg-secondary)', key: 'backgroundSecondary' },
   { name: 'Background Dark', value: 'var(--color-bg-dark)', key: 'backgroundDark' },
+  
+  // Text Colors
+  { name: 'Text Primary', value: 'var(--color-text-primary)', key: 'textPrimary' },
+  { name: 'Text Secondary', value: 'var(--color-text-secondary)', key: 'textSecondary' },
+  { name: 'Text Muted', value: 'var(--color-text-muted)', key: 'textMuted' },
 ] as const;
 
 type ThemeColor = {

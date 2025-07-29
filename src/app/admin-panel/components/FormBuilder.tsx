@@ -512,19 +512,33 @@ export default function FormBuilder() {
     if (!designSystem) return [];
     
     return [
+      // Brand Colors
       { name: 'Primary', value: designSystem.primaryColor, description: 'Main brand color' },
       { name: 'Primary Light', value: designSystem.primaryColorLight, description: 'Light primary variant' },
       { name: 'Primary Dark', value: designSystem.primaryColorDark, description: 'Dark primary variant' },
       { name: 'Secondary', value: designSystem.secondaryColor, description: 'Secondary brand color' },
       { name: 'Accent', value: designSystem.accentColor, description: 'Accent color' },
+      
+      // Semantic Colors
       { name: 'Success', value: designSystem.successColor, description: 'Success state color' },
       { name: 'Warning', value: designSystem.warningColor, description: 'Warning state color' },
       { name: 'Error', value: designSystem.errorColor, description: 'Error state color' },
       { name: 'Info', value: designSystem.infoColor, description: 'Info state color' },
-      { name: 'Gray Dark', value: designSystem.grayDark, description: 'Dark gray' },
+      
+      // Neutral Colors
+      { name: 'Gray Light', value: designSystem.grayLight, description: 'Light gray' },
       { name: 'Gray Medium', value: designSystem.grayMedium, description: 'Medium gray' },
+      { name: 'Gray Dark', value: designSystem.grayDark, description: 'Dark gray' },
+      
+      // Background Colors
+      { name: 'Background Primary', value: designSystem.backgroundPrimary, description: 'Primary background' },
+      { name: 'Background Secondary', value: designSystem.backgroundSecondary, description: 'Secondary background' },
+      { name: 'Background Dark', value: designSystem.backgroundDark, description: 'Dark background' },
+      
+      // Text Colors
       { name: 'Text Primary', value: designSystem.textPrimary, description: 'Primary text color' },
-      { name: 'Text Secondary', value: designSystem.textSecondary, description: 'Secondary text color' }
+      { name: 'Text Secondary', value: designSystem.textSecondary, description: 'Secondary text color' },
+      { name: 'Text Muted', value: designSystem.textMuted, description: 'Muted text color' }
     ];
   };
 
