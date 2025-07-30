@@ -405,6 +405,78 @@ async function migrateData() {
     }
     console.log(`✅ Migrated ${formSubmissions.length} form submissions`);
 
+    // Migrate page feature groups
+    console.log('📋 Migrating page feature groups...');
+    const pageFeatureGroups = await herokuPrisma.pageFeatureGroup.findMany();
+    for (const group of pageFeatureGroups) {
+      await vercelPrisma.pageFeatureGroup.upsert({
+        where: { id: group.id },
+        update: group,
+        create: group
+      });
+    }
+    console.log(`✅ Migrated ${pageFeatureGroups.length} page feature groups`);
+
+    // Migrate page HTML sections
+    console.log('📄 Migrating page HTML sections...');
+    const pageHtmlSections = await herokuPrisma.pageHtmlSection.findMany();
+    for (const section of pageHtmlSections) {
+      await vercelPrisma.pageHtmlSection.upsert({
+        where: { id: section.id },
+        update: section,
+        create: section
+      });
+    }
+    console.log(`✅ Migrated ${pageHtmlSections.length} page HTML sections`);
+
+    // Migrate page pricing sections
+    console.log('💳 Migrating page pricing sections...');
+    const pagePricingSections = await herokuPrisma.pagePricingSection.findMany();
+    for (const section of pagePricingSections) {
+      await vercelPrisma.pagePricingSection.upsert({
+        where: { id: section.id },
+        update: section,
+        create: section
+      });
+    }
+    console.log(`✅ Migrated ${pagePricingSections.length} page pricing sections`);
+
+    // Migrate section templates
+    console.log('📋 Migrating section templates...');
+    const sectionTemplates = await herokuPrisma.sectionTemplate.findMany();
+    for (const template of sectionTemplates) {
+      await vercelPrisma.sectionTemplate.upsert({
+        where: { id: template.id },
+        update: template,
+        create: template
+      });
+    }
+    console.log(`✅ Migrated ${sectionTemplates.length} section templates`);
+
+    // Migrate testimonials
+    console.log('💬 Migrating testimonials...');
+    const testimonials = await herokuPrisma.testimonial.findMany();
+    for (const testimonial of testimonials) {
+      await vercelPrisma.testimonial.upsert({
+        where: { id: testimonial.id },
+        update: testimonial,
+        create: testimonial
+      });
+    }
+    console.log(`✅ Migrated ${testimonials.length} testimonials`);
+
+    // Migrate header sections
+    console.log('🔝 Migrating header sections...');
+    const headerSections = await herokuPrisma.header_sections.findMany();
+    for (const section of headerSections) {
+      await vercelPrisma.header_sections.upsert({
+        where: { id: section.id },
+        update: section,
+        create: section
+      });
+    }
+    console.log(`✅ Migrated ${headerSections.length} header sections`);
+
     // Migrate global functions
     console.log('⚙️ Migrating global functions...');
     const globalFunctions = await herokuPrisma.globalFunctions.findMany();
