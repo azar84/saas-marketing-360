@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
-    "build": "npx prisma generate && npx prisma migrate deploy && next build",
-    "postbuild": "npx prisma db seed",
+    "build": "npx prisma generate && next build",
+    "postbuild": "echo 'Skipping database seeding during build'",
     "start": "next start",
     "deploy": "bash scripts/deploy.sh",
     "lint": "next lint",
@@ -73,8 +73,8 @@
     "typescript": "^5"
   },
   "engines": {
-    "node": "18.x",
-    "npm": "8.x"
+    "node": "22.x",
+    "npm": "10.x"
   },
   "cacheDirectories": [
     ".next/cache"
