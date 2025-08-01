@@ -117,7 +117,7 @@ import {
 } from 'lucide-react';
 import { renderIcon } from '@/lib/iconUtils';
 import { Button, Input } from '@/components/ui';
-import { applyCTAEvents, hasCTAEvents, executeCTAEvent, executeCTAEventFromConfig, type CTAWithEvents } from '@/lib/utils';
+import { applyCTAEvents, hasCTAEvents, executeCTAEvent, executeCTAEventFromConfig, getCTAStyles, cn, type CTAWithEvents } from '@/lib/utils';
 
 // AI Assistant Avatar Component
 const AIAvatar = ({ size = 'md', className = '' }: { size?: 'sm' | 'md' | 'lg', className?: string }) => {
@@ -285,57 +285,31 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
   };
 
   // Get button styles based on background
-  const getButtonStyles = (buttonType: 'primary' | 'secondary' | 'accent' | 'ghost' | 'destructive' | 'success' | 'info' | 'outline' | 'muted') => {
-    const isDarkBackground = getTextColor() === 'text-white';
-    const baseClasses = 'group px-8 py-4 text-base font-semibold transition-all duration-300 relative overflow-hidden rounded-xl';
-    
-    switch (buttonType) {
-      case 'primary':
-      return isDarkBackground 
-        ? `${baseClasses} bg-white/95 text-[var(--color-primary)] hover:bg-white border border-white/20 shadow-lg shadow-white/10 hover:shadow-xl hover:shadow-white/20`
-          : `${baseClasses} bg-[var(--color-primary)] hover:bg-[var(--color-primary-light)] text-white shadow-lg shadow-[var(--color-primary)]/25 hover:shadow-xl hover:shadow-[var(--color-primary)]/35`;
-      
-      case 'secondary':
-        return isDarkBackground
-          ? `${baseClasses} bg-white/10 text-white hover:bg-white/20 border border-white/20 backdrop-blur-sm shadow-sm hover:shadow-lg hover:shadow-white/10`
-          : `${baseClasses} bg-[var(--color-bg-secondary)] text-[var(--color-primary)] border border-[var(--color-primary)] hover:bg-[var(--color-primary-light)] hover:text-white shadow-lg shadow-[var(--color-primary)]/15`;
-      
-      case 'accent':
-        return isDarkBackground
-          ? `${baseClasses} bg-[var(--color-accent)]/90 text-white hover:bg-[var(--color-accent)] border border-[var(--color-accent)]/30`
-          : `${baseClasses} bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-dark)] shadow-lg shadow-[var(--color-accent)]/25 hover:shadow-xl hover:shadow-[var(--color-accent)]/35`;
-      
-      case 'ghost':
-        return isDarkBackground
-          ? `${baseClasses} text-white hover:bg-white/10 border border-transparent hover:border-white/20 backdrop-blur-sm`
-          : `${baseClasses} text-[var(--color-text-primary)] hover:bg-[var(--color-primary)]/10 border border-transparent hover:border-[var(--color-primary)]/20`;
-      
-      case 'destructive':
-        return isDarkBackground
-          ? `${baseClasses} bg-[var(--color-error)]/90 text-white hover:bg-[var(--color-error)] border border-[var(--color-error)]/30`
-          : `${baseClasses} bg-[var(--color-error)] text-white hover:bg-[var(--color-error-dark)] shadow-lg shadow-[var(--color-error)]/25`;
-      
-      case 'success':
-        return isDarkBackground
-          ? `${baseClasses} bg-[var(--color-success)]/90 text-white hover:bg-[var(--color-success)] border border-[var(--color-success)]/30`
-          : `${baseClasses} bg-[var(--color-success)] text-white hover:bg-[var(--color-success-dark)] shadow-lg shadow-[var(--color-success)]/25`;
-      
-      case 'info':
-        return isDarkBackground
-          ? `${baseClasses} bg-[var(--color-info)]/90 text-white hover:bg-[var(--color-info)] border border-[var(--color-info)]/30`
-          : `${baseClasses} bg-[var(--color-info)] text-white hover:bg-[var(--color-info-dark)] shadow-lg shadow-[var(--color-info)]/25`;
-      
-      case 'outline':
-      return isDarkBackground
-        ? `${baseClasses} min-w-[200px] border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 backdrop-blur-sm shadow-sm hover:shadow-lg hover:shadow-white/10`
-          : `${baseClasses} min-w-[200px] border-2 border-[var(--color-primary)]/30 text-[var(--color-primary)] hover:bg-[var(--color-primary)]/10 hover:border-[var(--color-primary)] backdrop-blur-sm shadow-sm hover:shadow-lg hover:shadow-[var(--color-primary)]/25`;
-      
-      case 'muted':
-        return `${baseClasses} bg-[var(--color-bg-secondary)] text-[var(--color-text-muted)] border border-[var(--color-border-medium)] cursor-not-allowed opacity-50`;
-      
-      default:
-        return baseClasses;
-    }
+  // Use unified CTA styling from utils
+  const getButtonStyles = (style: string) => {
+    // Use the same approach as the header - CSS classes instead of getCTAStyles
+    const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'destructive', 'success', 'info', 'outline', 'muted'];
+    const safeStyle = allowedStyles.includes(style) ? style : 'primary';
+    return {
+      className: cn(
+        'inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg transition-all duration-200 select-none relative overflow-hidden',
+        `btn-${safeStyle}`,
+        safeStyle === 'primary' && 'focus-visible:ring-blue-500 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 before:transition-opacity hover:before:opacity-100',
+        safeStyle === 'secondary' && 'focus-visible:ring-blue-500',
+        safeStyle === 'accent' && 'focus-visible:ring-purple-500 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 before:transition-opacity hover:before:opacity-100',
+        safeStyle === 'ghost' && 'focus-visible:ring-blue-500',
+        safeStyle === 'destructive' && 'focus-visible:ring-red-500',
+        safeStyle === 'success' && 'focus-visible:ring-green-500',
+        safeStyle === 'info' && 'focus-visible:ring-blue-400',
+        safeStyle === 'outline' && 'focus-visible:ring-blue-500',
+        safeStyle === 'muted' && 'cursor-not-allowed'
+      ),
+      style: {
+        fontSize: 'var(--font-size-base)',
+        fontWeight: 'var(--font-weight-medium)',
+        fontFamily: 'var(--font-family-sans)',
+      }
+    };
   };
 
   // Dynamic conversation flow from heroData
@@ -596,18 +570,109 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
   console.log('Background size:', heroData?.backgroundSize);
 
   return (
-    <motion.section 
-      ref={heroRef}
-      style={{ 
-        opacity,
-        backgroundColor: heroData?.backgroundColor || '#FFFFFF',
-        backgroundImage: heroData?.backgroundImage ? `url(${heroData.backgroundImage})` : 'none',
-        backgroundSize: heroData?.backgroundSize || 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 sm:pt-20 lg:pt-24"
-    >
+    <>
+      {/* Inject button styles for CTAs - same as header */}
+      <style dangerouslySetInnerHTML={{ 
+        __html: `
+          .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+          }
+          .btn-primary:hover {
+            background-color: var(--color-primary-light, var(--color-primary));
+            transform: scale(1.02);
+          }
+          .btn-secondary {
+            background-color: var(--color-secondary, #7C3AED);
+            color: white;
+            border: 1px solid var(--color-secondary, #7C3AED);
+          }
+          .btn-secondary:hover {
+            background-color: var(--color-secondary-dark, var(--color-secondary));
+            transform: scale(1.02);
+          }
+          .btn-accent {
+            background-color: var(--color-accent);
+            color: white;
+            border: none;
+          }
+          .btn-accent:hover {
+            background-color: var(--color-accent-dark, var(--color-accent));
+            transform: scale(1.02);
+          }
+          .btn-ghost {
+            background-color: transparent;
+            color: var(--color-text-primary);
+            border: 1px solid transparent;
+          }
+          .btn-ghost:hover {
+            background-color: var(--color-primary-light, rgba(99, 102, 241, 0.1));
+            transform: scale(1.02);
+          }
+          .btn-destructive {
+            background-color: var(--color-error);
+            color: white;
+            border: none;
+          }
+          .btn-destructive:hover {
+            background-color: var(--color-error-dark, var(--color-error));
+            transform: scale(1.02);
+          }
+          .btn-success {
+            background-color: var(--color-success);
+            color: white;
+            border: none;
+          }
+          .btn-success:hover {
+            background-color: var(--color-success-dark, var(--color-success));
+            transform: scale(1.02);
+          }
+          .btn-info {
+            background-color: var(--color-info);
+            color: white;
+            border: none;
+          }
+          .btn-info:hover {
+            background-color: var(--color-info-dark, var(--color-info));
+            transform: scale(1.02);
+          }
+          .btn-outline {
+            background-color: transparent;
+            color: var(--color-primary);
+            border: 1px solid var(--color-primary);
+          }
+          .btn-outline:hover {
+            background-color: var(--color-primary);
+            color: white;
+            transform: scale(1.02);
+          }
+          .btn-muted {
+            background-color: var(--color-gray-light);
+            color: var(--color-text-muted);
+            border: 1px solid var(--color-gray-dark);
+            cursor: not-allowed;
+          }
+          .btn-muted:hover {
+            background-color: var(--color-gray-medium);
+            transform: scale(1.02);
+            border-color: var(--color-gray-dark);
+          }
+        `
+      }} />
+      
+      <motion.section 
+        ref={heroRef}
+        style={{ 
+          opacity,
+          backgroundColor: heroData?.backgroundColor || '#FFFFFF',
+          backgroundImage: heroData?.backgroundImage ? `url(${heroData.backgroundImage})` : 'none',
+          backgroundSize: heroData?.backgroundSize || 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat'
+        }}
+        className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 sm:pt-20 lg:pt-24"
+      >
       {/* Background Overlay */}
       {heroData?.backgroundOverlay && (
         <div 
@@ -688,8 +753,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 const hasEvents = hasCTAEvents(heroData.primaryCta as CTAWithEvents);
                 
                 // Runtime safeguard for allowed styles
-                const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'outline', 'muted'];
+                const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'destructive', 'success', 'info', 'outline', 'muted'];
                 const safeStyle = allowedStyles.includes(heroData.primaryCta.style) ? heroData.primaryCta.style : 'primary';
+                
+                // Get button styles with design system colors
+                const buttonStyles = getButtonStyles(safeStyle);
                 
                 // Always render as <a> tag if URL is present (even if it's '#')
                 if (heroData.primaryCta.url) {
@@ -698,21 +766,29 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                       href={heroData.primaryCta.url}
                       target={heroData.primaryCta.target}
                       id={heroData.primaryCta.customId}
-                      className={`inline-flex items-center gap-2.5 ${getButtonStyles(safeStyle)}`}
+                      className={`inline-flex items-center gap-2.5 ${buttonStyles.className}`}
+                      style={buttonStyles.style}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={(e) => {
-                        // Handle URL navigation
-                        if (heroData.primaryCta.url.startsWith('#')) {
-                          const selector = heroData.primaryCta.url;
-                          if (selector.length > 1) {
-                            const element = document.querySelector(selector);
-                            element?.scrollIntoView({ behavior: 'smooth' });
+                        // Prevent navigation when there are JavaScript events
+                        if (heroData.primaryCta.events || ctaEvents.onClick) {
+                          e.preventDefault();
+                        }
+                        
+                        // Handle URL navigation (only if no JavaScript events)
+                        if (!heroData.primaryCta.events && !ctaEvents.onClick) {
+                          if (heroData.primaryCta.url.startsWith('#')) {
+                            const selector = heroData.primaryCta.url;
+                            if (selector.length > 1) {
+                              const element = document.querySelector(selector);
+                              element?.scrollIntoView({ behavior: 'smooth' });
+                            }
+                          } else if (heroData.primaryCta.target === '_blank') {
+                            window.open(heroData.primaryCta.url, '_blank');
+                          } else {
+                            window.location.href = heroData.primaryCta.url;
                           }
-                        } else if (heroData.primaryCta.target === '_blank') {
-                          window.open(heroData.primaryCta.url, '_blank');
-                        } else {
-                          window.location.href = heroData.primaryCta.url;
                         }
                         
                         // Execute CTA events (only use new event system)
@@ -769,7 +845,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                     <motion.button
                       type="button"
                       id={heroData.primaryCta.customId}
-                      className={`inline-flex items-center gap-2.5 ${getButtonStyles(safeStyle)}`}
+                      className={`inline-flex items-center gap-2.5 ${buttonStyles.className}`}
+                      style={buttonStyles.style}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={(e) => {
@@ -829,8 +906,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 const hasEvents = hasCTAEvents(heroData.secondaryCta as CTAWithEvents);
                 
                 // Runtime safeguard for allowed styles
-                const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'outline', 'muted'];
+                const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'destructive', 'success', 'info', 'outline', 'muted'];
                 const safeStyle = allowedStyles.includes(heroData.secondaryCta.style) ? heroData.secondaryCta.style : 'secondary';
+                
+                // Get button styles with design system colors
+                const secondaryButtonStyles = getButtonStyles(safeStyle);
                 
                 // Always render as <a> tag if URL is present (even if it's '#')
                 if (heroData.secondaryCta.url) {
@@ -839,21 +919,29 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                       href={heroData.secondaryCta.url}
                       target={heroData.secondaryCta.target}
                       id={heroData.secondaryCta.customId}
-                      className={`inline-flex items-center gap-2.5 ${getButtonStyles(safeStyle)}`}
+                      className={`inline-flex items-center gap-2.5 ${secondaryButtonStyles.className}`}
+                      style={secondaryButtonStyles.style}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={(e) => {
-                        // Handle URL navigation
-                        if (heroData.secondaryCta.url.startsWith('#')) {
-                          const selector = heroData.secondaryCta.url;
-                          if (selector.length > 1) {
-                            const element = document.querySelector(selector);
-                            element?.scrollIntoView({ behavior: 'smooth' });
+                        // Prevent navigation when there are JavaScript events
+                        if (heroData.secondaryCta.events || ctaEvents.onClick) {
+                          e.preventDefault();
+                        }
+                        
+                        // Handle URL navigation (only if no JavaScript events)
+                        if (!heroData.secondaryCta.events && !ctaEvents.onClick) {
+                          if (heroData.secondaryCta.url.startsWith('#')) {
+                            const selector = heroData.secondaryCta.url;
+                            if (selector.length > 1) {
+                              const element = document.querySelector(selector);
+                              element?.scrollIntoView({ behavior: 'smooth' });
+                            }
+                          } else if (heroData.secondaryCta.target === '_blank') {
+                            window.open(heroData.secondaryCta.url, '_blank');
+                          } else {
+                            window.location.href = heroData.secondaryCta.url;
                           }
-                        } else if (heroData.secondaryCta.target === '_blank') {
-                          window.open(heroData.secondaryCta.url, '_blank');
-                        } else {
-                          window.location.href = heroData.secondaryCta.url;
                         }
                         
                         // Execute CTA events (only use new event system)
@@ -910,7 +998,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                     <motion.button
                       type="button"
                       id={heroData.secondaryCta.customId}
-                      className={`inline-flex items-center gap-2.5 ${getButtonStyles(safeStyle)}`}
+                      className={`inline-flex items-center gap-2.5 ${secondaryButtonStyles.className}`}
+                      style={secondaryButtonStyles.style}
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={(e) => {
@@ -1009,7 +1098,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
           </motion.div>
         </div>
       </div>
-    </motion.section>
+      </motion.section>
+    </>
   );
 };
 

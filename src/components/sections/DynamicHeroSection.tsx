@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { renderIcon } from '@/lib/iconUtils';
-import { applyCTAEvents, hasCTAEvents, executeCTAEvent, type CTAWithEvents } from '@/lib/utils';
+import { applyCTAEvents, hasCTAEvents, executeCTAEvent, executeCTAEventFromConfig, getCTAStyles, type CTAWithEvents } from '@/lib/utils';
 
 interface CTA {
   id: number;
@@ -113,6 +113,25 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
     ctaSecondary
   } = heroSection;
 
+  // Determine if text should be light or dark based on background
+  const getTextColor = () => {
+    if (backgroundType === 'color') {
+      // Simple heuristic: if background is dark, use light text
+      const hex = backgroundValue.replace('#', '');
+      const r = parseInt(hex.substr(0, 2), 16);
+      const g = parseInt(hex.substr(2, 2), 16);
+      const b = parseInt(hex.substr(4, 2), 16);
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+      return brightness > 128 ? 'text-gray-900' : 'text-white';
+    }
+    // For gradients and images, assume light text
+    return 'text-white';
+  };
+
+  // Determine if background is dark for CTA styling
+  const smartTextColor = getTextColor();
+  const isDarkBackground = smartTextColor === 'text-white';
+
   // Get icon component with responsive sizing
   const getIconComponent = (iconName: string, size?: string) => {
     if (!iconName) return null;
@@ -183,21 +202,6 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
     return baseStyles;
   };
 
-  // Determine if text should be light or dark based on background
-  const getTextColor = () => {
-    if (backgroundType === 'color') {
-      // Simple heuristic: if background is dark, use light text
-      const hex = backgroundValue.replace('#', '');
-      const r = parseInt(hex.substr(0, 2), 16);
-      const g = parseInt(hex.substr(2, 2), 16);
-      const b = parseInt(hex.substr(4, 2), 16);
-      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-      return brightness > 128 ? 'text-gray-900' : 'text-white';
-    }
-    // For gradients and images, assume light text
-    return 'text-white';
-  };
-
   // Get responsive button size classes - modernized and sleeker
   const getButtonSizeClasses = (isHeroSection = true) => {
     if (isHeroSection) {
@@ -216,6 +220,7 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
   };
 
   // Get button style classes - modern, clean design
+  // Use unified CTA styling from utils
   const getButtonClasses = (buttonType: 'primary' | 'secondary', style: string, customColors?: {
     backgroundColor?: string;
     textColor?: string;
@@ -229,50 +234,10 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
       return `${baseClasses} hover:opacity-90 shadow-lg`;
     }
     
-    // Use smart design system colors based on background
-    const smartTextColor = getTextColor();
-    const isDarkBackground = smartTextColor === 'text-white';
+    // Use unified CTA styling with design system colors
+    const ctaStyles = getCTAStyles(style, undefined, isDarkBackground);
     
-    switch (style) {
-      case 'primary':
-        return `${baseClasses} ${isDarkBackground 
-          ? 'bg-white/95 text-[var(--color-primary)] hover:bg-white border border-white/20'
-          : 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-light)] border border-[var(--color-primary)]'}`;
-      case 'secondary':
-        return `${baseClasses} ${isDarkBackground
-          ? 'bg-white/10 text-white hover:bg-white/20 border border-white/30'
-          : 'bg-[var(--color-bg-secondary)] text-[var(--color-primary)] border border-[var(--color-primary)] hover:bg-[var(--color-primary-light)] hover:text-white'}`;
-      case 'accent':
-        return `${baseClasses} ${isDarkBackground
-          ? 'bg-[var(--color-accent)]/90 text-white hover:bg-[var(--color-accent)] border border-[var(--color-accent)]/30'
-          : 'bg-[var(--color-accent)] text-white hover:bg-[var(--color-accent-dark)] border border-[var(--color-accent)]'}`;
-      case 'ghost':
-        return `${baseClasses} ${isDarkBackground
-          ? 'bg-transparent text-white hover:bg-white/10 border border-transparent'
-          : 'bg-transparent text-[var(--color-text-primary)] hover:bg-[var(--color-primary)]/5 border border-transparent'}`;
-      case 'destructive':
-        return `${baseClasses} ${isDarkBackground
-          ? 'bg-[var(--color-error)]/90 text-white hover:bg-[var(--color-error)] border border-[var(--color-error)]/30'
-          : 'bg-[var(--color-error)] text-white hover:bg-[var(--color-error-dark)] border border-[var(--color-error)]'}`;
-      case 'success':
-        return `${baseClasses} ${isDarkBackground
-          ? 'bg-[var(--color-success)]/90 text-white hover:bg-[var(--color-success)] border border-[var(--color-success)]/30'
-          : 'bg-[var(--color-success)] text-white hover:bg-[var(--color-success-dark)] border border-[var(--color-success)]'}`;
-      case 'info':
-        return `${baseClasses} ${isDarkBackground
-          ? 'bg-[var(--color-info)]/90 text-white hover:bg-[var(--color-info)] border border-[var(--color-info)]/30'
-          : 'bg-[var(--color-info)] text-white hover:bg-[var(--color-info-dark)] border border-[var(--color-info)]'}`;
-      case 'outline':
-        return `${baseClasses} ${isDarkBackground
-          ? 'bg-transparent text-white border-2 border-white/50 hover:bg-white/10 hover:border-white'
-          : 'bg-transparent text-[var(--color-primary)] border-2 border-[var(--color-primary)]/50 hover:bg-[var(--color-primary)]/5 hover:border-[var(--color-primary)]'}`;
-      case 'muted':
-        return `${baseClasses} bg-[var(--color-bg-secondary)] text-[var(--color-text-muted)] border border-[var(--color-border-medium)] cursor-not-allowed opacity-50`;
-      default:
-        return `${baseClasses} ${isDarkBackground 
-          ? 'bg-white/95 text-[var(--color-primary)] hover:bg-white border border-white/20'
-          : 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-light)] border border-[var(--color-primary)]'}`;
-    }
+    return `${baseClasses} ${ctaStyles.className}`;
   };
 
   // Get responsive media height classes - larger, more prominent images
@@ -381,27 +346,25 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
     if (ctaPrimary && ctaPrimary.isActive) {
       const ctaEvents = applyCTAEvents(ctaPrimary as CTAWithEvents);
       // Runtime safeguard for allowed styles
-      const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'outline', 'muted'];
+      const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'destructive', 'success', 'info', 'outline', 'muted'];
       const safeStyle = allowedStyles.includes(ctaPrimary.style) ? ctaPrimary.style : 'primary';
+      // Get unified CTA styles
+      const ctaStyles = getCTAStyles(safeStyle, undefined, isDarkBackground);
       // Always render as <a> tag if URL is present (even if it's '#')
       if (ctaPrimary.url) {
+        
         ctas.push(
           <motion.a
             key="primary"
             href={ctaPrimary.url}
             target={ctaPrimary.target}
             id={ctaPrimary.customId}
-            className={`inline-flex items-center gap-2.5 ${getButtonClasses('primary', safeStyle, {
-              backgroundColor: ctaPrimaryBgColor,
-              textColor: ctaPrimaryTextColor
-            })}`}
-            style={{
-              backgroundColor: ctaPrimaryBgColor || undefined,
-              color: ctaPrimaryTextColor || undefined
-            }}
+            className={`inline-flex items-center gap-2.5 ${ctaStyles.className}`}
+            style={ctaStyles.style}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={ctaEvents.onClick ? (e) => {
+              e.preventDefault(); // Prevent navigation when there's a JavaScript event
               executeCTAEvent(ctaEvents.onClick, e, e.currentTarget);
             } : undefined}
             onMouseOver={ctaEvents.onMouseOver ? (e) => {
@@ -440,14 +403,8 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
             key="primary"
             type="button"
             id={ctaPrimary.customId}
-            className={`inline-flex items-center gap-2.5 ${getButtonClasses('primary', safeStyle, {
-              backgroundColor: ctaPrimaryBgColor,
-              textColor: ctaPrimaryTextColor
-            })}`}
-            style={{
-              backgroundColor: ctaPrimaryBgColor || undefined,
-              color: ctaPrimaryTextColor || undefined
-            }}
+            className={`inline-flex items-center gap-2.5 ${ctaStyles.className}`}
+            style={ctaStyles.style}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={ctaEvents.onClick ? (e) => {
@@ -488,27 +445,25 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
     if (ctaSecondary && ctaSecondary.isActive) {
       const ctaEvents = applyCTAEvents(ctaSecondary as CTAWithEvents);
       // Runtime safeguard for allowed styles
-      const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'outline', 'muted'];
+      const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'destructive', 'success', 'info', 'outline', 'muted'];
       const safeStyle = allowedStyles.includes(ctaSecondary.style) ? ctaSecondary.style : 'primary';
       // Always render as <a> tag if URL is present (even if it's '#')
       if (ctaSecondary.url) {
+        // Get unified CTA styles for secondary
+        const secondaryCtaStyles = getCTAStyles(safeStyle, undefined, isDarkBackground);
+        
         ctas.push(
           <motion.a
             key="secondary"
             href={ctaSecondary.url}
             target={ctaSecondary.target}
             id={ctaSecondary.customId}
-            className={`inline-flex items-center gap-2.5 ${getButtonClasses('secondary', safeStyle, {
-              backgroundColor: ctaSecondaryBgColor,
-              textColor: ctaSecondaryTextColor
-            })}`}
-            style={{
-              backgroundColor: ctaSecondaryBgColor || undefined,
-              color: ctaSecondaryTextColor || undefined
-            }}
+            className={`inline-flex items-center gap-2.5 ${secondaryCtaStyles.className}`}
+            style={secondaryCtaStyles.style}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={ctaEvents.onClick ? (e) => {
+              e.preventDefault(); // Prevent navigation when there's a JavaScript event
               executeCTAEvent(ctaEvents.onClick, e, e.currentTarget);
             } : undefined}
             onMouseOver={ctaEvents.onMouseOver ? (e) => {

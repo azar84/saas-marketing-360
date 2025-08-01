@@ -7,7 +7,6 @@ import MediaSection from './MediaSection';
 import FAQSection from './FAQSection';
 import DynamicHeroSection from './DynamicHeroSection';
 import HeroSection from './HeroSection';
-import PricingSection from './PricingSection';
 import ConfigurablePricingSection from './ConfigurablePricingSection';
 import FormSection from './FormSection';
 import HtmlSection from './HtmlSection';
@@ -293,8 +292,50 @@ async function fetchPageSections(pageSlug: string): Promise<PageSection[]> {
       include: {
         heroSection: {
           include: {
-            ctaPrimary: true,
-            ctaSecondary: true
+            ctaPrimary: {
+              select: {
+                id: true,
+                text: true,
+                url: true,
+                customId: true,
+                icon: true,
+                style: true,
+                target: true,
+                isActive: true,
+                onClickEvent: true,
+                onHoverEvent: true,
+                onMouseOutEvent: true,
+                onFocusEvent: true,
+                onBlurEvent: true,
+                onKeyDownEvent: true,
+                onKeyUpEvent: true,
+                onTouchStartEvent: true,
+                onTouchEndEvent: true,
+                events: true
+              }
+            },
+            ctaSecondary: {
+              select: {
+                id: true,
+                text: true,
+                url: true,
+                customId: true,
+                icon: true,
+                style: true,
+                target: true,
+                isActive: true,
+                onClickEvent: true,
+                onHoverEvent: true,
+                onMouseOutEvent: true,
+                onFocusEvent: true,
+                onBlurEvent: true,
+                onKeyDownEvent: true,
+                onKeyUpEvent: true,
+                onTouchStartEvent: true,
+                onTouchEndEvent: true,
+                events: true
+              }
+            }
           }
         },
         featureGroup: {
@@ -398,8 +439,50 @@ async function fetchHomeHeroData() {
         isActive: true
       },
       include: {
-        ctaPrimary: true,
-        ctaSecondary: true
+        ctaPrimary: {
+          select: {
+            id: true,
+            text: true,
+            url: true,
+            customId: true,
+            icon: true,
+            style: true,
+            target: true,
+            isActive: true,
+            onClickEvent: true,
+            onHoverEvent: true,
+            onMouseOutEvent: true,
+            onFocusEvent: true,
+            onBlurEvent: true,
+            onKeyDownEvent: true,
+            onKeyUpEvent: true,
+            onTouchStartEvent: true,
+            onTouchEndEvent: true,
+            events: true
+          }
+        },
+        ctaSecondary: {
+          select: {
+            id: true,
+            text: true,
+            url: true,
+            customId: true,
+            icon: true,
+            style: true,
+            target: true,
+            isActive: true,
+            onClickEvent: true,
+            onHoverEvent: true,
+            onMouseOutEvent: true,
+            onFocusEvent: true,
+            onBlurEvent: true,
+            onKeyDownEvent: true,
+            onKeyUpEvent: true,
+            onTouchStartEvent: true,
+            onTouchEndEvent: true,
+            events: true
+          }
+        }
       }
     });
 
@@ -472,6 +555,7 @@ async function fetchHomeHeroData() {
       secondaryCtaId: homeHero.ctaSecondaryId || null,
       primaryCta: homeHero.ctaPrimary || null,
       secondaryCta: homeHero.ctaSecondary || null,
+
       isActive: homeHero.isActive,
       animationType: homeHero.animationType || 'conversation',
       animationData: homeHero.animationData ? JSON.parse(homeHero.animationData) : {
@@ -810,6 +894,15 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
           );
         }
         break;
+
+      case 'home_hero':
+        // Use the home hero data as fallback for home_hero sections
+        return wrapWithSectionDiv(
+          <HeroSection 
+            key={section.id} 
+            heroData={homeHeroData}
+          />
+        );
 
       case 'features':
         if (section.featureGroup) {

@@ -452,3 +452,131 @@ export const executeCTAEventFromConfig = (events: any[], eventType: string, even
     console.error('Error executing CTA events from config:', error);
   }
 }; 
+
+// CTA Styling Utility - Unified styling across all components
+export const getCTAStyles = (
+  style: string, 
+  designSystem?: any, 
+  isDarkBackground: boolean = false
+) => {
+  const baseClasses = 'group px-8 py-4 text-base font-semibold transition-all duration-300 relative overflow-hidden rounded-xl';
+  
+  // Get colors from design system or use defaults
+  const getColor = (colorType: string, fallback: string) => {
+    if (!designSystem) return fallback;
+    
+    switch (colorType) {
+      case 'primary': return designSystem.primaryColor || fallback;
+      case 'primaryLight': return designSystem.primaryLightColor || fallback;
+      case 'secondary': return designSystem.secondaryColor || fallback;
+      case 'accent': return designSystem.accentColor || fallback;
+      case 'success': return designSystem.successColor || fallback;
+      case 'error': return designSystem.errorColor || fallback;
+      case 'warning': return designSystem.warningColor || fallback;
+      case 'info': return designSystem.infoColor || fallback;
+      default: return fallback;
+    }
+  };
+
+  // Map CTA manager styles to design system colors
+  switch (style) {
+    case 'primary':
+      const primaryColor = getColor('primary', '#3B82F6');
+      const primaryLightColor = getColor('primaryLight', '#60A5FA');
+      return {
+        className: isDarkBackground 
+          ? `${baseClasses} bg-white/95 hover:bg-white border border-white/20 shadow-lg shadow-white/10 hover:shadow-xl hover:shadow-white/20`
+          : `${baseClasses} hover:bg-opacity-80 text-white shadow-lg hover:shadow-xl`,
+        style: isDarkBackground 
+          ? { color: primaryColor }
+          : { backgroundColor: primaryColor, '--tw-shadow-color': primaryColor + '40' } as React.CSSProperties
+      };
+    
+    case 'secondary':
+      const secondaryColor = getColor('secondary', '#6B7280');
+      return {
+        className: isDarkBackground
+          ? `${baseClasses} bg-white/10 text-white hover:bg-white/20 border border-white/20 backdrop-blur-sm shadow-sm hover:shadow-lg hover:shadow-white/10`
+          : `${baseClasses} bg-gray-100 border hover:bg-gray-200 shadow-sm hover:shadow-lg`,
+        style: isDarkBackground 
+          ? {}
+          : { color: secondaryColor, borderColor: secondaryColor } as React.CSSProperties
+      };
+    
+    case 'accent':
+      const accentColor = getColor('accent', '#8B5CF6');
+      return {
+        className: isDarkBackground
+          ? `${baseClasses} text-white hover:bg-opacity-100 border backdrop-blur-sm`
+          : `${baseClasses} text-white hover:bg-opacity-80 shadow-lg hover:shadow-xl`,
+        style: isDarkBackground 
+          ? { backgroundColor: accentColor + 'E6', borderColor: accentColor + '4D' }
+          : { backgroundColor: accentColor, '--tw-shadow-color': accentColor + '40' } as React.CSSProperties
+      };
+    
+    case 'ghost':
+      return {
+        className: isDarkBackground
+          ? `${baseClasses} text-white hover:bg-white/10 border border-transparent hover:border-white/20 backdrop-blur-sm`
+          : `${baseClasses} text-gray-600 hover:bg-gray-100 border border-transparent hover:border-gray-300`,
+        style: {}
+      };
+    
+    case 'destructive':
+      const errorColor = getColor('error', '#DC2626');
+      return {
+        className: isDarkBackground
+          ? `${baseClasses} text-white hover:bg-opacity-100 border backdrop-blur-sm`
+          : `${baseClasses} text-white hover:bg-opacity-80 shadow-lg`,
+        style: isDarkBackground 
+          ? { backgroundColor: errorColor + 'E6', borderColor: errorColor + '4D' }
+          : { backgroundColor: errorColor, color: 'white', '--tw-shadow-color': errorColor + '40' } as React.CSSProperties
+      };
+    
+    case 'success':
+      const successColor = getColor('success', '#059669');
+      return {
+        className: isDarkBackground
+          ? `${baseClasses} text-white hover:bg-opacity-100 border backdrop-blur-sm`
+          : `${baseClasses} text-white hover:bg-opacity-80 shadow-lg`,
+        style: isDarkBackground 
+          ? { backgroundColor: successColor + 'E6', borderColor: successColor + '4D' }
+          : { backgroundColor: successColor, color: 'white', '--tw-shadow-color': successColor + '40' } as React.CSSProperties
+      };
+    
+    case 'info':
+      const infoColor = getColor('info', '#3B82F6');
+      return {
+        className: isDarkBackground
+          ? `${baseClasses} text-white hover:bg-opacity-100 border backdrop-blur-sm`
+          : `${baseClasses} text-white hover:bg-opacity-80 shadow-lg`,
+        style: isDarkBackground 
+          ? { backgroundColor: infoColor + 'E6', borderColor: infoColor + '4D' }
+          : { backgroundColor: infoColor, color: 'white', '--tw-shadow-color': infoColor + '40' } as React.CSSProperties
+      };
+    
+    case 'outline':
+      const outlineColor = getColor('primary', '#3B82F6');
+      return {
+        className: isDarkBackground
+          ? `${baseClasses} min-w-[200px] border-2 border-white/30 text-white hover:bg-white/10 hover:border-white/50 backdrop-blur-sm shadow-sm hover:shadow-lg hover:shadow-white/10`
+          : `${baseClasses} min-w-[200px] border-2 hover:bg-opacity-10 backdrop-blur-sm shadow-sm hover:shadow-lg`,
+        style: isDarkBackground 
+          ? {}
+          : { borderColor: outlineColor + '4D', color: outlineColor } as React.CSSProperties
+      };
+    
+    case 'muted':
+      return {
+        className: `${baseClasses} bg-gray-100 text-gray-500 border border-gray-300 cursor-not-allowed opacity-50`,
+        style: {}
+      };
+    
+    default:
+      const defaultColor = getColor('primary', '#3B82F6');
+      return {
+        className: `${baseClasses} hover:bg-opacity-80 text-white shadow-lg hover:shadow-xl`,
+        style: { backgroundColor: defaultColor, '--tw-shadow-color': defaultColor + '40' } as React.CSSProperties
+      };
+  }
+}; 

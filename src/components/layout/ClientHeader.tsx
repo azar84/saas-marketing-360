@@ -219,13 +219,15 @@ export default function ClientHeader({
             transform: scale(1.02);
           }
           .btn-muted {
-            background-color: var(--color-muted);
-            color: var(--color-text-primary);
-            border: none;
+            background-color: var(--color-gray-light);
+            color: var(--color-text-muted);
+            border: 1px solid var(--color-gray-dark);
+            cursor: not-allowed;
           }
           .btn-muted:hover {
-            background-color: var(--color-muted-dark, var(--color-muted));
+            background-color: var(--color-gray-medium);
             transform: scale(1.02);
+            border-color: var(--color-gray-dark);
           }
         `
       }} />
@@ -528,7 +530,7 @@ export default function ClientHeader({
                 const ctaEvents = applyCTAEvents(cta as CTAWithEvents);
                 const hasEvents = hasCTAEvents(cta as CTAWithEvents);
                 // Runtime safeguard for allowed styles
-                const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'outline', 'muted'];
+                const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'destructive', 'success', 'info', 'outline', 'muted'];
                 const safeStyle = allowedStyles.includes(cta.style) ? cta.style : 'primary';
                 return (
                   <motion.div
