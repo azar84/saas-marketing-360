@@ -293,8 +293,50 @@ async function fetchPageSections(pageSlug: string): Promise<PageSection[]> {
       include: {
         heroSection: {
           include: {
-            ctaPrimary: true,
-            ctaSecondary: true
+            ctaPrimary: {
+              select: {
+                id: true,
+                text: true,
+                url: true,
+                customId: true,
+                icon: true,
+                style: true,
+                target: true,
+                isActive: true,
+                onClickEvent: true,
+                onHoverEvent: true,
+                onMouseOutEvent: true,
+                onFocusEvent: true,
+                onBlurEvent: true,
+                onKeyDownEvent: true,
+                onKeyUpEvent: true,
+                onTouchStartEvent: true,
+                onTouchEndEvent: true,
+                events: true
+              }
+            },
+            ctaSecondary: {
+              select: {
+                id: true,
+                text: true,
+                url: true,
+                customId: true,
+                icon: true,
+                style: true,
+                target: true,
+                isActive: true,
+                onClickEvent: true,
+                onHoverEvent: true,
+                onMouseOutEvent: true,
+                onFocusEvent: true,
+                onBlurEvent: true,
+                onKeyDownEvent: true,
+                onKeyUpEvent: true,
+                onTouchStartEvent: true,
+                onTouchEndEvent: true,
+                events: true
+              }
+            }
           }
         },
         featureGroup: {
@@ -398,8 +440,50 @@ async function fetchHomeHeroData() {
         isActive: true
       },
       include: {
-        ctaPrimary: true,
-        ctaSecondary: true
+        ctaPrimary: {
+          select: {
+            id: true,
+            text: true,
+            url: true,
+            customId: true,
+            icon: true,
+            style: true,
+            target: true,
+            isActive: true,
+            onClickEvent: true,
+            onHoverEvent: true,
+            onMouseOutEvent: true,
+            onFocusEvent: true,
+            onBlurEvent: true,
+            onKeyDownEvent: true,
+            onKeyUpEvent: true,
+            onTouchStartEvent: true,
+            onTouchEndEvent: true,
+            events: true
+          }
+        },
+        ctaSecondary: {
+          select: {
+            id: true,
+            text: true,
+            url: true,
+            customId: true,
+            icon: true,
+            style: true,
+            target: true,
+            isActive: true,
+            onClickEvent: true,
+            onHoverEvent: true,
+            onMouseOutEvent: true,
+            onFocusEvent: true,
+            onBlurEvent: true,
+            onKeyDownEvent: true,
+            onKeyUpEvent: true,
+            onTouchStartEvent: true,
+            onTouchEndEvent: true,
+            events: true
+          }
+        }
       }
     });
 
