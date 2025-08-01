@@ -105,11 +105,7 @@ export async function POST(request: NextRequest) {
         taglineColor: validatedData.taglineColor || '#000000',
         headlineColor: validatedData.headlineColor || '#000000',
         subheadingColor: validatedData.subheadingColor || '#000000',
-        // CTA Styling
-        ctaPrimaryBgColor: validatedData.ctaPrimaryBgColor || '#5243E9',
-        ctaPrimaryTextColor: validatedData.ctaPrimaryTextColor || '#FFFFFF',
-        ctaSecondaryBgColor: validatedData.ctaSecondaryBgColor || '#7C3AED',
-        ctaSecondaryTextColor: validatedData.ctaSecondaryTextColor || '#FFFFFF',
+
         showTypingEffect: validatedData.showTypingEffect || false,
         enableBackgroundAnimation: validatedData.enableBackgroundAnimation || false,
         customClasses: validatedData.customClasses || null,
@@ -246,11 +242,7 @@ export async function PUT(request: NextRequest) {
     if (validatedData.taglineColor !== undefined) updateData.taglineColor = validatedData.taglineColor;
     if (validatedData.headlineColor !== undefined) updateData.headlineColor = validatedData.headlineColor;
     if (validatedData.subheadingColor !== undefined) updateData.subheadingColor = validatedData.subheadingColor;
-    // CTA Styling
-    if (validatedData.ctaPrimaryBgColor !== undefined) updateData.ctaPrimaryBgColor = validatedData.ctaPrimaryBgColor;
-    if (validatedData.ctaPrimaryTextColor !== undefined) updateData.ctaPrimaryTextColor = validatedData.ctaPrimaryTextColor;
-    if (validatedData.ctaSecondaryBgColor !== undefined) updateData.ctaSecondaryBgColor = validatedData.ctaSecondaryBgColor;
-    if (validatedData.ctaSecondaryTextColor !== undefined) updateData.ctaSecondaryTextColor = validatedData.ctaSecondaryTextColor;
+
     if (validatedData.showTypingEffect !== undefined) updateData.showTypingEffect = validatedData.showTypingEffect;
     if (validatedData.enableBackgroundAnimation !== undefined) updateData.enableBackgroundAnimation = validatedData.enableBackgroundAnimation;
     if (validatedData.customClasses !== undefined) updateData.customClasses = validatedData.customClasses;

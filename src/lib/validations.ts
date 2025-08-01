@@ -215,11 +215,7 @@ export const CreateHeroSectionSchema = z.object({
   headlineColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#1F2937'),
   subheadingColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#6B7280'),
   
-  // CTA Styling
-  ctaPrimaryBgColor: z.string().regex(/^(#[0-9A-Fa-f]{6}|transparent)$/, 'Invalid hex color or transparent').default('#5243E9'),
-  ctaPrimaryTextColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#FFFFFF'),
-  ctaSecondaryBgColor: z.string().regex(/^(#[0-9A-Fa-f]{6}|transparent)$/, 'Invalid hex color or transparent').default('transparent'),
-  ctaSecondaryTextColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#5243E9'),
+
   
   // Advanced
   showTypingEffect: z.boolean().default(false),

@@ -48,16 +48,16 @@ model SiteSettings {
   footerBackgroundColor    String?  @default("#F9FAFB")
   footerTextColor          String?  @default("#374151")
   baseUrl                  String?  @default("")
-  cloudinaryEnabled        Boolean  @default(false)
-  cloudinaryCloudName      String?
-  cloudinaryApiKey         String?
-  cloudinaryApiSecret      String?
-  cloudinaryUploadPreset   String?
   createdAt                DateTime @default(now())
   updatedAt                DateTime @updatedAt
   gaMeasurementId          String?  @default("NULL")
   gtmContainerId           String?  @default("NULL")
   gtmEnabled               Boolean  @default(false)
+  cloudinaryApiKey         String?
+  cloudinaryApiSecret      String?
+  cloudinaryCloudName      String?
+  cloudinaryEnabled        Boolean  @default(false)
+  cloudinaryUploadPreset   String?
 
   @@map("site_settings")
 }
@@ -198,9 +198,6 @@ model HeroSection {
   mediaPosition             String        @default("right")
   backgroundType            String        @default("color")
   backgroundValue           String        @default("#FFFFFF")
-  backgroundImage           String?
-  backgroundSize            String        @default("cover")
-  backgroundOverlay         String?
   taglineColor              String        @default("#5243E9")
   headlineColor             String        @default("#1F2937")
   subheadingColor           String        @default("#6B7280")
@@ -213,6 +210,9 @@ model HeroSection {
   visible                   Boolean       @default(true)
   createdAt                 DateTime      @default(now())
   updatedAt                 DateTime      @updatedAt
+  backgroundImage           String?
+  backgroundOverlay         String?
+  backgroundSize            String        @default("cover")
   ctaPrimary                CTA?          @relation("HeroPrimaryCTA", fields: [ctaPrimaryId], references: [id])
   ctaSecondary              CTA?          @relation("HeroSecondaryCTA", fields: [ctaSecondaryId], references: [id])
   pageSections              PageSection[]
@@ -251,7 +251,6 @@ model MediaSection {
   mediaPosition          String                @default("right")
   showBadge              Boolean               @default(true)
   showCtaButton          Boolean               @default(false)
-  ctaId                  Int?
   enableScrollAnimations Boolean               @default(false)
   animationType          String                @default("none")
   backgroundStyle        String                @default("solid")
@@ -263,9 +262,10 @@ model MediaSection {
   isActive               Boolean               @default(true)
   createdAt              DateTime              @default(now())
   updatedAt              DateTime              @updatedAt
+  ctaId                  Int?
   features               MediaSectionFeature[]
-  pageSections           PageSection[]
   cta                    CTA?                  @relation("MediaSectionCTA", fields: [ctaId], references: [id])
+  pageSections           PageSection[]
 
   @@map("media_sections")
 }
@@ -368,23 +368,23 @@ model CTA {
   id                Int            @id @default(autoincrement())
   text              String
   url               String
-  customId          String?
   icon              String?
   style             String         @default("primary")
   target            String         @default("_self")
   isActive          Boolean        @default(true)
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
-  onClickEvent      String?
-  onHoverEvent      String?
-  onMouseOutEvent   String?
-  onFocusEvent      String?
+  events            Json?
+  customId          String?
   onBlurEvent       String?
+  onClickEvent      String?
+  onFocusEvent      String?
+  onHoverEvent      String?
   onKeyDownEvent    String?
   onKeyUpEvent      String?
-  onTouchStartEvent String?
+  onMouseOutEvent   String?
   onTouchEndEvent   String?
-  events            Json?
+  onTouchStartEvent String?
   headerCTAs        HeaderCTA[]
   heroPrimary       HeroSection[]  @relation("HeroPrimaryCTA")
   heroSecondary     HeroSection[]  @relation("HeroSecondaryCTA")
@@ -419,30 +419,29 @@ model HeaderCTA {
 }
 
 model HomePageHero {
-  id               Int      @id @default(autoincrement())
-  tagline          String?
-  headline         String
-  subheading       String?
-  ctaPrimaryId     Int?
-  ctaSecondaryId   Int?
-  ctaPrimaryText   String?
-  ctaPrimaryUrl    String?
-  ctaSecondaryText String?
-  ctaSecondaryUrl  String?
-  mediaUrl         String?
-  backgroundColor  String?  @default("#FFFFFF")
-  backgroundImage  String?
-  backgroundSize   String   @default("cover")
+  id                Int      @id @default(autoincrement())
+  tagline           String?
+  headline          String
+  subheading        String?
+  ctaPrimaryId      Int?
+  ctaSecondaryId    Int?
+  ctaPrimaryText    String?
+  ctaPrimaryUrl     String?
+  ctaSecondaryText  String?
+  ctaSecondaryUrl   String?
+  mediaUrl          String?
+  backgroundColor   String?  @default("#FFFFFF")
+  isActive          Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  animationData     String?
+  animationType     String?  @default("conversation")
+  trustIndicators   String?
+  backgroundImage   String?
   backgroundOverlay String?
-  // Animation configuration
-  animationType    String?  @default("conversation") // conversation, video, html, script, image, none
-  animationData    String?  // JSON string for animation configuration
-  trustIndicators  String?  // JSON string for trust indicators configuration
-  isActive         Boolean  @default(true)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  ctaPrimary       CTA?     @relation("HomeHeroPrimaryCTA", fields: [ctaPrimaryId], references: [id])
-  ctaSecondary     CTA?     @relation("HomeHeroSecondaryCTA", fields: [ctaSecondaryId], references: [id])
+  backgroundSize    String   @default("cover")
+  ctaPrimary        CTA?     @relation("HomeHeroPrimaryCTA", fields: [ctaPrimaryId], references: [id])
+  ctaSecondary      CTA?     @relation("HomeHeroSecondaryCTA", fields: [ctaSecondaryId], references: [id])
 
   @@map("home_page_hero")
 }
@@ -540,11 +539,11 @@ model PageSection {
   contactSectionId Int?
   formId           Int?
   htmlSectionId    Int?
-  teamSectionId    Int?
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
   scriptSectionId  Int?
   headerSectionId  Int?
+  teamSectionId    Int?
   contactSection   ContactSection?  @relation(fields: [contactSectionId], references: [id])
   faqCategory      FAQCategory?     @relation(fields: [faqCategoryId], references: [id])
   faqSection       FAQSection?      @relation(fields: [faqSectionId], references: [id])
@@ -1173,26 +1172,26 @@ model TeamSection {
   name                  String
   heading               String
   subheading            String?
-  layoutType            String        @default("grid") // grid, staggered, list
+  layoutType            String        @default("grid")
   backgroundColor       String?       @default("#ffffff")
-  backgroundImage       String?
-  backgroundSize        String?       @default("cover") // cover, contain, auto, 100%, 200px
-  backgroundOverlay     String?
   headingColor          String?       @default("#000000")
   subheadingColor       String?       @default("#666666")
-  cardBackgroundColor   String?       @default("#ffffff")
-  photoBackgroundColor  String?       @default("#f3f4f6")
-  nameColor             String?       @default("#000000")
-  positionColor         String?       @default("#666666")
-  bioColor              String?       @default("#333333")
-  socialTextColor       String?       @default("#666666")
-  socialBackgroundColor String?       @default("#f3f4f6")
   paddingTop            Int           @default(96)
   paddingBottom         Int           @default(96)
   containerMaxWidth     String        @default("xl")
   isActive              Boolean       @default(true)
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt
+  cardBackgroundColor   String?       @default("#ffffff")
+  photoBackgroundColor  String?       @default("#f3f4f6")
+  bioColor              String?       @default("#333333")
+  nameColor             String?       @default("#000000")
+  positionColor         String?       @default("#666666")
+  socialBackgroundColor String?       @default("#f3f4f6")
+  socialTextColor       String?       @default("#666666")
+  backgroundImage       String?
+  backgroundOverlay     String?
+  backgroundSize        String?       @default("cover")
   pageSections          PageSection[]
   teamMembers           TeamMember[]
 
@@ -1200,24 +1199,24 @@ model TeamSection {
 }
 
 model TeamMember {
-  id              Int         @id @default(autoincrement())
-  teamSectionId   Int
-  name            String
-  position        String
-  bio             String?
-  photoUrl        String?
-  photoAlt        String?
-  email           String?
-  phone           String?
-  linkedinUrl     String?
-  twitterUrl      String?
-  githubUrl       String?
-  websiteUrl      String?
-  sortOrder       Int         @default(0)
-  isActive        Boolean     @default(true)
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
-  teamSection     TeamSection @relation(fields: [teamSectionId], references: [id], onDelete: Cascade)
+  id            Int         @id @default(autoincrement())
+  teamSectionId Int
+  name          String
+  position      String
+  bio           String?
+  photoUrl      String?
+  photoAlt      String?
+  email         String?
+  linkedinUrl   String?
+  twitterUrl    String?
+  githubUrl     String?
+  websiteUrl    String?
+  sortOrder     Int         @default(0)
+  isActive      Boolean     @default(true)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  phone         String?
+  teamSection   TeamSection @relation(fields: [teamSectionId], references: [id], onDelete: Cascade)
 
   @@map("team_members")
 }

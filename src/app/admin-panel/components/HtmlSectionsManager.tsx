@@ -245,11 +245,16 @@ const HtmlSectionsManager: React.FC = () => {
   const fetchHtmlSections = async () => {
     try {
       setLoading(true);
+      setError(null); // Clear any previous errors
+      console.log('🔍 Fetching HTML sections...');
       const response = await fetch('/api/admin/html-sections');
+      console.log('📡 Response status:', response.status);
       if (!response.ok) throw new Error('Failed to fetch HTML sections');
       const data = await response.json();
+      console.log('📊 HTML sections data:', data);
       setHtmlSections(data);
     } catch (err) {
+      console.error('❌ Error fetching HTML sections:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch HTML sections');
     } finally {
       setLoading(false);
