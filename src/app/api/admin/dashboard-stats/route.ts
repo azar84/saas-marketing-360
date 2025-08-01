@@ -52,6 +52,7 @@ export async function GET() {
     
     const response: ApiResponse<null> = {
       success: false,
+      data: null,
       message: 'Failed to fetch dashboard statistics'
     };
     
