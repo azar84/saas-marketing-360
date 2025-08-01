@@ -175,7 +175,7 @@ export default function AdminLogin() {
           </div>
           
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            {isResetMode ? 'Reset Password' : 'Admin Panel'}
+            {isResetMode ? 'Reset Password' : 'Sign In'}
           </h1>
           
           <p className="text-gray-600 text-sm max-w-sm mx-auto">
@@ -329,7 +329,7 @@ export default function AdminLogin() {
                       Signing in...
                     </div>
                   ) : (
-                    'Sign in to Admin Panel'
+                    'Sign In'
                   )}
                 </button>
               </div>
