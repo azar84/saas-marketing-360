@@ -116,6 +116,19 @@ export default function AdminPanel() {
   // Site settings state - moved to top to follow Rules of Hooks
   const [siteSettings, setSiteSettings] = useState<SiteSettings | null>(null);
   const [loadingSettings, setLoadingSettings] = useState(true);
+  
+  // Dashboard statistics state
+  const [dashboardStats, setDashboardStats] = useState({
+    totalPages: 0,
+    heroSections: 0,
+    features: 0,
+    pricingPlans: 0,
+    pagesGrowth: 0,
+    heroSectionsGrowth: 0,
+    featuresGrowth: 0,
+    pricingPlansGrowth: 0
+  });
+  const [loadingStats, setLoadingStats] = useState(true);
 
   // Check authentication
   useEffect(() => {
@@ -124,24 +137,34 @@ export default function AdminPanel() {
     }
   }, [authLoading, isAuthenticated, router]);
 
-  // Fetch site settings on component mount
+  // Fetch site settings and dashboard stats on component mount
   useEffect(() => {
     if (isAuthenticated) {
-      const fetchSiteSettings = async () => {
+      const fetchData = async () => {
         try {
           setLoadingSettings(true);
-          const response = await get<{ success: boolean; data: SiteSettings }>('/api/admin/site-settings');
-          if (response.success) {
-            setSiteSettings(response.data);
+          setLoadingStats(true);
+          
+          // Fetch site settings
+          const settingsResponse = await get<{ success: boolean; data: SiteSettings }>('/api/admin/site-settings');
+          if (settingsResponse.success) {
+            setSiteSettings(settingsResponse.data);
+          }
+          
+          // Fetch dashboard statistics
+          const statsResponse = await get<{ success: boolean; data: any }>('/api/admin/dashboard-stats');
+          if (statsResponse.success) {
+            setDashboardStats(statsResponse.data);
           }
         } catch (error) {
-          console.error('Error fetching site settings:', error);
+          console.error('Error fetching data:', error);
         } finally {
           setLoadingSettings(false);
+          setLoadingStats(false);
         }
       };
 
-      fetchSiteSettings();
+      fetchData();
     }
   }, [get, isAuthenticated]);
 
@@ -355,7 +378,9 @@ export default function AdminPanel() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p style={{ color: adminColors.textSecondary }} className="text-sm font-medium">Total Pages</p>
-                    <p style={{ color: adminColors.textPrimary }} className="text-2xl font-bold">8</p>
+                    <p style={{ color: adminColors.textPrimary }} className="text-2xl font-bold">
+                      {loadingStats ? '...' : dashboardStats.totalPages}
+                    </p>
                   </div>
                   <div 
                     className="p-3 rounded-lg"
@@ -372,7 +397,7 @@ export default function AdminPanel() {
                     className="text-sm font-medium"
                     style={{ color: designSystem?.successColor || '#10B981' }}
                   >
-                    +12% from last month
+                    {dashboardStats.pagesGrowth > 0 ? '+' : ''}{dashboardStats.pagesGrowth}% from last month
                   </span>
                 </div>
               </Card>
@@ -381,7 +406,9 @@ export default function AdminPanel() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p style={{ color: adminColors.textSecondary }} className="text-sm font-medium">Hero Sections</p>
-                    <p style={{ color: adminColors.textPrimary }} className="text-2xl font-bold">15</p>
+                    <p style={{ color: adminColors.textPrimary }} className="text-2xl font-bold">
+                      {loadingStats ? '...' : dashboardStats.heroSections}
+                    </p>
                   </div>
                   <div 
                     className="p-3 rounded-lg"
@@ -398,7 +425,7 @@ export default function AdminPanel() {
                     className="text-sm font-medium"
                     style={{ color: designSystem?.primaryColor || '#5243E9' }}
                   >
-                    +8% from last month
+                    {dashboardStats.heroSectionsGrowth > 0 ? '+' : ''}{dashboardStats.heroSectionsGrowth}% from last month
                   </span>
                 </div>
               </Card>
@@ -407,7 +434,9 @@ export default function AdminPanel() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p style={{ color: adminColors.textSecondary }} className="text-sm font-medium">Features</p>
-                    <p style={{ color: adminColors.textPrimary }} className="text-2xl font-bold">42</p>
+                    <p style={{ color: adminColors.textPrimary }} className="text-2xl font-bold">
+                      {loadingStats ? '...' : dashboardStats.features}
+                    </p>
                   </div>
                   <div 
                     className="p-3 rounded-lg"
@@ -424,7 +453,7 @@ export default function AdminPanel() {
                     className="text-sm font-medium"
                     style={{ color: designSystem?.warningColor || '#F59E0B' }}
                   >
-                    +24% from last month
+                    {dashboardStats.featuresGrowth > 0 ? '+' : ''}{dashboardStats.featuresGrowth}% from last month
                   </span>
                 </div>
               </Card>
@@ -433,7 +462,9 @@ export default function AdminPanel() {
                 <div className="flex items-center justify-between">
                   <div>
                     <p style={{ color: adminColors.textSecondary }} className="text-sm font-medium">Pricing Plans</p>
-                    <p style={{ color: adminColors.textPrimary }} className="text-2xl font-bold">3</p>
+                    <p style={{ color: adminColors.textPrimary }} className="text-2xl font-bold">
+                      {loadingStats ? '...' : dashboardStats.pricingPlans}
+                    </p>
                   </div>
                   <div 
                     className="p-3 rounded-lg"
@@ -450,7 +481,7 @@ export default function AdminPanel() {
                     className="text-sm font-medium"
                     style={{ color: designSystem?.successColor || '#10B981' }}
                   >
-                    Professional most popular
+                    {dashboardStats.pricingPlansGrowth > 0 ? '+' : ''}{dashboardStats.pricingPlansGrowth}% from last month
                   </span>
                 </div>
               </Card>
