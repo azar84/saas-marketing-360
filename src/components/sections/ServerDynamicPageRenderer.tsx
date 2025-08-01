@@ -556,6 +556,7 @@ async function fetchHomeHeroData() {
       secondaryCtaId: homeHero.ctaSecondaryId || null,
       primaryCta: homeHero.ctaPrimary || null,
       secondaryCta: homeHero.ctaSecondary || null,
+
       isActive: homeHero.isActive,
       animationType: homeHero.animationType || 'conversation',
       animationData: homeHero.animationData ? JSON.parse(homeHero.animationData) : {

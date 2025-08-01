@@ -438,6 +438,7 @@ model HomePageHero {
   backgroundImage  String?
   backgroundSize   String   @default("cover")
   backgroundOverlay String?
+
   // Animation configuration
   animationType    String?  @default("conversation") // conversation, video, html, script, image, none
   animationData    String?  // JSON string for animation configuration
