@@ -91,11 +91,7 @@ interface HeroSection {
   taglineColor: string;
   headlineColor: string;
   subheadingColor: string;
-  // CTA Styling
-  ctaPrimaryBgColor: string;
-  ctaPrimaryTextColor: string;
-  ctaSecondaryBgColor: string;
-  ctaSecondaryTextColor: string;
+
   showTypingEffect: boolean;
   enableBackgroundAnimation: boolean;
   customClasses?: string;
@@ -366,10 +362,7 @@ const HeroSectionsManager: React.FC = () => {
     taglineColor: themeDefaults.primaryColor,
     headlineColor: themeDefaults.textPrimary,
     subheadingColor: themeDefaults.textSecondary,
-    ctaPrimaryBgColor: themeDefaults.primaryColor,
-    ctaPrimaryTextColor: '#FFFFFF',
-    ctaSecondaryBgColor: 'transparent',
-    ctaSecondaryTextColor: themeDefaults.primaryColor,
+    
     showTypingEffect: false,
     enableBackgroundAnimation: false,
     customClasses: '',
@@ -389,8 +382,7 @@ const HeroSectionsManager: React.FC = () => {
         taglineColor: newThemeDefaults.primaryColor,
         headlineColor: newThemeDefaults.textPrimary,
         subheadingColor: newThemeDefaults.textSecondary,
-        ctaPrimaryBgColor: newThemeDefaults.primaryColor,
-        ctaSecondaryTextColor: newThemeDefaults.primaryColor,
+        
       }));
     }
   }, [designSystem, editingHero]);
@@ -541,10 +533,7 @@ const HeroSectionsManager: React.FC = () => {
       taglineColor: currentThemeDefaults.primaryColor,
       headlineColor: currentThemeDefaults.textPrimary,
       subheadingColor: currentThemeDefaults.textSecondary,
-      ctaPrimaryBgColor: currentThemeDefaults.primaryColor,
-      ctaPrimaryTextColor: '#FFFFFF',
-      ctaSecondaryBgColor: 'transparent',
-      ctaSecondaryTextColor: currentThemeDefaults.primaryColor,
+
       showTypingEffect: false,
       enableBackgroundAnimation: false,
       customClasses: '',
@@ -582,10 +571,7 @@ const HeroSectionsManager: React.FC = () => {
       taglineColor: hero.taglineColor,
       headlineColor: hero.headlineColor,
       subheadingColor: hero.subheadingColor,
-      ctaPrimaryBgColor: hero.ctaPrimaryBgColor,
-      ctaPrimaryTextColor: hero.ctaPrimaryTextColor,
-      ctaSecondaryBgColor: hero.ctaSecondaryBgColor,
-      ctaSecondaryTextColor: hero.ctaSecondaryTextColor,
+
       showTypingEffect: hero.showTypingEffect,
       enableBackgroundAnimation: hero.enableBackgroundAnimation,
       customClasses: hero.customClasses || '',
@@ -1366,56 +1352,7 @@ const HeroSectionsManager: React.FC = () => {
                   </div>
                 </div>
 
-                {/* CTA Styling */}
-                <div className="p-4 rounded-lg" style={{ backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>
-                  <h4 className="font-medium mb-4 flex items-center" style={{ color: designSystem?.textPrimary || '#000000' }}>
-                    <Zap size={20} className="mr-2" />
-                    CTA Button Styling
-                  </h4>
-                  <div className="space-y-4">
-                    {/* Primary CTA Colors */}
-                    <div>
-                      <h5 className="text-sm font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>Primary CTA Button</h5>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <ColorPicker
-                          label="Background Color"
-                          value={formData.ctaPrimaryBgColor}
-                          onChange={(color) => setFormData({ ...formData, ctaPrimaryBgColor: color })}
-                          allowTransparent
-                          designSystem={designSystem}
-                        />
-                        
-                        <ColorPicker
-                          label="Text Color"
-                          value={formData.ctaPrimaryTextColor}
-                          onChange={(color) => setFormData({ ...formData, ctaPrimaryTextColor: color })}
-                          designSystem={designSystem}
-                        />
-                      </div>
-                    </div>
 
-                    {/* Secondary CTA Colors */}
-                    <div>
-                      <h5 className="text-sm font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>Secondary CTA Button</h5>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <ColorPicker
-                          label="Background Color"
-                          value={formData.ctaSecondaryBgColor}
-                          onChange={(color) => setFormData({ ...formData, ctaSecondaryBgColor: color })}
-                          allowTransparent
-                          designSystem={designSystem}
-                        />
-                        
-                        <ColorPicker
-                          label="Text Color"
-                          value={formData.ctaSecondaryTextColor}
-                          onChange={(color) => setFormData({ ...formData, ctaSecondaryTextColor: color })}
-                          designSystem={designSystem}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                </div>
 
                 {/* Advanced Options */}
                 <div className="p-4 rounded-lg" style={{ backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>

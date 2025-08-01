@@ -587,6 +587,10 @@ const MediaSection: React.FC<MediaSectionProps> = ({
 
     const IconComponent = cta.icon ? getIconComponent(cta.icon) : null;
     const ctaEvents = applyCTAEvents(cta as CTAWithEvents);
+    
+    // Runtime safeguard for allowed styles
+    const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'destructive', 'success', 'info', 'outline', 'muted'];
+    const safeStyle = allowedStyles.includes(cta.style) ? cta.style : 'primary';
 
     return (
       <div className="mb-8">
@@ -594,7 +598,7 @@ const MediaSection: React.FC<MediaSectionProps> = ({
           href={cta.url}
           target={cta.target}
           id={cta.customId}
-          className={`inline-flex items-center px-6 py-3 rounded-lg font-semibold transition-all duration-200 select-none relative overflow-hidden btn-${cta.style}`}
+          className={`inline-flex items-center justify-center gap-2 h-12 px-6 rounded-lg transition-all duration-200 select-none relative overflow-hidden btn-${safeStyle}`}
           style={{
             fontSize: 'var(--font-size-base)',
             fontWeight: 'var(--font-weight-medium)',

@@ -204,10 +204,6 @@ model HeroSection {
   taglineColor              String        @default("#5243E9")
   headlineColor             String        @default("#1F2937")
   subheadingColor           String        @default("#6B7280")
-  ctaPrimaryBgColor         String        @default("#5243E9")
-  ctaPrimaryTextColor       String        @default("#FFFFFF")
-  ctaSecondaryBgColor       String        @default("transparent")
-  ctaSecondaryTextColor     String        @default("#5243E9")
   showTypingEffect          Boolean       @default(false)
   enableBackgroundAnimation Boolean       @default(false)
   customClasses             String?

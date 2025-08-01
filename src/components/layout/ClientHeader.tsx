@@ -155,9 +155,9 @@ export default function ClientHeader({
             transform: scale(1.02);
           }
           .btn-secondary {
-            background-color: var(--color-secondary, #7C3AED);
+            background-color: var(--color-secondary);
             color: white;
-            border: 1px solid var(--color-secondary, #7C3AED);
+            border: 1px solid var(--color-secondary);
           }
           .btn-secondary:hover {
             background-color: var(--color-secondary-dark, var(--color-secondary));
@@ -246,7 +246,7 @@ export default function ClientHeader({
       >
       {/* Subtle border animation */}
       <motion.div
-        className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-[#5243E9] via-[#7C3AED] to-[#5243E9]"
+        className="absolute bottom-0 left-0 h-0.5 bg-gradient-to-r from-[var(--color-primary)] via-[var(--color-secondary)] to-[var(--color-primary)]"
         initial={{ width: 0 }}
         animate={{ width: isScrolled ? '100%' : '0%' }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
@@ -289,7 +289,7 @@ export default function ClientHeader({
                         transition={{ type: "spring", stiffness: 400, damping: 10 }}
                       >
                         {/* Animated gradient background */}
-                        <div className="absolute inset-0 bg-gradient-to-br from-[#5243E9] via-[#7C3AED] to-[#8B5CF6] animate-pulse" />
+                        <div className="absolute inset-0 bg-gradient-to-br from-[var(--color-primary)] via-[var(--color-secondary)] to-[var(--color-accent)] animate-pulse" />
                         
                         {/* Icon */}
                         <span className="relative text-white font-bold text-lg lg:text-xl z-10">
@@ -300,7 +300,7 @@ export default function ClientHeader({
                         <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                       </motion.div>
                       <motion.span 
-                        className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-[#5243E9] to-[#7C3AED] bg-clip-text text-transparent group-hover:from-[#4338CA] group-hover:to-[#6D28D9] transition-all duration-300"
+                        className="text-xl lg:text-2xl font-bold bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-secondary)] bg-clip-text text-transparent group-hover:from-[var(--color-primary-dark)] group-hover:to-[var(--color-secondary-dark)] transition-all duration-300"
                         whileHover={{ x: 2 }}
                         transition={{ type: "spring", stiffness: 400, damping: 10 }}
                       >
@@ -546,7 +546,7 @@ export default function ClientHeader({
                       target={cta.target}
                       id={cta.customId}
                       className={cn(
-                        'inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg transition-all duration-200 select-none relative overflow-hidden',
+                        'inline-flex items-center justify-center gap-2 h-12 px-6 rounded-lg transition-all duration-200 select-none relative overflow-hidden',
                         `btn-${safeStyle}`,
                         safeStyle === 'primary' && 'focus-visible:ring-blue-500 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 before:transition-opacity hover:before:opacity-100',
                         safeStyle === 'secondary' && 'focus-visible:ring-blue-500',
@@ -602,7 +602,7 @@ export default function ClientHeader({
 
             {/* Mobile Menu Toggle */}
             <motion.button
-              className="lg:hidden relative p-3 rounded-xl hover:bg-gradient-to-r hover:from-[var(--color-primary)]/5 hover:to-[#7C3AED]/5 transition-all duration-300 group"
+              className="lg:hidden relative p-3 rounded-xl hover:bg-gradient-to-r hover:from-[var(--color-primary)]/5 hover:to-[var(--color-secondary)]/5 transition-all duration-300 group"
               type="button"
               onClick={toggleMenu}
               aria-controls="navbarSupportedContent"
@@ -612,7 +612,7 @@ export default function ClientHeader({
               whileTap={{ scale: 0.95 }}
             >
               {/* Background glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)]/10 to-[#7C3AED]/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)]/10 to-[var(--color-secondary)]/10 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
               
               <motion.div
                 animate={{ rotate: isMenuOpen ? 180 : 0 }}
@@ -626,7 +626,7 @@ export default function ClientHeader({
                     transition={{ duration: 0.2 }}
                   >
                     <X 
-                      className="w-6 h-6 group-hover:text-[#7C3AED] transition-colors duration-300" 
+                      className="w-6 h-6 group-hover:text-[var(--color-secondary)] transition-colors duration-300" 
                       style={{ color: finalMenuTextColor }}
                     />
                   </motion.div>
@@ -664,7 +664,7 @@ export default function ClientHeader({
             }}
           >
             {/* Decorative gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)]/3 via-transparent to-[#7C3AED]/3 pointer-events-none" />
+                                <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-primary)]/3 via-transparent to-[var(--color-secondary)]/3 pointer-events-none" />
             <div className="max-w-7xl mx-auto px-6 py-8 relative z-10">
               <nav className="space-y-2">
                 {navigationItems.map((item, index) => (

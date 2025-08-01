@@ -117,7 +117,7 @@ import {
 } from 'lucide-react';
 import { renderIcon } from '@/lib/iconUtils';
 import { Button, Input } from '@/components/ui';
-import { applyCTAEvents, hasCTAEvents, executeCTAEvent, executeCTAEventFromConfig, getCTAStyles, cn, type CTAWithEvents } from '@/lib/utils';
+import { applyCTAEvents, hasCTAEvents, executeCTAEvent, executeCTAEventFromConfig, cn, type CTAWithEvents } from '@/lib/utils';
 
 // AI Assistant Avatar Component
 const AIAvatar = ({ size = 'md', className = '' }: { size?: 'sm' | 'md' | 'lg', className?: string }) => {
@@ -290,26 +290,29 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
     // Use the same approach as the header - CSS classes instead of getCTAStyles
     const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'destructive', 'success', 'info', 'outline', 'muted'];
     const safeStyle = allowedStyles.includes(style) ? style : 'primary';
-    return {
-      className: cn(
-        'inline-flex items-center justify-center gap-2 h-10 px-4 rounded-lg transition-all duration-200 select-none relative overflow-hidden',
-        `btn-${safeStyle}`,
-        safeStyle === 'primary' && 'focus-visible:ring-blue-500 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 before:transition-opacity hover:before:opacity-100',
-        safeStyle === 'secondary' && 'focus-visible:ring-blue-500',
-        safeStyle === 'accent' && 'focus-visible:ring-purple-500 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 before:transition-opacity hover:before:opacity-100',
-        safeStyle === 'ghost' && 'focus-visible:ring-blue-500',
-        safeStyle === 'destructive' && 'focus-visible:ring-red-500',
-        safeStyle === 'success' && 'focus-visible:ring-green-500',
-        safeStyle === 'info' && 'focus-visible:ring-blue-400',
-        safeStyle === 'outline' && 'focus-visible:ring-blue-500',
-        safeStyle === 'muted' && 'cursor-not-allowed'
-      ),
-      style: {
-        fontSize: 'var(--font-size-base)',
-        fontWeight: 'var(--font-weight-medium)',
-        fontFamily: 'var(--font-family-sans)',
-      }
-    };
+    
+    const baseClasses = cn(
+      'inline-flex items-center justify-center gap-2 h-12 px-6 rounded-lg transition-all duration-200 select-none relative overflow-hidden',
+      `btn-${safeStyle}`,
+      safeStyle === 'primary' && 'focus-visible:ring-blue-500 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 before:transition-opacity hover:before:opacity-100',
+      safeStyle === 'secondary' && 'focus-visible:ring-blue-500',
+      safeStyle === 'accent' && 'focus-visible:ring-purple-500 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:to-transparent before:opacity-0 before:transition-opacity hover:before:opacity-100',
+      safeStyle === 'ghost' && 'focus-visible:ring-blue-500',
+      safeStyle === 'destructive' && 'focus-visible:ring-red-500',
+      safeStyle === 'success' && 'focus-visible:ring-green-500',
+      safeStyle === 'info' && 'focus-visible:ring-blue-400',
+      safeStyle === 'outline' && 'focus-visible:ring-blue-500',
+      safeStyle === 'muted' && 'cursor-not-allowed'
+    );
+    
+                  return {
+                className: baseClasses,
+                style: {
+                  fontSize: 'var(--font-size-base)',
+                  fontWeight: 'var(--font-weight-medium)',
+                  fontFamily: 'var(--font-family-sans)',
+                }
+              };
   };
 
   // Dynamic conversation flow from heroData
@@ -584,9 +587,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
             transform: scale(1.02);
           }
           .btn-secondary {
-            background-color: var(--color-secondary, #7C3AED);
+            background-color: var(--color-secondary);
             color: white;
-            border: 1px solid var(--color-secondary, #7C3AED);
+            border: 1px solid var(--color-secondary);
           }
           .btn-secondary:hover {
             background-color: var(--color-secondary-dark, var(--color-secondary));
@@ -665,7 +668,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
         ref={heroRef}
         style={{ 
           opacity,
-          backgroundColor: heroData?.backgroundColor || '#FFFFFF',
+          backgroundColor: heroData?.backgroundColor || 'var(--color-background)',
           backgroundImage: heroData?.backgroundImage ? `url(${heroData.backgroundImage})` : 'none',
           backgroundSize: heroData?.backgroundSize || 'cover',
           backgroundPosition: 'center',
@@ -691,7 +694,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
           style={{
             background: heroData?.backgroundColor 
               ? `radial-gradient(circle at center, ${heroData.backgroundColor}, ${heroData.backgroundColor})`
-              : 'radial-gradient(circle at center, #FBFBFB, #FFFFFF)'
+              : 'radial-gradient(circle at center, var(--color-background-light), var(--color-background))'
           }}
         />
       )}
@@ -706,7 +709,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
       {/* Soft Gradient Mesh - More Subtle */}
       <div className="absolute inset-0 opacity-30">
         <div className="absolute top-20 left-20 w-96 h-96 bg-gradient-to-r from-[var(--color-primary)]/8 to-[var(--color-primary-light)]/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-[var(--color-primary-light)]/6 to-[#8B5CF6]/4 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-[var(--color-primary-light)]/6 to-[var(--color-accent)]/4 rounded-full blur-3xl" />
       </div>
 
       <div className="relative z-10 w-full px-6 lg:px-8 pb-8 lg:pb-0">
@@ -756,8 +759,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'destructive', 'success', 'info', 'outline', 'muted'];
                 const safeStyle = allowedStyles.includes(heroData.primaryCta.style) ? heroData.primaryCta.style : 'primary';
                 
-                // Get button styles with design system colors
-                const buttonStyles = getButtonStyles(safeStyle);
+                // Get button styles with custom colors if provided
+                        const buttonStyles = getButtonStyles(safeStyle);
                 
                 // Always render as <a> tag if URL is present (even if it's '#')
                 if (heroData.primaryCta.url) {
@@ -909,8 +912,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'destructive', 'success', 'info', 'outline', 'muted'];
                 const safeStyle = allowedStyles.includes(heroData.secondaryCta.style) ? heroData.secondaryCta.style : 'secondary';
                 
-                // Get button styles with design system colors
-                const secondaryButtonStyles = getButtonStyles(safeStyle);
+                // Get button styles with custom colors if provided
+                                  const secondaryButtonStyles = getButtonStyles(safeStyle);
                 
                 // Always render as <a> tag if URL is present (even if it's '#')
                 if (heroData.secondaryCta.url) {

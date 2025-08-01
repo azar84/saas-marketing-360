@@ -3,7 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { renderIcon } from '@/lib/iconUtils';
-import { applyCTAEvents, hasCTAEvents, executeCTAEvent, executeCTAEventFromConfig, getCTAStyles, type CTAWithEvents } from '@/lib/utils';
+import { applyCTAEvents, hasCTAEvents, executeCTAEvent, executeCTAEventFromConfig, cn, type CTAWithEvents } from '@/lib/utils';
 
 interface CTA {
   id: number;
@@ -190,7 +190,7 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
           baseStyles.backgroundRepeat = 'no-repeat';
           break;
         case 'video':
-          baseStyles.backgroundColor = '#000';
+          baseStyles.backgroundColor = 'var(--color-background-dark)';
           break;
         case 'color':
         default:
@@ -205,11 +205,11 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
   // Get responsive button size classes - modernized and sleeker
   const getButtonSizeClasses = (isHeroSection = true) => {
     if (isHeroSection) {
-      // More refined, less bulky buttons for hero sections
+      // Use larger sizing for hero sections - more prominent
       return {
-        padding: 'px-6 py-3 lg:px-8 lg:py-4',
-        text: 'text-sm lg:text-base',
-        icon: 'w-4 h-4 lg:w-5 lg:h-5'
+        padding: 'h-12 px-6',
+        text: 'text-base',
+        icon: 'w-5 h-5'
       };
     }
     return {
@@ -226,7 +226,7 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
     textColor?: string;
   }) => {
     const buttonSizes = getButtonSizeClasses(true);
-    const baseClasses = `${buttonSizes.padding} ${buttonSizes.text} rounded-xl font-medium transition-all duration-300 hover:transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-offset-2 backdrop-blur-sm`;
+    const baseClasses = `${buttonSizes.padding} ${buttonSizes.text} rounded-lg font-medium transition-all duration-200 select-none relative overflow-hidden`;
     
     // If custom colors are provided, use them
     if (customColors) {
@@ -234,10 +234,11 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
       return `${baseClasses} hover:opacity-90 shadow-lg`;
     }
     
-    // Use unified CTA styling with design system colors
-    const ctaStyles = getCTAStyles(style, undefined, isDarkBackground);
+    // Use the same approach as the header - CSS classes instead of getCTAStyles
+    const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'destructive', 'success', 'info', 'outline', 'muted'];
+    const safeStyle = allowedStyles.includes(style) ? style : 'primary';
     
-    return `${baseClasses} ${ctaStyles.className}`;
+    return `${baseClasses} btn-${safeStyle}`;
   };
 
   // Get responsive media height classes - larger, more prominent images
@@ -348,8 +349,8 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
       // Runtime safeguard for allowed styles
       const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'destructive', 'success', 'info', 'outline', 'muted'];
       const safeStyle = allowedStyles.includes(ctaPrimary.style) ? ctaPrimary.style : 'primary';
-      // Get unified CTA styles
-      const ctaStyles = getCTAStyles(safeStyle, undefined, isDarkBackground);
+      // Get button classes using the same approach as header
+      const buttonClasses = getButtonClasses('primary', safeStyle);
       // Always render as <a> tag if URL is present (even if it's '#')
       if (ctaPrimary.url) {
         
@@ -359,8 +360,8 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
             href={ctaPrimary.url}
             target={ctaPrimary.target}
             id={ctaPrimary.customId}
-            className={`inline-flex items-center gap-2.5 ${ctaStyles.className}`}
-            style={ctaStyles.style}
+            className={`inline-flex items-center gap-2.5 ${buttonClasses}`}
+            style={{}}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={ctaEvents.onClick ? (e) => {
@@ -403,8 +404,8 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
             key="primary"
             type="button"
             id={ctaPrimary.customId}
-            className={`inline-flex items-center gap-2.5 ${ctaStyles.className}`}
-            style={ctaStyles.style}
+            className={`inline-flex items-center gap-2.5 ${buttonClasses}`}
+            style={{}}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={ctaEvents.onClick ? (e) => {
@@ -449,8 +450,8 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
       const safeStyle = allowedStyles.includes(ctaSecondary.style) ? ctaSecondary.style : 'primary';
       // Always render as <a> tag if URL is present (even if it's '#')
       if (ctaSecondary.url) {
-        // Get unified CTA styles for secondary
-        const secondaryCtaStyles = getCTAStyles(safeStyle, undefined, isDarkBackground);
+        // Get button classes using the same approach as header
+        const secondaryButtonClasses = getButtonClasses('secondary', safeStyle);
         
         ctas.push(
           <motion.a
@@ -458,8 +459,8 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
             href={ctaSecondary.url}
             target={ctaSecondary.target}
             id={ctaSecondary.customId}
-            className={`inline-flex items-center gap-2.5 ${secondaryCtaStyles.className}`}
-            style={secondaryCtaStyles.style}
+            className={`inline-flex items-center gap-2.5 ${secondaryButtonClasses}`}
+            style={{}}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={ctaEvents.onClick ? (e) => {
@@ -565,7 +566,7 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
     const titleElement = (
       <motion.h1 
         className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 lg:mb-6 leading-tight ${textAlign}`}
-        style={{ color: headlineColor || '#1F2937' }}
+                        style={{ color: headlineColor || 'var(--color-text-primary)' }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -577,7 +578,7 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
     const subtitleElement = (overrideSubtitle || subheading) ? (
       <motion.p 
         className={`text-lg sm:text-xl lg:text-2xl xl:text-3xl mb-6 lg:mb-8 ${textAlign} max-w-4xl leading-relaxed ${textAlignment === 'center' ? 'mx-auto' : ''}`}
-        style={{ color: subheadingColor || '#6B7280' }}
+                        style={{ color: subheadingColor || 'var(--color-text-muted)' }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
@@ -590,9 +591,9 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
       <motion.div 
         className={`inline-block px-3 py-1.5 lg:px-4 lg:py-2 rounded-full backdrop-blur-sm border text-xs lg:text-sm font-medium mb-4 lg:mb-6`}
         style={{ 
-          color: taglineColor || '#5243E9',
-          backgroundColor: `${taglineColor || '#5243E9'}15`,
-          borderColor: `${taglineColor || '#5243E9'}25`
+                      color: taglineColor || 'var(--color-primary)',
+            backgroundColor: `${taglineColor || 'var(--color-primary)'}15`,
+            borderColor: `${taglineColor || 'var(--color-primary)'}25`
         }}
         initial={{ opacity: 0, scale: 0.8 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -713,16 +714,107 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
   const sectionHeightConfig = getSectionHeight();
 
   return (
-    <section 
-      className={`relative overflow-hidden ${sectionHeightConfig.className} flex items-center ${customClasses || ''} ${className}`}
-      style={{
-        ...getBackgroundStyles(),
-        ...sectionHeightConfig.style,
-        paddingTop: `${paddingTop}px`,
-        paddingBottom: `${paddingBottom}px`,
-        marginTop: '-3vh'
-      }}
-    >
+    <>
+      {/* Inject button styles for CTAs - same as header */}
+      <style dangerouslySetInnerHTML={{ 
+        __html: `
+          .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+          }
+          .btn-primary:hover {
+            background-color: var(--color-primary-light, var(--color-primary));
+            transform: scale(1.02);
+          }
+          .btn-secondary {
+            background-color: var(--color-secondary);
+            color: white;
+            border: 1px solid var(--color-secondary);
+          }
+          .btn-secondary:hover {
+            background-color: var(--color-secondary-dark, var(--color-secondary));
+            transform: scale(1.02);
+          }
+          .btn-accent {
+            background-color: var(--color-accent);
+            color: white;
+            border: none;
+          }
+          .btn-accent:hover {
+            background-color: var(--color-accent-dark, var(--color-accent));
+            transform: scale(1.02);
+          }
+          .btn-ghost {
+            background-color: transparent;
+            color: var(--color-text-primary);
+            border: 1px solid transparent;
+          }
+          .btn-ghost:hover {
+            background-color: var(--color-primary-light, rgba(99, 102, 241, 0.1));
+            transform: scale(1.02);
+          }
+          .btn-destructive {
+            background-color: var(--color-error);
+            color: white;
+            border: none;
+          }
+          .btn-destructive:hover {
+            background-color: var(--color-error-dark, var(--color-error));
+            transform: scale(1.02);
+          }
+          .btn-success {
+            background-color: var(--color-success);
+            color: white;
+            border: none;
+          }
+          .btn-success:hover {
+            background-color: var(--color-success-dark, var(--color-success));
+            transform: scale(1.02);
+          }
+          .btn-info {
+            background-color: var(--color-info);
+            color: white;
+            border: none;
+          }
+          .btn-info:hover {
+            background-color: var(--color-info-dark, var(--color-info));
+            transform: scale(1.02);
+          }
+          .btn-outline {
+            background-color: transparent;
+            color: var(--color-primary);
+            border: 1px solid var(--color-primary);
+          }
+          .btn-outline:hover {
+            background-color: var(--color-primary);
+            color: white;
+            transform: scale(1.02);
+          }
+          .btn-muted {
+            background-color: var(--color-gray-light);
+            color: var(--color-text-muted);
+            border: 1px solid var(--color-gray-dark);
+            cursor: not-allowed;
+          }
+          .btn-muted:hover {
+            background-color: var(--color-gray-medium);
+            transform: scale(1.02);
+            border-color: var(--color-gray-dark);
+          }
+        `
+      }} />
+      
+      <section 
+        className={`relative overflow-hidden ${sectionHeightConfig.className} flex items-center ${customClasses || ''} ${className}`}
+        style={{
+          ...getBackgroundStyles(),
+          ...sectionHeightConfig.style,
+          paddingTop: `${paddingTop}px`,
+          paddingBottom: `${paddingBottom}px`,
+          marginTop: '-3vh'
+        }}
+      >
       {/* Background Overlay */}
       {backgroundOverlay && (
         <div 
@@ -763,7 +855,8 @@ const DynamicHeroSection: React.FC<DynamicHeroSectionProps> = ({
         {renderContent()}
         </div>
       </div>
-    </section>
+          </section>
+    </>
   );
 };
 
