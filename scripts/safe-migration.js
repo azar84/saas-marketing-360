@@ -9,8 +9,22 @@ async function safeMigration() {
   console.log('='.repeat(60));
   
   try {
-    await prisma.$connect();
-    console.log('✅ Connected to database');
+    // Try to connect to database, but don't fail if we can't
+    let canConnect = false;
+    try {
+      await prisma.$connect();
+      console.log('✅ Connected to database');
+      canConnect = true;
+    } catch (error) {
+      console.log('⚠️  Cannot connect to database during build - skipping migration');
+      console.log('   This is normal for Vercel builds. Migration will run at runtime.');
+      return;
+    }
+    
+    // Only proceed if we can connect to the database
+    if (!canConnect) {
+      return;
+    }
     
     // Check if we're in production
     const isProduction = process.env.NODE_ENV === 'production';

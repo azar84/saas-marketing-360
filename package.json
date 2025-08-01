@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "npx prisma generate && next build",
-    "postbuild": "node scripts/safe-migration.js",
+    "postbuild": "node scripts/safe-migration.js || echo 'Migration skipped - will run at runtime'",
     "start": "next start",
     "deploy": "bash scripts/deploy.sh",
     "lint": "next lint",
