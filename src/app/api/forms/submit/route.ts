@@ -69,16 +69,60 @@ export async function POST(request: NextRequest) {
     }
 
     // Store the form submission first
-    const submission = await prisma.formSubmission.create({
-      data: {
-        formId: form.id,
-        formData: JSON.stringify(formData),
-        ipAddress: metadata?.ipAddress || null,
-        userAgent: metadata?.userAgent || null,
-        referrer: metadata?.url || null,
-        emailStatus: form.emailNotification ? 'pending' : 'not_configured',
+    let submission;
+    try {
+      submission = await prisma.formSubmission.create({
+        data: {
+          formId: form.id,
+          formData: JSON.stringify(formData),
+          ipAddress: metadata?.ipAddress || null,
+          userAgent: metadata?.userAgent || null,
+          referrer: metadata?.url || null,
+          emailStatus: form.emailNotification ? 'pending' : 'not_configured',
+        }
+      });
+    } catch (error: any) {
+      console.error('Error creating form submission:', error);
+      
+      // Handle unique constraint violation on id field
+      if (error.code === 'P2002' && error.meta?.target?.includes('id')) {
+        console.log('🔄 Attempting to fix sequence and retry...');
+        
+        try {
+          // Try to fix the sequence
+          const maxResult = await prisma.$queryRaw`SELECT MAX(id) as max_id FROM form_submissions`;
+          const maxId = maxResult[0]?.max_id || 0;
+          
+          if (maxId > 0) {
+            await prisma.$executeRaw`ALTER SEQUENCE form_submissions_id_seq RESTART WITH ${maxId + 1}`;
+            console.log(`✅ Sequence reset to ${maxId + 1}`);
+          }
+          
+          // Retry the creation
+          submission = await prisma.formSubmission.create({
+            data: {
+              formId: form.id,
+              formData: JSON.stringify(formData),
+              ipAddress: metadata?.ipAddress || null,
+              userAgent: metadata?.userAgent || null,
+              referrer: metadata?.url || null,
+              emailStatus: form.emailNotification ? 'pending' : 'not_configured',
+            }
+          });
+          
+          console.log('✅ Form submission created after sequence fix');
+        } catch (retryError) {
+          console.error('❌ Retry failed:', retryError);
+          return NextResponse.json(
+            { error: 'Failed to create form submission. Please try again.' },
+            { status: 500 }
+          );
+        }
+      } else {
+        // Re-throw other errors
+        throw error;
       }
-    });
+    }
 
     // Handle email notifications if enabled
     let emailResults = {
