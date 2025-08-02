@@ -90,7 +90,7 @@ export default function ConfigurablePricingManager() {
     basicFeatures: [] as string[]
   });
 
-  const [newPlanPricing, setNewPlanPricing] = useState<{[key: string]: {priceCents: number, stripePriceId: string, ctaUrl: string}}>({});
+  const [newPlanPricing, setNewPlanPricing] = useState<{[key: string]: {priceCents: number, stripePriceId: string, ctaUrl: string, events?: any[]}}>({});
 
   const [newFeatureType, setNewFeatureType] = useState({
     name: '',
@@ -119,7 +119,7 @@ export default function ConfigurablePricingManager() {
 
   const [editingPlan, setEditingPlan] = useState<string | null>(null);
   const [editPlanData, setEditPlanData] = useState<any>(null);
-  const [editPlanPricing, setEditPlanPricing] = useState<{[key: string]: {priceCents: number, stripePriceId: string, ctaUrl: string}}>({});
+  const [editPlanPricing, setEditPlanPricing] = useState<{[key: string]: {priceCents: number, stripePriceId: string, ctaUrl: string, events?: any[]}}>({});
   const [editPlanPricingEvents, setEditPlanPricingEvents] = useState<{[key: string]: any[]}>({});
   const [selectedBillingCycle, setSelectedBillingCycle] = useState('');
   

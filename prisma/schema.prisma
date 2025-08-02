@@ -376,15 +376,6 @@ model CTA {
   updatedAt         DateTime       @updatedAt
   events            Json?
   customId          String?
-  onBlurEvent       String?
-  onClickEvent      String?
-  onFocusEvent      String?
-  onHoverEvent      String?
-  onKeyDownEvent    String?
-  onKeyUpEvent      String?
-  onMouseOutEvent   String?
-  onTouchEndEvent   String?
-  onTouchStartEvent String?
   headerCTAs        HeaderCTA[]
   heroPrimary       HeroSection[]  @relation("HeroPrimaryCTA")
   heroSecondary     HeroSection[]  @relation("HeroSecondaryCTA")

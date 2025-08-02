@@ -34,15 +34,12 @@ interface CTA {
   target: '_self' | '_blank';
   isActive: boolean;
   // JavaScript Events
-  onClickEvent?: string;
-  onHoverEvent?: string;
-  onMouseOutEvent?: string;
-  onFocusEvent?: string;
-  onBlurEvent?: string;
-  onKeyDownEvent?: string;
-  onKeyUpEvent?: string;
-  onTouchStartEvent?: string;
-  onTouchEndEvent?: string;
+  events?: Array<{
+    id: string;
+    eventType: 'onClick' | 'onHover' | 'onMouseOut' | 'onFocus' | 'onBlur' | 'onKeyDown' | 'onKeyUp' | 'onTouchStart' | 'onTouchEnd';
+    functionName: string;
+    description: string;
+  }>;
   createdAt: string;
   updatedAt: string;
 }
@@ -64,23 +61,13 @@ interface CTAFormData {
     style: 'primary' | 'secondary' | 'accent' | 'ghost' | 'destructive' | 'success' | 'info' | 'outline' | 'muted';
     target: '_self' | '_blank';
     isActive: boolean;
-    // Enhanced JavaScript Events
+    // JavaScript Events
     events: Array<{
         id: string;
         eventType: 'onClick' | 'onHover' | 'onMouseOut' | 'onFocus' | 'onBlur' | 'onKeyDown' | 'onKeyUp' | 'onTouchStart' | 'onTouchEnd';
         functionName: string;
         description: string;
     }>;
-    // Legacy fields for backward compatibility
-    onClickEvent?: string;
-    onHoverEvent?: string;
-    onMouseOutEvent?: string;
-    onFocusEvent?: string;
-    onBlurEvent?: string;
-    onKeyDownEvent?: string;
-    onKeyUpEvent?: string;
-    onTouchStartEvent?: string;
-    onTouchEndEvent?: string;
 }
 
 export default function CTAManager() {
@@ -100,16 +87,7 @@ export default function CTAManager() {
     style: 'primary',
     target: '_self',
     isActive: true,
-    events: [],
-    onClickEvent: '',
-    onHoverEvent: '',
-    onMouseOutEvent: '',
-    onFocusEvent: '',
-    onBlurEvent: '',
-    onKeyDownEvent: '',
-    onKeyUpEvent: '',
-    onTouchStartEvent: '',
-    onTouchEndEvent: ''
+    events: []
   });
 
   // Event type options
@@ -140,6 +118,7 @@ export default function CTAManager() {
       if (response.ok) {
         const result = await response.json();
         if (result.success && Array.isArray(result.data)) {
+          console.log('Fetched CTAs:', result.data);
           setCtas(result.data);
         } else {
           console.error('Invalid CTA data structure:', result);
@@ -218,34 +197,18 @@ export default function CTAManager() {
       const url = '/api/admin/cta-buttons';
       const method = editingId ? 'PUT' : 'POST';
       
-      // Prepare the body with both legacy and new event systems
+      // Prepare the body with events array
       const body = editingId ? { 
         ...formData, 
         id: editingId,
-        // Convert new events to legacy format for backward compatibility
-        onClickEvent: formData.events.find(e => e.eventType === 'onClick')?.functionName || formData.onClickEvent,
-        onHoverEvent: formData.events.find(e => e.eventType === 'onHover')?.functionName || formData.onHoverEvent,
-        onMouseOutEvent: formData.events.find(e => e.eventType === 'onMouseOut')?.functionName || formData.onMouseOutEvent,
-        onFocusEvent: formData.events.find(e => e.eventType === 'onFocus')?.functionName || formData.onFocusEvent,
-        onBlurEvent: formData.events.find(e => e.eventType === 'onBlur')?.functionName || formData.onBlurEvent,
-        onKeyDownEvent: formData.events.find(e => e.eventType === 'onKeyDown')?.functionName || formData.onKeyDownEvent,
-        onKeyUpEvent: formData.events.find(e => e.eventType === 'onKeyUp')?.functionName || formData.onKeyUpEvent,
-        onTouchStartEvent: formData.events.find(e => e.eventType === 'onTouchStart')?.functionName || formData.onTouchStartEvent,
-        onTouchEndEvent: formData.events.find(e => e.eventType === 'onTouchEnd')?.functionName || formData.onTouchEndEvent,
+        events: formData.events
       } : {
         ...formData,
-        // Convert new events to legacy format for backward compatibility
-        onClickEvent: formData.events.find(e => e.eventType === 'onClick')?.functionName || formData.onClickEvent,
-        onHoverEvent: formData.events.find(e => e.eventType === 'onHover')?.functionName || formData.onHoverEvent,
-        onMouseOutEvent: formData.events.find(e => e.eventType === 'onMouseOut')?.functionName || formData.onMouseOutEvent,
-        onFocusEvent: formData.events.find(e => e.eventType === 'onFocus')?.functionName || formData.onFocusEvent,
-        onBlurEvent: formData.events.find(e => e.eventType === 'onBlur')?.functionName || formData.onBlurEvent,
-        onKeyDownEvent: formData.events.find(e => e.eventType === 'onKeyDown')?.functionName || formData.onKeyDownEvent,
-        onKeyUpEvent: formData.events.find(e => e.eventType === 'onKeyUp')?.functionName || formData.onKeyUpEvent,
-        onTouchStartEvent: formData.events.find(e => e.eventType === 'onTouchStart')?.functionName || formData.onTouchStartEvent,
-        onTouchEndEvent: formData.events.find(e => e.eventType === 'onTouchEnd')?.functionName || formData.onTouchEndEvent,
+        events: formData.events
       };
 
+      console.log('Saving CTA with data:', body);
+      
       const response = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
@@ -255,6 +218,7 @@ export default function CTAManager() {
       const result = await response.json();
       
       if (response.ok) {
+        console.log('CTA saved successfully:', result);
         await fetchCtas();
         await fetchHeaderConfig();
         resetForm();
@@ -361,16 +325,7 @@ export default function CTAManager() {
       style: 'primary',
       target: '_self',
       isActive: true,
-      events: [],
-      onClickEvent: '',
-      onHoverEvent: '',
-      onMouseOutEvent: '',
-      onFocusEvent: '',
-      onBlurEvent: '',
-      onKeyDownEvent: '',
-      onKeyUpEvent: '',
-      onTouchStartEvent: '',
-      onTouchEndEvent: ''
+      events: []
     });
     setEditingId(null);
     setShowForm(false);
@@ -385,16 +340,7 @@ export default function CTAManager() {
       style: cta.style,
       target: cta.target,
       isActive: cta.isActive,
-      events: [], // Clear events when editing
-      onClickEvent: cta.onClickEvent || '',
-      onHoverEvent: cta.onHoverEvent || '',
-      onMouseOutEvent: cta.onMouseOutEvent || '',
-      onFocusEvent: cta.onFocusEvent || '',
-      onBlurEvent: cta.onBlurEvent || '',
-      onKeyDownEvent: cta.onKeyDownEvent || '',
-      onKeyUpEvent: cta.onKeyUpEvent || '',
-      onTouchStartEvent: cta.onTouchStartEvent || '',
-      onTouchEndEvent: cta.onTouchEndEvent || ''
+      events: cta.events || []
     });
     setEditingId(cta.id);
     setShowForm(true);
@@ -479,16 +425,7 @@ export default function CTAManager() {
               style: 'primary',
               target: '_self',
               isActive: true,
-              events: [],
-              onClickEvent: '',
-              onHoverEvent: '',
-              onMouseOutEvent: '',
-              onFocusEvent: '',
-              onBlurEvent: '',
-              onKeyDownEvent: '',
-              onKeyUpEvent: '',
-              onTouchStartEvent: '',
-              onTouchEndEvent: ''
+              events: []
             });
             setShowForm(true);
           }}
@@ -997,9 +934,7 @@ export default function CTAManager() {
                       {cta.style}
                     </Badge>
                     {/* JavaScript Events Indicator */}
-                    {(cta.onClickEvent || cta.onHoverEvent || cta.onMouseOutEvent || cta.onFocusEvent || 
-                      cta.onBlurEvent || cta.onKeyDownEvent || cta.onKeyUpEvent || cta.onTouchStartEvent || 
-                      cta.onTouchEndEvent) && (
+                    {cta.events && cta.events.length > 0 && (
                       <Badge className="bg-purple-100 text-purple-800 text-xs">
                         <MousePointer className="w-3 h-3 mr-1" />
                         JS Events

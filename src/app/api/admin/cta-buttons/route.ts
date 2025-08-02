@@ -44,16 +44,6 @@ export async function POST(request: NextRequest) {
         target: validatedData.target,
         isActive: validatedData.isActive,
         // JavaScript Events
-        onClickEvent: validatedData.onClickEvent || null,
-        onHoverEvent: validatedData.onHoverEvent || null,
-        onMouseOutEvent: validatedData.onMouseOutEvent || null,
-        onFocusEvent: validatedData.onFocusEvent || null,
-        onBlurEvent: validatedData.onBlurEvent || null,
-        onKeyDownEvent: validatedData.onKeyDownEvent || null,
-        onKeyUpEvent: validatedData.onKeyUpEvent || null,
-        onTouchStartEvent: validatedData.onTouchStartEvent || null,
-        onTouchEndEvent: validatedData.onTouchEndEvent || null,
-        // Enhanced Events
         events: validatedData.events || undefined,
       }
     });
@@ -95,16 +85,6 @@ export async function PUT(request: NextRequest) {
         ...(validatedData.target !== undefined && { target: validatedData.target }),
         ...(validatedData.isActive !== undefined && { isActive: validatedData.isActive }),
         // JavaScript Events
-        ...(validatedData.onClickEvent !== undefined && { onClickEvent: validatedData.onClickEvent || null }),
-        ...(validatedData.onHoverEvent !== undefined && { onHoverEvent: validatedData.onHoverEvent || null }),
-        ...(validatedData.onMouseOutEvent !== undefined && { onMouseOutEvent: validatedData.onMouseOutEvent || null }),
-        ...(validatedData.onFocusEvent !== undefined && { onFocusEvent: validatedData.onFocusEvent || null }),
-        ...(validatedData.onBlurEvent !== undefined && { onBlurEvent: validatedData.onBlurEvent || null }),
-        ...(validatedData.onKeyDownEvent !== undefined && { onKeyDownEvent: validatedData.onKeyDownEvent || null }),
-        ...(validatedData.onKeyUpEvent !== undefined && { onKeyUpEvent: validatedData.onKeyUpEvent || null }),
-        ...(validatedData.onTouchStartEvent !== undefined && { onTouchStartEvent: validatedData.onTouchStartEvent || null }),
-        ...(validatedData.onTouchEndEvent !== undefined && { onTouchEndEvent: validatedData.onTouchEndEvent || null }),
-        // Enhanced Events
         ...(validatedData.events !== undefined && { events: validatedData.events || undefined }),
         updatedAt: new Date()
       }

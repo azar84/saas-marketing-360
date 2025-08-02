@@ -63,6 +63,9 @@ export default function PricingSection() {
   const [selectedBillingCycleId, setSelectedBillingCycleId] = useState<string>('');
   const [loading, setLoading] = useState(true);
 
+  // Array of refs for each plan card
+  const planRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   useEffect(() => {
     const fetchPricingData = async () => {
       try {
@@ -177,6 +180,21 @@ export default function PricingSection() {
     });
   };
 
+  // Apply plan events to each card after plans are loaded
+  useEffect(() => {
+    plans.forEach((plan, i) => {
+      const ref = planRefs.current[i];
+      if (ref) {
+        // Remove all previous event listeners by cloning the node
+        const newRef = ref.cloneNode(true) as HTMLDivElement;
+        ref.parentNode?.replaceChild(newRef, ref);
+        planRefs.current[i] = newRef;
+        applyPlanEvents(plan, newRef);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plans, selectedBillingCycleId]);
+
   if (loading) {
     return (
       <section className="py-20 bg-white">
@@ -246,23 +264,14 @@ export default function PricingSection() {
 
         {/* Pricing Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {plans.map((plan) => {
+          {plans.map((plan, i) => {
             const pricing = getPlanPricing(plan, selectedBillingCycleId);
             const availableFeatures = plan.features.filter(f => f.available);
 
-            const cardRef = useRef<HTMLDivElement>(null);
-
-            // Apply events when component mounts
-            useEffect(() => {
-              if (cardRef.current) {
-                applyPlanEvents(plan, cardRef.current);
-              }
-            }, [plan]);
-
             return (
               <Card
-                ref={cardRef}
                 key={plan.id}
+                ref={el => { planRefs.current[i] = el; }}
                 className={`relative p-8${plan.isPopular ? ' ring-2 ring-blue-500 shadow-lg' : ''}`}
               >
                 {plan.isPopular && (

@@ -309,37 +309,61 @@ export interface CTAWithEvents {
   style: string;
   target: string;
   isActive: boolean;
-  onClickEvent?: string;
-  onHoverEvent?: string;
-  onMouseOutEvent?: string;
-  onFocusEvent?: string;
-  onBlurEvent?: string;
-  onKeyDownEvent?: string;
-  onKeyUpEvent?: string;
-  onTouchStartEvent?: string;
-  onTouchEndEvent?: string;
+  // JavaScript Events
+  events?: Array<{
+    id: string;
+    eventType: 'onClick' | 'onHover' | 'onMouseOut' | 'onFocus' | 'onBlur' | 'onKeyDown' | 'onKeyUp' | 'onTouchStart' | 'onTouchEnd';
+    functionName: string;
+    description: string;
+  }>;
 }
 
 export const applyCTAEvents = (cta: CTAWithEvents) => {
   const events: { [key: string]: string } = {};
   
-  if (cta.onClickEvent) events.onClick = cta.onClickEvent;
-  if (cta.onHoverEvent) events.onMouseOver = cta.onHoverEvent;
-  if (cta.onMouseOutEvent) events.onMouseOut = cta.onMouseOutEvent;
-  if (cta.onFocusEvent) events.onFocus = cta.onFocusEvent;
-  if (cta.onBlurEvent) events.onBlur = cta.onBlurEvent;
-  if (cta.onKeyDownEvent) events.onKeyDown = cta.onKeyDownEvent;
-  if (cta.onKeyUpEvent) events.onKeyUp = cta.onKeyUpEvent;
-  if (cta.onTouchStartEvent) events.onTouchStart = cta.onTouchStartEvent;
-  if (cta.onTouchEndEvent) events.onTouchEnd = cta.onTouchEndEvent;
+  // Use events array
+  if (cta.events && Array.isArray(cta.events) && cta.events.length > 0) {
+    console.log('Using events array:', cta.events);
+    cta.events.forEach(event => {
+      switch (event.eventType) {
+        case 'onClick':
+          events.onClick = event.functionName;
+          break;
+        case 'onHover':
+          events.onMouseOver = event.functionName;
+          break;
+        case 'onMouseOut':
+          events.onMouseOut = event.functionName;
+          break;
+        case 'onFocus':
+          events.onFocus = event.functionName;
+          break;
+        case 'onBlur':
+          events.onBlur = event.functionName;
+          break;
+        case 'onKeyDown':
+          events.onKeyDown = event.functionName;
+          break;
+        case 'onKeyUp':
+          events.onKeyUp = event.functionName;
+          break;
+        case 'onTouchStart':
+          events.onTouchStart = event.functionName;
+          break;
+        case 'onTouchEnd':
+          events.onTouchEnd = event.functionName;
+          break;
+      }
+    });
+  }
   
+  console.log('Final events object:', events);
   return events;
 };
 
 export const hasCTAEvents = (cta: CTAWithEvents): boolean => {
-  return !!(cta.onClickEvent || cta.onHoverEvent || cta.onMouseOutEvent || 
-           cta.onFocusEvent || cta.onBlurEvent || cta.onKeyDownEvent || 
-           cta.onKeyUpEvent || cta.onTouchStartEvent || cta.onTouchEndEvent);
+  // Check events array
+  return !!(cta.events && Array.isArray(cta.events) && cta.events.length > 0);
 };
 
 // Enhanced CTA event execution with support for both legacy and new event systems
@@ -406,46 +430,9 @@ export const executeCTAEventFromConfig = (events: any[], eventType: string, even
     
     matchingEvents.forEach(eventConfig => {
       if (eventConfig.functionName) {
-        // Extract function name and parameters from the function call string
-        const functionCall = eventConfig.functionName;
-        const functionMatch = functionCall.match(/^(\w+)\s*\(([^)]*)\)$/);
-        
-        if (functionMatch) {
-          const [, functionName, paramsString] = functionMatch;
-          
-          // Check if the function exists globally
-          if (typeof (window as any)[functionName] === 'function') {
-            try {
-              // Parse parameters (handle strings, numbers, etc.)
-              let params: any[] = [];
-              if (paramsString.trim()) {
-                // Simple parameter parsing - handle strings and numbers
-                const paramMatches = paramsString.match(/'([^']*)'|"([^"]*)"|(\d+)/g);
-                if (paramMatches) {
-                  params = paramMatches.map((param: string) => {
-                    // Remove quotes if it's a string
-                    if (param.startsWith("'") || param.startsWith('"')) {
-                      return param.slice(1, -1);
-                    }
-                    // Convert to number if it's numeric
-                    return isNaN(Number(param)) ? param : Number(param);
-                  });
-                }
-              }
-              
-              // Call the global function with parameters
-              (window as any)[functionName](...params);
-              console.log(`✅ Executed CTA function: ${functionName}(${params.join(', ')})`);
-            } catch (error) {
-              console.error(`Error executing CTA function ${functionName}:`, error);
-            }
-          } else {
-            console.warn(`Function ${functionName} is not defined globally`);
-            console.log('Available global functions:', Object.keys(window).filter(key => typeof (window as any)[key] === 'function'));
-          }
-        } else {
-          console.warn(`Invalid function call format: ${functionCall}`);
-        }
+        // Use the same approach as executeCTAEvent - execute the code directly
+        console.log('executeCTAEventFromConfig - Executing function:', eventConfig.functionName);
+        executeEventCode(eventConfig.functionName, event, element);
       }
     });
   } catch (error) {

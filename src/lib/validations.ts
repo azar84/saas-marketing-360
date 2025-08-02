@@ -155,16 +155,6 @@ export const CreateCTASchema = z.object({
   target: CTATargetEnum.default('_self'),
   isActive: z.boolean().default(true),
   // JavaScript Events
-  onClickEvent: z.string().max(1000).optional(),
-  onHoverEvent: z.string().max(1000).optional(),
-  onMouseOutEvent: z.string().max(1000).optional(),
-  onFocusEvent: z.string().max(1000).optional(),
-  onBlurEvent: z.string().max(1000).optional(),
-  onKeyDownEvent: z.string().max(1000).optional(),
-  onKeyUpEvent: z.string().max(1000).optional(),
-  onTouchStartEvent: z.string().max(1000).optional(),
-  onTouchEndEvent: z.string().max(1000).optional(),
-  // Enhanced Events
   events: z.array(z.object({
     id: z.string(),
     eventType: z.enum(['onClick', 'onHover', 'onMouseOut', 'onFocus', 'onBlur', 'onKeyDown', 'onKeyUp', 'onTouchStart', 'onTouchEnd']),

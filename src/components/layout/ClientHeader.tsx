@@ -58,16 +58,7 @@ interface CTAButton {
   icon?: string; // Optional Lucide icon name
   style: 'primary' | 'secondary' | 'accent' | 'ghost' | 'destructive' | 'success' | 'info' | 'outline' | 'muted';
   target: '_self' | '_blank';
-  // JavaScript Events
-  onClickEvent?: string;
-  onHoverEvent?: string;
-  onMouseOutEvent?: string;
-  onFocusEvent?: string;
-  onBlurEvent?: string;
-  onKeyDownEvent?: string;
-  onKeyUpEvent?: string;
-  onTouchStartEvent?: string;
-  onTouchEndEvent?: string;
+
 }
 
 interface ClientHeaderProps {

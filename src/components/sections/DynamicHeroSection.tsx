@@ -15,15 +15,8 @@ interface CTA {
   target: string;
   isActive: boolean;
   // JavaScript Events
-  onClickEvent?: string;
-  onHoverEvent?: string;
-  onMouseOutEvent?: string;
-  onFocusEvent?: string;
-  onBlurEvent?: string;
-  onKeyDownEvent?: string;
-  onKeyUpEvent?: string;
-  onTouchStartEvent?: string;
-  onTouchEndEvent?: string;
+
+
 }
 
 interface HeroSectionData {

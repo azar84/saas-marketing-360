@@ -120,6 +120,14 @@ export async function PUT(request: NextRequest) {
 
     const data = updatePlanSchema.parse(updateData);
 
+    // Handle events field properly for JSON
+    const updateDataForPrisma: any = { ...data };
+    if (data.events === null) {
+      updateDataForPrisma.events = { set: null };
+    } else if (data.events !== undefined) {
+      updateDataForPrisma.events = data.events;
+    }
+
     // If setting as popular, unset other popular plans
     if (data.isPopular) {
       await prisma.plan.updateMany({
@@ -133,7 +141,7 @@ export async function PUT(request: NextRequest) {
 
     const plan = await prisma.plan.update({
       where: { id },
-      data,
+      data: updateDataForPrisma,
       include: {
         pricing: {
           include: {

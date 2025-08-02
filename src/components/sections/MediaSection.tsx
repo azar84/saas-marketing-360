@@ -178,15 +178,7 @@ interface MediaSectionProps {
     target: string;
     isActive: boolean;
     customId?: string;
-    onClickEvent?: string;
-    onHoverEvent?: string;
-    onMouseOutEvent?: string;
-    onFocusEvent?: string;
-    onBlurEvent?: string;
-    onKeyDownEvent?: string;
-    onKeyUpEvent?: string;
-    onTouchStartEvent?: string;
-    onTouchEndEvent?: string;
+
   };
   enableScrollAnimations: boolean;
   animationType: string;

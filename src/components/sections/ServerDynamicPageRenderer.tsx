@@ -67,15 +67,12 @@ interface PageSection {
       target: string;
       isActive: boolean;
       // JavaScript Events
-      onClickEvent?: string;
-      onHoverEvent?: string;
-      onMouseOutEvent?: string;
-      onFocusEvent?: string;
-      onBlurEvent?: string;
-      onKeyDownEvent?: string;
-      onKeyUpEvent?: string;
-      onTouchStartEvent?: string;
-      onTouchEndEvent?: string;
+      events?: Array<{
+        id: string;
+        eventType: 'onClick' | 'onHover' | 'onMouseOut' | 'onFocus' | 'onBlur' | 'onKeyDown' | 'onKeyUp' | 'onTouchStart' | 'onTouchEnd';
+        functionName: string;
+        description: string;
+      }>;
     };
     ctaSecondary?: {
       id: number;
@@ -87,15 +84,12 @@ interface PageSection {
       target: string;
       isActive: boolean;
       // JavaScript Events
-      onClickEvent?: string;
-      onHoverEvent?: string;
-      onMouseOutEvent?: string;
-      onFocusEvent?: string;
-      onBlurEvent?: string;
-      onKeyDownEvent?: string;
-      onKeyUpEvent?: string;
-      onTouchStartEvent?: string;
-      onTouchEndEvent?: string;
+      events?: Array<{
+        id: string;
+        eventType: 'onClick' | 'onHover' | 'onMouseOut' | 'onFocus' | 'onBlur' | 'onKeyDown' | 'onKeyUp' | 'onTouchStart' | 'onTouchEnd';
+        functionName: string;
+        description: string;
+      }>;
     };
   };
   featureGroup?: {
@@ -302,15 +296,6 @@ async function fetchPageSections(pageSlug: string): Promise<PageSection[]> {
                 style: true,
                 target: true,
                 isActive: true,
-                onClickEvent: true,
-                onHoverEvent: true,
-                onMouseOutEvent: true,
-                onFocusEvent: true,
-                onBlurEvent: true,
-                onKeyDownEvent: true,
-                onKeyUpEvent: true,
-                onTouchStartEvent: true,
-                onTouchEndEvent: true,
                 events: true
               }
             },
@@ -324,15 +309,6 @@ async function fetchPageSections(pageSlug: string): Promise<PageSection[]> {
                 style: true,
                 target: true,
                 isActive: true,
-                onClickEvent: true,
-                onHoverEvent: true,
-                onMouseOutEvent: true,
-                onFocusEvent: true,
-                onBlurEvent: true,
-                onKeyDownEvent: true,
-                onKeyUpEvent: true,
-                onTouchStartEvent: true,
-                onTouchEndEvent: true,
                 events: true
               }
             }
@@ -413,7 +389,39 @@ async function fetchPageSections(pageSlug: string): Promise<PageSection[]> {
       }
     });
 
-    return sections as PageSection[];
+    // Patch events field for CTAs to always be an array of the correct type
+    for (const section of sections) {
+      if (section.heroSection) {
+        if (section.heroSection.ctaPrimary) {
+          const events = section.heroSection.ctaPrimary.events;
+          if (!Array.isArray(events)) {
+            section.heroSection.ctaPrimary.events = [];
+          } else {
+            section.heroSection.ctaPrimary.events = events as Array<{
+              id: string;
+              eventType: 'onClick' | 'onHover' | 'onMouseOut' | 'onFocus' | 'onBlur' | 'onKeyDown' | 'onKeyUp' | 'onTouchStart' | 'onTouchEnd';
+              functionName: string;
+              description: string;
+            }>;
+          }
+        }
+        if (section.heroSection.ctaSecondary) {
+          const events = section.heroSection.ctaSecondary.events;
+          if (!Array.isArray(events)) {
+            section.heroSection.ctaSecondary.events = [];
+          } else {
+            section.heroSection.ctaSecondary.events = events as Array<{
+              id: string;
+              eventType: 'onClick' | 'onHover' | 'onMouseOut' | 'onFocus' | 'onBlur' | 'onKeyDown' | 'onKeyUp' | 'onTouchStart' | 'onTouchEnd';
+              functionName: string;
+              description: string;
+            }>;
+          }
+        }
+      }
+    }
+
+    return sections as unknown as PageSection[];
   } catch (error) {
     console.error('Error fetching page sections:', error);
     return [];
@@ -449,15 +457,6 @@ async function fetchHomeHeroData() {
             style: true,
             target: true,
             isActive: true,
-            onClickEvent: true,
-            onHoverEvent: true,
-            onMouseOutEvent: true,
-            onFocusEvent: true,
-            onBlurEvent: true,
-            onKeyDownEvent: true,
-            onKeyUpEvent: true,
-            onTouchStartEvent: true,
-            onTouchEndEvent: true,
             events: true
           }
         },
@@ -471,21 +470,14 @@ async function fetchHomeHeroData() {
             style: true,
             target: true,
             isActive: true,
-            onClickEvent: true,
-            onHoverEvent: true,
-            onMouseOutEvent: true,
-            onFocusEvent: true,
-            onBlurEvent: true,
-            onKeyDownEvent: true,
-            onKeyUpEvent: true,
-            onTouchStartEvent: true,
-            onTouchEndEvent: true,
             events: true
           }
         }
       }
     });
 
+    console.log('fetchHomeHeroData - Raw homeHero from database:', homeHero);
+    
     if (!homeHero) {
       // Return default data if no hero exists
       return {
@@ -543,7 +535,7 @@ async function fetchHomeHeroData() {
     }
 
     // Transform database data to component format
-    return {
+    const transformedData = {
       id: homeHero.id,
       heading: homeHero.headline,
       subheading: homeHero.subheading,
@@ -596,6 +588,9 @@ async function fetchHomeHeroData() {
         { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
       ]
     };
+    
+    console.log('fetchHomeHeroData - Transformed data:', transformedData);
+    return transformedData;
   } catch (error) {
     console.error('Error fetching home hero data:', error);
     // Return default data on error

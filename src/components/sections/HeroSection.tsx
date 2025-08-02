@@ -752,8 +752,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
               className="flex flex-col sm:flex-row gap-4 pt-2"
             >
               {heroData?.primaryCtaId && heroData?.primaryCta && (() => {
+                console.log('HeroSection - Primary CTA data:', heroData.primaryCta);
                 const ctaEvents = applyCTAEvents(heroData.primaryCta as CTAWithEvents);
                 const hasEvents = hasCTAEvents(heroData.primaryCta as CTAWithEvents);
+                console.log('HeroSection - Applied CTA events:', ctaEvents);
+                console.log('HeroSection - Has events:', hasEvents);
                 
                 // Runtime safeguard for allowed styles
                 const allowedStyles = ['primary', 'secondary', 'accent', 'ghost', 'destructive', 'success', 'info', 'outline', 'muted'];
@@ -774,13 +777,19 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={(e) => {
+                        console.log('HeroSection - Button clicked!');
+                        console.log('HeroSection - Events from CTA:', heroData.primaryCta.events);
+                        console.log('HeroSection - ctaEvents.onClick:', ctaEvents.onClick);
+                        
                         // Prevent navigation when there are JavaScript events
                         if (heroData.primaryCta.events || ctaEvents.onClick) {
                           e.preventDefault();
+                          console.log('HeroSection - Prevented default navigation');
                         }
                         
                         // Handle URL navigation (only if no JavaScript events)
                         if (!heroData.primaryCta.events && !ctaEvents.onClick) {
+                          console.log('HeroSection - No events, handling URL navigation');
                           if (heroData.primaryCta.url.startsWith('#')) {
                             const selector = heroData.primaryCta.url;
                             if (selector.length > 1) {
@@ -794,37 +803,37 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                           }
                         }
                         
-                        // Execute CTA events (only use new event system)
-                        if (heroData.primaryCta.events) {
-                          executeCTAEventFromConfig(heroData.primaryCta.events, 'onClick', e, e.currentTarget);
-                        } else if (ctaEvents.onClick) {
-                          // Fallback to legacy system only if no new events
-                          executeCTAEvent(ctaEvents.onClick, e, e.currentTarget);
-                        }
+                                                     // Execute CTA events
+                             if (heroData.primaryCta.events) {
+                               console.log('HeroSection - Executing events');
+                               executeCTAEventFromConfig(heroData.primaryCta.events, 'onClick', e, e.currentTarget);
+                             } else {
+                               console.log('HeroSection - No events to execute');
+                             }
                       }}
-                      onMouseOver={ctaEvents.onMouseOver ? (e) => {
-                        executeCTAEvent(ctaEvents.onMouseOver, e, e.currentTarget);
+                      onMouseOver={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onHover', e, e.currentTarget);
                       } : undefined}
-                      onMouseOut={ctaEvents.onMouseOut ? (e) => {
-                        executeCTAEvent(ctaEvents.onMouseOut, e, e.currentTarget);
+                      onMouseOut={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onMouseOut', e, e.currentTarget);
                       } : undefined}
-                      onFocus={ctaEvents.onFocus ? (e) => {
-                        executeCTAEvent(ctaEvents.onFocus, e, e.currentTarget);
+                      onFocus={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onFocus', e, e.currentTarget);
                       } : undefined}
-                      onBlur={ctaEvents.onBlur ? (e) => {
-                        executeCTAEvent(ctaEvents.onBlur, e, e.currentTarget);
+                      onBlur={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onBlur', e, e.currentTarget);
                       } : undefined}
-                      onKeyDown={ctaEvents.onKeyDown ? (e) => {
-                        executeCTAEvent(ctaEvents.onKeyDown, e, e.currentTarget);
+                      onKeyDown={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onKeyDown', e, e.currentTarget);
                       } : undefined}
-                      onKeyUp={ctaEvents.onKeyUp ? (e) => {
-                        executeCTAEvent(ctaEvents.onKeyUp, e, e.currentTarget);
+                      onKeyUp={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onKeyUp', e, e.currentTarget);
                       } : undefined}
-                      onTouchStart={ctaEvents.onTouchStart ? (e) => {
-                        executeCTAEvent(ctaEvents.onTouchStart, e, e.currentTarget);
+                      onTouchStart={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onTouchStart', e, e.currentTarget);
                       } : undefined}
-                      onTouchEnd={ctaEvents.onTouchEnd ? (e) => {
-                        executeCTAEvent(ctaEvents.onTouchEnd, e, e.currentTarget);
+                      onTouchEnd={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onTouchEnd', e, e.currentTarget);
                       } : undefined}
                     >
                       <motion.div
@@ -853,37 +862,34 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={(e) => {
-                        // Execute CTA events (only use new event system)
+                        // Execute CTA events
                         if (heroData.primaryCta.events) {
                           executeCTAEventFromConfig(heroData.primaryCta.events, 'onClick', e, e.currentTarget);
-                        } else if (ctaEvents.onClick) {
-                          // Fallback to legacy system only if no new events
-                          executeCTAEvent(ctaEvents.onClick, e, e.currentTarget);
                         }
                       }}
-                      onMouseOver={ctaEvents.onMouseOver ? (e) => {
-                        executeCTAEvent(ctaEvents.onMouseOver, e, e.currentTarget);
+                      onMouseOver={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onHover', e, e.currentTarget);
                       } : undefined}
-                      onMouseOut={ctaEvents.onMouseOut ? (e) => {
-                        executeCTAEvent(ctaEvents.onMouseOut, e, e.currentTarget);
+                      onMouseOut={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onMouseOut', e, e.currentTarget);
                       } : undefined}
-                      onFocus={ctaEvents.onFocus ? (e) => {
-                        executeCTAEvent(ctaEvents.onFocus, e, e.currentTarget);
+                      onFocus={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onFocus', e, e.currentTarget);
                       } : undefined}
-                      onBlur={ctaEvents.onBlur ? (e) => {
-                        executeCTAEvent(ctaEvents.onBlur, e, e.currentTarget);
+                      onBlur={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onBlur', e, e.currentTarget);
                       } : undefined}
-                      onKeyDown={ctaEvents.onKeyDown ? (e) => {
-                        executeCTAEvent(ctaEvents.onKeyDown, e, e.currentTarget);
+                      onKeyDown={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onKeyDown', e, e.currentTarget);
                       } : undefined}
-                      onKeyUp={ctaEvents.onKeyUp ? (e) => {
-                        executeCTAEvent(ctaEvents.onKeyUp, e, e.currentTarget);
+                      onKeyUp={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onKeyUp', e, e.currentTarget);
                       } : undefined}
-                      onTouchStart={ctaEvents.onTouchStart ? (e) => {
-                        executeCTAEvent(ctaEvents.onTouchStart, e, e.currentTarget);
+                      onTouchStart={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onTouchStart', e, e.currentTarget);
                       } : undefined}
-                      onTouchEnd={ctaEvents.onTouchEnd ? (e) => {
-                        executeCTAEvent(ctaEvents.onTouchEnd, e, e.currentTarget);
+                      onTouchEnd={heroData.primaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.primaryCta.events, 'onTouchEnd', e, e.currentTarget);
                       } : undefined}
                     >
                       <motion.div
@@ -947,37 +953,34 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                           }
                         }
                         
-                        // Execute CTA events (only use new event system)
+                        // Execute CTA events
                         if (heroData.secondaryCta.events) {
                           executeCTAEventFromConfig(heroData.secondaryCta.events, 'onClick', e, e.currentTarget);
-                        } else if (ctaEvents.onClick) {
-                          // Fallback to legacy system only if no new events
-                          executeCTAEvent(ctaEvents.onClick, e, e.currentTarget);
                         }
                       }}
-                      onMouseOver={ctaEvents.onMouseOver ? (e) => {
-                        executeCTAEvent(ctaEvents.onMouseOver, e, e.currentTarget);
+                      onMouseOver={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onHover', e, e.currentTarget);
                       } : undefined}
-                      onMouseOut={ctaEvents.onMouseOut ? (e) => {
-                        executeCTAEvent(ctaEvents.onMouseOut, e, e.currentTarget);
+                      onMouseOut={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onMouseOut', e, e.currentTarget);
                       } : undefined}
-                      onFocus={ctaEvents.onFocus ? (e) => {
-                        executeCTAEvent(ctaEvents.onFocus, e, e.currentTarget);
+                      onFocus={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onFocus', e, e.currentTarget);
                       } : undefined}
-                      onBlur={ctaEvents.onBlur ? (e) => {
-                        executeCTAEvent(ctaEvents.onBlur, e, e.currentTarget);
+                      onBlur={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onBlur', e, e.currentTarget);
                       } : undefined}
-                      onKeyDown={ctaEvents.onKeyDown ? (e) => {
-                        executeCTAEvent(ctaEvents.onKeyDown, e, e.currentTarget);
+                      onKeyDown={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onKeyDown', e, e.currentTarget);
                       } : undefined}
-                      onKeyUp={ctaEvents.onKeyUp ? (e) => {
-                        executeCTAEvent(ctaEvents.onKeyUp, e, e.currentTarget);
+                      onKeyUp={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onKeyUp', e, e.currentTarget);
                       } : undefined}
-                      onTouchStart={ctaEvents.onTouchStart ? (e) => {
-                        executeCTAEvent(ctaEvents.onTouchStart, e, e.currentTarget);
+                      onTouchStart={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onTouchStart', e, e.currentTarget);
                       } : undefined}
-                      onTouchEnd={ctaEvents.onTouchEnd ? (e) => {
-                        executeCTAEvent(ctaEvents.onTouchEnd, e, e.currentTarget);
+                      onTouchEnd={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onTouchEnd', e, e.currentTarget);
                       } : undefined}
                     >
                       <motion.div
@@ -1006,37 +1009,34 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={(e) => {
-                        // Execute CTA events (only use new event system)
+                        // Execute CTA events
                         if (heroData.secondaryCta.events) {
                           executeCTAEventFromConfig(heroData.secondaryCta.events, 'onClick', e, e.currentTarget);
-                        } else if (ctaEvents.onClick) {
-                          // Fallback to legacy system only if no new events
-                          executeCTAEvent(ctaEvents.onClick, e, e.currentTarget);
                         }
                       }}
-                      onMouseOver={ctaEvents.onMouseOver ? (e) => {
-                        executeCTAEvent(ctaEvents.onMouseOver, e, e.currentTarget);
+                      onMouseOver={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onHover', e, e.currentTarget);
                       } : undefined}
-                      onMouseOut={ctaEvents.onMouseOut ? (e) => {
-                        executeCTAEvent(ctaEvents.onMouseOut, e, e.currentTarget);
+                      onMouseOut={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onMouseOut', e, e.currentTarget);
                       } : undefined}
-                      onFocus={ctaEvents.onFocus ? (e) => {
-                        executeCTAEvent(ctaEvents.onFocus, e, e.currentTarget);
+                      onFocus={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onFocus', e, e.currentTarget);
                       } : undefined}
-                      onBlur={ctaEvents.onBlur ? (e) => {
-                        executeCTAEvent(ctaEvents.onBlur, e, e.currentTarget);
+                      onBlur={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onBlur', e, e.currentTarget);
                       } : undefined}
-                      onKeyDown={ctaEvents.onKeyDown ? (e) => {
-                        executeCTAEvent(ctaEvents.onKeyDown, e, e.currentTarget);
+                      onKeyDown={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onKeyDown', e, e.currentTarget);
                       } : undefined}
-                      onKeyUp={ctaEvents.onKeyUp ? (e) => {
-                        executeCTAEvent(ctaEvents.onKeyUp, e, e.currentTarget);
+                      onKeyUp={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onKeyUp', e, e.currentTarget);
                       } : undefined}
-                      onTouchStart={ctaEvents.onTouchStart ? (e) => {
-                        executeCTAEvent(ctaEvents.onTouchStart, e, e.currentTarget);
+                      onTouchStart={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onTouchStart', e, e.currentTarget);
                       } : undefined}
-                      onTouchEnd={ctaEvents.onTouchEnd ? (e) => {
-                        executeCTAEvent(ctaEvents.onTouchEnd, e, e.currentTarget);
+                      onTouchEnd={heroData.secondaryCta.events ? (e) => {
+                        executeCTAEventFromConfig(heroData.secondaryCta.events, 'onTouchEnd', e, e.currentTarget);
                       } : undefined}
                     >
                       <motion.div

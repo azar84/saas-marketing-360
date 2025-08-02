@@ -329,10 +329,10 @@ export default function ConfigurablePricingSection({
                 ?.map((sp: PricingSectionPlan) => sp.plan) || [];
               
               // Debug: Log plans and their events
-              console.log('📋 Plans loaded:', sectionPlans.map(plan => ({
-                name: plan.name,
-                events: plan.events,
-                eventCount: plan.events?.length || 0
+              console.log('📋 Plans loaded:', sectionPlans.map((plan: PricingSectionPlan) => ({
+                name: plan.plan.name,
+                events: plan.plan.events,
+                eventCount: plan.plan.events?.length || 0
               })));
               
               setPlans(sectionPlans);
