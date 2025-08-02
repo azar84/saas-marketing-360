@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, useScroll, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Advanced client-only component for animated HTML content
 const ClientOnlyHTML: React.FC<{ htmlContent: string; fallback: React.ReactNode }> = ({ htmlContent, fallback }) => {
@@ -222,12 +222,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
   const [isTyping, setIsTyping] = useState(false);
   const heroRef = useRef<HTMLElement>(null);
 
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ["start start", "end start"]
-  });
 
-  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   // Use server-side data if provided, otherwise use default fallback
   const heroData = propHeroData || {
@@ -667,7 +662,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
       <motion.section 
         ref={heroRef}
         style={{ 
-          opacity,
           backgroundColor: heroData?.backgroundColor || 'var(--color-background)',
           backgroundImage: heroData?.backgroundImage ? `url(${heroData.backgroundImage})` : 'none',
           backgroundSize: heroData?.backgroundSize || 'cover',
