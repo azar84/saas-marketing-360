@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Menu, X, ChevronDown, UserPlus, LogIn, Star, ArrowRight } from 'lucide-react';
 import { renderIcon } from '@/lib/iconUtils';
-import { cn, getAppropriateLogoUrl, applyCTAEvents, hasCTAEvents, executeCTAEvent, type CTAWithEvents } from '@/lib/utils';
+import { cn, getAppropriateLogoUrl, applyCTAEvents, hasCTAEvents, executeCTAEvent, executeCTAEventFromConfig, type CTAWithEvents } from '@/lib/utils';
 import { useDesignSystem } from '@/hooks/useDesignSystem';
 import { Button } from '@/components/ui/Button';
 
@@ -58,7 +58,13 @@ interface CTAButton {
   icon?: string; // Optional Lucide icon name
   style: 'primary' | 'secondary' | 'accent' | 'ghost' | 'destructive' | 'success' | 'info' | 'outline' | 'muted';
   target: '_self' | '_blank';
-
+  // JavaScript Events
+  events?: Array<{
+    id: string;
+    eventType: 'onClick' | 'onHover' | 'onMouseOut' | 'onFocus' | 'onBlur' | 'onKeyDown' | 'onKeyUp' | 'onTouchStart' | 'onTouchEnd';
+    functionName: string;
+    description: string;
+  }>;
 }
 
 interface ClientHeaderProps {
@@ -554,33 +560,33 @@ export default function ClientHeader({
                         fontWeight: 'var(--font-weight-medium)',
                         fontFamily: 'var(--font-family-sans)',
                       }}
-                      onClick={ctaEvents.onClick ? (e) => {
+                      onClick={cta.events && cta.events.length > 0 ? (e) => {
                         e.preventDefault(); // Prevent navigation when there's a JavaScript event
-                        executeCTAEvent(ctaEvents.onClick, e, e.currentTarget);
+                        executeCTAEventFromConfig(cta.events!, 'onClick', e, e.currentTarget);
                       } : undefined}
-                      onMouseOver={ctaEvents.onMouseOver ? (e) => {
-                        executeCTAEvent(ctaEvents.onMouseOver, e, e.currentTarget);
+                      onMouseOver={cta.events && cta.events.length > 0 ? (e) => {
+                        executeCTAEventFromConfig(cta.events!, 'onHover', e, e.currentTarget);
                       } : undefined}
-                      onMouseOut={ctaEvents.onMouseOut ? (e) => {
-                        executeCTAEvent(ctaEvents.onMouseOut, e, e.currentTarget);
+                      onMouseOut={cta.events && cta.events.length > 0 ? (e) => {
+                        executeCTAEventFromConfig(cta.events!, 'onMouseOut', e, e.currentTarget);
                       } : undefined}
-                      onFocus={ctaEvents.onFocus ? (e) => {
-                        executeCTAEvent(ctaEvents.onFocus, e, e.currentTarget);
+                      onFocus={cta.events && cta.events.length > 0 ? (e) => {
+                        executeCTAEventFromConfig(cta.events!, 'onFocus', e, e.currentTarget);
                       } : undefined}
-                      onBlur={ctaEvents.onBlur ? (e) => {
-                        executeCTAEvent(ctaEvents.onBlur, e, e.currentTarget);
+                      onBlur={cta.events && cta.events.length > 0 ? (e) => {
+                        executeCTAEventFromConfig(cta.events!, 'onBlur', e, e.currentTarget);
                       } : undefined}
-                      onKeyDown={ctaEvents.onKeyDown ? (e) => {
-                        executeCTAEvent(ctaEvents.onKeyDown, e, e.currentTarget);
+                      onKeyDown={cta.events && cta.events.length > 0 ? (e) => {
+                        executeCTAEventFromConfig(cta.events!, 'onKeyDown', e, e.currentTarget);
                       } : undefined}
-                      onKeyUp={ctaEvents.onKeyUp ? (e) => {
-                        executeCTAEvent(ctaEvents.onKeyUp, e, e.currentTarget);
+                      onKeyUp={cta.events && cta.events.length > 0 ? (e) => {
+                        executeCTAEventFromConfig(cta.events!, 'onKeyUp', e, e.currentTarget);
                       } : undefined}
-                      onTouchStart={ctaEvents.onTouchStart ? (e) => {
-                        executeCTAEvent(ctaEvents.onTouchStart, e, e.currentTarget);
+                      onTouchStart={cta.events && cta.events.length > 0 ? (e) => {
+                        executeCTAEventFromConfig(cta.events!, 'onTouchStart', e, e.currentTarget);
                       } : undefined}
-                      onTouchEnd={ctaEvents.onTouchEnd ? (e) => {
-                        executeCTAEvent(ctaEvents.onTouchEnd, e, e.currentTarget);
+                      onTouchEnd={cta.events && cta.events.length > 0 ? (e) => {
+                        executeCTAEventFromConfig(cta.events!, 'onTouchEnd', e, e.currentTarget);
                       } : undefined}
                     >
                       {cta.icon && getIconComponent(cta.icon)}
@@ -890,8 +896,6 @@ export default function ClientHeader({
                 >
                   <div className="flex flex-col space-y-3">
                     {ctaButtons.map((cta, index) => {
-                      const ctaEvents = applyCTAEvents(cta as CTAWithEvents);
-                      
                       return (
                         <motion.div
                           key={`mobile-cta-${cta.text}-${index}`}
@@ -905,9 +909,9 @@ export default function ClientHeader({
                             id={cta.customId}
                             onClick={(e) => {
                               setIsMenuOpen(false);
-                              if (ctaEvents.onClick) {
+                              if (cta.events && cta.events.length > 0) {
                                 e.preventDefault(); // Prevent navigation when there's a JavaScript event
-                                executeCTAEvent(ctaEvents.onClick, e, e.currentTarget);
+                                executeCTAEventFromConfig(cta.events!, 'onClick', e, e.currentTarget);
                               }
                             }}
                             className={cn(
@@ -928,29 +932,29 @@ export default function ClientHeader({
                               fontWeight: 'var(--font-weight-medium)',
                               fontFamily: 'var(--font-family-sans)',
                             }}
-                            onMouseOver={ctaEvents.onMouseOver ? (e) => {
-                              executeCTAEvent(ctaEvents.onMouseOver, e, e.currentTarget);
+                            onMouseOver={cta.events && cta.events.length > 0 ? (e) => {
+                              executeCTAEventFromConfig(cta.events!, 'onHover', e, e.currentTarget);
                             } : undefined}
-                            onMouseOut={ctaEvents.onMouseOut ? (e) => {
-                              executeCTAEvent(ctaEvents.onMouseOut, e, e.currentTarget);
+                            onMouseOut={cta.events && cta.events.length > 0 ? (e) => {
+                              executeCTAEventFromConfig(cta.events!, 'onMouseOut', e, e.currentTarget);
                             } : undefined}
-                            onFocus={ctaEvents.onFocus ? (e) => {
-                              executeCTAEvent(ctaEvents.onFocus, e, e.currentTarget);
+                            onFocus={cta.events && cta.events.length > 0 ? (e) => {
+                              executeCTAEventFromConfig(cta.events!, 'onFocus', e, e.currentTarget);
                             } : undefined}
-                            onBlur={ctaEvents.onBlur ? (e) => {
-                              executeCTAEvent(ctaEvents.onBlur, e, e.currentTarget);
+                            onBlur={cta.events && cta.events.length > 0 ? (e) => {
+                              executeCTAEventFromConfig(cta.events!, 'onBlur', e, e.currentTarget);
                             } : undefined}
-                            onKeyDown={ctaEvents.onKeyDown ? (e) => {
-                              executeCTAEvent(ctaEvents.onKeyDown, e, e.currentTarget);
+                            onKeyDown={cta.events && cta.events.length > 0 ? (e) => {
+                              executeCTAEventFromConfig(cta.events!, 'onKeyDown', e, e.currentTarget);
                             } : undefined}
-                            onKeyUp={ctaEvents.onKeyUp ? (e) => {
-                              executeCTAEvent(ctaEvents.onKeyUp, e, e.currentTarget);
+                            onKeyUp={cta.events && cta.events.length > 0 ? (e) => {
+                              executeCTAEventFromConfig(cta.events!, 'onKeyUp', e, e.currentTarget);
                             } : undefined}
-                            onTouchStart={ctaEvents.onTouchStart ? (e) => {
-                              executeCTAEvent(ctaEvents.onTouchStart, e, e.currentTarget);
+                            onTouchStart={cta.events && cta.events.length > 0 ? (e) => {
+                              executeCTAEventFromConfig(cta.events!, 'onTouchStart', e, e.currentTarget);
                             } : undefined}
-                            onTouchEnd={ctaEvents.onTouchEnd ? (e) => {
-                              executeCTAEvent(ctaEvents.onTouchEnd, e, e.currentTarget);
+                            onTouchEnd={cta.events && cta.events.length > 0 ? (e) => {
+                              executeCTAEventFromConfig(cta.events!, 'onTouchEnd', e, e.currentTarget);
                             } : undefined}
                           >
                             {cta.icon && getIconComponent(cta.icon)}

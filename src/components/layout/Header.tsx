@@ -14,15 +14,12 @@ interface CTAButton {
   style: 'primary' | 'secondary' | 'accent' | 'ghost' | 'destructive' | 'success' | 'info' | 'outline' | 'muted';
   target: '_self' | '_blank';
   // JavaScript Events
-  onClickEvent?: string;
-  onHoverEvent?: string;
-  onMouseOutEvent?: string;
-  onFocusEvent?: string;
-  onBlurEvent?: string;
-  onKeyDownEvent?: string;
-  onKeyUpEvent?: string;
-  onTouchStartEvent?: string;
-  onTouchEndEvent?: string;
+  events?: Array<{
+    id: string;
+    eventType: 'onClick' | 'onHover' | 'onMouseOut' | 'onFocus' | 'onBlur' | 'onKeyDown' | 'onKeyUp' | 'onTouchStart' | 'onTouchEnd';
+    functionName: string;
+    description: string;
+  }>;
 }
 
 interface Page {
@@ -169,15 +166,12 @@ export default function Header() {
       style: item.cta.style as "info" | "primary" | "secondary" | "accent" | "ghost" | "destructive" | "success" | "outline" | "muted",
       target: item.cta.target as "_self" | "_blank",
       // JavaScript Events
-      onClickEvent: item.cta.onClickEvent,
-      onHoverEvent: item.cta.onHoverEvent,
-      onMouseOutEvent: item.cta.onMouseOutEvent,
-      onFocusEvent: item.cta.onFocusEvent,
-      onBlurEvent: item.cta.onBlurEvent,
-      onKeyDownEvent: item.cta.onKeyDownEvent,
-      onKeyUpEvent: item.cta.onKeyUpEvent,
-      onTouchStartEvent: item.cta.onTouchStartEvent,
-      onTouchEndEvent: item.cta.onTouchEndEvent
+      events: item.cta.events?.map((event: any) => ({
+        id: event.id,
+        eventType: event.eventType as 'onClick' | 'onHover' | 'onMouseOut' | 'onFocus' | 'onBlur' | 'onKeyDown' | 'onKeyUp' | 'onTouchStart' | 'onTouchEnd',
+        functionName: event.functionName,
+        description: event.description
+      }))
     }));
 
   }
