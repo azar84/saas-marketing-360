@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
         
         try {
           // Try to fix the sequence
-          const maxResult = await prisma.$queryRaw`SELECT MAX(id) as max_id FROM form_submissions`;
+          const maxResult = await prisma.$queryRaw<Array<{ max_id: number }>>`SELECT MAX(id) as max_id FROM form_submissions`;
           const maxId = maxResult[0]?.max_id || 0;
           
           if (maxId > 0) {
