@@ -423,10 +423,16 @@ const executeEventCode = (eventCode: string, event: React.SyntheticEvent, elemen
 // New function to execute CTA events from the enhanced event system
 export const executeCTAEventFromConfig = (events: any[], eventType: string, event: React.SyntheticEvent, element: HTMLElement) => {
   try {
-    if (!events || !Array.isArray(events)) return;
+    console.log('executeCTAEventFromConfig called with:', { events, eventType, element });
+    
+    if (!events || !Array.isArray(events)) {
+      console.log('executeCTAEventFromConfig - No events or not array:', events);
+      return;
+    }
     
     // Find events that match the current event type
     const matchingEvents = events.filter(eventConfig => eventConfig.eventType === eventType);
+    console.log('executeCTAEventFromConfig - Matching events:', matchingEvents);
     
     matchingEvents.forEach(eventConfig => {
       if (eventConfig.functionName) {

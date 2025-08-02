@@ -806,6 +806,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                                                      // Execute CTA events
                              if (heroData.primaryCta.events) {
                                console.log('HeroSection - Executing events');
+                               console.log('Events data:', heroData.primaryCta.events);
                                executeCTAEventFromConfig(heroData.primaryCta.events, 'onClick', e, e.currentTarget);
                              } else {
                                console.log('HeroSection - No events to execute');
