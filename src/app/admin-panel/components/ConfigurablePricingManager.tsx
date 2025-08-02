@@ -33,34 +33,35 @@ import {
   } from 'lucide-react';
 import { renderIcon } from '@/lib/iconUtils';
 
-const IconDisplay = ({ iconName, iconUrl, className = "w-5 h-5 text-gray-600" }: { 
+const IconDisplay = ({ iconName, iconUrl, className = "w-5 h-5", style }: { 
   iconName: string; 
   iconUrl?: string; 
   className?: string;
+  style?: React.CSSProperties;
 }) => {
   // If iconUrl is provided, use the PNG image
   if (iconUrl) {
-    return <img src={iconUrl} alt={iconName} className={`${className} object-contain`} />;
+    return <img src={iconUrl} alt={iconName} className={`${className} object-contain`} style={style} />;
   }
   
   // Handle new universal icon format (library:iconName)
   if (iconName && iconName.includes(':')) {
-    return renderIcon(iconName, { className });
+    return renderIcon(iconName, { className, style });
   }
   
   // Fallback to old format for backward compatibility
   const iconData = iconName;
   if (iconData) {
     // For old format, try to render as universal icon with lucide prefix
-    return renderIcon(`lucide:${iconName}`, { className });
+    return renderIcon(`lucide:${iconName}`, { className, style });
   }
   
   // Fallback to Settings icon
-  return <Settings className={className} />;
+  return <Settings className={className} style={style} />;
 };
 
 const getIcon = (iconName: string, iconUrl?: string) => {
-  return <IconDisplay iconName={iconName} iconUrl={iconUrl} />;
+  return <IconDisplay iconName={iconName} iconUrl={iconUrl} style={{ color: '#6366F1' }} />;
 };
 
 export default function ConfigurablePricingManager() {
@@ -119,7 +120,37 @@ export default function ConfigurablePricingManager() {
   const [editingPlan, setEditingPlan] = useState<string | null>(null);
   const [editPlanData, setEditPlanData] = useState<any>(null);
   const [editPlanPricing, setEditPlanPricing] = useState<{[key: string]: {priceCents: number, stripePriceId: string, ctaUrl: string}}>({});
+  const [editPlanPricingEvents, setEditPlanPricingEvents] = useState<{[key: string]: any[]}>({});
   const [selectedBillingCycle, setSelectedBillingCycle] = useState('');
+  
+  // Event form state
+  const [newEvent, setNewEvent] = useState({
+    eventType: '',
+    functionName: ''
+  });
+
+  // Event type options
+  const eventTypes = [
+    { value: 'onClick', label: 'Click Event' },
+    { value: 'onHover', label: 'Hover Event' },
+    { value: 'onMouseOut', label: 'Mouse Out Event' },
+    { value: 'onFocus', label: 'Focus Event' },
+    { value: 'onBlur', label: 'Blur Event' },
+    { value: 'onKeyDown', label: 'Key Down Event' },
+    { value: 'onKeyUp', label: 'Key Up Event' },
+    { value: 'onTouchStart', label: 'Touch Start Event' },
+    { value: 'onTouchEnd', label: 'Touch End Event' }
+  ];
+
+  // Billing cycle form state
+  const [newBillingCycle, setNewBillingCycle] = useState({
+    label: '',
+    multiplier: 1,
+    isDefault: false
+  });
+
+  const [editingBillingCycle, setEditingBillingCycle] = useState<string | null>(null);
+  const [editBillingCycleData, setEditBillingCycleData] = useState<any>(null);
 
   // Toast notification functions
   const showSuccess = (message: string) => {
@@ -186,13 +217,14 @@ export default function ConfigurablePricingManager() {
       
       for (const cycle of billingCycles) {
         const pricingData = newPlanPricing[cycle.id];
-        if (pricingData && (pricingData.priceCents > 0 || pricingData.stripePriceId || pricingData.ctaUrl)) {
+        if (pricingData && (pricingData.priceCents > 0 || pricingData.stripePriceId || pricingData.ctaUrl || (pricingData.events && pricingData.events.length > 0))) {
           await post('/api/admin/plan-pricing', {
             planId: createdPlan.id,
             billingCycleId: cycle.id,
             priceCents: pricingData.priceCents || 0,
             stripePriceId: pricingData.stripePriceId || '',
-            ctaUrl: pricingData.ctaUrl || ''
+            ctaUrl: pricingData.ctaUrl || '',
+            events: pricingData.events || []
           });
         }
       }
@@ -208,7 +240,15 @@ export default function ConfigurablePricingManager() {
       }
       
       setPlans([...plans, createdPlan]);
-      setNewPlan({ name: '', description: '', ctaText: 'Get Started', isActive: true, isPopular: false, position: 0, basicFeatures: [] });
+              setNewPlan({ 
+          name: '', 
+          description: '', 
+          ctaText: 'Get Started', 
+          isActive: true, 
+          isPopular: false, 
+          position: 0, 
+          basicFeatures: []
+        });
       setNewPlanPricing({});
       await loadData();
       showSuccess(`Plan "${createdPlan.name}" created successfully!`);
@@ -231,7 +271,11 @@ export default function ConfigurablePricingManager() {
       position: plan.position
     });
     
+
+    
     const pricingData: {[key: string]: {priceCents: number, stripePriceId: string, ctaUrl: string}} = {};
+    const pricingEvents: {[key: string]: any[]} = {};
+    
     billingCycles.forEach(cycle => {
       const pricing = getPlanPricing(plan.id, cycle.id);
       pricingData[cycle.id] = {
@@ -239,8 +283,11 @@ export default function ConfigurablePricingManager() {
         stripePriceId: pricing?.stripePriceId || '',
         ctaUrl: pricing?.ctaUrl || ''
       };
+      pricingEvents[cycle.id] = pricing?.events || [];
     });
+    
     setEditPlanPricing(pricingData);
+    setEditPlanPricingEvents(pricingEvents);
   };
 
   const handleUpdatePlan = async () => {
@@ -257,15 +304,17 @@ export default function ConfigurablePricingManager() {
       for (const cycle of billingCycles) {
         const existingPricing = getPlanPricing(editingPlan, cycle.id);
         const pricingData = editPlanPricing[cycle.id];
+        const pricingEvents = editPlanPricingEvents[cycle.id] || [];
         
         // Only create/update pricing if there's meaningful data
-        if (pricingData && (pricingData.priceCents > 0 || pricingData.stripePriceId || pricingData.ctaUrl)) {
+        if (pricingData && (pricingData.priceCents > 0 || pricingData.stripePriceId || pricingData.ctaUrl || pricingEvents.length > 0)) {
           const newPricingData = {
             planId: editingPlan,
             billingCycleId: cycle.id,
             priceCents: pricingData.priceCents || 0,
             stripePriceId: pricingData.stripePriceId || '',
-            ctaUrl: pricingData.ctaUrl || ''
+            ctaUrl: pricingData.ctaUrl || '',
+            events: pricingEvents
           };
           
           if (existingPricing) {
@@ -296,6 +345,7 @@ export default function ConfigurablePricingManager() {
     setEditingPlan(null);
     setEditPlanData(null);
     setEditPlanPricing({});
+    setEditPlanPricingEvents({});
   };
 
   const handleIconFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -535,6 +585,134 @@ export default function ConfigurablePricingManager() {
       .sort((a, b) => a.sortOrder - b.sortOrder);
   };
 
+  // Event type options
+  const eventTypeOptions = [
+    { value: 'onClick', label: 'onClick' },
+    { value: 'onHover', label: 'onHover' },
+    { value: 'onMouseOut', label: 'onMouseOut' },
+    { value: 'onFocus', label: 'onFocus' },
+    { value: 'onBlur', label: 'onBlur' },
+    { value: 'onKeyDown', label: 'onKeyDown' },
+    { value: 'onKeyUp', label: 'onKeyUp' },
+    { value: 'onTouchStart', label: 'onTouchStart' },
+    { value: 'onTouchEnd', label: 'onTouchEnd' }
+  ];
+
+  // Event management functions
+
+
+  // Edit plan events management
+
+
+  // Edit plan pricing events management
+  const addEditPricingEvent = (cycleId: string) => {
+    if (newEvent.eventType && newEvent.functionName) {
+      const currentEvents = editPlanPricingEvents[cycleId] || [];
+      setEditPlanPricingEvents({
+        ...editPlanPricingEvents,
+        [cycleId]: [...currentEvents, newEvent]
+      });
+      setNewEvent({ eventType: '', functionName: '' });
+    }
+  };
+
+  const removeEditPricingEvent = (cycleId: string, index: number) => {
+    const currentEvents = editPlanPricingEvents[cycleId] || [];
+    setEditPlanPricingEvents({
+      ...editPlanPricingEvents,
+      [cycleId]: currentEvents.filter((_, i) => i !== index)
+    });
+  };
+
+  // Billing cycle management functions
+  const handleCreateBillingCycle = async () => {
+    if (!newBillingCycle.label || newBillingCycle.multiplier <= 0) {
+      showError('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      // If setting as default, unset other default cycles
+      if (newBillingCycle.isDefault) {
+        await put('/api/admin/billing-cycles', { 
+          action: 'unset-defaults' 
+        });
+      }
+
+      const createdCycle = await post('/api/admin/billing-cycles', newBillingCycle) as any;
+      if (createdCycle && createdCycle.id) {
+        setBillingCycles([...billingCycles, createdCycle]);
+      }
+      setNewBillingCycle({ label: '', multiplier: 1, isDefault: false });
+      showSuccess('Billing cycle created successfully');
+    } catch (error) {
+      console.error('Failed to create billing cycle:', error);
+      showError('Failed to create billing cycle');
+    }
+  };
+
+  const handleEditBillingCycle = (cycle: any) => {
+    setEditingBillingCycle(cycle.id);
+    setEditBillingCycleData({
+      label: cycle.label,
+      multiplier: cycle.multiplier,
+      isDefault: cycle.isDefault
+    });
+  };
+
+  const handleUpdateBillingCycle = async () => {
+    if (!editBillingCycleData.label || editBillingCycleData.multiplier <= 0) {
+      showError('Please fill in all required fields');
+      return;
+    }
+
+    try {
+      // If setting as default, unset other default cycles
+      if (editBillingCycleData.isDefault) {
+        await put('/api/admin/billing-cycles', { 
+          action: 'unset-defaults' 
+        });
+      }
+
+      await put('/api/admin/billing-cycles', {
+        id: editingBillingCycle,
+        ...editBillingCycleData
+      });
+
+      setBillingCycles(billingCycles.map(cycle => 
+        cycle.id === editingBillingCycle 
+          ? { ...cycle, ...editBillingCycleData, id: cycle.id }
+          : cycle
+      ));
+      setEditingBillingCycle(null);
+      setEditBillingCycleData(null);
+      showSuccess('Billing cycle updated successfully');
+    } catch (error) {
+      console.error('Failed to update billing cycle:', error);
+      showError('Failed to update billing cycle');
+    }
+  };
+
+  const handleDeleteBillingCycle = async (cycleId: string) => {
+    if (!confirm('Are you sure you want to delete this billing cycle? This will also delete all associated pricing.')) {
+      return;
+    }
+
+    try {
+      await del(`/api/admin/billing-cycles?id=${cycleId}`);
+      setBillingCycles(billingCycles.filter(cycle => cycle.id !== cycleId));
+      showSuccess('Billing cycle deleted successfully');
+    } catch (error) {
+      console.error('Failed to delete billing cycle:', error);
+      showError('Failed to delete billing cycle');
+    }
+  };
+
+  const handleCancelEditBillingCycle = () => {
+    setEditingBillingCycle(null);
+    setEditBillingCycleData(null);
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -624,6 +802,7 @@ export default function ConfigurablePricingManager() {
           <nav className="flex space-x-2">
             {[
               { id: 'plans', label: 'Plans', icon: Users, color: 'bg-blue-500' },
+              { id: 'billing-cycles', label: 'Billing Cycles', icon: Calendar, color: 'bg-cyan-500' },
               { id: 'pricing-sections', label: 'Pricing Sections', icon: Layout, color: 'bg-pink-500' },
               { id: 'feature-pool', label: 'Feature Pool', icon: Database, color: 'bg-emerald-500' },
               { id: 'basic-features', label: 'Basic Features', icon: CheckCircle, color: 'bg-green-500' },
@@ -685,6 +864,8 @@ export default function ConfigurablePricingManager() {
                   onChange={(e) => setNewPlan({ ...newPlan, position: parseInt(e.target.value) || 0 })}
                 />
               </div>
+
+
 
               {basicFeatures.length > 0 && (
                 <div className="mt-6">
@@ -782,6 +963,77 @@ export default function ConfigurablePricingManager() {
                               }
                             })}
                           />
+                          
+                          {/* Billing Cycle Events Section */}
+                          <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
+                            <h6 className="text-sm font-medium text-blue-900 mb-2">
+                              {cycle.label} Events
+                            </h6>
+                            <div className="space-y-2">
+                              {(newPlanPricing[cycle.id]?.events || []).map((event: any, index: number) => (
+                                <div key={index} className="flex items-center space-x-2 p-2 bg-white rounded border">
+                                  <span className="text-xs text-gray-600 font-medium">{event.eventType}</span>
+                                  <span className="text-xs text-gray-400">→</span>
+                                  <span className="text-xs text-gray-600">{event.functionName}</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const currentEvents = newPlanPricing[cycle.id]?.events || [];
+                                      setNewPlanPricing({
+                                        ...newPlanPricing,
+                                        [cycle.id]: {
+                                          ...newPlanPricing[cycle.id],
+                                          events: currentEvents.filter((_, i) => i !== index)
+                                        }
+                                      });
+                                    }}
+                                    className="text-red-500 hover:text-red-700 text-xs ml-auto"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+                              ))}
+                              <div className="flex space-x-2">
+                                <select
+                                  value={newEvent.eventType}
+                                  onChange={(e) => setNewEvent({...newEvent, eventType: e.target.value})}
+                                  className="text-xs border rounded px-2 py-1 flex-1"
+                                >
+                                  <option value="">Select Event</option>
+                                  {eventTypes.map((type) => (
+                                    <option key={type.value} value={type.value}>
+                                      {type.label}
+                                    </option>
+                                  ))}
+                                </select>
+                                <Input
+                                  placeholder="Function Name"
+                                  value={newEvent.functionName}
+                                  onChange={(e) => setNewEvent({...newEvent, functionName: e.target.value})}
+                                  className="text-xs flex-1"
+                                />
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    if (newEvent.eventType && newEvent.functionName) {
+                                      const currentEvents = newPlanPricing[cycle.id]?.events || [];
+                                      setNewPlanPricing({
+                                        ...newPlanPricing,
+                                        [cycle.id]: {
+                                          ...newPlanPricing[cycle.id],
+                                          events: [...currentEvents, newEvent]
+                                        }
+                                      });
+                                      setNewEvent({ eventType: '', functionName: '' });
+                                    }
+                                  }}
+                                  className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                                >
+                                  Add
+                                </button>
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -902,6 +1154,8 @@ export default function ConfigurablePricingManager() {
                         onChange={(e) => setEditPlanData({...editPlanData, position: parseInt(e.target.value) || 0})}
                       />
                       
+
+                      
                       <div className="space-y-2">
                         <h5 className="font-medium text-sm text-gray-900">Pricing:</h5>
                         {billingCycles.length > 0 ? (
@@ -947,6 +1201,56 @@ export default function ConfigurablePricingManager() {
                                 })}
                                 className="text-sm mt-2"
                               />
+                              
+                              {/* Billing Cycle Events Section */}
+                              <div className="mt-3 p-2 bg-blue-50 rounded border border-blue-200">
+                                <h6 className="text-xs font-medium text-blue-900 mb-2">
+                                  {cycle.label} Events
+                                </h6>
+                                <div className="space-y-2">
+                                  {(editPlanPricingEvents[cycle.id] || []).map((event, index) => (
+                                    <div key={index} className="flex items-center space-x-2 p-1 bg-white rounded border">
+                                      <span className="text-xs text-gray-600 font-medium">{event.eventType}</span>
+                                      <span className="text-xs text-gray-400">→</span>
+                                      <span className="text-xs text-gray-600">{event.functionName}</span>
+                                      <button
+                                        type="button"
+                                        onClick={() => removeEditPricingEvent(cycle.id, index)}
+                                        className="text-red-500 hover:text-red-700 text-xs ml-auto"
+                                      >
+                                        Remove
+                                      </button>
+                                    </div>
+                                  ))}
+                                  <div className="flex space-x-2">
+                                    <select
+                                      value={newEvent.eventType}
+                                      onChange={(e) => setNewEvent({...newEvent, eventType: e.target.value})}
+                                      className="text-xs border rounded px-1 py-1 flex-1"
+                                    >
+                                      <option value="">Select Event</option>
+                                      {eventTypes.map((type) => (
+                                        <option key={type.value} value={type.value}>
+                                          {type.label}
+                                        </option>
+                                      ))}
+                                    </select>
+                                    <Input
+                                      placeholder="Function Name"
+                                      value={newEvent.functionName}
+                                      onChange={(e) => setNewEvent({...newEvent, functionName: e.target.value})}
+                                      className="text-xs flex-1"
+                                    />
+                                    <button
+                                      type="button"
+                                      onClick={() => addEditPricingEvent(cycle.id)}
+                                      className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                                    >
+                                      Add
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                           ))
                         ) : (
@@ -1080,6 +1384,182 @@ export default function ConfigurablePricingManager() {
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
+                      </div>
+                    </>
+                  )}
+                </Card>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'billing-cycles' && (
+          <div className="space-y-6">
+            <Card className="p-8 border-2 border-cyan-100 bg-gradient-to-br from-white to-cyan-50 shadow-xl">
+              <div className="flex items-center space-x-3 mb-6">
+                <div className="p-2 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-lg">
+                  <Plus className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">Create New Billing Cycle</h3>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Label (e.g., Monthly, Yearly)
+                  </label>
+                  <Input
+                    placeholder="Enter billing cycle label"
+                    value={newBillingCycle.label}
+                    onChange={(e) => setNewBillingCycle({ ...newBillingCycle, label: e.target.value })}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Multiplier (e.g., 1 for monthly, 12 for yearly)
+                  </label>
+                  <Input
+                    type="number"
+                    min="0.1"
+                    step="0.1"
+                    placeholder="Enter multiplier"
+                    value={newBillingCycle.multiplier}
+                    onChange={(e) => setNewBillingCycle({ ...newBillingCycle, multiplier: parseFloat(e.target.value) || 1 })}
+                  />
+                </div>
+                <div className="flex items-center">
+                  <label className="flex items-center space-x-3 cursor-pointer">
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        checked={newBillingCycle.isDefault}
+                        onChange={(e) => setNewBillingCycle({ ...newBillingCycle, isDefault: e.target.checked })}
+                        className="sr-only"
+                      />
+                      <div className={`w-5 h-5 rounded border-2 cursor-pointer transition-all duration-200 flex items-center justify-center ${
+                        newBillingCycle.isDefault 
+                          ? 'bg-cyan-600 border-cyan-600' 
+                          : 'bg-white border-gray-300 hover:border-cyan-400'
+                      }`}>
+                        {newBillingCycle.isDefault && (
+                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        )}
+                      </div>
+                    </div>
+                    <span className="text-gray-900 font-medium">Set as Default</span>
+                  </label>
+                </div>
+              </div>
+              
+              <div className="flex justify-end mt-6">
+                <Button 
+                  onClick={handleCreateBillingCycle} 
+                  disabled={!newBillingCycle.label || newBillingCycle.multiplier <= 0}
+                  className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Create Billing Cycle
+                </Button>
+              </div>
+            </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {billingCycles.filter(cycle => cycle && cycle.id).map((cycle) => (
+                <Card key={cycle.id} className="p-6 hover:shadow-xl transition-all duration-300 bg-white border border-gray-200">
+                  {editingBillingCycle === cycle.id ? (
+                    <div className="space-y-4">
+                      <Input
+                        placeholder="Label"
+                        value={editBillingCycleData?.label || ''}
+                        onChange={(e) => setEditBillingCycleData({...editBillingCycleData, label: e.target.value})}
+                      />
+                      <Input
+                        type="number"
+                        min="0.1"
+                        step="0.1"
+                        placeholder="Multiplier"
+                        value={editBillingCycleData?.multiplier || 1}
+                        onChange={(e) => setEditBillingCycleData({...editBillingCycleData, multiplier: parseFloat(e.target.value) || 1})}
+                      />
+                      <label className="flex items-center space-x-3 cursor-pointer">
+                        <div className="relative">
+                          <input
+                            type="checkbox"
+                            checked={editBillingCycleData?.isDefault || false}
+                            onChange={(e) => setEditBillingCycleData({...editBillingCycleData, isDefault: e.target.checked})}
+                            className="sr-only"
+                          />
+                          <div className={`w-5 h-5 rounded border-2 cursor-pointer transition-all duration-200 flex items-center justify-center ${
+                            editBillingCycleData?.isDefault 
+                              ? 'bg-cyan-600 border-cyan-600' 
+                              : 'bg-white border-gray-300 hover:border-cyan-400'
+                          }`}>
+                            {editBillingCycleData?.isDefault && (
+                              <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            )}
+                          </div>
+                        </div>
+                        <span className="text-gray-900 font-medium">Default</span>
+                      </label>
+                      
+                      <div className="flex space-x-2">
+                        <Button
+                          onClick={handleUpdateBillingCycle}
+                          className="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg"
+                        >
+                          <Save className="w-4 h-4 mr-2" />
+                          Save
+                        </Button>
+                        <Button
+                          onClick={handleCancelEditBillingCycle}
+                          className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
+                        >
+                          <X className="w-4 h-4 mr-2" />
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center space-x-2">
+                          <Calendar className="w-5 h-5 text-cyan-600" />
+                          <h4 className="text-lg font-semibold text-gray-900">{cycle.label || 'Unnamed Cycle'}</h4>
+                          {cycle.isDefault && (
+                            <Badge className="bg-cyan-100 text-cyan-800">
+                              Default
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex space-x-2">
+                          <Button
+                            onClick={() => handleEditBillingCycle(cycle)}
+                            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded"
+                          >
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            onClick={() => handleDeleteBillingCycle(cycle.id)}
+                            className="p-2 text-red-600 hover:text-red-700 hover:bg-red-50 rounded"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Multiplier:</span>
+                          <span className="font-medium">{cycle.multiplier || 1}x</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-gray-600">Created:</span>
+                          <span className="font-medium">{cycle.createdAt ? new Date(cycle.createdAt).toLocaleDateString() : 'N/A'}</span>
+                        </div>
                       </div>
                     </>
                   )}
@@ -1487,7 +1967,16 @@ export default function ConfigurablePricingManager() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {planFeatureTypes.filter(ft => ft.isActive).map((featureType) => (
+                    {planFeatureTypes
+                      .filter(ft => ft.isActive)
+                      .filter(featureType => {
+                        // Only show feature types that have at least one limit configured
+                        return plans.filter(p => p.isActive).some(plan => {
+                          const limit = getPlanLimit(plan.id, featureType.id);
+                          return limit && (limit.value > 0 || limit.isUnlimited);
+                        });
+                      })
+                      .map((featureType) => (
                       <tr key={featureType.id} className="hover:bg-gray-50 transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center space-x-3">
@@ -1712,7 +2201,14 @@ export default function ConfigurablePricingManager() {
                         Feature Limits
                       </td>
                     </tr>
-                    {planFeatureTypes.filter(ft => ft.isActive).map((featureType) => (
+                    {planFeatureTypes
+                      .filter(ft => ft.isActive)
+                      .filter((featureType, index, self) => 
+                        // Remove duplicates based on name
+                        index === self.findIndex(ft => ft.name === featureType.name)
+                      )
+                      .sort((a, b) => a.sortOrder - b.sortOrder)
+                      .map((featureType) => (
                       <tr key={featureType.id} className="hover:bg-gray-50 transition-colors">
                                                  <td className="px-6 py-4 font-medium text-gray-900">
                            <div className="flex items-center space-x-3">
@@ -1734,7 +2230,9 @@ export default function ConfigurablePricingManager() {
                               <div className="text-lg font-bold text-gray-900">
                                 {limitValue}
                               </div>
-                              {featureType.unit && (
+                              {featureType.unit && 
+                               featureType.unit !== limitValue && 
+                               !/^\d+$/.test(featureType.unit) && (
                                 <div className="text-xs text-gray-500">{featureType.unit}</div>
                               )}
                             </td>

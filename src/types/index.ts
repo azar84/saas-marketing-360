@@ -601,6 +601,8 @@ export interface PlanDB {
   position: number;
   isActive: boolean;
   isPopular: boolean;
+  // JavaScript Events
+  events?: Array<{eventType: string, functionName: string}>;
   createdAt: Date;
   updatedAt: Date;
   pricing: PlanPricing[];

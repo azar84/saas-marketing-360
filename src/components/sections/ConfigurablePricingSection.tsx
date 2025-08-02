@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Check, Settings, CheckCircle, X } from 'lucide-react';
 import { useDesignSystem } from '@/hooks/useDesignSystem';
 import { iconLibrary } from '@/components/ui/IconPicker';
+import { executeCTAEvent } from '@/lib/utils';
 
 interface BillingCycle {
   id: string;
@@ -22,6 +23,10 @@ interface PlanPricing {
   priceCents: number;
   stripePriceId?: string;
   ctaUrl?: string;
+  events?: Array<{
+    eventType: string;
+    functionName: string;
+  }>;
   billingCycle: BillingCycle;
 }
 
@@ -76,9 +81,14 @@ interface Plan {
   name: string;
   description?: string;
   ctaText?: string;
+  ctaUrl?: string;
   position: number;
   isActive: boolean;
   isPopular: boolean;
+  events?: Array<{
+    eventType: string;
+    functionName: string;
+  }>;
   pricing: PlanPricing[];
   featureLimits?: PlanFeatureLimit[];
   basicFeatures?: PlanBasicFeature[];
@@ -115,22 +125,23 @@ interface ConfigurablePricingSectionProps {
 }
 
 // IconDisplay component exactly like admin panel
-const IconDisplay = ({ iconName, iconUrl, className = "w-4 h-4" }: { 
+const IconDisplay = ({ iconName, iconUrl, className = "w-4 h-4", style }: { 
   iconName: string; 
   iconUrl?: string; 
   className?: string;
+  style?: React.CSSProperties;
 }) => {
   if (iconUrl) {
-    return <img src={iconUrl} alt={iconName} className={`${className} object-contain`} />;
+    return <img src={iconUrl} alt={iconName} className={`${className} object-contain`} style={style} />;
   }
   
   const iconData = iconLibrary.find(icon => icon.name === iconName);
   if (iconData) {
     const IconComponent = iconData.component;
-    return <IconComponent className={className} />;
+    return <IconComponent className={className} style={style} />;
   }
   
-  return <Settings className={className} />;
+  return <Settings className={className} style={style} />;
 };
 
 export default function ConfigurablePricingSection({
@@ -146,23 +157,23 @@ export default function ConfigurablePricingSection({
     serverPricingData?.pricingSection || null
   );
   const [billingCycles, setBillingCycles] = useState<BillingCycle[]>(
-    serverPricingData?.billingCycles || []
+    Array.isArray(serverPricingData?.billingCycles) ? serverPricingData.billingCycles : []
   );
   const [selectedBillingCycleId, setSelectedBillingCycleId] = useState<string>('');
   const [plans, setPlans] = useState<Plan[]>(
-    serverPricingData?.plans || []
+    Array.isArray(serverPricingData?.plans) ? serverPricingData.plans : []
   );
   const [planFeatureTypes, setPlanFeatureTypes] = useState<FeatureType[]>(
-    serverPricingData?.planFeatureTypes || []
+    Array.isArray(serverPricingData?.planFeatureTypes) ? serverPricingData.planFeatureTypes : []
   );
   const [planLimits, setPlanLimits] = useState<PlanFeatureLimit[]>(
-    serverPricingData?.planLimits || []
+    Array.isArray(serverPricingData?.planLimits) ? serverPricingData.planLimits : []
   );
   const [planBasicFeatures, setPlanBasicFeatures] = useState<PlanBasicFeature[]>(
-    serverPricingData?.planBasicFeatures || []
+    Array.isArray(serverPricingData?.planBasicFeatures) ? serverPricingData.planBasicFeatures : []
   );
   const [basicFeatures, setBasicFeatures] = useState<BasicFeature[]>(
-    serverPricingData?.basicFeatures || []
+    Array.isArray(serverPricingData?.basicFeatures) ? serverPricingData.basicFeatures : []
   );
   const [loading, setLoading] = useState(!serverPricingData);
   const [error, setError] = useState<string | null>(null);
@@ -170,12 +181,15 @@ export default function ConfigurablePricingSection({
 
   // Helper functions exactly like admin panel
   const getPlanLimit = (planId: string, featureTypeId: string) => {
+    if (!Array.isArray(planLimits)) return undefined;
     return planLimits.find(l => l.planId === planId && l.featureTypeId === featureTypeId);
   };
 
   const getPlanPricing = (planId: string, billingCycleId: string) => {
+    if (!Array.isArray(plans)) return undefined;
     const plan = plans.find(p => p.id === planId);
-    return plan?.pricing.find(p => p.billingCycleId === billingCycleId);
+    if (!plan || !Array.isArray(plan.pricing)) return undefined;
+    return plan.pricing.find(p => p.billingCycleId === billingCycleId);
   };
 
   const formatPrice = (priceCents: number) => {
@@ -184,12 +198,14 @@ export default function ConfigurablePricingSection({
   };
 
   const isPlanBasicFeatureEnabled = (planId: string, featureId: string) => {
+    if (!Array.isArray(planBasicFeatures)) return false;
     return planBasicFeatures.some(pbf => 
       pbf.planId === planId && pbf.basicFeatureId === featureId
     );
   };
 
   const getEnabledBasicFeatures = (planId: string) => {
+    if (!Array.isArray(basicFeatures)) return [];
     return basicFeatures.filter(bf => 
       bf.isActive && isPlanBasicFeatureEnabled(planId, bf.id)
     );
@@ -200,10 +216,12 @@ export default function ConfigurablePricingSection({
     
     // Calculate savings based on actual price differences
     // Get the first plan to calculate savings (using Starter as reference)
+    if (!Array.isArray(plans) || plans.length === 0) return 0;
     const referencePlan = plans[0]; // Use first plan as reference
     if (!referencePlan) return 0;
     
     // Get monthly pricing for reference plan
+    if (!Array.isArray(billingCycles)) return 0;
     const monthlyBillingCycle = billingCycles.find(c => c.multiplier === 1);
     if (!monthlyBillingCycle) return 0;
     
@@ -218,6 +236,47 @@ export default function ConfigurablePricingSection({
     const savings = ((monthlyTotal - yearlyCost) / monthlyTotal) * 100;
     
     return Math.round(savings);
+  };
+
+  // Execute JavaScript events for a plan using the same approach as header CTAs
+  const executePlanEvents = (plan: Plan, eventType: string, event?: React.SyntheticEvent, element?: HTMLElement) => {
+    console.log(`🎯 Executing events for plan: ${plan.name}, eventType: ${eventType}`);
+    
+    // Get the current billing cycle's pricing data
+    const pricing = getPlanPricing(plan.id, selectedBillingCycleId);
+    const events = pricing?.events || plan.events || [];
+    
+    console.log(`📋 Pricing events:`, events);
+    console.log(`📋 Plan events (fallback):`, plan.events);
+    
+    if (!events || !Array.isArray(events) || events.length === 0) {
+      console.log('❌ No events found for plan or pricing');
+      return;
+    }
+    
+    events.forEach(eventConfig => {
+      if (eventConfig.eventType === eventType && eventConfig.functionName) {
+        console.log(`🔧 Executing ${eventConfig.functionName} for ${eventType}`);
+        
+        // Use the same executeCTAEvent function that header CTAs use
+        if (event && element) {
+          executeCTAEvent(eventConfig.functionName, event, element);
+        } else {
+          // Fallback for when we don't have the event object
+          try {
+            if (typeof window !== 'undefined' && (window as any)[eventConfig.functionName]) {
+              (window as any)[eventConfig.functionName]();
+              console.log(`✅ Executed function: ${eventConfig.functionName} for event: ${eventType}`);
+            } else {
+              console.warn(`Function ${eventConfig.functionName} not found in global scope`);
+              console.log('Available global functions:', Object.keys(window).filter(key => typeof (window as any)[key] === 'function'));
+            }
+          } catch (error) {
+            console.error(`Error executing event ${eventType} with function ${eventConfig.functionName}:`, error);
+          }
+        }
+      }
+    });
   };
 
   // Load data exactly like admin panel approach
@@ -245,12 +304,12 @@ export default function ConfigurablePricingSection({
           const basicFeaturesData = await basicFeaturesRes.json();
           const planBasicFeaturesData = await planBasicFeaturesRes.json();
           
-          // Set data exactly like admin panel
-          setBillingCycles(cycles || []);
-          setPlanFeatureTypes(featureTypes || []);
-          setPlanLimits(limits || []);
-          setBasicFeatures(basicFeaturesData || []);
-          setPlanBasicFeatures(planBasicFeaturesData || []);
+          // Set data exactly like admin panel with safety checks
+          setBillingCycles(Array.isArray(cycles) ? cycles : []);
+          setPlanFeatureTypes(Array.isArray(featureTypes) ? featureTypes : []);
+          setPlanLimits(Array.isArray(limits) ? limits : []);
+          setBasicFeatures(Array.isArray(basicFeaturesData) ? basicFeaturesData : []);
+          setPlanBasicFeatures(Array.isArray(planBasicFeaturesData) ? planBasicFeaturesData : []);
           
           // Set default billing cycle
           const defaultCycle = cycles?.find((c: BillingCycle) => c.isDefault) || cycles?.[0];
@@ -268,6 +327,14 @@ export default function ConfigurablePricingSection({
                 ?.filter((sp: PricingSectionPlan) => sp.isVisible && sp.plan.isActive)
                 ?.sort((a: PricingSectionPlan, b: PricingSectionPlan) => a.plan.position - b.plan.position)
                 ?.map((sp: PricingSectionPlan) => sp.plan) || [];
+              
+              // Debug: Log plans and their events
+              console.log('📋 Plans loaded:', sectionPlans.map(plan => ({
+                name: plan.name,
+                events: plan.events,
+                eventCount: plan.events?.length || 0
+              })));
+              
               setPlans(sectionPlans);
             } else {
               setError('Pricing section not found');
@@ -415,16 +482,43 @@ export default function ConfigurablePricingSection({
                       </div>
 
                     <button 
-                        className={`w-full py-3 rounded-lg font-medium transition-all duration-300 mb-6 ${
+                        className={`w-full py-3 rounded-lg font-medium transition-all duration-300 mb-6 cursor-pointer ${
                           plan.isPopular 
                             ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl'
                             : 'bg-purple-600 hover:bg-purple-700 text-white'
                         }`}
-                        onClick={() => {
-                          if (pricing?.ctaUrl) {
-                            window.open(pricing.ctaUrl, '_blank');
+                        onClick={(e) => {
+                          // Execute onClick events first
+                          executePlanEvents(plan, 'onClick', e, e.currentTarget);
+                          
+                          // Try to get CTA URL from multiple sources
+                          let ctaUrl = pricing?.ctaUrl;
+                          
+                          // If no CTA URL in pricing, try to get it from the plan itself
+                          if (!ctaUrl && plan.ctaUrl) {
+                            ctaUrl = plan.ctaUrl;
+                          }
+                          
+                          // If still no URL, try to get it from any pricing entry for this plan
+                          if (!ctaUrl) {
+                            const anyPricing = plan.pricing?.find(p => p.ctaUrl);
+                            ctaUrl = anyPricing?.ctaUrl;
+                          }
+                          
+                          if (ctaUrl && ctaUrl !== '#') {
+                            window.open(ctaUrl, '_blank');
+                          } else if (ctaUrl === '#') {
+                            // Do nothing for "#" URLs - prevents navigation
                           }
                         }}
+                        onMouseEnter={(e) => executePlanEvents(plan, 'onHover', e, e.currentTarget)}
+                        onMouseLeave={(e) => executePlanEvents(plan, 'onMouseOut', e, e.currentTarget)}
+                        onFocus={(e) => executePlanEvents(plan, 'onFocus', e, e.currentTarget)}
+                        onBlur={(e) => executePlanEvents(plan, 'onBlur', e, e.currentTarget)}
+                        onKeyDown={(e) => executePlanEvents(plan, 'onKeyDown', e, e.currentTarget)}
+                        onKeyUp={(e) => executePlanEvents(plan, 'onKeyUp', e, e.currentTarget)}
+                        onTouchStart={(e) => executePlanEvents(plan, 'onTouchStart', e, e.currentTarget)}
+                        onTouchEnd={(e) => executePlanEvents(plan, 'onTouchEnd', e, e.currentTarget)}
                       >
                         <span className="mr-2">{plan.ctaText || 'Get Started'}</span>
                         <span className="text-lg">✨</span>
@@ -585,7 +679,14 @@ export default function ConfigurablePricingSection({
                 </tr>
                 
                 {/* Dynamic Feature Types from Database */}
-                {planFeatureTypes.filter(ft => ft.isActive).map((featureType) => (
+                {planFeatureTypes
+                  .filter(ft => ft.isActive)
+                  .filter((featureType, index, self) => 
+                    // Remove duplicates based on name
+                    index === self.findIndex(ft => ft.name === featureType.name)
+                  )
+                  .sort((a, b) => a.sortOrder - b.sortOrder)
+                  .map((featureType) => (
                     <tr key={featureType.id} className="hover:opacity-90 transition-all">
                       <td 
                         className="px-6 py-4 font-medium"
@@ -595,7 +696,8 @@ export default function ConfigurablePricingSection({
                           <IconDisplay 
                             iconName={featureType.icon} 
                             iconUrl={featureType.iconUrl} 
-                            className="w-5 h-5 text-gray-600"
+                            className="w-5 h-5"
+                            style={{ color: designSystem?.primaryColor || '#6366F1' }}
                           />
                         <div>
                           <div className="font-semibold">{featureType.name}</div>
@@ -622,7 +724,9 @@ export default function ConfigurablePricingSection({
                             >
                             {limitValue}
                           </div>
-                          {featureType.unit && (
+                          {featureType.unit && 
+                           featureType.unit !== limitValue && 
+                           !/^\d+$/.test(featureType.unit) && (
                               <div 
                                 className="text-xs"
                                 style={{ color: designSystem?.textSecondary || '#6B7280' }}
@@ -711,17 +815,53 @@ export default function ConfigurablePricingSection({
                   return (
                 <div key={plan.id} className="text-center">
                       <button 
-                        className="w-full py-3 rounded-lg font-medium transition-all duration-300 text-white shadow-lg hover:shadow-xl"
+                        className="w-full py-3 rounded-lg font-medium transition-all duration-300 text-white shadow-lg hover:shadow-xl cursor-pointer"
                         style={{
                           background: plan.isPopular
                             ? `linear-gradient(to right, ${designSystem?.primaryColor || '#6366F1'}, ${designSystem?.accentColor || '#8B5CF6'})`
                             : designSystem?.primaryColor || '#6366F1'
                         }}
-                        onClick={() => {
-                          if (pricing?.ctaUrl) {
-                            window.open(pricing.ctaUrl, '_blank');
+                        onClick={(e) => {
+                          // Execute onClick events first
+                          executePlanEvents(plan, 'onClick', e, e.currentTarget);
+                          
+                          // Try to get CTA URL from multiple sources
+                          let ctaUrl = pricing?.ctaUrl;
+                          
+                          // If no CTA URL in pricing, try to get it from the plan itself
+                          if (!ctaUrl && plan.ctaUrl) {
+                            ctaUrl = plan.ctaUrl;
+                          }
+                          
+                          // If still no URL, try to get it from any pricing entry for this plan
+                          if (!ctaUrl) {
+                            const anyPricing = plan.pricing?.find(p => p.ctaUrl);
+                            ctaUrl = anyPricing?.ctaUrl;
+                          }
+                          
+                          console.log('CTA clicked for plan:', plan.name);
+                          console.log('Pricing data:', pricing);
+                          console.log('Plan data:', plan);
+                          console.log('Final CTA URL:', ctaUrl);
+                          
+                          if (ctaUrl && ctaUrl !== '#') {
+                            console.log('Opening URL:', ctaUrl);
+                            window.open(ctaUrl, '_blank');
+                          } else if (ctaUrl === '#') {
+                            console.log('CTA URL is "#" - preventing navigation');
+                            // Do nothing for "#" URLs
+                          } else {
+                            console.log('No CTA URL found for plan:', plan.name);
                           }
                         }}
+                        onMouseEnter={(e) => executePlanEvents(plan, 'onHover', e, e.currentTarget)}
+                        onMouseLeave={(e) => executePlanEvents(plan, 'onMouseOut', e, e.currentTarget)}
+                        onFocus={(e) => executePlanEvents(plan, 'onFocus', e, e.currentTarget)}
+                        onBlur={(e) => executePlanEvents(plan, 'onBlur', e, e.currentTarget)}
+                        onKeyDown={(e) => executePlanEvents(plan, 'onKeyDown', e, e.currentTarget)}
+                        onKeyUp={(e) => executePlanEvents(plan, 'onKeyUp', e, e.currentTarget)}
+                        onTouchStart={(e) => executePlanEvents(plan, 'onTouchStart', e, e.currentTarget)}
+                        onTouchEnd={(e) => executePlanEvents(plan, 'onTouchEnd', e, e.currentTarget)}
                   >
                         <span className="mr-2">{plan.ctaText || `Choose ${plan.name}`}</span>
                     {plan.isPopular && <span className="text-lg">⭐</span>}

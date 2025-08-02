@@ -10,6 +10,11 @@ const createPlanSchema = z.object({
   position: z.number().int().min(0).default(0),
   isActive: z.boolean().default(true),
   isPopular: z.boolean().default(false),
+  // JavaScript Events
+  events: z.array(z.object({
+    eventType: z.string(),
+    functionName: z.string()
+  })).optional().default([]),
 });
 
 const updatePlanSchema = z.object({
@@ -19,6 +24,11 @@ const updatePlanSchema = z.object({
   position: z.number().int().min(0).optional(),
   isActive: z.boolean().optional(),
   isPopular: z.boolean().optional(),
+  // JavaScript Events - make it truly optional
+  events: z.array(z.object({
+    eventType: z.string(),
+    functionName: z.string()
+  })).optional().nullable(),
 });
 
 export async function GET() {

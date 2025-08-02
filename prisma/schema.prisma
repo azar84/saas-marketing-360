@@ -750,6 +750,8 @@ model Plan {
   position      Int                  @default(0)
   isActive      Boolean              @default(true)
   isPopular     Boolean              @default(false)
+  // JavaScript Events
+  events        Json?                @default("[]")
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
   basicFeatures PlanBasicFeature[]
@@ -780,6 +782,7 @@ model PlanPricing {
   priceCents     Int
   stripePriceId  String?
   ctaUrl         String?
+  events         Json?        // Events for this specific billing cycle
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   billingCycle   BillingCycle @relation(fields: [billingCycleId], references: [id], onDelete: Cascade)

@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import { Check, X, Star, Zap, Users, Database, Phone } from 'lucide-react';
+import { executeCTAEvent } from '@/lib/utils';
 
 interface BillingCycle {
   id: string;
@@ -50,6 +51,8 @@ interface Plan {
   position: number;
   isActive: boolean;
   isPopular: boolean;
+  // JavaScript Events
+  events?: Array<{eventType: string, functionName: string}>;
   pricing: PlanPricing[];
   features: PlanFeature[];
 }
@@ -133,6 +136,47 @@ export default function PricingSection() {
     return 'Check';
   };
 
+  // Apply plan events to an element
+  const applyPlanEvents = (plan: Plan, element: HTMLElement) => {
+    if (!plan.events || !Array.isArray(plan.events)) return;
+    
+    plan.events.forEach(event => {
+      if (event.eventType && event.functionName) {
+        const eventHandler = (e: Event) => executeCTAEvent(event.functionName, e as any, element);
+        
+        switch (event.eventType) {
+          case 'onClick':
+            element.addEventListener('click', eventHandler);
+            break;
+          case 'onHover':
+            element.addEventListener('mouseover', eventHandler);
+            break;
+          case 'onMouseOut':
+            element.addEventListener('mouseout', eventHandler);
+            break;
+          case 'onFocus':
+            element.addEventListener('focus', eventHandler);
+            break;
+          case 'onBlur':
+            element.addEventListener('blur', eventHandler);
+            break;
+          case 'onKeyDown':
+            element.addEventListener('keydown', eventHandler);
+            break;
+          case 'onKeyUp':
+            element.addEventListener('keyup', eventHandler);
+            break;
+          case 'onTouchStart':
+            element.addEventListener('touchstart', eventHandler);
+            break;
+          case 'onTouchEnd':
+            element.addEventListener('touchend', eventHandler);
+            break;
+        }
+      }
+    });
+  };
+
   if (loading) {
     return (
       <section className="py-20 bg-white">
@@ -206,8 +250,18 @@ export default function PricingSection() {
             const pricing = getPlanPricing(plan, selectedBillingCycleId);
             const availableFeatures = plan.features.filter(f => f.available);
 
+            const cardRef = useRef<HTMLDivElement>(null);
+
+            // Apply events when component mounts
+            useEffect(() => {
+              if (cardRef.current) {
+                applyPlanEvents(plan, cardRef.current);
+              }
+            }, [plan]);
+
             return (
               <Card
+                ref={cardRef}
                 key={plan.id}
                 className={`relative p-8${plan.isPopular ? ' ring-2 ring-blue-500 shadow-lg' : ''}`}
               >

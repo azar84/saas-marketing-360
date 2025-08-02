@@ -83,6 +83,16 @@ export async function POST(request: NextRequest) {
 export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
+    
+    // Handle special action for unsetting defaults
+    if (body.action === 'unset-defaults') {
+      await prisma.billingCycle.updateMany({
+        where: { isDefault: true },
+        data: { isDefault: false },
+      });
+      return NextResponse.json({ success: true });
+    }
+
     const { id, ...updateData } = body;
 
     if (!id) {
