@@ -29,6 +29,12 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
   subheading,
   backgroundColor = '#ffffff'
 }) => {
+  console.log('🎨 FeaturesListLayout rendered with:', {
+    featuresCount: features.length,
+    heading,
+    subheading,
+    backgroundColor
+  });
   const { designSystem } = useDesignSystem();
   const sectionRef = useRef<HTMLElement>(null);
   const particlesRef = useRef<HTMLDivElement>(null);
@@ -75,7 +81,9 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
 
   // Create DNA base pairs
   const createDNABases = () => {
+    console.log('🧬 Creating DNA bases...');
     const strands = dnaRef.current?.querySelectorAll('.dna-strand');
+    console.log('🧬 Found strands:', strands?.length || 0);
     strands?.forEach((strand, strandIndex) => {
       strand.innerHTML = '';
       for (let i = 0; i < 50; i++) {
@@ -95,26 +103,36 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
 
   // Create particle system
   const createParticles = () => {
-    if (!particlesRef.current) return;
+    console.log('✨ Creating particles...');
+    if (!particlesRef.current) {
+      console.log('❌ No particles ref found');
+      return;
+    }
     particlesRef.current.innerHTML = '';
     
     for (let i = 0; i < 50; i++) {
       const particle = document.createElement('div');
       particle.className = 'particle';
       particle.style.position = 'absolute';
-      particle.style.width = '3px';
-      particle.style.height = '3px';
+      particle.style.width = '6px';
+      particle.style.height = '6px';
       particle.style.background = primaryColor;
       particle.style.borderRadius = '50%';
       particle.style.left = `${Math.random() * 100}%`;
-      particle.style.animation = `particleFloat ${15 + Math.random() * 10}s linear infinite ${Math.random() * 15}s`;
+      particle.style.animation = `particleFloat ${8 + Math.random() * 5}s linear infinite ${Math.random() * 8}s`;
+      particle.style.boxShadow = `0 0 8px ${primaryColor}60`;
+      particle.style.opacity = '0.8';
       particlesRef.current.appendChild(particle);
     }
   };
 
   // Create geometric shapes
   const createGeometricShapes = () => {
-    if (!geometricRef.current) return;
+    console.log('🔷 Creating geometric shapes...');
+    if (!geometricRef.current) {
+      console.log('❌ No geometric ref found');
+      return;
+    }
     
     // Clear existing shapes
     geometricRef.current.innerHTML = '';
@@ -131,79 +149,56 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
       
       if (shapeType === 0) {
         // Circle
-        shape.style.width = `${20 + Math.random() * 30}px`;
+        shape.style.width = `${30 + Math.random() * 40}px`;
         shape.style.height = shape.style.width;
         shape.style.borderRadius = '50%';
-        shape.style.background = `linear-gradient(45deg, ${primaryColor}40, ${secondaryColor}40)`;
+        shape.style.background = `linear-gradient(45deg, ${primaryColor}60, ${secondaryColor}60)`;
+        shape.style.boxShadow = `0 0 15px ${primaryColor}40`;
       } else if (shapeType === 1) {
         // Triangle
         shape.style.width = '0';
         shape.style.height = '0';
-        const size = 15 + Math.random() * 20;
+        const size = 20 + Math.random() * 30;
         shape.style.borderLeft = `${size}px solid transparent`;
         shape.style.borderRight = `${size}px solid transparent`;
-        shape.style.borderBottom = `${size * 1.5}px solid ${accentColor}40`;
+        shape.style.borderBottom = `${size * 1.5}px solid ${accentColor}60`;
+        shape.style.filter = `drop-shadow(0 0 10px ${accentColor}40)`;
       } else {
         // Square
-        const size = 15 + Math.random() * 25;
+        const size = 20 + Math.random() * 35;
         shape.style.width = `${size}px`;
         shape.style.height = `${size}px`;
-        shape.style.background = `linear-gradient(45deg, ${accentColor}40, ${primaryColor}40)`;
+        shape.style.background = `linear-gradient(45deg, ${accentColor}60, ${primaryColor}60)`;
         shape.style.transform = `rotate(${Math.random() * 360}deg)`;
+        shape.style.boxShadow = `0 0 12px ${accentColor}40`;
       }
       
       geometricRef.current.appendChild(shape);
     }
 
-    // Create animated logos spread across full width
-    console.log('🚀 Creating 15 animated logos...');
+    // Create animated decorative elements spread across full width
+    console.log('🚀 Creating 15 animated decorative elements...');
     for (let i = 0; i < 15; i++) {
-      const logoContainer = document.createElement('div');
-              logoContainer.className = 'company-logo';
-      logoContainer.style.position = 'absolute';
-      logoContainer.style.left = `${Math.random() * 100}%`;
-      logoContainer.style.top = `${Math.random() * 100}%`;
-      logoContainer.style.animation = `logoFloat ${20 + Math.random() * 10}s linear infinite ${Math.random() * 20}s`;
-      logoContainer.style.zIndex = '35';
+      const decorativeElement = document.createElement('div');
+      decorativeElement.className = 'decorative-element';
+      decorativeElement.style.position = 'absolute';
+      decorativeElement.style.left = `${Math.random() * 100}%`;
+      decorativeElement.style.top = `${Math.random() * 100}%`;
+      decorativeElement.style.animation = `logoFloat ${20 + Math.random() * 10}s linear infinite ${Math.random() * 20}s`;
+      decorativeElement.style.zIndex = '5';
       
-              // Create company logo using the actual favicon.svg
-      const logo = document.createElement('img');
-      logo.src = '/favicon.svg';
-              logo.alt = 'Your Company';
-      logo.style.width = '60px';
-      logo.style.height = '60px';
-      logo.style.opacity = '0.8';
-      logo.style.filter = `hue-rotate(${Math.random() * 360}deg) brightness(1.8) saturate(1.5)`;
-      logo.style.animation = `logoSpin ${6 + Math.random() * 8}s linear infinite`;
-      logo.style.boxShadow = `0 0 40px ${primaryColor}90, 0 0 80px ${primaryColor}60, 0 0 120px ${primaryColor}30`;
-      logo.style.borderRadius = '50%';
-      logo.style.border = `3px solid ${primaryColor}50`;
+      // Create decorative circle
+      decorativeElement.style.width = '60px';
+      decorativeElement.style.height = '60px';
+      decorativeElement.style.borderRadius = '50%';
+      decorativeElement.style.background = `linear-gradient(45deg, ${primaryColor}40, ${accentColor}40)`;
+      decorativeElement.style.opacity = '0.8';
+      decorativeElement.style.filter = `hue-rotate(${Math.random() * 360}deg) brightness(1.8) saturate(1.5)`;
+      decorativeElement.style.animation = `logoSpin ${6 + Math.random() * 8}s linear infinite`;
+      decorativeElement.style.boxShadow = `0 0 40px ${primaryColor}90, 0 0 80px ${primaryColor}60, 0 0 120px ${primaryColor}30`;
+      decorativeElement.style.border = `3px solid ${primaryColor}50`;
       
-      // Add error handling - fallback to styled div if SVG doesn't load
-      logo.onerror = () => {
-        const fallback = document.createElement('div');
-        fallback.style.width = '60px';
-        fallback.style.height = '60px';
-        fallback.style.borderRadius = '50%';
-        fallback.style.background = `linear-gradient(45deg, ${primaryColor}, ${accentColor})`;
-        fallback.style.display = 'flex';
-        fallback.style.alignItems = 'center';
-        fallback.style.justifyContent = 'center';
-        fallback.style.fontSize = '28px';
-        fallback.style.fontWeight = 'bold';
-        fallback.style.color = 'white';
-        fallback.style.fontFamily = 'Arial, sans-serif';
-        fallback.textContent = 'S';
-        fallback.style.opacity = '0.8';
-        fallback.style.filter = `hue-rotate(${Math.random() * 360}deg) brightness(1.8) saturate(1.5)`;
-        fallback.style.animation = `logoSpin ${6 + Math.random() * 8}s linear infinite`;
-        fallback.style.boxShadow = `0 0 40px ${primaryColor}90, 0 0 80px ${primaryColor}60, 0 0 120px ${primaryColor}30`;
-        fallback.style.border = `3px solid ${primaryColor}50`;
-        logoContainer.replaceChild(fallback, logo);
-      };
-      
-      logoContainer.appendChild(logo);
-      geometricRef.current.appendChild(logoContainer);
+      geometricRef.current.appendChild(decorativeElement);
     }
   };
 
@@ -249,6 +244,12 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
   useEffect(() => {
     const timer = setTimeout(() => {
       console.log('🎬 Initializing FeaturesListLayout animations...');
+      console.log('🔍 Checking refs:', {
+        dnaRef: !!dnaRef.current,
+        particlesRef: !!particlesRef.current,
+        geometricRef: !!geometricRef.current,
+        sectionRef: !!sectionRef.current
+      });
       createDNABases();
       createParticles();
       createGeometricShapes();
@@ -287,7 +288,7 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
       }}
     >
       {/* Content */}
-      <div className="relative z-50 max-w-7xl mx-auto px-6">
+              <div className="relative z-10 max-w-7xl mx-auto px-6">
         {/* Simple Header */}
         <div className="text-center mb-16">
           <h1 
@@ -329,11 +330,13 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
               {[...Array(8)].map((_, i) => (
                 <div
                   key={i}
-                  className="dna-strand absolute w-1 h-full"
+                  className="dna-strand absolute w-2 h-full"
                   style={{
                     left: `${25 + i * 6.25}%`,
                     background: `linear-gradient(to bottom, ${primaryColor}, ${accentColor}, ${primaryColor})`,
-                    animation: `dnaRotate 8s linear infinite ${-i * 2}s`
+                    animation: `dnaRotate 4s linear infinite ${-i * 1}s`,
+                    opacity: 0.8,
+                    boxShadow: `0 0 10px ${primaryColor}40`
                   }}
                 />
               ))}
@@ -371,7 +374,7 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
           </div>
 
           {/* Features Grid */}
-          <div className="relative z-50 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-16">
+          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-16">
             {features.map((feature, index) => (
               <div
                 key={feature.id}
@@ -381,7 +384,7 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
                   backdropFilter: 'blur(20px)',
                   border: `1px solid rgba(255, 255, 255, 0.1)`,
                   transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-                  animation: `fadeInUp 0.8s ease-out forwards ${index * 0.1}s`,
+                  animation: `fadeInUp 0.8s ease-out forwards ${index * 0.1}s, pulse 2s ease-in-out infinite`,
                   opacity: 0
                 }}
               >
@@ -396,12 +399,12 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
                 
                 {/* Card Background */}
                 <div 
-                  className="absolute inset-0.5 rounded-3xl z-10"
+                  className="absolute inset-0.5 rounded-3xl z-5"
                   style={{ backgroundColor: backgroundPrimary }}
                 />
 
                 {/* Content */}
-                <div className="relative z-20">
+                <div className="relative z-5">
                   {/* Morphing Icon */}
                   <div className="w-20 h-20 mx-auto mb-8 relative flex items-center justify-center">
                     <div 
@@ -411,7 +414,7 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
                         animation: 'morphIcon 6s ease-in-out infinite'
                       }}
                     />
-                    <div className="relative z-10 text-white">
+                    <div className="relative z-5 text-white">
                       {getIconComponent(feature.iconName)}
                     </div>
                   </div>
@@ -439,10 +442,12 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
       </div>
 
       {/* CSS Animations */}
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes dnaRotate {
-          0% { transform: rotateY(0deg); }
-          100% { transform: rotateY(360deg); }
+          0% { transform: rotateY(0deg) scale(1); }
+          50% { transform: rotateY(180deg) scale(1.2); }
+          100% { transform: rotateY(360deg) scale(1); }
         }
 
         @keyframes dnaPulse {
@@ -452,17 +457,23 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
 
         @keyframes particleFloat {
           0% {
-            transform: translateY(100vh) rotate(0deg);
+            transform: translateY(100vh) rotate(0deg) scale(0.5);
             opacity: 0;
           }
           10% {
             opacity: 1;
+            transform: translateY(80vh) rotate(90deg) scale(1);
+          }
+          50% {
+            transform: translateY(50vh) rotate(180deg) scale(1.5);
+            opacity: 1;
           }
           90% {
             opacity: 1;
+            transform: translateY(20vh) rotate(270deg) scale(1);
           }
           100% {
-            transform: translateY(-100vh) rotate(360deg);
+            transform: translateY(-100vh) rotate(360deg) scale(0.5);
             opacity: 0;
           }
         }
@@ -485,15 +496,15 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
           }
           25% { 
             border-radius: 30%;
-            transform: rotate(90deg) scale(1.1);
+            transform: rotate(90deg) scale(1.3);
           }
           50% { 
             border-radius: 20%;
-            transform: rotate(180deg) scale(0.9);
+            transform: rotate(180deg) scale(0.7);
           }
           75% { 
             border-radius: 40%;
-            transform: rotate(270deg) scale(1.05);
+            transform: rotate(270deg) scale(1.2);
           }
         }
 
@@ -519,20 +530,31 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
           }
         }
 
-        @keyframes gradientShift {
+        @keyframes pulse {
           0%, 100% {
-            transform: rotate(0deg) scale(1);
-            opacity: 0.3;
+            transform: scale(1);
           }
-          33% {
-            transform: rotate(120deg) scale(1.1);
-            opacity: 0.5;
-          }
-          66% {
-            transform: rotate(240deg) scale(0.9);
-            opacity: 0.4;
+          50% {
+            transform: scale(1.05);
           }
         }
+
+        @keyframes bounce {
+          0%, 20%, 53%, 80%, 100% {
+            transform: translate3d(0,0,0);
+          }
+          40%, 43% {
+            transform: translate3d(0, -30px, 0);
+          }
+          70% {
+            transform: translate3d(0, -15px, 0);
+          }
+          90% {
+            transform: translate3d(0, -4px, 0);
+          }
+        }
+
+        @keyframes gradientShift {
           0%, 100% {
             transform: rotate(0deg) scale(1);
             opacity: 0.3;
@@ -613,7 +635,7 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
             padding: 30px;
           }
         }
-      `}</style>
+      `}} />
     </section>
   );
 };

@@ -57,6 +57,23 @@ body {
   }
 }
 
+/* Favicon styles using design system colors */
+.favicon-bg {
+  fill: var(--color-primary);
+}
+
+.favicon-accent {
+  fill: var(--color-accent);
+}
+
+.favicon-secondary {
+  fill: var(--color-secondary);
+}
+
+.favicon-center {
+  fill: var(--color-light-100);
+}
+
 html {
   scroll-behavior: smooth;
 }
