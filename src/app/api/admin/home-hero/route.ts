@@ -113,7 +113,6 @@ export async function POST(request: NextRequest) {
         headline: body.heading || body.headline, // Accept both heading and headline
         subheading: body.subheading || null,
         backgroundColor: body.backgroundColor || '#FFFFFF',
-        backgroundImage: body.backgroundImage || null,
         backgroundSize: body.backgroundSize || 'cover',
         backgroundOverlay: body.backgroundOverlay || null,
         ctaPrimaryId: body.primaryCtaId || null,     // Store CTA ID

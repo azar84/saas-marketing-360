@@ -432,31 +432,27 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
   };
 
   // Get line spacing styles
-  const getLineSpacingStyles = () => {
+  const getLineSpacingClasses = () => {
     const lineSpacing = heroData?.lineSpacing || '4';
     
     // If it's a number, use it directly as gap
     if (!isNaN(parseInt(lineSpacing))) {
       const spacingValue = parseInt(lineSpacing) * 0.25; // Convert to rem (4 = 1rem)
-      return { 
-        display: 'flex',
-        flexDirection: 'column',
-        gap: `${spacingValue}rem`
-      };
+      return `flex flex-col gap-[${spacingValue}rem]`;
     }
     
     // Fallback for legacy string values
     switch (lineSpacing) {
       case 'tight':
-        return { display: 'flex', flexDirection: 'column', gap: '0.5rem' };
+        return 'flex flex-col gap-2';
       case 'normal':
-        return { display: 'flex', flexDirection: 'column', gap: '1rem' };
+        return 'flex flex-col gap-4';
       case 'relaxed':
-        return { display: 'flex', flexDirection: 'column', gap: '1.5rem' };
+        return 'flex flex-col gap-6';
       case 'loose':
-        return { display: 'flex', flexDirection: 'column', gap: '2rem' };
+        return 'flex flex-col gap-8';
       default:
-        return { display: 'flex', flexDirection: 'column', gap: '1rem' };
+        return 'flex flex-col gap-4';
     }
   };
 
@@ -953,8 +949,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
             initial={{ opacity: 0, x: getTextAnimationDirection() }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className={`${getTextContentClasses()}`}
-            style={getLineSpacingStyles()}
+            className={`${getTextContentClasses()} ${getLineSpacingClasses()}`}
           >
             {/* Tighter Main Headline with Refined Typography */}
             <div>
