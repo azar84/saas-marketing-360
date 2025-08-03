@@ -399,7 +399,8 @@ const HomeHeroManager: React.FC = () => {
             <Button
               onClick={handleSave}
               disabled={saving}
-              className="flex items-center gap-2 bg-[#5243E9] hover:bg-[#4338CA]"
+              className="flex items-center gap-2"
+              style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)' }}
             >
               {saving ? (
                 <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
@@ -458,7 +459,7 @@ const HomeHeroManager: React.FC = () => {
               </p>
               <div className="flex flex-wrap gap-4 mb-8">
                 {heroData.primaryCtaId && heroData.primaryCta && (
-                  <Button className="bg-[#5243E9] hover:bg-[#4338CA] flex items-center gap-2">
+                  <Button className="flex items-center gap-2" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)' }}>
                     {heroData.primaryCta.icon && (() => {
                       const IconComponent = getIconComponent(heroData.primaryCta.icon);
                       return <IconComponent className="w-4 h-4" />;
@@ -497,15 +498,15 @@ const HomeHeroManager: React.FC = () => {
               <div 
                 className="rounded-xl p-6 shadow-sm border"
                 style={{ 
-                  borderColor: 'var(--color-gray-light, #E5E7EB)',
-                  backgroundColor: designSystem?.backgroundSecondary || '#F9FAFB' 
+                  borderColor: 'var(--color-gray-light)',
+                  backgroundColor: 'var(--color-bg-secondary)' 
                 }}
               >
-                <h3 className="text-lg font-semibold mb-4" style={{ color: designSystem?.textPrimary || '#1F2937' }}>Main Content</h3>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Main Content</h3>
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                       Hero Heading
                     </label>
                     <Input
@@ -515,14 +516,14 @@ const HomeHeroManager: React.FC = () => {
                       placeholder="Enter your hero heading"
                       className="w-full"
                       style={{
-                        color: designSystem?.textPrimary || '#1F2937',
-                        backgroundColor: designSystem?.backgroundSecondary || '#F9FAFB'
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-bg-primary)'
                       }}
                     />
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                       Hero Subheading
                     </label>
                     <textarea
@@ -532,9 +533,9 @@ const HomeHeroManager: React.FC = () => {
                       rows={3}
                       className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                       style={{ 
-                        color: designSystem?.textPrimary || '#1F2937',
-                        backgroundColor: designSystem?.backgroundSecondary || '#F9FAFB',
-                        borderColor: 'var(--color-gray-light, #E5E7EB)'
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-bg-primary)',
+                        borderColor: 'var(--color-gray-light)'
                       }}
                     />
                     <style jsx>{`
@@ -573,7 +574,7 @@ const HomeHeroManager: React.FC = () => {
                         borderColor: 'var(--color-gray-light, #E5E7EB)'
                       }}
                     />
-                    <label htmlFor="heroActive" className="text-sm font-medium ml-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                    <label htmlFor="heroActive" className="text-sm font-medium ml-2" style={{ color: 'var(--color-text-primary)' }}>
                       Enable Hero Section
                     </label>
                   </div>
@@ -584,8 +585,8 @@ const HomeHeroManager: React.FC = () => {
               <div 
                 className="rounded-xl p-6 shadow-sm border"
                 style={{ 
-                  borderColor: 'var(--color-gray-light, #E5E7EB)',
-                  backgroundColor: designSystem?.backgroundSecondary || '#F9FAFB' 
+                  borderColor: 'var(--color-gray-light)',
+                  backgroundColor: 'var(--color-bg-secondary)' 
                 }}
               >
                 <div className="flex items-center space-x-3 mb-6">
@@ -593,18 +594,18 @@ const HomeHeroManager: React.FC = () => {
                     <Palette className="w-5 h-5 text-indigo-600" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold" style={{ color: designSystem?.textPrimary || '#000000' }}>Styling</h3>
-                    <p className="text-sm" style={{ color: designSystem?.textSecondary || '#666666' }}>Customize the hero section appearance</p>
+                                      <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Styling</h3>
+                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Customize the hero section appearance</p>
                   </div>
                 </div>
 
                 <div className="space-y-6">
                   {/* Background Color */}
                   <div>
-                    <label className="block text-sm font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                    <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
                       Background Color
                     </label>
-                    <p className="text-xs mb-4" style={{ color: designSystem?.textMuted || '#999999' }}>
+                    <p className="text-xs mb-4" style={{ color: 'var(--color-text-muted)' }}>
                       Choose a background color for your hero section. Use hex codes (e.g., #ffffff) or CSS color names.
                     </p>
                     
@@ -636,7 +637,7 @@ const HomeHeroManager: React.FC = () => {
                               </div>
                             )}
                           </div>
-                          <span className="text-xs block truncate" style={{ color: designSystem?.textSecondary || '#666666' }}>
+                          <span className="text-xs block truncate" style={{ color: 'var(--color-text-secondary)' }}>
                             {colorOption.name}
                           </span>
                         </div>
@@ -664,11 +665,12 @@ const HomeHeroManager: React.FC = () => {
                           type="text"
                           value={heroData.backgroundColor}
                           onChange={(e) => setHeroData(prev => ({ ...prev, backgroundColor: e.target.value }))}
-                          className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent font-mono text-sm"
+                          className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent font-mono text-sm"
                           placeholder="#FFFFFF"
                           style={{ 
-                            color: designSystem?.textPrimary || '#000000',
-                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                            color: 'var(--color-text-primary)',
+                            backgroundColor: 'var(--color-bg-primary)',
+                            borderColor: 'var(--color-gray-light)'
                           }}
                         />
                       </div>
@@ -679,10 +681,10 @@ const HomeHeroManager: React.FC = () => {
 
                   {/* Background Overlay */}
                   <div>
-                    <label className="block text-sm font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                    <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
                       Background Overlay
                     </label>
-                    <p className="text-xs mb-4" style={{ color: designSystem?.textMuted || '#999999' }}>
+                    <p className="text-xs mb-4" style={{ color: 'var(--color-text-muted)' }}>
                       Add a color overlay on top of the background image for better text readability.
                     </p>
                     
@@ -841,10 +843,10 @@ const HomeHeroManager: React.FC = () => {
               {/* Creatives Configuration */}
               <div className="rounded-xl p-6 shadow-sm border"
                    style={{
-                     backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
-                     borderColor: 'var(--color-gray-light, #E5E7EB)'
+                     backgroundColor: 'var(--color-bg-secondary)',
+                     borderColor: 'var(--color-gray-light)'
                    }}>
-                <h3 className="text-lg font-semibold mb-4" style={{ color: designSystem?.textPrimary || '#000000' }}>Creatives & Layout Configuration</h3>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Creatives & Layout Configuration</h3>
                 
                 <div className="space-y-4">
                   <div>
@@ -1113,18 +1115,18 @@ const HomeHeroManager: React.FC = () => {
               {/* Call-to-Action Buttons */}
               <div className="rounded-xl p-6 shadow-sm border"
                    style={{
-                     backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
-                     borderColor: 'var(--color-gray-light, #E5E7EB)'
+                     backgroundColor: 'var(--color-bg-secondary)',
+                     borderColor: 'var(--color-gray-light)'
                    }}>
-                <h3 className="text-lg font-semibold mb-4" style={{ color: designSystem?.textPrimary || '#000000' }}>Call-to-Action Buttons</h3>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Call-to-Action Buttons</h3>
                 
                 <div className="space-y-6">
                   <div>
-                    <h4 className="font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>Primary CTA Button</h4>
+                    <h4 className="font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>Primary CTA Button</h4>
                     
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                        <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>
                           Select Primary CTA
                         </label>
                         <select
@@ -1156,11 +1158,11 @@ const HomeHeroManager: React.FC = () => {
                   </div>
                   
                   <div>
-                    <h4 className="font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>Secondary CTA Button</h4>
+                    <h4 className="font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>Secondary CTA Button</h4>
                     
                     <div className="space-y-3">
                       <div>
-                        <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                        <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>
                           Select Secondary CTA
                         </label>
                         <select
@@ -1198,15 +1200,16 @@ const HomeHeroManager: React.FC = () => {
             <div className="space-y-6">
               <div className="rounded-xl p-6 shadow-sm border"
                    style={{
-                     backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
-                     borderColor: 'var(--color-gray-light, #E5E7EB)'
+                     backgroundColor: 'var(--color-bg-secondary)',
+                     borderColor: 'var(--color-gray-light)'
                    }}>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Trust Indicators</h3>
+                  <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Trust Indicators</h3>
                   <Button
                     onClick={addTrustIndicator}
                     size="sm"
-                    className="flex items-center gap-2 bg-[#5243E9] hover:bg-[#4338CA]"
+                    className="flex items-center gap-2"
+                    style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)' }}
                   >
                     <Plus className="w-4 h-4" />
                     Add Indicator
@@ -1215,10 +1218,11 @@ const HomeHeroManager: React.FC = () => {
 
                 <div className="space-y-4">
                   {(heroData.trustIndicators || []).map((indicator, index) => (
-                    <div key={index} className="p-4 rounded-lg border"
+                    <div key={index} className="p-4 rounded-lg border-2 transition-all duration-200"
                          style={{
-                           backgroundColor: 'var(--color-bg-secondary, #F9FAFB)',
-                           borderColor: 'var(--color-gray-light, #E5E7EB)'
+                           backgroundColor: indicator.isVisible ? 'var(--color-bg-primary)' : 'var(--color-bg-secondary)',
+                           borderColor: indicator.isVisible ? 'var(--color-gray-light)' : 'var(--color-text-muted)',
+                           opacity: indicator.isVisible ? 1 : 0.6
                          }}>
                       <div className="flex items-center gap-3 mb-3">
                         <GripVertical className="w-4 h-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
@@ -1232,7 +1236,7 @@ const HomeHeroManager: React.FC = () => {
                               borderColor: 'var(--color-gray-light, #E5E7EB)'
                             }}
                           />
-                        <div className="flex items-center gap-2" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
+                        <div className="flex items-center gap-2" style={{ color: 'var(--color-text-secondary)' }}>
                           {React.createElement(getIconComponent(indicator.iconName), { className: "w-4 h-4" })}
                           <span className="text-sm font-medium">{indicator.text}</span>
                         </div>
@@ -1252,7 +1256,7 @@ const HomeHeroManager: React.FC = () => {
 
                       <div className="space-y-3">
                         <div>
-                          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>
                             Icon
                           </label>
                           <UniversalIconPicker
@@ -1269,7 +1273,7 @@ const HomeHeroManager: React.FC = () => {
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>
                             Text
                           </label>
                           <input
