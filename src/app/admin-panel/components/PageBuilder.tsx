@@ -47,6 +47,7 @@ import {
   Users
 } from 'lucide-react';
 import { Button, Input } from '@/components/ui';
+import { useDesignSystem, getAdminPanelColorsWithDesignSystem } from '@/hooks/useDesignSystem';
 
 // Section type icons mapping
 const sectionIcons = {
@@ -149,14 +150,20 @@ const SortableItem: React.FC<SortableItemProps> = ({
   return (
     <div
       ref={setNodeRef}
-      style={style}
-      className={`bg-white rounded-lg border-2 transition-all duration-200 ${
-        isDragging 
-          ? 'border-blue-400 shadow-lg scale-105 opacity-90' 
+      style={{
+        ...style,
+        backgroundColor: section.isVisible 
+          ? 'var(--color-bg-primary, #FFFFFF)' 
+          : 'var(--color-bg-secondary, #F9FAFB)',
+        borderColor: isDragging 
+          ? 'var(--color-primary, #5243E9)' 
           : section.isVisible 
-            ? 'border-gray-200 hover:border-gray-300' 
-            : 'border-gray-100 bg-gray-50 opacity-60'
-      }`}
+            ? 'var(--color-gray-light, #E5E7EB)' 
+            : 'var(--color-text-muted, #9CA3AF)',
+        opacity: isDragging ? 0.9 : section.isVisible ? 1 : 0.6,
+        transform: isDragging ? 'scale(1.05)' : undefined
+      }}
+      className="rounded-lg border-2 transition-all duration-200"
     >
       <div className="p-4">
         <div className="flex items-center justify-between">
@@ -165,22 +172,34 @@ const SortableItem: React.FC<SortableItemProps> = ({
             <div
               {...attributes}
               {...listeners}
-              className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600"
+              className="cursor-grab active:cursor-grabbing p-1"
+              style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
             >
               <GripVertical className="w-5 h-5" />
             </div>
 
             {/* Section Icon & Info */}
             <div className="flex items-center gap-3 flex-1">
-              <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                section.isVisible ? 'bg-blue-100 text-blue-600' : 'bg-gray-100 text-gray-400'
-              }`}>
+              <div 
+                className="w-10 h-10 rounded-lg flex items-center justify-center"
+                style={{
+                  backgroundColor: section.isVisible 
+                    ? 'var(--color-primary, #5243E9)' 
+                    : 'var(--color-bg-secondary, #F9FAFB)',
+                  color: section.isVisible 
+                    ? '#FFFFFF' 
+                    : 'var(--color-text-muted, #9CA3AF)'
+                }}
+              >
                 <IconComponent className="w-5 h-5" />
               </div>
               
               <div className="flex-1">
                                  <div className="flex items-center gap-2">
-                   <h4 className="font-medium text-gray-900">
+                   <h4 
+                     className="font-medium"
+                     style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                   >
                      {section.title || 
                       (section as any).heroSection?.heading || 
                       (section as any).featureGroup?.heading ||
@@ -189,41 +208,68 @@ const SortableItem: React.FC<SortableItemProps> = ({
                       (section as any).htmlSection?.name ||
                       sectionLabels[section.sectionType as keyof typeof sectionLabels]}
                    </h4>
-                   <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                   <span 
+                     className="text-xs px-2 py-1 rounded"
+                     style={{ 
+                       color: 'var(--color-text-secondary, #6B7280)',
+                       backgroundColor: 'var(--color-bg-secondary, #F9FAFB)'
+                     }}
+                   >
                      {section.sectionType}
                    </span>
                  </div>
                  {(section.subtitle || (section as any).heroSection?.subheading || (section as any).featureGroup?.subheading || (section as any).pricingSection?.subheading || (section as any).form?.subheading || (section as any).htmlSection?.description) && (
-                   <p className="text-sm text-gray-500 mt-1">
+                   <p 
+                     className="text-sm mt-1"
+                     style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+                   >
                      {section.subtitle || (section as any).heroSection?.subheading || (section as any).featureGroup?.subheading || (section as any).pricingSection?.subheading || (section as any).form?.subheading || (section as any).htmlSection?.description}
                    </p>
                  )}
                  {(section as any).featureGroup && (
-                   <p className="text-xs text-blue-600 mt-1">
+                   <p 
+                     className="text-xs mt-1"
+                     style={{ color: 'var(--color-primary, #5243E9)' }}
+                   >
                      Linked to: {(section as any).featureGroup.name} ({(section as any).featureGroup._count?.groupItems || 0} features)
                    </p>
                  )}
                  {(section as any).heroSection && (
-                   <p className="text-xs text-purple-600 mt-1">
+                   <p 
+                     className="text-xs mt-1"
+                     style={{ color: 'var(--color-secondary, #7C3AED)' }}
+                   >
                      Linked to: Hero Section "{(section as any).heroSection.name || (section as any).heroSection.headline || 'Untitled'}"
                    </p>
                  )}
                  {(section as any).pricingSection && (
-                   <p className="text-xs text-green-600 mt-1">
+                   <p 
+                     className="text-xs mt-1"
+                     style={{ color: 'var(--color-success, #10B981)' }}
+                   >
                      Linked to: Pricing Section "{(section as any).pricingSection.name}" ({(section as any).pricingSection._count?.sectionPlans || 0} plans)
                    </p>
                  )}
                  {(section as any).form && (
-                   <p className="text-xs text-orange-600 mt-1">
+                   <p 
+                     className="text-xs mt-1"
+                     style={{ color: 'var(--color-warning, #F59E0B)' }}
+                   >
                      Linked to: Form "{(section as any).form.name}" ({(section as any).form._count?.fields || 0} fields, {(section as any).form._count?.submissions || 0} submissions)
                    </p>
                  )}
                  {(section as any).htmlSection && (
-                   <p className="text-xs text-red-600 mt-1">
+                   <p 
+                     className="text-xs mt-1"
+                     style={{ color: 'var(--color-error, #EF4444)' }}
+                   >
                      Linked to: HTML Section "{(section as any).htmlSection.name}"
                    </p>
                  )}
-                <div className="flex items-center gap-2 mt-1 text-xs text-gray-400">
+                <div 
+                  className="flex items-center gap-2 mt-1 text-xs"
+                  style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
+                >
                   <span>Order: {section.sortOrder}</span>
                   <span>•</span>
                   <span>ID: {section.id}</span>
@@ -238,7 +284,8 @@ const SortableItem: React.FC<SortableItemProps> = ({
               size="sm"
               variant="ghost"
               onClick={() => onToggleVisibility(section)}
-              className="p-2 text-gray-500 hover:text-gray-700"
+              className="p-2"
+              style={{ color: 'var(--color-text-secondary, #6B7280)' }}
               title={section.isVisible ? 'Hide section' : 'Show section'}
             >
               {section.isVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
@@ -248,7 +295,8 @@ const SortableItem: React.FC<SortableItemProps> = ({
               size="sm"
               variant="ghost"
               onClick={() => onDuplicate(section)}
-              className="p-2 text-gray-500 hover:text-gray-700"
+              className="p-2"
+              style={{ color: 'var(--color-text-secondary, #6B7280)' }}
               title="Duplicate section"
             >
               <Copy className="w-4 h-4" />
@@ -258,7 +306,8 @@ const SortableItem: React.FC<SortableItemProps> = ({
               size="sm"
               variant="ghost"
               onClick={() => onEdit(section)}
-              className="p-2 text-blue-600 hover:text-blue-700"
+              className="p-2"
+              style={{ color: 'var(--color-primary, #5243E9)' }}
               title="Edit section"
             >
               <Edit className="w-4 h-4" />
@@ -268,7 +317,8 @@ const SortableItem: React.FC<SortableItemProps> = ({
               size="sm"
               variant="ghost"
               onClick={() => onDelete(section)}
-              className="p-2 text-red-600 hover:text-red-700"
+              className="p-2"
+              style={{ color: 'var(--color-error, #EF4444)' }}
               title="Delete section"
             >
               <Trash2 className="w-4 h-4" />
@@ -312,6 +362,9 @@ interface AvailableContent {
 }
 
 const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
+  const { designSystem } = useDesignSystem();
+  const adminColors = getAdminPanelColorsWithDesignSystem(designSystem);
+  
   const [pages, setPages] = useState<Page[]>([]);
   const [sections, setSections] = useState<PageSection[]>([]);
   const [currentPageId, setCurrentPageId] = useState<number | null>(selectedPageId || null);
@@ -770,13 +823,26 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Page Builder</h2>
-          <p className="text-gray-600 mt-1">Design your pages with drag-and-drop sections</p>
+          <h2 
+            className="text-3xl font-bold"
+            style={{ color: 'var(--color-text-primary, #1F2937)' }}
+          >
+            Page Builder
+          </h2>
+          <p 
+            className="mt-1"
+            style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+          >
+            Design your pages with drag-and-drop sections
+          </p>
         </div>
         <Button
           onClick={() => setShowAddSection(true)}
           disabled={!currentPageId}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+          style={{
+            backgroundColor: 'var(--color-success, #10B981)',
+            color: '#FFFFFF'
+          }}
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Section
@@ -784,21 +850,44 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
       </div>
 
       {/* Page Selector */}
-      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Select Page to Edit</h3>
+      <div 
+        className="rounded-xl p-6 shadow-sm border"
+        style={{ 
+          backgroundColor: 'var(--color-bg-secondary, #F9FAFB)',
+          borderColor: 'var(--color-gray-light, #E5E7EB)'
+        }}
+      >
+        <h3 
+          className="text-lg font-semibold mb-4"
+          style={{ color: 'var(--color-text-primary, #1F2937)' }}
+        >
+          Select Page to Edit
+        </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {pages.map((page) => (
             <button
               key={page.id}
               onClick={() => setCurrentPageId(page.id)}
-              className={`p-4 rounded-lg border-2 text-left transition-all duration-200 ${
-                currentPageId === page.id
-                  ? 'border-blue-500 bg-blue-50 text-blue-900'
-                  : 'border-gray-200 bg-white hover:border-gray-300 text-gray-900'
-              }`}
+              className="p-4 rounded-lg border-2 text-left transition-all duration-200"
+              style={{
+                backgroundColor: currentPageId === page.id 
+                  ? 'var(--color-primary, #5243E9)' 
+                  : 'var(--color-bg-primary, #FFFFFF)',
+                borderColor: currentPageId === page.id 
+                  ? 'var(--color-primary, #5243E9)' 
+                  : 'var(--color-gray-light, #E5E7EB)',
+                color: currentPageId === page.id 
+                  ? '#FFFFFF' 
+                  : 'var(--color-text-primary, #1F2937)'
+              }}
             >
               <h4 className="font-medium">{page.title}</h4>
-              <p className="text-sm text-gray-500 mt-1">/{page.slug}</p>
+              <p 
+                className="text-sm mt-1"
+                style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+              >
+                /{page.slug}
+              </p>
             </button>
           ))}
         </div>
@@ -811,11 +900,16 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className={`flex items-center gap-2 p-4 rounded-lg ${
-              message.type === 'success' 
-                ? 'bg-green-50 text-green-800 border border-green-200' 
-                : 'bg-red-50 text-red-800 border border-red-200'
-            }`}
+            className="flex items-center gap-2 p-4 rounded-lg border"
+            style={{
+              backgroundColor: message.type === 'success' 
+                ? 'var(--color-success, #10B981)' 
+                : 'var(--color-error, #EF4444)',
+              color: '#FFFFFF',
+              borderColor: message.type === 'success' 
+                ? 'var(--color-success, #10B981)' 
+                : 'var(--color-error, #EF4444)'
+            }}
           >
             {message.type === 'success' ? (
               <CheckCircle className="w-5 h-5" />
@@ -829,28 +923,59 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
 
       {/* Page Sections */}
       {currentPageId && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        <div 
+          className="rounded-xl p-6 shadow-sm border"
+          style={{ 
+            backgroundColor: 'var(--color-bg-secondary, #F9FAFB)',
+            borderColor: 'var(--color-gray-light, #E5E7EB)'
+          }}
+        >
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-semibold text-gray-900">
+            <h3 
+              className="text-lg font-semibold"
+              style={{ color: 'var(--color-text-primary, #1F2937)' }}
+            >
               Page Sections - {currentPage?.title}
             </h3>
-            <div className="text-sm text-gray-500">
+            <div 
+              className="text-sm"
+              style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+            >
               {sections.length} section{sections.length !== 1 ? 's' : ''}
             </div>
           </div>
 
           {loading ? (
             <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              <div 
+                className="animate-spin rounded-full h-8 w-8 border-b-2"
+                style={{ borderColor: 'var(--color-primary, #5243E9)' }}
+              ></div>
             </div>
           ) : sections.length === 0 ? (
             <div className="text-center py-12">
-              <Layout className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No sections yet</h3>
-              <p className="text-gray-500 mb-6">Start building your page by adding sections.</p>
+              <Layout 
+                className="w-12 h-12 mx-auto mb-4"
+                style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
+              />
+              <h3 
+                className="text-lg font-medium mb-2"
+                style={{ color: 'var(--color-text-primary, #1F2937)' }}
+              >
+                No sections yet
+              </h3>
+              <p 
+                className="mb-6"
+                style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+              >
+                Start building your page by adding sections.
+              </p>
               <Button
                 onClick={() => setShowAddSection(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                style={{
+                  backgroundColor: 'var(--color-primary, #5243E9)',
+                  color: '#FFFFFF'
+                }}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Add Your First Section
@@ -885,17 +1010,22 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
       {/* Add/Edit Section Modal */}
       {showAddSection && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+          <div className="rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+               style={{
+                 backgroundColor: 'var(--color-bg-primary, #FFFFFF)'
+               }}>
+            <div className="p-6 border-b"
+                 style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 className="text-xl font-semibold"
+                    style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   {editingSection ? 'Edit Section' : 'Add New Section'}
                 </h2>
                 <Button
                   onClick={resetForm}
                   variant="ghost"
                   size="sm"
-                  className="text-gray-500 hover:text-gray-700"
+                  style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -905,7 +1035,8 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
             <div className="p-6 space-y-6">
               {/* Section Type */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium mb-3"
+                       style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Section Type *
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -916,11 +1047,18 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                         key={type}
                         type="button"
                         onClick={() => setFormData({ ...formData, sectionType: type as any })}
-                        className={`p-3 rounded-lg border-2 text-center transition-all duration-200 ${
-                          formData.sectionType === type
-                            ? 'border-blue-500 bg-blue-50 text-blue-900'
-                            : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
-                        }`}
+                        className="p-3 rounded-lg border-2 text-center transition-all duration-200"
+                        style={{
+                          borderColor: formData.sectionType === type 
+                            ? 'var(--color-primary, #5243E9)' 
+                            : 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: formData.sectionType === type 
+                            ? 'var(--color-bg-secondary, #F9FAFB)' 
+                            : 'var(--color-bg-primary, #FFFFFF)',
+                          color: formData.sectionType === type 
+                            ? 'var(--color-primary, #5243E9)' 
+                            : 'var(--color-text-primary, #1F2937)'
+                        }}
                       >
                         <IconComponent className="w-6 h-6 mx-auto mb-2" />
                         <div className="text-sm font-medium">{label}</div>
@@ -933,35 +1071,59 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
               {/* Home Hero Special Section */}
               {formData.sectionType === 'home_hero' && (
                 <div>
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <div className="rounded-lg p-4"
+                       style={{
+                         backgroundColor: 'var(--color-success-light, #D1FAE5)',
+                         borderColor: 'var(--color-success, #10B981)'
+                       }}>
                     <div className="flex items-start space-x-3">
-                      <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                      <CheckCircle className="w-5 h-5 mt-0.5 flex-shrink-0"
+                                  style={{ color: 'var(--color-success, #10B981)' }} />
                       <div>
-                        <h4 className="font-medium text-green-900">Home Hero Section Selected</h4>
-                        <p className="text-sm text-green-700 mt-1">
+                        <h4 className="font-medium"
+                            style={{ color: 'var(--color-success-dark, #065F46)' }}>Home Hero Section Selected</h4>
+                        <p className="text-sm mt-1"
+                           style={{ color: 'var(--color-success-dark, #065F46)' }}>
                           This is your special Home Hero section that's managed separately. 
                           It will automatically use your configured Home Hero content and styling.
                         </p>
-                        <div className="mt-3 p-3 bg-blue-50 border border-blue-200 rounded">
+                        <div className="mt-3 p-3 rounded"
+                             style={{
+                               backgroundColor: 'var(--color-info-light, #DBEAFE)',
+                               borderColor: 'var(--color-info, #3B82F6)'
+                             }}>
                           <div className="flex items-start space-x-2">
-                            <div className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0">💡</div>
-                            <div className="text-sm text-blue-800">
+                            <div className="w-4 h-4 mt-0.5 flex-shrink-0"
+                                 style={{ color: 'var(--color-info, #3B82F6)' }}>💡</div>
+                            <div className="text-sm"
+                                 style={{ color: 'var(--color-info-dark, #1E40AF)' }}>
                               <p className="font-medium">Want to customize this section?</p>
                               <p className="mt-1">Head over to the <strong>Home Page Hero</strong> menu in your admin panel to configure the content, styling, and layout of your hero section.</p>
                             </div>
                           </div>
                         </div>
-                        <div className="mt-3 p-3 bg-white rounded border border-green-200">
+                        <div className="mt-3 p-3 rounded border"
+                             style={{
+                               backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                               borderColor: 'var(--color-success, #10B981)'
+                             }}>
                           <div className="flex items-center justify-between">
                             <div>
-                              <div className="font-medium text-gray-900">Home Hero</div>
-                              <div className="text-sm text-gray-600">Pre-configured hero section</div>
+                              <div className="font-medium"
+                                   style={{ color: 'var(--color-text-primary, #1F2937)' }}>Home Hero</div>
+                              <div className="text-sm"
+                                   style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Pre-configured hero section</div>
                             </div>
                             <div className="flex items-center space-x-2">
-                              <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
+                              <span className="text-xs px-2 py-1 rounded-full"
+                                    style={{
+                                      backgroundColor: 'var(--color-success-light, #D1FAE5)',
+                                      color: 'var(--color-success-dark, #065F46)'
+                                    }}>
                                 Auto-configured
                               </span>
-                              <CheckCircle className="w-4 h-4 text-green-600" />
+                              <CheckCircle className="w-4 h-4"
+                                          style={{ color: 'var(--color-success, #10B981)' }} />
                             </div>
                           </div>
                         </div>
@@ -974,16 +1136,24 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
               {/* Content Selection */}
               {formData.sectionType === 'hero' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium mb-3"
+                         style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Select Hero Section *
                     {formData.heroSectionId && (
-                      <span className="ml-2 text-sm text-green-600">✓ Selected</span>
+                      <span className="ml-2 text-sm"
+                            style={{ color: 'var(--color-success, #10B981)' }}>✓ Selected</span>
                     )}
                   </label>
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
+                  <div className="rounded-lg p-3 mb-4"
+                       style={{
+                         backgroundColor: 'var(--color-info-light, #DBEAFE)',
+                         borderColor: 'var(--color-info, #3B82F6)'
+                       }}>
                     <div className="flex items-start space-x-2">
-                      <AlertCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                      <div className="text-sm text-blue-800">
+                      <AlertCircle className="w-4 h-4 mt-0.5 flex-shrink-0"
+                                  style={{ color: 'var(--color-info, #3B82F6)' }} />
+                      <div className="text-sm"
+                           style={{ color: 'var(--color-info-dark, #1E40AF)' }}>
                         <p className="font-medium">Hero sections can be shared across pages</p>
                         <p className="mt-1">If a hero section is already used on another page, you can either:</p>
                         <ul className="mt-1 ml-4 list-disc space-y-1">
@@ -1003,36 +1173,56 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                       <button
                         type="button"
                         onClick={() => setFormData({ ...formData, heroSectionId: hero.id })}
-                            className={`w-full p-3 rounded-lg border-2 text-left transition-all duration-200 ${
-                          formData.heroSectionId === hero.id
-                            ? 'border-green-500 bg-green-50 text-green-900'
+                            className="w-full p-3 rounded-lg border-2 text-left transition-all duration-200"
+                            style={{
+                              borderColor: formData.heroSectionId === hero.id 
+                                ? 'var(--color-success, #10B981)' 
                                 : isInUse
-                                ? 'border-amber-300 bg-amber-50 text-amber-900'
-                            : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
-                        }`}
+                                ? 'var(--color-warning, #F59E0B)'
+                                : 'var(--color-gray-light, #E5E7EB)',
+                              backgroundColor: formData.heroSectionId === hero.id 
+                                ? 'var(--color-success-light, #D1FAE5)' 
+                                : isInUse
+                                ? 'var(--color-warning-light, #FEF3C7)'
+                                : 'var(--color-bg-primary, #FFFFFF)',
+                              color: formData.heroSectionId === hero.id 
+                                ? 'var(--color-success-dark, #065F46)' 
+                                : isInUse
+                                ? 'var(--color-warning-dark, #92400E)'
+                                : 'var(--color-text-primary, #1F2937)'
+                            }}
                       >
                         <div className="flex items-center justify-between">
                               <div className="font-medium">{hero.name || hero.heading || 'Untitled Hero'}</div>
                               <div className="flex items-center space-x-2">
                                 {isInUse && (
-                                  <span className="text-xs bg-amber-200 text-amber-800 px-2 py-1 rounded-full">
+                                  <span className="text-xs px-2 py-1 rounded-full"
+                                        style={{
+                                          backgroundColor: 'var(--color-warning-light, #FEF3C7)',
+                                          color: 'var(--color-warning-dark, #92400E)'
+                                        }}>
                                     In Use
                                   </span>
                                 )}
                           {formData.heroSectionId === hero.id && (
-                            <CheckCircle className="w-5 h-5 text-green-600" />
+                            <CheckCircle className="w-5 h-5"
+                                        style={{ color: 'var(--color-success, #10B981)' }} />
                           )}
                         </div>
                             </div>
-                            <div className="text-sm text-gray-500 mt-1">{hero.heading}</div>
+                            <div className="text-sm mt-1"
+                                 style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{hero.heading}</div>
                         {hero.subheading && (
-                              <div className="text-xs text-gray-400 mt-1">{hero.subheading}</div>
+                              <div className="text-xs mt-1"
+                                   style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>{hero.subheading}</div>
                         )}
-                        <div className="text-xs text-gray-400 mt-1">
+                        <div className="text-xs mt-1"
+                             style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                               Height: {hero.sectionHeight || '100vh'} • Layout: {hero.layoutType}
                         </div>
                             {isInUse && (
-                              <div className="text-xs text-amber-600 mt-2">
+                              <div className="text-xs mt-2"
+                                   style={{ color: 'var(--color-warning, #F59E0B)' }}>
                                 ⚠️ Currently used in: {usedInPages.join(', ')}
                               </div>
                             )}
@@ -1042,7 +1232,11 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                             <button
                               type="button"
                               onClick={() => duplicateHeroSection(hero.id)}
-                              className="w-full px-3 py-2 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+                              className="w-full px-3 py-2 text-sm rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+                            style={{
+                              backgroundColor: 'var(--color-info-light, #DBEAFE)',
+                              color: 'var(--color-info-dark, #1E40AF)'
+                            }}
                             >
                               <Copy className="w-4 h-4" />
                               <span>Create Copy for This Page</span>
@@ -1052,7 +1246,8 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                       );
                     })}
                     {availableContent.heroSections.length === 0 && (
-                      <p className="text-gray-500 text-center py-4">
+                      <p className="text-center py-4"
+                         style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                         No hero sections available. Create one first in Hero Sections manager.
                       </p>
                     )}
@@ -1062,10 +1257,12 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
 
               {formData.sectionType === 'features' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium mb-3"
+                         style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Select Feature Group *
                     {formData.featureGroupId && (
-                      <span className="ml-2 text-sm text-green-600">✓ Selected</span>
+                      <span className="ml-2 text-sm"
+                            style={{ color: 'var(--color-success, #10B981)' }}>✓ Selected</span>
                     )}
                   </label>
                   <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
@@ -1074,29 +1271,41 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                         key={group.id}
                         type="button"
                         onClick={() => setFormData({ ...formData, featureGroupId: group.id })}
-                        className={`p-3 rounded-lg border-2 text-left transition-all duration-200 ${
-                          formData.featureGroupId === group.id
-                            ? 'border-green-500 bg-green-50 text-green-900'
-                            : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
-                        }`}
+                        className="p-3 rounded-lg border-2 text-left transition-all duration-200"
+                        style={{
+                          borderColor: formData.featureGroupId === group.id 
+                            ? 'var(--color-success, #10B981)' 
+                            : 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: formData.featureGroupId === group.id 
+                            ? 'var(--color-success-light, #D1FAE5)' 
+                            : 'var(--color-bg-primary, #FFFFFF)',
+                          color: formData.featureGroupId === group.id 
+                            ? 'var(--color-success-dark, #065F46)' 
+                            : 'var(--color-text-primary, #1F2937)'
+                        }}
                       >
                         <div className="flex items-center justify-between">
                           <div className="font-medium">{group.name}</div>
                           {formData.featureGroupId === group.id && (
-                            <CheckCircle className="w-5 h-5 text-green-600" />
+                            <CheckCircle className="w-5 h-5"
+                                        style={{ color: 'var(--color-success, #10B981)' }} />
                           )}
                         </div>
-                        <div className="text-sm text-gray-600 mt-1">{group.heading}</div>
+                        <div className="text-sm mt-1"
+                             style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{group.heading}</div>
                         {group.subheading && (
-                          <div className="text-sm text-gray-500 mt-1">{group.subheading}</div>
+                          <div className="text-sm mt-1"
+                               style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{group.subheading}</div>
                         )}
-                        <div className="text-xs text-gray-400 mt-1">
+                        <div className="text-xs mt-1"
+                             style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                           {group._count.groupItems} features
                         </div>
                       </button>
                     ))}
                     {availableContent.featureGroups.length === 0 && (
-                      <p className="text-gray-500 text-center py-4">
+                      <p className="text-center py-4"
+                         style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                         No feature groups available. Create one first in Feature Groups manager.
                       </p>
                     )}
@@ -1106,10 +1315,12 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
 
               {formData.sectionType === 'media' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium mb-3"
+                         style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Select Media Section *
                     {formData.mediaSectionId && (
-                      <span className="ml-2 text-sm text-green-600">✓ Selected</span>
+                      <span className="ml-2 text-sm"
+                            style={{ color: 'var(--color-success, #10B981)' }}>✓ Selected</span>
                     )}
                   </label>
                   <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
@@ -1118,39 +1329,59 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                         key={media.id}
                         type="button"
                         onClick={() => setFormData({ ...formData, mediaSectionId: media.id })}
-                        className={`p-3 rounded-lg border-2 text-left transition-all duration-200 ${
-                          formData.mediaSectionId === media.id
-                            ? 'border-green-500 bg-green-50 text-green-900'
-                            : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
-                        }`}
+                        className="p-3 rounded-lg border-2 text-left transition-all duration-200"
+                        style={{
+                          borderColor: formData.mediaSectionId === media.id 
+                            ? 'var(--color-success, #10B981)' 
+                            : 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: formData.mediaSectionId === media.id 
+                            ? 'var(--color-success-light, #D1FAE5)' 
+                            : 'var(--color-bg-primary, #FFFFFF)',
+                          color: formData.mediaSectionId === media.id 
+                            ? 'var(--color-success-dark, #065F46)' 
+                            : 'var(--color-text-primary, #1F2937)'
+                        }}
                       >
                         <div className="flex items-center justify-between">
                           <div className="font-medium">{media.headline}</div>
                           {formData.mediaSectionId === media.id && (
-                            <CheckCircle className="w-5 h-5 text-green-600" />
+                            <CheckCircle className="w-5 h-5"
+                                        style={{ color: 'var(--color-success, #10B981)' }} />
                           )}
                         </div>
                         {media.subheading && (
-                          <div className="text-sm text-gray-500 mt-1">{media.subheading}</div>
+                          <div className="text-sm mt-1"
+                               style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{media.subheading}</div>
                         )}
-                        <div className="text-xs text-gray-400 mt-1 flex items-center space-x-3">
-                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md font-medium">
+                        <div className="text-xs mt-1 flex items-center space-x-3"
+                             style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+                          <span className="px-2 py-1 rounded-md font-medium"
+                                style={{
+                                  backgroundColor: 'var(--color-info-light, #DBEAFE)',
+                                  color: 'var(--color-info-dark, #1E40AF)'
+                                }}>
                             {media.mediaType}
                           </span>
-                          <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-md font-medium">
+                          <span className="px-2 py-1 rounded-md font-medium"
+                                style={{
+                                  backgroundColor: 'var(--color-primary-light, #EDE9FE)',
+                                  color: 'var(--color-primary-dark, #5B21B6)'
+                                }}>
                             {media.layoutType.replace('_', ' ')}
                           </span>
                           <span>{media._count.features} features</span>
                         </div>
                         {media.badgeText && (
-                          <div className="text-xs text-gray-500 mt-1">
+                          <div className="text-xs mt-1"
+                               style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                             Badge: {media.badgeText}
                           </div>
                         )}
                       </button>
                     ))}
                     {availableContent.mediaSections.length === 0 && (
-                      <p className="text-gray-500 text-center py-4">
+                      <p className="text-center py-4"
+                         style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                         No media sections available. Create one first in Media Sections manager.
                       </p>
                     )}
@@ -1160,10 +1391,12 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
 
               {formData.sectionType === 'pricing' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium mb-3"
+                         style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Select Pricing Section *
                     {formData.pricingSectionId && (
-                      <span className="ml-2 text-sm text-green-600">✓ Selected</span>
+                      <span className="ml-2 text-sm"
+                            style={{ color: 'var(--color-success, #10B981)' }}>✓ Selected</span>
                     )}
                   </label>
                   <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
@@ -1172,24 +1405,39 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                         key={pricing.id}
                         type="button"
                         onClick={() => setFormData({ ...formData, pricingSectionId: pricing.id })}
-                        className={`p-3 rounded-lg border-2 text-left transition-all duration-200 ${
-                          formData.pricingSectionId === pricing.id
-                            ? 'border-green-500 bg-green-50 text-green-900'
-                            : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
-                        }`}
+                        className="p-3 rounded-lg border-2 text-left transition-all duration-200"
+                        style={{
+                          borderColor: formData.pricingSectionId === pricing.id 
+                            ? 'var(--color-success, #10B981)' 
+                            : 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: formData.pricingSectionId === pricing.id 
+                            ? 'var(--color-success-light, #D1FAE5)' 
+                            : 'var(--color-bg-primary, #FFFFFF)',
+                          color: formData.pricingSectionId === pricing.id 
+                            ? 'var(--color-success-dark, #065F46)' 
+                            : 'var(--color-text-primary, #1F2937)'
+                        }}
                       >
                         <div className="flex items-center justify-between">
                           <div className="font-medium">{pricing.name}</div>
                           {formData.pricingSectionId === pricing.id && (
-                            <CheckCircle className="w-5 h-5 text-green-600" />
+                            <CheckCircle className="w-5 h-5"
+                                        style={{ color: 'var(--color-success, #10B981)' }} />
                           )}
                         </div>
-                        <div className="text-sm text-gray-600 mt-1">{pricing.heading}</div>
+                        <div className="text-sm mt-1"
+                             style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{pricing.heading}</div>
                         {pricing.subheading && (
-                          <div className="text-sm text-gray-500 mt-1">{pricing.subheading}</div>
+                          <div className="text-sm mt-1"
+                               style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{pricing.subheading}</div>
                         )}
-                        <div className="text-xs text-gray-400 mt-1 flex items-center space-x-3">
-                          <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-md font-medium capitalize">
+                        <div className="text-xs mt-1 flex items-center space-x-3"
+                             style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+                          <span className="px-2 py-1 rounded-md font-medium capitalize"
+                                style={{
+                                  backgroundColor: 'var(--color-primary-light, #EDE9FE)',
+                                  color: 'var(--color-primary-dark, #5B21B6)'
+                                }}>
                             {pricing.layoutType}
                           </span>
                           <span>{pricing._count.sectionPlans} plans</span>
@@ -1197,7 +1445,8 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                       </button>
                     ))}
                     {availableContent.pricingSections.length === 0 && (
-                      <p className="text-gray-500 text-center py-4">
+                      <p className="text-center py-4"
+                         style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                         No pricing sections available. Create one first in Pricing Sections manager.
                       </p>
                     )}
@@ -1207,10 +1456,12 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
 
               {formData.sectionType === 'faq' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium mb-3"
+                         style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Select FAQ Section *
                     {formData.faqSectionId && (
-                      <span className="ml-2 text-sm text-green-600">✓ Selected</span>
+                      <span className="ml-2 text-sm"
+                            style={{ color: 'var(--color-success, #10B981)' }}>✓ Selected</span>
                     )}
                   </label>
                   <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
@@ -1219,39 +1470,60 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                         key={faq.id}
                         type="button"
                         onClick={() => setFormData({ ...formData, faqSectionId: faq.id })}
-                        className={`p-3 rounded-lg border-2 text-left transition-all duration-200 ${
-                          formData.faqSectionId === faq.id
-                            ? 'border-green-500 bg-green-50 text-green-900'
-                            : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
-                        }`}
+                        className="p-3 rounded-lg border-2 text-left transition-all duration-200"
+                        style={{
+                          borderColor: formData.faqSectionId === faq.id 
+                            ? 'var(--color-success, #10B981)' 
+                            : 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: formData.faqSectionId === faq.id 
+                            ? 'var(--color-success-light, #D1FAE5)' 
+                            : 'var(--color-bg-primary, #FFFFFF)',
+                          color: formData.faqSectionId === faq.id 
+                            ? 'var(--color-success-dark, #065F46)' 
+                            : 'var(--color-text-primary, #1F2937)'
+                        }}
                       >
                         <div className="flex items-center justify-between">
                           <div className="font-medium">{faq.name}</div>
                           {formData.faqSectionId === faq.id && (
-                            <CheckCircle className="w-5 h-5 text-green-600" />
+                            <CheckCircle className="w-5 h-5"
+                                        style={{ color: 'var(--color-success, #10B981)' }} />
                           )}
                         </div>
-                        <div className="text-sm text-gray-600 mt-1">{faq.heading}</div>
+                        <div className="text-sm mt-1"
+                             style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{faq.heading}</div>
                         {faq.subheading && (
-                          <div className="text-sm text-gray-500 mt-1">{faq.subheading}</div>
+                          <div className="text-sm mt-1"
+                               style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{faq.subheading}</div>
                         )}
-                        <div className="text-xs text-gray-400 mt-1 flex items-center space-x-3">
-                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md font-medium">
+                        <div className="text-xs mt-1 flex items-center space-x-3"
+                             style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+                          <span className="px-2 py-1 rounded-md font-medium"
+                                style={{
+                                  backgroundColor: 'var(--color-info-light, #DBEAFE)',
+                                  color: 'var(--color-info-dark, #1E40AF)'
+                                }}>
                             {faq.showHero ? 'With Hero' : 'No Hero'}
                           </span>
-                          <span className="bg-purple-100 text-purple-800 px-2 py-1 rounded-md font-medium">
+                          <span className="px-2 py-1 rounded-md font-medium"
+                                style={{
+                                  backgroundColor: 'var(--color-primary-light, #EDE9FE)',
+                                  color: 'var(--color-primary-dark, #5B21B6)'
+                                }}>
                             {faq.showCategories ? 'With Categories' : 'No Categories'}
                           </span>
                         </div>
                         {faq.heroTitle && (
-                          <div className="text-xs text-gray-500 mt-1">
+                          <div className="text-xs mt-1"
+                               style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                             Hero: {faq.heroTitle}
                           </div>
                         )}
                       </button>
                     ))}
                     {availableContent.faqSections.length === 0 && (
-                      <p className="text-gray-500 text-center py-4">
+                      <p className="text-center py-4"
+                         style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                         No FAQ sections available. Create one first in FAQ Sections manager.
                       </p>
                     )}
@@ -1261,10 +1533,12 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
 
               {formData.sectionType === 'form' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium mb-3"
+                         style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Select Form *
                     {formData.formId && (
-                      <span className="ml-2 text-sm text-green-600">✓ Selected</span>
+                      <span className="ml-2 text-sm"
+                            style={{ color: 'var(--color-success, #10B981)' }}>✓ Selected</span>
                     )}
                   </label>
                   <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
@@ -1273,34 +1547,54 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                         key={form.id}
                         type="button"
                         onClick={() => setFormData({ ...formData, formId: form.id })}
-                        className={`p-3 rounded-lg border-2 text-left transition-all duration-200 ${
-                          formData.formId === form.id
-                            ? 'border-green-500 bg-green-50 text-green-900'
-                            : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
-                        }`}
+                        className="p-3 rounded-lg border-2 text-left transition-all duration-200"
+                        style={{
+                          borderColor: formData.formId === form.id 
+                            ? 'var(--color-success, #10B981)' 
+                            : 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: formData.formId === form.id 
+                            ? 'var(--color-success-light, #D1FAE5)' 
+                            : 'var(--color-bg-primary, #FFFFFF)',
+                          color: formData.formId === form.id 
+                            ? 'var(--color-success-dark, #065F46)' 
+                            : 'var(--color-text-primary, #1F2937)'
+                        }}
                       >
                         <div className="flex items-center justify-between">
                           <div className="font-medium">{form.name}</div>
                           {formData.formId === form.id && (
-                            <CheckCircle className="w-5 h-5 text-green-600" />
+                            <CheckCircle className="w-5 h-5"
+                                        style={{ color: 'var(--color-success, #10B981)' }} />
                           )}
                         </div>
-                        <div className="text-sm text-gray-600 mt-1">{form.title}</div>
+                        <div className="text-sm mt-1"
+                             style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{form.title}</div>
                         {form.subheading && (
-                          <div className="text-sm text-gray-500 mt-1">{form.subheading}</div>
+                          <div className="text-sm mt-1"
+                               style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{form.subheading}</div>
                         )}
-                        <div className="text-xs text-gray-400 mt-1 flex items-center space-x-3">
-                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md font-medium">
+                        <div className="text-xs mt-1 flex items-center space-x-3"
+                             style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+                          <span className="px-2 py-1 rounded-md font-medium"
+                                style={{
+                                  backgroundColor: 'var(--color-info-light, #DBEAFE)',
+                                  color: 'var(--color-info-dark, #1E40AF)'
+                                }}>
                             {form._count.fields} fields
                           </span>
-                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-md font-medium">
+                          <span className="px-2 py-1 rounded-md font-medium"
+                                style={{
+                                  backgroundColor: 'var(--color-success-light, #D1FAE5)',
+                                  color: 'var(--color-success-dark, #065F46)'
+                                }}>
                             {form._count.submissions} submissions
                           </span>
                         </div>
                       </button>
                     ))}
                     {availableContent.forms.length === 0 && (
-                      <p className="text-gray-500 text-center py-4">
+                      <p className="text-center py-4"
+                         style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                         No forms available. Create one first in Form Builder.
                       </p>
                     )}
@@ -1310,10 +1604,12 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
 
               {formData.sectionType === 'html' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium mb-3"
+                         style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Select HTML Section *
                     {formData.htmlSectionId && (
-                      <span className="ml-2 text-sm text-green-600">✓ Selected</span>
+                      <span className="ml-2 text-sm"
+                            style={{ color: 'var(--color-success, #10B981)' }}>✓ Selected</span>
                     )}
                   </label>
                   <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
@@ -1322,33 +1618,52 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                         key={htmlSection.id}
                         type="button"
                         onClick={() => setFormData({ ...formData, htmlSectionId: htmlSection.id })}
-                        className={`p-3 rounded-lg border-2 text-left transition-all duration-200 ${
-                          formData.htmlSectionId === htmlSection.id
-                            ? 'border-green-500 bg-green-50 text-green-900'
-                            : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
-                        }`}
+                        className="p-3 rounded-lg border-2 text-left transition-all duration-200"
+                        style={{
+                          borderColor: formData.htmlSectionId === htmlSection.id 
+                            ? 'var(--color-success, #10B981)' 
+                            : 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: formData.htmlSectionId === htmlSection.id 
+                            ? 'var(--color-success-light, #D1FAE5)' 
+                            : 'var(--color-bg-primary, #FFFFFF)',
+                          color: formData.htmlSectionId === htmlSection.id 
+                            ? 'var(--color-success-dark, #065F46)' 
+                            : 'var(--color-text-primary, #1F2937)'
+                        }}
                       >
                         <div className="flex items-center justify-between">
                           <div className="font-medium">{htmlSection.name}</div>
                           {formData.htmlSectionId === htmlSection.id && (
-                            <CheckCircle className="w-5 h-5 text-green-600" />
+                            <CheckCircle className="w-5 h-5"
+                                        style={{ color: 'var(--color-success, #10B981)' }} />
                           )}
                         </div>
                         {htmlSection.description && (
-                          <div className="text-sm text-gray-600 mt-1">{htmlSection.description}</div>
+                          <div className="text-sm mt-1"
+                               style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{htmlSection.description}</div>
                         )}
-                        <div className="text-xs text-gray-400 mt-1 flex items-center space-x-3">
-                          <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-md font-medium">
+                        <div className="text-xs mt-1 flex items-center space-x-3"
+                             style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+                          <span className="px-2 py-1 rounded-md font-medium"
+                                style={{
+                                  backgroundColor: 'var(--color-warning-light, #FEF3C7)',
+                                  color: 'var(--color-warning-dark, #92400E)'
+                                }}>
                             HTML Section
                           </span>
-                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md font-medium">
+                          <span className="px-2 py-1 rounded-md font-medium"
+                                style={{
+                                  backgroundColor: 'var(--color-info-light, #DBEAFE)',
+                                  color: 'var(--color-info-dark, #1E40AF)'
+                                }}>
                             {htmlSection._count.pageSections} page uses
                           </span>
                         </div>
                       </button>
                     ))}
                     {availableContent.htmlSections.length === 0 && (
-                      <p className="text-gray-500 text-center py-4">
+                      <p className="text-center py-4"
+                         style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                         No HTML sections available. Create one first in HTML Sections manager.
                       </p>
                     )}
@@ -1358,10 +1673,12 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
 
               {formData.sectionType === 'team' && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium mb-3"
+                         style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Select Team Section *
                     {formData.teamSectionId && (
-                      <span className="ml-2 text-sm text-green-600">✓ Selected</span>
+                      <span className="ml-2 text-sm"
+                            style={{ color: 'var(--color-success, #10B981)' }}>✓ Selected</span>
                     )}
                   </label>
                   <div className="grid grid-cols-1 gap-3 max-h-48 overflow-y-auto">
@@ -1370,36 +1687,59 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                         key={teamSection.id}
                         type="button"
                         onClick={() => setFormData({ ...formData, teamSectionId: teamSection.id })}
-                        className={`p-3 rounded-lg border-2 text-left transition-all duration-200 ${
-                          formData.teamSectionId === teamSection.id
-                            ? 'border-green-500 bg-green-50 text-green-900'
-                            : 'border-gray-200 bg-white hover:border-gray-300 text-gray-700'
-                        }`}
+                        className="p-3 rounded-lg border-2 text-left transition-all duration-200"
+                        style={{
+                          borderColor: formData.teamSectionId === teamSection.id 
+                            ? 'var(--color-success, #10B981)' 
+                            : 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: formData.teamSectionId === teamSection.id 
+                            ? 'var(--color-success-light, #D1FAE5)' 
+                            : 'var(--color-bg-primary, #FFFFFF)',
+                          color: formData.teamSectionId === teamSection.id 
+                            ? 'var(--color-success-dark, #065F46)' 
+                            : 'var(--color-text-primary, #1F2937)'
+                        }}
                       >
                         <div className="flex items-center justify-between">
                           <div className="font-medium">{teamSection.name}</div>
                           {formData.teamSectionId === teamSection.id && (
-                            <CheckCircle className="w-5 h-5 text-green-600" />
+                            <CheckCircle className="w-5 h-5"
+                                        style={{ color: 'var(--color-success, #10B981)' }} />
                           )}
                         </div>
                         {teamSection.heading && (
-                          <div className="text-sm text-gray-600 mt-1">{teamSection.heading}</div>
+                          <div className="text-sm mt-1"
+                               style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{teamSection.heading}</div>
                         )}
-                        <div className="text-xs text-gray-400 mt-1 flex items-center space-x-3">
-                          <span className="bg-indigo-100 text-indigo-800 px-2 py-1 rounded-md font-medium">
+                        <div className="text-xs mt-1 flex items-center space-x-3"
+                             style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+                          <span className="px-2 py-1 rounded-md font-medium"
+                                style={{
+                                  backgroundColor: 'var(--color-primary-light, #EDE9FE)',
+                                  color: 'var(--color-primary-dark, #5B21B6)'
+                                }}>
                             Team Section
                           </span>
-                          <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-md font-medium">
+                          <span className="px-2 py-1 rounded-md font-medium"
+                                style={{
+                                  backgroundColor: 'var(--color-info-light, #DBEAFE)',
+                                  color: 'var(--color-info-dark, #1E40AF)'
+                                }}>
                             {teamSection._count.teamMembers} members
                           </span>
-                          <span className="bg-green-100 text-green-800 px-2 py-1 rounded-md font-medium">
+                          <span className="px-2 py-1 rounded-md font-medium"
+                                style={{
+                                  backgroundColor: 'var(--color-success-light, #D1FAE5)',
+                                  color: 'var(--color-success-dark, #065F46)'
+                                }}>
                             {teamSection._count.pageSections} page uses
                           </span>
                         </div>
                       </button>
                     ))}
                     {availableContent.teamSections.length === 0 && (
-                      <p className="text-gray-500 text-center py-4">
+                      <p className="text-center py-4"
+                         style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                         No team sections available. Create one first in Team Sections manager.
                       </p>
                     )}
@@ -1409,7 +1749,8 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
 
               {/* Title */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2"
+                       style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Section Title Override
                 </label>
                 <Input
@@ -1423,7 +1764,8 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
 
               {/* Subtitle */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2"
+                       style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Section Subtitle
                 </label>
                 <Input
@@ -1437,7 +1779,8 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
 
               {/* Content */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2"
+                       style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Section Content (JSON)
                 </label>
                 <textarea
@@ -1445,9 +1788,15 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                   placeholder="Enter section configuration as JSON (optional)"
                   rows={6}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none font-mono text-sm"
+                  className="w-full px-3 py-2 border rounded-lg resize-none font-mono text-sm"
+                  style={{
+                    borderColor: 'var(--color-gray-light, #E5E7EB)',
+                    backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                    color: 'var(--color-text-primary, #1F2937)'
+                  }}
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs mt-1"
+                   style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                   Advanced: JSON configuration for section-specific settings
                 </p>
               </div>
@@ -1459,9 +1808,14 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                   id="isVisible"
                   checked={formData.isVisible}
                   onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-4 h-4 border rounded"
+                  style={{
+                    color: 'var(--color-primary, #5243E9)',
+                    borderColor: 'var(--color-gray-light, #E5E7EB)'
+                  }}
                 />
-                <label htmlFor="isVisible" className="text-sm font-medium text-gray-700">
+                <label htmlFor="isVisible" className="text-sm font-medium"
+                       style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Section is visible
                 </label>
               </div>
@@ -1472,49 +1826,57 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                 {(formData.sectionType === 'hero' || formData.sectionType === 'features' || formData.sectionType === 'media' || formData.sectionType === 'pricing' || formData.sectionType === 'faq' || formData.sectionType === 'form' || formData.sectionType === 'html' || formData.sectionType === 'team') && (
                   <div className="flex-1 text-sm">
                     {formData.sectionType === 'hero' && !formData.heroSectionId && (
-                      <div className="text-amber-600 flex items-center">
+                      <div className="flex items-center"
+                           style={{ color: 'var(--color-warning, #F59E0B)' }}>
                         <AlertCircle className="w-4 h-4 mr-1" />
                         Please select a hero section
                       </div>
                     )}
                     {formData.sectionType === 'features' && !formData.featureGroupId && (
-                      <div className="text-amber-600 flex items-center">
+                      <div className="flex items-center"
+                           style={{ color: 'var(--color-warning, #F59E0B)' }}>
                         <AlertCircle className="w-4 h-4 mr-1" />
                         Please select a feature group
                       </div>
                     )}
                     {formData.sectionType === 'media' && !formData.mediaSectionId && (
-                      <div className="text-amber-600 flex items-center">
+                      <div className="flex items-center"
+                           style={{ color: 'var(--color-warning, #F59E0B)' }}>
                         <AlertCircle className="w-4 h-4 mr-1" />
                         Please select a media section
                       </div>
                     )}
                     {formData.sectionType === 'pricing' && !formData.pricingSectionId && (
-                      <div className="text-amber-600 flex items-center">
+                      <div className="flex items-center"
+                           style={{ color: 'var(--color-warning, #F59E0B)' }}>
                         <AlertCircle className="w-4 h-4 mr-1" />
                         Please select a pricing section
                       </div>
                     )}
                     {formData.sectionType === 'faq' && !formData.faqSectionId && (
-                      <div className="text-amber-600 flex items-center">
+                      <div className="flex items-center"
+                           style={{ color: 'var(--color-warning, #F59E0B)' }}>
                         <AlertCircle className="w-4 h-4 mr-1" />
                         Please select a FAQ section
                       </div>
                     )}
                     {formData.sectionType === 'form' && !formData.formId && (
-                      <div className="text-amber-600 flex items-center">
+                      <div className="flex items-center"
+                           style={{ color: 'var(--color-warning, #F59E0B)' }}>
                         <AlertCircle className="w-4 h-4 mr-1" />
                         Please select a form
                       </div>
                     )}
                     {formData.sectionType === 'html' && !formData.htmlSectionId && (
-                      <div className="text-amber-600 flex items-center">
+                      <div className="flex items-center"
+                           style={{ color: 'var(--color-warning, #F59E0B)' }}>
                         <AlertCircle className="w-4 h-4 mr-1" />
                         Please select an HTML section
                       </div>
                     )}
                     {formData.sectionType === 'team' && !formData.teamSectionId && (
-                      <div className="text-amber-600 flex items-center">
+                      <div className="flex items-center"
+                           style={{ color: 'var(--color-warning, #F59E0B)' }}>
                         <AlertCircle className="w-4 h-4 mr-1" />
                         Please select a team section
                       </div>
@@ -1527,7 +1889,8 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                       (formData.sectionType === 'form' && formData.formId) ||
                       (formData.sectionType === 'html' && formData.htmlSectionId) ||
                       (formData.sectionType === 'team' && formData.teamSectionId)) && (
-                      <div className="text-green-600 flex items-center">
+                      <div className="flex items-center"
+                           style={{ color: 'var(--color-success, #10B981)' }}>
                         <CheckCircle className="w-4 h-4 mr-1" />
                         Ready to save
                       </div>
@@ -1539,7 +1902,10 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                   <Button
                     onClick={editingSection ? handleEditSection : handleAddSection}
                     disabled={saving}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    style={{
+                      backgroundColor: 'var(--color-primary, #5243E9)',
+                      color: 'var(--color-bg-primary, #FFFFFF)'
+                    }}
                   >
                     {saving ? (
                       <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />

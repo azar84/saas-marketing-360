@@ -1051,10 +1051,10 @@ export default function FormBuilder() {
             <Card key={form.id} className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{form.title}</h3>
+                  <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{form.title}</h3>
                   <p className="text-sm text-gray-500">{form.name}</p>
                   {form.subheading && (
-                    <p className="text-sm text-gray-600 mt-1">{form.subheading}</p>
+                    <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{form.subheading}</p>
                   )}
                 </div>
                 <div className="flex space-x-2">

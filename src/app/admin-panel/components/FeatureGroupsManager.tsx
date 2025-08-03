@@ -190,7 +190,7 @@ const FeatureGroupsManager: React.FC = () => {
     // Use the universal renderIcon utility
     // If iconName doesn't include a library prefix, assume it's a Lucide icon
     const iconString = iconName.includes(':') ? iconName : `lucide:${iconName}`;
-    return renderIcon(iconString, { className: 'w-4 h-4 text-blue-600' }) || renderIcon('lucide:MessageSquare', { className: 'w-4 h-4 text-blue-600' });
+    return renderIcon(iconString, { className: 'w-4 h-4', style: { color: 'var(--color-primary, #5243E9)' } }) || renderIcon('lucide:MessageSquare', { className: 'w-4 h-4', style: { color: 'var(--color-primary, #5243E9)' } });
   };
 
   const fetchFeatureGroups = async () => {
@@ -452,12 +452,15 @@ const FeatureGroupsManager: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Feature Groups Manager</h2>
-          <p className="text-gray-600 mt-1">Create reusable feature collections and assign them to pages</p>
+          <h2 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Feature Groups Manager</h2>
+          <p className="mt-1" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Create reusable feature collections and assign them to pages</p>
         </div>
         <Button
           onClick={() => setShowCreateForm(true)}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+          style={{
+            backgroundColor: 'var(--color-success, #10B981)',
+            color: 'var(--color-bg-primary, #FFFFFF)'
+          }}
         >
           <Plus className="w-4 h-4 mr-2" />
           Create Group
@@ -471,11 +474,18 @@ const FeatureGroupsManager: React.FC = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className={`flex items-center gap-2 p-4 rounded-lg ${
-              message.type === 'success' 
-                ? 'bg-green-50 text-green-800 border border-green-200' 
-                : 'bg-red-50 text-red-800 border border-red-200'
-            }`}
+            className="flex items-center gap-2 p-4 rounded-lg border"
+            style={{
+              backgroundColor: message.type === 'success' 
+                ? 'var(--color-success-light, #D1FAE5)' 
+                : 'var(--color-error-light, #FEE2E2)',
+              color: message.type === 'success' 
+                ? 'var(--color-success-dark, #065F46)' 
+                : 'var(--color-error-dark, #991B1B)',
+              borderColor: message.type === 'success' 
+                ? 'var(--color-success, #10B981)' 
+                : 'var(--color-error, #EF4444)'
+            }}
           >
             {message.type === 'success' ? (
               <CheckCircle className="w-5 h-5" />
@@ -489,16 +499,16 @@ const FeatureGroupsManager: React.FC = () => {
 
       {/* Create/Edit Form */}
       {showCreateForm && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        <div className="rounded-xl p-6 shadow-sm border" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">
+            <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
               {editingGroup ? 'Edit Feature Group' : 'Create New Feature Group'}
             </h3>
             <Button
               variant="ghost"
               size="sm"
               onClick={resetForm}
-              className="text-gray-500 hover:text-gray-700"
+              style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
             >
               <X className="w-4 h-4" />
             </Button>
@@ -507,7 +517,7 @@ const FeatureGroupsManager: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Group Name *
                 </label>
                 <Input
@@ -521,7 +531,7 @@ const FeatureGroupsManager: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Display Heading *
                 </label>
                 <Input
@@ -535,24 +545,29 @@ const FeatureGroupsManager: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Layout Type *
                 </label>
                 <select
                   value={formData.layoutType}
                   onChange={(e) => setFormData({ ...formData, layoutType: e.target.value as 'grid' | 'list' })}
-                  className="w-full h-12 px-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full h-12 px-3 border rounded-lg"
+                  style={{
+                    borderColor: 'var(--color-gray-light, #E5E7EB)',
+                    backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                    color: 'var(--color-text-primary, #1F2937)'
+                  }}
                 >
                   <option value="grid">Grid Layout (Classic Cards)</option>
                   <option value="list">List Layout (Horizontal Features)</option>
                 </select>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                   Grid: Traditional card-based layout. List: Modern horizontal layout with icons and descriptions.
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Display Subheading
                 </label>
                 <Input
@@ -580,9 +595,13 @@ const FeatureGroupsManager: React.FC = () => {
                 id="isActive"
                 checked={formData.isActive}
                 onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 border rounded"
+                style={{
+                  color: 'var(--color-primary, #5243E9)',
+                  borderColor: 'var(--color-gray-light, #E5E7EB)'
+                }}
               />
-              <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
+              <label htmlFor="isActive" className="text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Active (Available for use)
               </label>
             </div>
@@ -591,7 +610,10 @@ const FeatureGroupsManager: React.FC = () => {
               <Button
                 type="submit"
                 disabled={saving}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                style={{
+                  backgroundColor: 'var(--color-success, #10B981)',
+                  color: 'var(--color-bg-primary, #FFFFFF)'
+                }}
               >
                 {saving ? (
                   <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
@@ -617,37 +639,46 @@ const FeatureGroupsManager: React.FC = () => {
         {featureGroups.map((group) => (
           <div
             key={group.id}
-            className={`border-2 rounded-xl transition-all duration-200 ${
-              group.isActive
-                ? 'border-gray-200 bg-white'
-                : 'border-gray-100 bg-gray-50 opacity-60'
-            }`}
+            className="border-2 rounded-xl transition-all duration-200"
+            style={{
+              borderColor: group.isActive
+                ? 'var(--color-gray-light, #E5E7EB)'
+                : 'var(--color-gray-lighter, #F3F4F6)',
+              backgroundColor: group.isActive
+                ? 'var(--color-bg-primary, #FFFFFF)'
+                : 'var(--color-bg-secondary, #F9FAFB)',
+              opacity: group.isActive ? 1 : 0.6
+            }}
           >
             {/* Group Header */}
-            <div className="p-6 border-b border-gray-100">
+            <div className="p-6 border-b" style={{ borderColor: 'var(--color-gray-lighter, #F3F4F6)' }}>
               <div className="flex items-center justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <Layers className="w-5 h-5 text-purple-600" />
-                    <h4 className="text-xl font-semibold text-gray-900">{group.name}</h4>
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      group.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'
-                    }`}>
+                    <Layers className="w-5 h-5" style={{ color: 'var(--color-purple, #A855F7)' }} />
+                    <h4 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{group.name}</h4>
+                    <span className="px-2 py-1 text-xs rounded-full" style={{
+                      backgroundColor: group.isActive ? 'var(--color-success-light, #D1FAE5)' : 'var(--color-bg-secondary, #F9FAFB)',
+                      color: group.isActive ? 'var(--color-success-dark, #065F46)' : 'var(--color-text-muted, #9CA3AF)'
+                    }}>
                       {group.isActive ? 'Active' : 'Inactive'}
                     </span>
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      (group.layoutType || 'grid') === 'grid' 
-                        ? 'bg-blue-100 text-blue-800' 
-                        : 'bg-purple-100 text-purple-800'
-                    }`}>
+                    <span className="px-2 py-1 text-xs rounded-full" style={{
+                      backgroundColor: (group.layoutType || 'grid') === 'grid' 
+                        ? 'var(--color-info-light, #DBEAFE)' 
+                        : 'var(--color-purple-light, #F3E8FF)',
+                      color: (group.layoutType || 'grid') === 'grid' 
+                        ? 'var(--color-info-dark, #1E40AF)' 
+                        : 'var(--color-purple-dark, #581C87)'
+                    }}>
                       {(group.layoutType || 'grid') === 'grid' ? 'Grid Layout' : 'List Layout'}
                     </span>
                   </div>
-                  <p className="text-gray-600">{group.heading}</p>
+                  <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{group.heading}</p>
                   {group.subheading && (
-                    <p className="text-sm text-gray-500 mt-1">{group.subheading}</p>
+                    <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>{group.subheading}</p>
                   )}
-                  <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                  <div className="flex items-center gap-4 mt-2 text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                     <span>{group._count?.groupItems || 0} features</span>
                     <span>{group._count?.pageAssignments || 0} pages</span>
                   </div>
@@ -657,7 +688,7 @@ const FeatureGroupsManager: React.FC = () => {
                     variant="outline"
                     size="sm"
                     onClick={() => setExpandedGroup(expandedGroup === group.id ? null : group.id)}
-                    className="text-gray-600"
+                    style={{ color: 'var(--color-text-secondary, #6B7280)' }}
                   >
                     {expandedGroup === group.id ? 'Collapse' : 'Manage'}
                   </Button>
@@ -665,7 +696,7 @@ const FeatureGroupsManager: React.FC = () => {
                     size="sm"
                     variant="ghost"
                     onClick={() => startEdit(group)}
-                    className="p-2 text-gray-600 hover:text-gray-700"
+                    style={{ color: 'var(--color-text-secondary, #6B7280)' }}
                   >
                     <Edit2 className="w-4 h-4" />
                   </Button>
@@ -673,7 +704,7 @@ const FeatureGroupsManager: React.FC = () => {
                     size="sm"
                     variant="ghost"
                     onClick={() => handleDelete(group.id)}
-                    className="p-2 text-red-600 hover:text-red-700"
+                    style={{ color: 'var(--color-error, #EF4444)' }}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -683,27 +714,27 @@ const FeatureGroupsManager: React.FC = () => {
 
             {/* Expanded Management Section */}
             {expandedGroup === group.id && (
-              <div className="p-6 bg-gray-50">
+              <div className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}>
                 {/* Tab Navigation */}
-                <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg mb-6">
+                <div className="flex space-x-1 p-1 rounded-lg mb-6" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}>
                   <button
                     onClick={() => setActiveTab('features')}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                      activeTab === 'features'
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                    style={{
+                      backgroundColor: activeTab === 'features' ? 'var(--color-bg-primary, #FFFFFF)' : 'transparent',
+                      color: activeTab === 'features' ? 'var(--color-text-primary, #1F2937)' : 'var(--color-text-secondary, #6B7280)'
+                    }}
                   >
                     <Zap className="w-4 h-4" />
                     Manage Features
                   </button>
                   <button
                     onClick={() => setActiveTab('pages')}
-                    className={`flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                      activeTab === 'pages'
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                    style={{
+                      backgroundColor: activeTab === 'pages' ? 'var(--color-bg-primary, #FFFFFF)' : 'transparent',
+                      color: activeTab === 'pages' ? 'var(--color-text-primary, #1F2937)' : 'var(--color-text-secondary, #6B7280)'
+                    }}
                   >
                     <FileText className="w-4 h-4" />
                     Assign to Pages
@@ -715,7 +746,7 @@ const FeatureGroupsManager: React.FC = () => {
                   <div className="space-y-6">
                     {/* Current Features in Group */}
                     <div>
-                      <h5 className="text-lg font-semibold text-gray-900 mb-4">Features in this Group</h5>
+                      <h5 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Features in this Group</h5>
                       {group.groupItems && group.groupItems.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {group.groupItems.map((item) => {
@@ -725,20 +756,20 @@ const FeatureGroupsManager: React.FC = () => {
                                 className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200"
                               >
                                 <div className="flex items-center gap-3">
-                                  <GripVertical className="w-4 h-4 text-gray-400" />
-                                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                                                                      <GripVertical className="w-4 h-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
+                                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary-light, #E0E7FF)' }}>
                                     {getIconComponent(item.feature.iconName)}
                                   </div>
                                   <div>
-                                    <h6 className="font-medium text-gray-900">{item.feature.title}</h6>
-                                    <p className="text-sm text-gray-500">Order: {item.sortOrder}</p>
+                                    <h6 className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{item.feature.title}</h6>
+                                    <p className="text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Order: {item.sortOrder}</p>
                                   </div>
                                 </div>
                                 <div className="flex items-center space-x-2">
                                   <Button
                                     size="sm"
                                     variant="ghost"
-                                    className="p-1 text-gray-500"
+                                    style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
                                   >
                                     {item.isVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                                   </Button>
@@ -746,7 +777,7 @@ const FeatureGroupsManager: React.FC = () => {
                                     size="sm"
                                     variant="ghost"
                                     onClick={() => removeFeatureFromGroup(item.id)}
-                                    className="p-1 text-red-600 hover:text-red-700"
+                                    style={{ color: 'var(--color-error, #EF4444)' }}
                                   >
                                     <X className="w-4 h-4" />
                                   </Button>
@@ -756,13 +787,13 @@ const FeatureGroupsManager: React.FC = () => {
                           })}
                         </div>
                       ) : (
-                        <p className="text-gray-500 text-center py-8">No features in this group yet.</p>
+                        <p className="text-center py-8" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>No features in this group yet.</p>
                       )}
                     </div>
 
                     {/* Add Features */}
                     <div>
-                      <h5 className="text-lg font-semibold text-gray-900 mb-4">Add Features</h5>
+                      <h5 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Add Features</h5>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {availableFeatures
                           .filter(feature => !group.groupItems?.some(item => item.featureId === feature.id))
@@ -770,21 +801,28 @@ const FeatureGroupsManager: React.FC = () => {
                             return (
                               <div
                                 key={feature.id}
-                                className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
+                                className="flex items-center justify-between p-4 rounded-lg border transition-colors"
+                                style={{ 
+                                  backgroundColor: 'var(--color-bg-primary, #FFFFFF)', 
+                                  borderColor: 'var(--color-gray-light, #E5E7EB)'
+                                }}
                               >
                                 <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
+                                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}>
                                     {getIconComponent(feature.iconName)}
                                   </div>
                                   <div>
-                                    <h6 className="font-medium text-gray-900">{feature.title}</h6>
-                                    <p className="text-sm text-gray-500">{feature.category}</p>
+                                    <h6 className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{feature.title}</h6>
+                                    <p className="text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>{feature.category}</p>
                                   </div>
                                 </div>
                                 <Button
                                   size="sm"
                                   onClick={() => addFeatureToGroup(group.id, feature.id)}
-                                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                                  style={{
+                                    backgroundColor: 'var(--color-info, #3B82F6)',
+                                    color: 'var(--color-bg-primary, #FFFFFF)'
+                                  }}
                                 >
                                   <Plus className="w-4 h-4" />
                                 </Button>
@@ -801,26 +839,27 @@ const FeatureGroupsManager: React.FC = () => {
                   <div className="space-y-6">
                     {/* Current Page Assignments */}
                     <div>
-                      <h5 className="text-lg font-semibold text-gray-900 mb-4">Pages Using This Group</h5>
+                      <h5 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Pages Using This Group</h5>
                       {group.pageAssignments && group.pageAssignments.length > 0 ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {group.pageAssignments.map((assignment) => (
                             <div
                               key={assignment.id}
-                              className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200"
+                              className="flex items-center justify-between p-4 rounded-lg border"
+                              style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}
                             >
                               <div className="flex items-center gap-3">
-                                <FileText className="w-5 h-5 text-blue-600" />
+                                <FileText className="w-5 h-5" style={{ color: 'var(--color-info, #3B82F6)' }} />
                                 <div>
-                                  <h6 className="font-medium text-gray-900">{assignment.page.title}</h6>
-                                  <p className="text-sm text-gray-500">/{assignment.page.slug}</p>
+                                  <h6 className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{assignment.page.title}</h6>
+                                  <p className="text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>/{assignment.page.slug}</p>
                                 </div>
                               </div>
                               <div className="flex items-center space-x-2">
                                 <Button
                                   size="sm"
                                   variant="ghost"
-                                  className="p-1 text-gray-500"
+                                  style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
                                 >
                                   {assignment.isVisible ? <Eye className="w-4 h-4" /> : <EyeOff className="w-4 h-4" />}
                                 </Button>
@@ -828,7 +867,7 @@ const FeatureGroupsManager: React.FC = () => {
                                   size="sm"
                                   variant="ghost"
                                   onClick={() => removeGroupFromPage(assignment.id)}
-                                  className="p-1 text-red-600 hover:text-red-700"
+                                  style={{ color: 'var(--color-error, #EF4444)' }}
                                 >
                                   <X className="w-4 h-4" />
                                 </Button>
@@ -837,32 +876,39 @@ const FeatureGroupsManager: React.FC = () => {
                           ))}
                         </div>
                       ) : (
-                        <p className="text-gray-500 text-center py-8">This group is not assigned to any pages yet.</p>
+                        <p className="text-center py-8" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>This group is not assigned to any pages yet.</p>
                       )}
                     </div>
 
                     {/* Assign to Pages */}
                     <div>
-                      <h5 className="text-lg font-semibold text-gray-900 mb-4">Assign to Pages</h5>
+                      <h5 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Assign to Pages</h5>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {availablePages
                           .filter(page => !group.pageAssignments?.some(assignment => assignment.pageId === page.id))
                           .map((page) => (
                             <div
                               key={page.id}
-                              className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200 hover:border-green-300 transition-colors"
+                              className="flex items-center justify-between p-4 rounded-lg border transition-colors"
+                              style={{ 
+                                backgroundColor: 'var(--color-bg-primary, #FFFFFF)', 
+                                borderColor: 'var(--color-gray-light, #E5E7EB)'
+                              }}
                             >
                               <div className="flex items-center gap-3">
-                                <FileText className="w-5 h-5 text-gray-600" />
+                                <FileText className="w-5 h-5" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
                                 <div>
-                                  <h6 className="font-medium text-gray-900">{page.title}</h6>
-                                  <p className="text-sm text-gray-500">/{page.slug}</p>
+                                  <h6 className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{page.title}</h6>
+                                  <p className="text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>/{page.slug}</p>
                                 </div>
                               </div>
                               <Button
                                 size="sm"
                                 onClick={() => assignGroupToPage(group.id, page.id)}
-                                className="bg-green-600 hover:bg-green-700 text-white"
+                                style={{
+                                  backgroundColor: 'var(--color-success, #10B981)',
+                                  color: 'var(--color-bg-primary, #FFFFFF)'
+                                }}
                               >
                                 <Link className="w-4 h-4" />
                               </Button>
@@ -880,9 +926,9 @@ const FeatureGroupsManager: React.FC = () => {
 
       {featureGroups.length === 0 && (
         <div className="text-center py-12">
-          <Layers className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No feature groups yet</h3>
-          <p className="text-gray-500">Create your first feature group to get started.</p>
+          <Layers className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
+          <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>No feature groups yet</h3>
+          <p style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Create your first feature group to get started.</p>
         </div>
       )}
     </div>

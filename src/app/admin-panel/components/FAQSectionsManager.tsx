@@ -732,7 +732,7 @@ export default function FAQSectionsManager() {
                   {section.subheading && (
                     <div>
                       <span className="font-medium text-gray-700">Subheading:</span>
-                      <p className="text-gray-600 mt-1">{section.subheading}</p>
+                      <p className="mt-1" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{section.subheading}</p>
                     </div>
                   )}
 

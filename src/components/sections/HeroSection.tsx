@@ -244,20 +244,20 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
 
   // Smart color calculation based on background color
   const getTextColor = () => {
-    if (!heroData?.backgroundColor) return 'text-gray-900'; // Default dark text
+    if (!heroData?.backgroundColor) return 'text-[var(--color-text-primary,#1F2937)]'; // Default dark text
     
     const hex = heroData.backgroundColor.replace('#', '');
     const r = parseInt(hex.substr(0, 2), 16);
     const g = parseInt(hex.substr(2, 2), 16);
     const b = parseInt(hex.substr(4, 2), 16);
     const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness > 128 ? 'text-gray-900' : 'text-white';
+    return brightness > 128 ? 'text-[var(--color-text-primary,#1F2937)]' : 'text-white';
   };
 
   // Get secondary text color based on background
   const getSecondaryTextColor = () => {
     const primaryColor = getTextColor();
-    return primaryColor === 'text-white' ? 'text-white/90' : 'text-gray-600';
+    return primaryColor === 'text-white' ? 'text-white/90' : 'text-[var(--color-text-secondary,#6B7280)]';
   };
 
   // Get trust indicator colors based on background
@@ -272,10 +272,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
       };
     }
     return {
-      text: 'text-gray-700',
+      text: 'text-[var(--color-text-primary,#1F2937)]',
       background: 'bg-white/60',
       border: 'border-white/40',
-      icon: 'text-[var(--color-primary)]'
+      icon: 'text-[var(--color-primary,#5243E9)]'
     };
   };
 
@@ -684,9 +684,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 }
               })()
             ) : (
-              <div className={`${getMediaContentClasses()} bg-gray-200 rounded-2xl flex items-center justify-center`}>
-                <span className="text-gray-500">No video URL provided</span>
-              </div>
+                      <div className={`${getMediaContentClasses()} bg-[var(--color-bg-secondary,#F9FAFB)] rounded-2xl flex items-center justify-center`}>
+          <span className="text-[var(--color-text-muted,#9CA3AF)]">No video URL provided</span>
+        </div>
             )}
           </motion.div>
         );
@@ -705,7 +705,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 htmlContent={heroData?.animationData?.htmlContent || ''}
                 fallback={
                   <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-gray-500">
+                    <span className="text-[var(--color-text-muted,#9CA3AF)]">
                       {heroData?.animationData?.htmlContent ? 'Loading animated content...' : 'No HTML content provided'}
                     </span>
                   </div>
@@ -742,8 +742,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 />
               </>
             ) : (
-              <div className={`${getMediaContentClasses()} bg-gray-200 rounded-2xl flex items-center justify-center`}>
-                <span className="text-gray-500">No script content provided</span>
+              <div className={`${getMediaContentClasses()} bg-[var(--color-bg-secondary,#F9FAFB)] rounded-2xl flex items-center justify-center`}>
+                <span className="text-[var(--color-text-muted,#9CA3AF)]">No script content provided</span>
               </div>
             )}
           </motion.div>
@@ -766,7 +766,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                     />
                   ) : (
                     <div className={`${getMediaContentClasses()} flex items-center justify-center`}>
-                      <span className="text-gray-500">No image selected</span>
+                      <span className="text-[var(--color-text-muted,#9CA3AF)]">No image selected</span>
                     </div>
                   )}
                 </motion.div>
@@ -787,11 +787,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
             whileHover={{ scale: 1.02 }}
           >
             <div className="text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Video className="w-8 h-8 text-gray-400" />
+              <div className="w-16 h-16 bg-[var(--color-bg-secondary,#F9FAFB)] rounded-full flex items-center justify-center mx-auto mb-4">
+                <Video className="w-8 h-8 text-[var(--color-text-muted,#9CA3AF)]" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No Content Selected</h3>
-              <p className="text-gray-500">Please select a content type from the admin panel</p>
+              <h3 className="text-lg font-medium text-[var(--color-text-primary,#1F2937)] mb-2">No Content Selected</h3>
+              <p className="text-[var(--color-text-muted,#9CA3AF)]">Please select a content type from the admin panel</p>
             </div>
           </motion.div>
         );

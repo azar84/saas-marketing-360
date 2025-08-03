@@ -39,7 +39,7 @@ import {
 import dynamic from 'next/dynamic';
 import MediaSelector from '@/components/ui/MediaSelector';
 import { IconPicker } from '@/components/ui';
-import { useDesignSystem } from '@/hooks/useDesignSystem';
+import { useDesignSystem, getAdminPanelColorsWithDesignSystem } from '@/hooks/useDesignSystem';
 import { renderIcon } from '@/lib/iconUtils';
 
 // Dynamically import TinyMCE to avoid SSR issues
@@ -301,26 +301,27 @@ const MediaSectionsManager: React.FC = () => {
     // Generate dynamic preset colors from design system
     const getPresetColors = () => {
       if (!designSystem) {
-        // Fallback colors if design system isn't loaded
+        // Use design system defaults from useDesignSystem hook
+        const defaultColors = getAdminPanelColorsWithDesignSystem(null);
         return [
-          { name: 'Primary', value: '#5243E9' },
-          { name: 'Secondary', value: '#7C3AED' },
-          { name: 'Accent', value: '#10B981' },
-          { name: 'Success', value: '#059669' },
-          { name: 'Warning', value: '#D97706' },
-          { name: 'Error', value: '#DC2626' },
-          { name: 'Info', value: '#3B82F6' },
+          { name: 'Primary', value: defaultColors.primary },
+          { name: 'Secondary', value: defaultColors.secondary },
+          { name: 'Accent', value: defaultColors.accent },
+          { name: 'Success', value: defaultColors.success },
+          { name: 'Warning', value: defaultColors.warning },
+          { name: 'Error', value: defaultColors.error },
+          { name: 'Info', value: defaultColors.info },
           { name: 'White', value: '#FFFFFF' },
           { name: 'Black', value: '#000000' },
-          { name: 'Gray Light', value: '#F3F4F6' },
-          { name: 'Gray Medium', value: '#9CA3AF' },
-          { name: 'Gray Dark', value: '#374151' },
-          { name: 'Background Primary', value: '#FFFFFF' },
-          { name: 'Background Secondary', value: '#F6F8FC' },
-          { name: 'Background Dark', value: '#1F2937' },
-          { name: 'Text Primary', value: '#1F2937' },
-          { name: 'Text Secondary', value: '#6B7280' },
-          { name: 'Text Muted', value: '#9CA3AF' },
+          { name: 'Gray Light', value: defaultColors.grayLight },
+          { name: 'Gray Medium', value: defaultColors.grayMedium },
+          { name: 'Gray Dark', value: defaultColors.grayDark },
+          { name: 'Background Primary', value: defaultColors.backgroundPrimary },
+          { name: 'Background Secondary', value: defaultColors.backgroundSecondary },
+          { name: 'Background Dark', value: defaultColors.backgroundDark },
+          { name: 'Text Primary', value: defaultColors.textPrimary },
+          { name: 'Text Secondary', value: defaultColors.textSecondary },
+          { name: 'Text Muted', value: defaultColors.textMuted },
         ];
       }
 
@@ -784,12 +785,16 @@ const MediaSectionsManager: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Media Sections</h2>
-          <p className="text-gray-600 mt-1">Manage video, support, and conversation sections</p>
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Media Sections</h2>
+          <p className="mt-1" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Manage video, support, and conversation sections</p>
         </div>
         <button
           onClick={() => setIsFormOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors"
+          style={{
+            backgroundColor: 'var(--color-info, #3B82F6)',
+            color: 'var(--color-bg-primary, #FFFFFF)'
+          }}
         >
           <Plus className="w-4 h-4" />
           Create Media Section
@@ -807,20 +812,27 @@ const MediaSectionsManager: React.FC = () => {
       {/* Media Sections List */}
       <div className="space-y-4">
         {mediaSections.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <Image className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No media sections yet</h3>
-            <p className="text-gray-500 mb-4">Create your first media section to get started</p>
+          <div className="text-center py-12 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}>
+            <Image className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
+            <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>No media sections yet</h3>
+            <p className="mb-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Create your first media section to get started</p>
             <button
               onClick={() => setIsFormOpen(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 rounded-lg transition-colors"
+              style={{
+                backgroundColor: 'var(--color-info, #3B82F6)',
+                color: 'var(--color-bg-primary, #FFFFFF)'
+              }}
             >
               Create Media Section
             </button>
           </div>
         ) : (
           mediaSections.map((section) => (
-            <div key={section.id} className="bg-white border border-gray-200 rounded-lg p-6">
+            <div key={section.id} className="rounded-lg p-6" style={{ 
+              backgroundColor: 'var(--color-bg-primary, #FFFFFF)', 
+              borderColor: 'var(--color-gray-light, #E5E7EB)' 
+            }}>
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
                   <div 
@@ -828,21 +840,27 @@ const MediaSectionsManager: React.FC = () => {
                     style={{ backgroundColor: section.badgeColor }}
                   />
                   <div>
-                    <h3 className="font-semibold text-gray-900">{section.headline}</h3>
-                    <div className="flex items-center gap-4 text-sm text-gray-500">
+                    <h3 className="font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{section.headline}</h3>
+                    <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                       <span className="capitalize">{section.mediaType}</span>
                       <span className="capitalize">{section.layoutType.replace('_', ' ')}</span>
                       {section.mediaType === 'video' && (section.mediaUrl.includes('youtube.com') || section.mediaUrl.includes('youtu.be')) && (
-                        <span className="flex items-center gap-1 px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs">
+                        <span className="flex items-center gap-1 px-2 py-1 rounded-full text-xs" style={{
+                          backgroundColor: 'var(--color-error-light, #FEE2E2)',
+                          color: 'var(--color-error-dark, #991B1B)'
+                        }}>
                           <Video className="w-3 h-3" />
                           YouTube
                         </span>
                       )}
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        section.isActive 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span className="px-2 py-1 rounded-full text-xs" style={{
+                        backgroundColor: section.isActive 
+                          ? 'var(--color-success-light, #D1FAE5)' 
+                          : 'var(--color-bg-secondary, #F9FAFB)',
+                        color: section.isActive 
+                          ? 'var(--color-success-dark, #065F46)' 
+                          : 'var(--color-text-primary, #1F2937)'
+                      }}>
                         {section.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </div>
@@ -852,19 +870,22 @@ const MediaSectionsManager: React.FC = () => {
                 <div className="flex items-center gap-2">
                   <button
                     onClick={() => toggleExpanded(section.id!)}
-                    className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                    className="p-2 transition-colors"
+                    style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
                   >
                     {expandedSections.has(section.id!) ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                   <button
                     onClick={() => startEdit(section)}
-                    className="p-2 text-blue-600 hover:text-blue-800 transition-colors"
+                    className="p-2 transition-colors"
+                    style={{ color: 'var(--color-info, #3B82F6)' }}
                   >
                     <Edit className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(section.id!)}
-                    className="p-2 text-red-600 hover:text-red-800 transition-colors"
+                    className="p-2 transition-colors"
+                    style={{ color: 'var(--color-error, #EF4444)' }}
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -873,54 +894,55 @@ const MediaSectionsManager: React.FC = () => {
 
               {/* Expanded Details */}
               {expandedSections.has(section.id!) && (
-                <div className="border-t pt-4 space-y-4">
+                <div className="border-t pt-4 space-y-4" style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                     <div>
-                      <span className="font-medium text-gray-700">Media URL:</span>
+                      <span className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Media URL:</span>
                       {section.mediaType === 'video' && (section.mediaUrl.includes('youtube.com') || section.mediaUrl.includes('youtu.be')) ? (
                         <div className="space-y-1">
-                          <p className="text-gray-600 truncate">{section.mediaUrl}</p>
-                          <p className="text-xs text-blue-600">
+                          <p className="truncate" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{section.mediaUrl}</p>
+                          <p className="text-xs" style={{ color: 'var(--color-info, #3B82F6)' }}>
                             Video ID: {getVideoId(section.mediaUrl)}
                           </p>
                         </div>
                       ) : (
-                        <p className="text-gray-600 truncate">{section.mediaUrl}</p>
+                        <p className="truncate" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{section.mediaUrl}</p>
                       )}
                     </div>
                     <div>
-                      <span className="font-medium text-gray-700">Background:</span>
+                      <span className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Background:</span>
                       <div className="flex items-center gap-2">
                         <div 
                           className="w-4 h-4 rounded border"
                           style={{ backgroundColor: section.backgroundColor }}
                         />
-                        <span className="text-gray-600">{section.backgroundColor}</span>
+                        <span style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{section.backgroundColor}</span>
                       </div>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-700">Padding:</span>
-                      <p className="text-gray-600">{section.paddingTop}px / {section.paddingBottom}px</p>
+                      <span className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Padding:</span>
+                      <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{section.paddingTop}px / {section.paddingBottom}px</p>
                     </div>
                   </div>
 
                   {/* Features */}
                   {section.features && section.features.length > 0 && (
                     <div>
-                      <h4 className="font-medium text-gray-700 mb-2">Features ({section.features.length})</h4>
+                      <h4 className="font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Features ({section.features.length})</h4>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                         {section.features.map((feature, index) => {
                           const IconComponent = getIconComponent(feature.icon);
                           return (
-                            <div key={index} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
+                            <div key={index} className="flex items-center gap-2 p-2 rounded" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}>
                               {IconComponent ? (
                               <IconComponent 
-                                className={`w-4 h-4 ${getIconCategoryColor(feature.icon)}`}
+                                className="w-4 h-4"
+                                style={{ color: 'var(--color-primary, #5243E9)' }}
                               />
                               ) : (
-                                <div className="w-4 h-4 bg-gray-300 rounded" />
+                                <div className="w-4 h-4 rounded" style={{ backgroundColor: 'var(--color-text-muted, #9CA3AF)' }} />
                               )}
-                              <span className="text-sm text-gray-700">{feature.label}</span>
+                              <span className="text-sm" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{feature.label}</span>
                             </div>
                           );
                         })}
@@ -936,15 +958,19 @@ const MediaSectionsManager: React.FC = () => {
 
       {/* Form Modal */}
       {isFormOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
-              <h3 className="text-lg font-semibold">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div className="rounded-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}>
+            <div className="sticky top-0 border-b px-6 py-4 flex justify-between items-center" style={{ 
+              backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+              borderColor: 'var(--color-gray-light, #E5E7EB)'
+            }}>
+              <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 {editingSection ? 'Edit Media Section' : 'Create Media Section'}
               </h3>
               <button
                 onClick={resetForm}
-                className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                className="p-2 transition-colors"
+                style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
               >
                 <X className="w-5 h-5" />
               </button>
@@ -953,14 +979,14 @@ const MediaSectionsManager: React.FC = () => {
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
               {/* Basic Information */}
               <div className="space-y-4">
-                <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                  <Settings className="w-4 h-4" />
-                  Basic Information
+                              <h4 className="font-medium flex items-center gap-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                <Settings className="w-4 h-4" style={{ color: 'var(--color-primary, #5243E9)' }} />
+                Basic Information
                 </h4>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       Headline *
                     </label>
                     <div className="relative">
@@ -968,35 +994,43 @@ const MediaSectionsManager: React.FC = () => {
                       type="text"
                       value={formData.headline}
                       onChange={(e) => setFormData({ ...formData, headline: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent pr-16"
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent pr-16"
+                        style={{ 
+                          borderColor: 'var(--color-gray-light, #E5E7EB)',
+                          outline: 'none'
+                        }}
                       required
                         maxLength={200}
                     />
-                      <div className="absolute top-1/2 right-2 transform -translate-y-1/2 text-xs text-gray-500">
+                      <div className="absolute top-1/2 right-2 transform -translate-y-1/2 text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                         {(formData.headline?.length || 0)}/200
                       </div>
                     </div>
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       Position
                     </label>
                     <input
                       type="number"
                       value={formData.position}
                       onChange={(e) => setFormData({ ...formData, position: parseInt(e.target.value) })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent"
+                      style={{ 
+                        borderColor: 'var(--color-gray-light, #E5E7EB)',
+                        outline: 'none'
+                      }}
                       min="0"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Subheading (Rich Text Editor)
                   </label>
-                  <div className="border border-gray-300 rounded-lg w-full">
+                  <div className="border rounded-lg w-full" style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
                     <Editor
                       apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY || process.env.TINYMCE_API_KEY}
                     value={formData.subheading}
@@ -1239,8 +1273,8 @@ const MediaSectionsManager: React.FC = () => {
 
               {/* Badge Configuration */}
               <div className="space-y-4">
-                <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                  <Palette className="w-4 h-4" />
+                <h4 className="font-medium flex items-center gap-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                  <Palette className="w-4 h-4" style={{ color: 'var(--color-primary, #5243E9)' }} />
                   Badge Configuration
                 </h4>
                 
@@ -1252,16 +1286,16 @@ const MediaSectionsManager: React.FC = () => {
                       onChange={(e) => setFormData({ ...formData, showBadge: e.target.checked })}
                       className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                     />
-                    <span className="text-sm font-medium text-gray-700">Show Badge</span>
+                    <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Show Badge</span>
                   </label>
                 </div>
 
                 {formData.showBadge && (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Badge Text
-                      </label>
+                                          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                      Badge Text
+                    </label>
                       <input
                         type="text"
                         value={formData.badgeText}
@@ -1285,20 +1319,24 @@ const MediaSectionsManager: React.FC = () => {
 
               {/* Media Configuration */}
               <div className="space-y-4">
-                <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                  <Video className="w-4 h-4" />
+                <h4 className="font-medium flex items-center gap-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                  <Video className="w-4 h-4" style={{ color: 'var(--color-primary, #5243E9)' }} />
                   Media Configuration
                 </h4>
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       Media Type
                     </label>
                     <select
                       value={formData.mediaType}
                       onChange={(e) => setFormData({ ...formData, mediaType: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent"
+                      style={{ 
+                        borderColor: 'var(--color-gray-light, #E5E7EB)',
+                        outline: 'none'
+                      }}
                     >
                       <option value="image">Image</option>
                       <option value="video">Video</option>
@@ -1308,13 +1346,17 @@ const MediaSectionsManager: React.FC = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       Media Size
                     </label>
                     <select
                       value={formData.mediaSize}
                       onChange={(e) => setFormData({ ...formData, mediaSize: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent"
+                      style={{ 
+                        borderColor: 'var(--color-gray-light, #E5E7EB)',
+                        outline: 'none'
+                      }}
                     >
                       <option value="sm">Small</option>
                       <option value="md">Medium</option>
@@ -1324,13 +1366,17 @@ const MediaSectionsManager: React.FC = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       Layout Type
                     </label>
                     <select
                       value={formData.layoutType}
                       onChange={(e) => setFormData({ ...formData, layoutType: e.target.value as any })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent"
+                      style={{ 
+                        borderColor: 'var(--color-gray-light, #E5E7EB)',
+                        outline: 'none'
+                      }}
                     >
                       <option value="media_left">Media Left</option>
                       <option value="media_right">Media Right</option>
@@ -1361,7 +1407,7 @@ const MediaSectionsManager: React.FC = () => {
                 {/* YouTube URL Input for Video Type */}
                 {formData.mediaType === 'video' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       YouTube URL (Alternative)
                     </label>
                     <input
@@ -1369,9 +1415,13 @@ const MediaSectionsManager: React.FC = () => {
                       value={formData.mediaUrl}
                       onChange={(e) => setFormData({ ...formData, mediaUrl: e.target.value })}
                       placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent"
+                      style={{ 
+                        borderColor: 'var(--color-gray-light, #E5E7EB)',
+                        outline: 'none'
+                      }}
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                       Enter a YouTube URL directly (supports watch URLs, short URLs, and embed URLs)
                     </p>
                     
@@ -1412,14 +1462,18 @@ const MediaSectionsManager: React.FC = () => {
               {/* Features */}
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                    <Star className="w-4 h-4" />
+                  <h4 className="font-medium flex items-center gap-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                    <Star className="w-4 h-4" style={{ color: 'var(--color-primary, #5243E9)' }} />
                     Features ({formData.features?.length || 0})
                   </h4>
                   <button
                     type="button"
                     onClick={addFeature}
-                    className="flex items-center gap-2 px-3 py-1 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    className="flex items-center gap-2 px-3 py-1 text-sm rounded-lg transition-colors"
+                    style={{
+                      backgroundColor: 'var(--color-info, #3B82F6)',
+                      color: 'var(--color-bg-primary, #FFFFFF)'
+                    }}
                   >
                     <Plus className="w-3 h-3" />
                     Add Feature
@@ -1431,10 +1485,13 @@ const MediaSectionsManager: React.FC = () => {
                     {formData.features.map((feature, index) => {
                       const IconComponent = getIconComponent(feature.icon);
                       return (
-                        <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                        <div key={index} className="p-4 rounded-lg border" style={{
+                          backgroundColor: 'var(--color-bg-secondary, #F9FAFB)',
+                          borderColor: 'var(--color-gray-light, #E5E7EB)'
+                        }}>
                           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-center">
                             <div className="md:col-span-1">
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                                 Icon
                               </label>
                               <div onClick={(e) => e.stopPropagation()}>
@@ -1448,7 +1505,7 @@ const MediaSectionsManager: React.FC = () => {
                             </div>
                             
                             <div className="md:col-span-2">
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                                 Feature Label
                               </label>
                               <input
@@ -1456,12 +1513,16 @@ const MediaSectionsManager: React.FC = () => {
                                 value={feature.label}
                                 onChange={(e) => updateFeature(index, 'label', e.target.value)}
                                 placeholder="Enter feature description"
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent"
+                                style={{ 
+                                  borderColor: 'var(--color-gray-light, #E5E7EB)',
+                                  outline: 'none'
+                                }}
                               />
                             </div>
                             
                             <div className="md:col-span-1">
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                                 Color
                               </label>
                               <ColorPicker
@@ -1474,20 +1535,21 @@ const MediaSectionsManager: React.FC = () => {
                             </div>
                           </div>
                           
-                          <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200">
+                          <div className="flex items-center justify-between mt-3 pt-3 border-t rounded-lg transition-colors" style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
                             <div className="flex items-center gap-2">
                               {IconComponent ? (
-                              <IconComponent className={`w-4 h-4 ${getIconCategoryColor(feature.icon)}`} />
+                              <IconComponent className="w-4 h-4" style={{ color: 'var(--color-primary, #5243E9)' }} />
                               ) : (
-                                <div className="w-4 h-4 bg-gray-300 rounded" />
+                                <div className="w-4 h-4 rounded" style={{ backgroundColor: 'var(--color-text-muted, #9CA3AF)' }} />
                               )}
-                              <span className="text-sm text-gray-600">{feature.label || 'Preview'}</span>
+                              <span className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{feature.label || 'Preview'}</span>
                             </div>
                             
                             <button
                               type="button"
                               onClick={() => removeFeature(index)}
-                              className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-lg transition-colors"
+                              className="p-2 rounded-lg transition-colors"
+                              style={{ color: 'var(--color-error, #EF4444)' }}
                               title="Remove feature"
                             >
                               <Trash2 className="w-4 h-4" />
@@ -1502,8 +1564,8 @@ const MediaSectionsManager: React.FC = () => {
 
               {/* CTA Configuration */}
               <div className="space-y-4">
-                <h4 className="font-medium text-gray-900 flex items-center gap-2">
-                  <Target className="w-4 h-4" />
+                <h4 className="font-medium flex items-center gap-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                  <Target className="w-4 h-4" style={{ color: 'var(--color-primary, #5243E9)' }} />
                   Call-to-Action
                 </h4>
                 
@@ -1513,9 +1575,13 @@ const MediaSectionsManager: React.FC = () => {
                       type="checkbox"
                       checked={formData.showCtaButton}
                       onChange={(e) => setFormData({ ...formData, showCtaButton: e.target.checked })}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="rounded focus:ring-blue-500"
+                      style={{ 
+                        borderColor: 'var(--color-gray-light, #E5E7EB)',
+                        color: 'var(--color-info, #3B82F6)'
+                      }}
                     />
-                    <span className="text-sm font-medium text-gray-700">Show CTA Button</span>
+                    <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Show CTA Button</span>
                   </label>
                 </div>
 

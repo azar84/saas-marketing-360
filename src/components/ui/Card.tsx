@@ -9,9 +9,9 @@ const cardVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-white border border-[#E2E8F0] shadow-sm',
-        outlined: 'bg-transparent border-2 border-[#E2E8F0]',
-        elevated: 'bg-white shadow-lg shadow-black/5 border border-[#E2E8F0]/50',
+        default: 'shadow-sm',
+        outlined: 'bg-transparent border-2',
+        elevated: 'shadow-lg shadow-black/5 border border-opacity-50',
         glass: 'glass backdrop-blur-xl bg-white/80 border border-white/20',
       },
       padding: {
@@ -46,6 +46,11 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       <div
         ref={ref}
         className={cn(cardVariants({ variant, padding, hover, className }))}
+        style={{
+          backgroundColor: variant === 'outlined' ? 'transparent' : 'var(--color-bg-secondary, #F9FAFB)',
+          borderColor: 'var(--color-gray-light, #E5E7EB)',
+          color: 'var(--color-text-primary, #1F2937)'
+        }}
         {...props}
       >
         {children}
@@ -75,7 +80,8 @@ const CardTitle = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <h3
     ref={ref}
-    className={cn('font-semibold text-lg leading-none tracking-tight text-[#1E2A3B]', className)}
+    className={cn('font-semibold text-lg leading-none tracking-tight', className)}
+    style={{ color: 'var(--color-text-primary, #1F2937)' }}
     {...props}
   >
     {children}
@@ -89,7 +95,8 @@ const CardDescription = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn('text-sm text-[#64748B]', className)}
+    className={cn('text-sm', className)}
+    style={{ color: 'var(--color-text-secondary, #6B7280)' }}
     {...props}
   />
 ));

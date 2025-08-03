@@ -23,6 +23,7 @@ import {
   Eye,
   EyeOff
 } from 'lucide-react';
+import { useDesignSystem, getAdminPanelColorsWithDesignSystem } from '@/hooks/useDesignSystem';
 
 interface CTA {
   id: number;
@@ -71,6 +72,9 @@ interface CTAFormData {
 }
 
 export default function CTAManager() {
+  const { designSystem } = useDesignSystem();
+  const adminColors = getAdminPanelColorsWithDesignSystem(designSystem);
+  
   const [ctas, setCtas] = useState<CTA[]>([]);
   const [headerCtas, setHeaderCtas] = useState<HeaderCTA[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -401,7 +405,10 @@ export default function CTAManager() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div 
+          className="animate-spin rounded-full h-8 w-8 border-b-2"
+          style={{ borderColor: 'var(--color-primary, #5243E9)' }}
+        ></div>
       </div>
     );
   }
@@ -411,8 +418,18 @@ export default function CTAManager() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">CTA Button Manager</h2>
-          <p className="text-gray-600 mt-2">Manage call-to-action buttons for your website header</p>
+          <h2 
+            className="text-3xl font-bold"
+            style={{ color: 'var(--color-text-primary, #1F2937)' }}
+          >
+            CTA Button Manager
+          </h2>
+          <p 
+            className="mt-2"
+            style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+          >
+            Manage call-to-action buttons for your website header
+          </p>
         </div>
         <Button
           onClick={() => {
@@ -429,7 +446,10 @@ export default function CTAManager() {
             });
             setShowForm(true);
           }}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+          style={{
+            backgroundColor: 'var(--color-success, #10B981)',
+            color: '#FFFFFF'
+          }}
         >
           <Plus className="w-4 h-4 mr-2" />
           Create CTA Button
@@ -438,16 +458,19 @@ export default function CTAManager() {
 
       {/* Create/Edit Form */}
       {showForm && (
-        <Card className="p-6 border-2 border-blue-200 bg-blue-50/50">
+        <Card className="p-6 border-2">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">
+            <h3 
+              className="text-xl font-semibold"
+              style={{ color: 'var(--color-text-primary, #1F2937)' }}
+            >
               {editingId ? 'Edit CTA Button' : 'Create New CTA Button'}
             </h3>
             <Button
               variant="ghost"
               size="sm"
               onClick={resetForm}
-              className="text-gray-500 hover:text-gray-700"
+              style={{ color: 'var(--color-text-secondary, #6B7280)' }}
             >
               <X className="w-4 h-4" />
             </Button>
@@ -456,7 +479,10 @@ export default function CTAManager() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label 
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                >
                   Button Text *
                 </label>
                 <Input
@@ -470,7 +496,10 @@ export default function CTAManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label 
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                >
                   URL *
                 </label>
                 <Input
@@ -481,13 +510,19 @@ export default function CTAManager() {
                   required
                   className="h-12"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p 
+                  className="text-xs mt-1"
+                  style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+                >
                   Enter a full URL, relative path, anchor link (e.g., #pricing, #contact), or empty anchor (#)
                 </p>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label 
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                >
                   Custom ID (Optional)
                 </label>
                 <Input
@@ -497,19 +532,36 @@ export default function CTAManager() {
                   placeholder="e.g., cta-primary, signup-button, hero-cta"
                   className="h-12"
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p 
+                  className="text-xs mt-1"
+                  style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+                >
                   Custom HTML ID for the button element (for CSS/JS targeting)
                 </p>
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label 
+                  className="block text-sm font-medium mb-3"
+                  style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                >
                   Button Style
                 </label>
                 
                 {/* Style Preview Grid */}
-                <div className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                  <p className="text-sm text-gray-600 mb-3">Click a style to select it:</p>
+                <div 
+                  className="mb-4 p-4 border rounded-lg"
+                  style={{ 
+                    borderColor: 'var(--color-gray-light, #E5E7EB)',
+                    backgroundColor: 'var(--color-bg-secondary, #F9FAFB)'
+                  }}
+                >
+                  <p 
+                    className="text-sm mb-3"
+                    style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+                  >
+                    Click a style to select it:
+                  </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {[
                       { value: 'primary', label: 'Primary', description: 'Main action' },
@@ -524,11 +576,16 @@ export default function CTAManager() {
                     ].map((styleOption) => (
                       <div
                         key={styleOption.value}
-                        className={`p-3 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
-                          formData.style === styleOption.value
-                            ? 'border-blue-500 bg-blue-50 shadow-md'
-                            : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
-                        }`}
+                        className="p-3 rounded-lg border-2 cursor-pointer transition-all duration-200"
+                        style={{
+                          borderColor: formData.style === styleOption.value
+                            ? 'var(--color-primary, #5243E9)'
+                            : 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: formData.style === styleOption.value
+                            ? 'var(--color-bg-secondary, #F9FAFB)'
+                            : 'var(--color-bg-primary, #FFFFFF)',
+                          boxShadow: formData.style === styleOption.value ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : undefined
+                        }}
                         onClick={() => setFormData({ ...formData, style: styleOption.value as any })}
                       >
                         <div className="text-center space-y-2">
@@ -541,8 +598,18 @@ export default function CTAManager() {
                             {formData.text || 'Sample Text'}
                           </Button>
                           <div>
-                            <p className="text-xs font-semibold text-gray-900">{styleOption.label}</p>
-                            <p className="text-xs text-gray-600">{styleOption.description}</p>
+                            <p 
+                              className="text-xs font-semibold"
+                              style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                            >
+                              {styleOption.label}
+                            </p>
+                            <p 
+                              className="text-xs"
+                              style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+                            >
+                              {styleOption.description}
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -573,7 +640,10 @@ export default function CTAManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label 
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                >
                   Link Target
                 </label>
                 <select
@@ -582,7 +652,12 @@ export default function CTAManager() {
                     const value = e.target.value as '_self' | '_blank';
                     setFormData({ ...formData, target: value });
                   }}
-                  className="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full h-12 px-4 border rounded-lg"
+                  style={{
+                    borderColor: 'var(--color-gray-light, #E5E7EB)',
+                    backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                    color: 'var(--color-text-primary, #1F2937)'
+                  }}
                 >
                   <option value="_self">Same Tab</option>
                   <option value="_blank">New Tab</option>
@@ -590,7 +665,10 @@ export default function CTAManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label 
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                >
                   Icon
                 </label>
                 <UniversalIconPicker
@@ -605,8 +683,14 @@ export default function CTAManager() {
             {/* Enhanced JavaScript Events Section */}
             <div className="md:col-span-2">
               <div className="flex items-center justify-between mb-4">
-                <h4 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <MousePointer className="w-5 h-5 mr-2 text-purple-600" />
+                <h4 
+                  className="text-lg font-semibold flex items-center"
+                  style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                >
+                  <MousePointer 
+                    className="w-5 h-5 mr-2"
+                    style={{ color: 'var(--color-secondary, #7C3AED)' }}
+                  />
                   JavaScript Events & Functions
                 </h4>
                 <Button
@@ -614,7 +698,10 @@ export default function CTAManager() {
                   variant="outline"
                   size="sm"
                   onClick={() => setShowGlobalFunctions(!showGlobalFunctions)}
-                  className="text-purple-600 border-purple-300 hover:bg-purple-50"
+                  style={{
+                    color: 'var(--color-secondary, #7C3AED)',
+                    borderColor: 'var(--color-secondary, #7C3AED)'
+                  }}
                 >
                   {showGlobalFunctions ? 'Hide' : 'Show'} Global Functions
                 </Button>
@@ -622,28 +709,50 @@ export default function CTAManager() {
 
               {/* Global Functions Section */}
               {showGlobalFunctions && (
-                <div className="mb-6 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+                <div 
+                  className="mb-6 p-4 border rounded-lg"
+                  style={{
+                    backgroundColor: 'var(--color-bg-secondary, #F9FAFB)',
+                    borderColor: 'var(--color-secondary, #7C3AED)'
+                  }}
+                >
                   <div className="flex items-center justify-between mb-3">
-                    <h5 className="text-md font-semibold text-purple-900">Global JavaScript Functions</h5>
+                    <h5 
+                      className="text-md font-semibold"
+                      style={{ color: 'var(--color-secondary, #7C3AED)' }}
+                    >
+                      Global JavaScript Functions
+                    </h5>
                     <div className="flex space-x-2">
                       <Button
                         type="button"
                         size="sm"
                         onClick={saveGlobalFunctions}
-                        className="bg-purple-600 hover:bg-purple-700 text-white"
+                        style={{
+                          backgroundColor: 'var(--color-secondary, #7C3AED)',
+                          color: '#FFFFFF'
+                        }}
                       >
                         Save Functions
                       </Button>
                     </div>
                   </div>
                   
-                  <p className="text-sm text-purple-700 mb-3">
+                  <p 
+                    className="text-sm mb-3"
+                    style={{ color: 'var(--color-secondary, #7C3AED)' }}
+                  >
                     These functions will be loaded globally and available to all CTAs. They're injected after the body tag opens.
                   </p>
 
                   {/* Function Templates */}
                   <div className="mb-3">
-                    <p className="text-xs font-medium text-purple-700 mb-2">Quick Templates:</p>
+                    <p 
+                      className="text-xs font-medium mb-2"
+                      style={{ color: 'var(--color-secondary, #7C3AED)' }}
+                    >
+                      Quick Templates:
+                    </p>
                     <div className="flex flex-wrap gap-2">
                       {functionTemplates.map((template) => (
                         <Button
@@ -652,7 +761,10 @@ export default function CTAManager() {
                           size="sm"
                           variant="outline"
                           onClick={() => insertFunctionTemplate(template)}
-                          className="text-xs border-purple-300 text-purple-700 hover:bg-purple-100"
+                          style={{
+                            borderColor: 'var(--color-secondary, #7C3AED)',
+                            color: 'var(--color-secondary, #7C3AED)'
+                          }}
                         >
                           {template.name}
                         </Button>
@@ -664,7 +776,12 @@ export default function CTAManager() {
                     value={globalFunctions}
                     onChange={(e) => setGlobalFunctions(e.target.value)}
                     placeholder="// Add your global JavaScript functions here\n// These will be available to all CTAs\n\nfunction exampleFunction() {\n  console.log('Hello from global function!');\n}"
-                    className="w-full h-32 px-3 py-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm font-mono bg-white"
+                    className="w-full h-32 px-3 py-2 border rounded-lg text-sm font-mono"
+                    style={{
+                      borderColor: 'var(--color-secondary, #7C3AED)',
+                      backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                      color: 'var(--color-text-primary, #1F2937)'
+                    }}
                   />
                 </div>
               )}
@@ -672,12 +789,20 @@ export default function CTAManager() {
               {/* Event Configuration */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h5 className="text-md font-semibold text-gray-900">Event Configuration</h5>
+                  <h5 
+                    className="text-md font-semibold"
+                    style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                  >
+                    Event Configuration
+                  </h5>
                   <Button
                     type="button"
                     size="sm"
                     onClick={addEvent}
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
+                    style={{
+                      backgroundColor: 'var(--color-primary, #5243E9)',
+                      color: '#FFFFFF'
+                    }}
                   >
                     <Plus className="w-3 h-3 mr-1" />
                     Add Event
@@ -685,23 +810,51 @@ export default function CTAManager() {
                 </div>
 
                 {formData.events.length === 0 ? (
-                  <div className="text-center py-6 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                    <MousePointer className="w-8 h-8 mx-auto text-gray-400 mb-2" />
-                    <p className="text-gray-600">No events configured</p>
-                    <p className="text-sm text-gray-500">Click "Add Event" to configure JavaScript events</p>
+                  <div 
+                    className="text-center py-6 rounded-lg border-2 border-dashed"
+                    style={{ 
+                      backgroundColor: 'var(--color-bg-secondary, #F9FAFB)',
+                      borderColor: 'var(--color-text-muted, #9CA3AF)'
+                    }}
+                  >
+                    <MousePointer 
+                      className="w-8 h-8 mx-auto mb-2"
+                      style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
+                    />
+                    <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
+                      No events configured
+                    </p>
+                    <p 
+                      className="text-sm"
+                      style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
+                    >
+                      Click "Add Event" to configure JavaScript events
+                    </p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {formData.events.map((event) => (
-                      <div key={event.id} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                      <div 
+                        key={event.id} 
+                        className="p-4 rounded-lg border"
+                        style={{
+                          backgroundColor: 'var(--color-bg-secondary, #F9FAFB)',
+                          borderColor: 'var(--color-gray-light, #E5E7EB)'
+                        }}
+                      >
                         <div className="flex items-center justify-between mb-3">
-                          <h6 className="text-sm font-medium text-gray-900">Event #{event.id}</h6>
+                          <h6 
+                            className="text-sm font-medium"
+                            style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                          >
+                            Event #{event.id}
+                          </h6>
                           <Button
                             type="button"
                             size="sm"
                             variant="ghost"
                             onClick={() => removeEvent(event.id)}
-                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                            style={{ color: 'var(--color-error, #EF4444)' }}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -709,13 +862,21 @@ export default function CTAManager() {
                         
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                            <label 
+                              className="block text-xs font-medium mb-1"
+                              style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                            >
                               Event Type
                             </label>
                             <select
                               value={event.eventType}
                               onChange={(e) => updateEvent(event.id, 'eventType', e.target.value)}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                              style={{
+                                borderColor: 'var(--color-gray-light, #E5E7EB)',
+                                backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                                color: 'var(--color-text-primary, #1F2937)'
+                              }}
                             >
                               {eventTypeOptions.map((option) => (
                                 <option key={option.value} value={option.value}>
@@ -726,7 +887,10 @@ export default function CTAManager() {
                           </div>
                           
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                            <label 
+                              className="block text-xs font-medium mb-1"
+                              style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                            >
                               Function Name
                             </label>
                             <input
@@ -734,12 +898,20 @@ export default function CTAManager() {
                               value={event.functionName}
                               onChange={(e) => updateEvent(event.id, 'functionName', e.target.value)}
                               placeholder="e.g., openYouTubePopup, trackAnalytics"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                              style={{
+                                borderColor: 'var(--color-gray-light, #E5E7EB)',
+                                backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                                color: 'var(--color-text-primary, #1F2937)'
+                              }}
                             />
                           </div>
                           
                           <div>
-                            <label className="block text-xs font-medium text-gray-700 mb-1">
+                            <label 
+                              className="block text-xs font-medium mb-1"
+                              style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                            >
                               Description
                             </label>
                             <input
@@ -747,7 +919,12 @@ export default function CTAManager() {
                               value={event.description}
                               onChange={(e) => updateEvent(event.id, 'description', e.target.value)}
                               placeholder="Brief description of what this does"
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="w-full px-3 py-2 border rounded-md text-sm"
+                              style={{
+                                borderColor: 'var(--color-gray-light, #E5E7EB)',
+                                backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                                color: 'var(--color-text-primary, #1F2937)'
+                              }}
                             />
                           </div>
                         </div>
@@ -757,25 +934,62 @@ export default function CTAManager() {
                 )}
               </div>
 
-              <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                <p className="text-sm text-blue-800">
+              <div 
+                className="mt-4 p-3 border rounded-lg"
+                style={{
+                  backgroundColor: 'var(--color-bg-secondary, #F9FAFB)',
+                  borderColor: 'var(--color-primary, #5243E9)'
+                }}
+              >
+                <p 
+                  className="text-sm"
+                  style={{ color: 'var(--color-primary, #5243E9)' }}
+                >
                   <strong>💡 How it works:</strong> 
                   <br />• Global functions are loaded once at the app root level
                   <br />• Event functions are called when the specified event occurs
-                  <br />• Use <code className="bg-blue-100 px-1 rounded">this</code> to reference the button element
-                  <br />• Use <code className="bg-blue-100 px-1 rounded">event</code> for event details
+                  <br />• Use <code 
+                    className="px-1 rounded"
+                    style={{ backgroundColor: 'var(--color-primary, #5243E9)', color: '#FFFFFF' }}
+                  >this</code> to reference the button element
+                  <br />• Use <code 
+                    className="px-1 rounded"
+                    style={{ backgroundColor: 'var(--color-primary, #5243E9)', color: '#FFFFFF' }}
+                  >event</code> for event details
                 </p>
               </div>
             </div>
 
             {/* Live Preview Section */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
-              <h4 className="text-lg font-semibold text-gray-900 mb-3">Live Preview</h4>
+            <div 
+              className="p-6 rounded-lg border"
+              style={{
+                background: 'linear-gradient(to right, var(--color-bg-secondary, #F9FAFB), var(--color-bg-primary, #FFFFFF))',
+                borderColor: 'var(--color-primary, #5243E9)'
+              }}
+            >
+              <h4 
+                className="text-lg font-semibold mb-3"
+                style={{ color: 'var(--color-text-primary, #1F2937)' }}
+              >
+                Live Preview
+              </h4>
               <div className="space-y-4">
                 <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
                   {/* Light background preview */}
-                  <div className="flex-1 p-4 bg-white rounded-lg border border-gray-200">
-                    <p className="text-xs text-gray-500 mb-2 text-center">On Light Background</p>
+                  <div 
+                    className="flex-1 p-4 rounded-lg border"
+                    style={{
+                      backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                      borderColor: 'var(--color-gray-light, #E5E7EB)'
+                    }}
+                  >
+                    <p 
+                      className="text-xs mb-2 text-center"
+                      style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+                    >
+                      On Light Background
+                    </p>
                     <div className="flex justify-center">
                       <Button
                         variant={formData.style as any}
@@ -790,8 +1004,19 @@ export default function CTAManager() {
                   </div>
                   
                   {/* Dark background preview */}
-                  <div className="flex-1 p-4 bg-gray-900 rounded-lg border border-gray-700">
-                    <p className="text-xs text-gray-400 mb-2 text-center">On Dark Background</p>
+                  <div 
+                    className="flex-1 p-4 rounded-lg border"
+                    style={{ 
+                      backgroundColor: 'var(--color-bg-dark, #1F2937)',
+                      borderColor: 'var(--color-text-muted, #9CA3AF)'
+                    }}
+                  >
+                    <p 
+                      className="text-xs mb-2 text-center"
+                      style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
+                    >
+                      On Dark Background
+                    </p>
                     <div className="flex justify-center">
                       <Button
                         variant={formData.style as any}
@@ -808,12 +1033,18 @@ export default function CTAManager() {
                 
                 {/* Preview details */}
                 <div className="text-center space-y-1">
-                  <p className="text-sm text-gray-700">
+                  <p 
+                    className="text-sm"
+                    style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                  >
                     <span className="font-medium">Text:</span> {formData.text || 'Button Text'} |{' '}
                     <span className="font-medium">Style:</span> {formData.style} |{' '}
                     <span className="font-medium">Target:</span> {formData.target === '_blank' ? 'New Tab' : 'Same Tab'}
                   </p>
-                  <p className="text-xs text-gray-600">
+                  <p 
+                    className="text-xs"
+                    style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+                  >
                     <span className="font-medium">URL:</span> {formData.url || 'No URL set'} |{' '}
                     <span className="font-medium">Icon:</span> {formData.icon || 'None'}
                   </p>
@@ -829,7 +1060,11 @@ export default function CTAManager() {
                 onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                 className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
               />
-              <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
+              <label 
+                htmlFor="isActive" 
+                className="text-sm font-medium"
+                style={{ color: 'var(--color-text-primary, #1F2937)' }}
+              >
                 Active (Available for use)
               </label>
             </div>
@@ -837,7 +1072,10 @@ export default function CTAManager() {
             <div className="flex space-x-4">
               <Button
                 type="submit"
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                style={{
+                  backgroundColor: 'var(--color-success, #10B981)',
+                  color: '#FFFFFF'
+                }}
               >
                 <Save className="w-4 h-4 mr-2" />
                 {editingId ? 'Update CTA' : 'Create CTA'}
@@ -856,19 +1094,34 @@ export default function CTAManager() {
 
       {/* Header CTAs Section */}
       <Card className="p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-          <ExternalLink className="w-5 h-5 mr-2 text-blue-600" />
+        <h3 
+          className="text-xl font-semibold mb-4 flex items-center"
+          style={{ color: 'var(--color-text-primary, #1F2937)' }}
+        >
+          <ExternalLink 
+            className="w-5 h-5 mr-2"
+            style={{ color: 'var(--color-primary, #5243E9)' }}
+          />
           CTAs Currently in Header
         </h3>
         
         {!Array.isArray(headerCtas) || headerCtas.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">No CTA buttons in header yet</p>
+          <p 
+            className="text-center py-8"
+            style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+          >
+            No CTA buttons in header yet
+          </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {headerCtas.map((headerCta) => (
               <div
                 key={headerCta.id}
-                className="border border-gray-200 rounded-lg p-4 bg-gradient-to-br from-blue-50 to-indigo-50"
+                className="border rounded-lg p-4"
+                style={{ 
+                  borderColor: 'var(--color-gray-light, #E5E7EB)',
+                  background: 'linear-gradient(to bottom right, var(--color-bg-secondary, #F9FAFB), var(--color-bg-primary, #FFFFFF))'
+                }}
               >
                 <div className="flex items-center justify-between mb-2">
                   <Badge className={getStyleColor(headerCta.cta.style)}>
@@ -882,27 +1135,50 @@ export default function CTAManager() {
                       className="p-1"
                     >
                       {headerCta.isVisible ? (
-                        <Eye className="w-4 h-4 text-green-600" />
+                        <Eye 
+                          className="w-4 h-4"
+                          style={{ color: 'var(--color-success, #10B981)' }}
+                        />
                       ) : (
-                        <EyeOff className="w-4 h-4 text-gray-400" />
+                        <EyeOff 
+                          className="w-4 h-4"
+                          style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
+                        />
                       )}
                     </Button>
                     <Button
                       size="sm"
                       variant="ghost"
                       onClick={() => removeFromHeader(headerCta.id)}
-                      className="p-1 text-red-600 hover:text-red-700"
+                      className="p-1"
+                      style={{ color: 'var(--color-error, #EF4444)' }}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 mb-1">
-                  {headerCta.cta.icon && renderIcon(headerCta.cta.icon, { className: 'w-4 h-4 text-blue-600' })}
-                  <h4 className="font-semibold text-gray-900">{headerCta.cta.text}</h4>
+                  {headerCta.cta.icon && renderIcon(headerCta.cta.icon, { 
+                    className: 'w-4 h-4',
+                    style: { color: 'var(--color-primary, #5243E9)' }
+                  } as any)}
+                  <h4 
+                    className="font-semibold"
+                    style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                  >
+                    {headerCta.cta.text}
+                  </h4>
                 </div>
-                <p className="text-sm text-gray-600 truncate">{headerCta.cta.url}</p>
-                <p className="text-xs text-gray-500 mt-1">
+                <p 
+                  className="text-sm truncate"
+                  style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+                >
+                  {headerCta.cta.url}
+                </p>
+                <p 
+                  className="text-xs mt-1"
+                  style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
+                >
                   Order: {headerCta.sortOrder} | {headerCta.isVisible ? 'Visible' : 'Hidden'}
                 </p>
               </div>
@@ -913,20 +1189,35 @@ export default function CTAManager() {
 
       {/* All CTAs Section */}
       <Card className="p-6">
-        <h3 className="text-xl font-semibold text-gray-900 mb-4">All CTA Buttons</h3>
+        <h3 
+          className="text-xl font-semibold mb-4"
+          style={{ color: 'var(--color-text-primary, #1F2937)' }}
+        >
+          All CTA Buttons
+        </h3>
         
         {!Array.isArray(ctas) || ctas.length === 0 ? (
-          <p className="text-gray-500 text-center py-8">No CTA buttons created yet</p>
+          <p 
+            className="text-center py-8"
+            style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+          >
+            No CTA buttons created yet
+          </p>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {ctas.map((cta) => (
               <div
                 key={cta.id}
-                className={`border-2 rounded-xl p-6 transition-all duration-200 ${
-                  cta.isActive
-                    ? 'border-gray-200 bg-white hover:shadow-lg'
-                    : 'border-gray-100 bg-gray-50 opacity-60'
-                }`}
+                className="border-2 rounded-xl p-6 transition-all duration-200"
+                style={{
+                  borderColor: cta.isActive
+                    ? 'var(--color-gray-light, #E5E7EB)'
+                    : 'var(--color-text-muted, #9CA3AF)',
+                  backgroundColor: cta.isActive
+                    ? 'var(--color-bg-primary, #FFFFFF)'
+                    : 'var(--color-bg-secondary, #F9FAFB)',
+                  opacity: cta.isActive ? 1 : 0.6
+                }}
               >
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center space-x-2">
@@ -935,7 +1226,13 @@ export default function CTAManager() {
                     </Badge>
                     {/* JavaScript Events Indicator */}
                     {cta.events && cta.events.length > 0 && (
-                      <Badge className="bg-purple-100 text-purple-800 text-xs">
+                      <Badge 
+                        className="text-xs"
+                        style={{
+                          backgroundColor: 'var(--color-secondary, #7C3AED)',
+                          color: '#FFFFFF'
+                        }}
+                      >
                         <MousePointer className="w-3 h-3 mr-1" />
                         JS Events
                       </Badge>
@@ -947,7 +1244,8 @@ export default function CTAManager() {
                         size="sm"
                         variant="ghost"
                         onClick={() => addToHeader(cta.id)}
-                        className="p-1 text-blue-600 hover:text-blue-700"
+                        className="p-1"
+                        style={{ color: 'var(--color-primary, #5243E9)' }}
                         title="Add to Header"
                       >
                         <Plus className="w-4 h-4" />
@@ -957,7 +1255,8 @@ export default function CTAManager() {
                       size="sm"
                       variant="ghost"
                       onClick={() => startEdit(cta)}
-                      className="p-1 text-gray-600 hover:text-gray-700"
+                      className="p-1"
+                      style={{ color: 'var(--color-text-secondary, #6B7280)' }}
                     >
                       <Edit className="w-4 h-4" />
                     </Button>
@@ -965,7 +1264,8 @@ export default function CTAManager() {
                       size="sm"
                       variant="ghost"
                       onClick={() => handleDelete(cta.id)}
-                      className="p-1 text-red-600 hover:text-red-700"
+                      className="p-1"
+                      style={{ color: 'var(--color-error, #EF4444)' }}
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>

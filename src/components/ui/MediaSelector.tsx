@@ -91,8 +91,8 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
             key={item.id}
             className="flex items-center gap-3 p-3 border rounded-lg"
             style={{
-              borderColor: designSystem?.textMuted || '#e5e7eb',
-              backgroundColor: designSystem?.backgroundSecondary || '#f9fafb'
+              borderColor: 'var(--color-gray-light, #E5E7EB)',
+              backgroundColor: 'var(--color-bg-secondary, #F9FAFB)'
             }}
           >
             {/* Preview */}
@@ -138,12 +138,12 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
                 type="button"
                 onClick={() => window.open(item.publicUrl, '_blank')}
                 className="p-1 rounded"
-                style={{ color: designSystem?.textMuted || '#9ca3af' }}
+                style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = designSystem?.textSecondary || '#6b7280';
+                  e.currentTarget.style.color = 'var(--color-text-secondary, #6B7280)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = designSystem?.textMuted || '#9ca3af';
+                  e.currentTarget.style.color = 'var(--color-text-muted, #9CA3AF)';
                 }}
                 title="Preview"
               >
@@ -153,12 +153,12 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
                 type="button"
                 onClick={() => handleRemove(allowMultiple ? item : undefined)}
                 className="p-1 rounded"
-                style={{ color: designSystem?.textMuted || '#9ca3af' }}
+                style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.color = '#ef4444';
+                  e.currentTarget.style.color = 'var(--color-error, #EF4444)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.color = designSystem?.textMuted || '#9ca3af';
+                  e.currentTarget.style.color = 'var(--color-text-muted, #9CA3AF)';
                 }}
                 title="Remove"
                 disabled={disabled}
@@ -177,10 +177,10 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
       {label && (
         <label 
           className="block text-sm font-medium mb-2"
-          style={{ color: designSystem?.textPrimary || '#000000' }}
+          style={{ color: 'var(--color-text-primary, #1F2937)' }}
         >
           {label}
-          {required && <span className="text-red-500 ml-1">*</span>}
+          {required && <span style={{ color: 'var(--color-error, #EF4444)' }} className="ml-1">*</span>}
         </label>
       )}
 
@@ -195,20 +195,20 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({
           disabled={disabled}
           className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           style={{
-            borderColor: designSystem?.textMuted || '#d1d5db',
-            color: designSystem?.textSecondary || '#6b7280',
-            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+            borderColor: 'var(--color-text-muted, #D1D5DB)',
+            color: 'var(--color-text-secondary, #6B7280)',
+            backgroundColor: 'var(--color-bg-primary, #FFFFFF)'
           }}
           onMouseEnter={(e) => {
             if (!disabled) {
-              e.currentTarget.style.borderColor = '#3b82f6';
-              e.currentTarget.style.color = '#3b82f6';
+              e.currentTarget.style.borderColor = 'var(--color-primary, #5243E9)';
+              e.currentTarget.style.color = 'var(--color-primary, #5243E9)';
             }
           }}
           onMouseLeave={(e) => {
             if (!disabled) {
-              e.currentTarget.style.borderColor = designSystem?.textMuted || '#d1d5db';
-              e.currentTarget.style.color = designSystem?.textSecondary || '#6b7280';
+              e.currentTarget.style.borderColor = 'var(--color-text-muted, #D1D5DB)';
+              e.currentTarget.style.color = 'var(--color-text-secondary, #6B7280)';
             }
           }}
         >

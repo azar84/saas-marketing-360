@@ -245,7 +245,7 @@ const ScriptSectionManager: React.FC = () => {
                     <div>
                       <h4 className="font-medium text-gray-900">{script.name}</h4>
                       {script.description && (
-                        <p className="text-sm text-gray-600">{script.description}</p>
+                        <p className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{script.description}</p>
                       )}
                     </div>
                   </div>

@@ -1082,12 +1082,12 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
 
       default:
         return wrapWithSectionDiv(
-          <div key={section.id} className="py-16 bg-gray-50">
+          <div key={section.id} className="py-16 bg-[var(--color-bg-secondary,#F9FAFB)]">
             <div className="container mx-auto px-4 text-center">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              <h2 className="text-2xl font-bold text-[var(--color-text-primary,#1F2937)] mb-4">
                 Unknown Section Type: {section.sectionType}
               </h2>
-              <p className="text-gray-600">
+              <p className="text-[var(--color-text-secondary,#6B7280)]">
                 This section type is not yet supported in the page builder.
               </p>
             </div>
@@ -1101,15 +1101,15 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
       <div className={`py-16 ${className}`}>
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-2xl mx-auto">
-            <h1 className="text-4xl font-bold text-gray-900 mb-6">
+            <h1 className="text-4xl font-bold text-[var(--color-text-primary,#1F2937)] mb-6">
               Page Not Found
             </h1>
-            <p className="text-xl text-gray-600 mb-8">
+            <p className="text-xl text-[var(--color-text-secondary,#6B7280)] mb-8">
               The page you're looking for doesn't exist or has no content sections.
             </p>
             <Link 
               href="/home" 
-              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-[var(--color-primary,#5243E9)] hover:bg-[var(--color-primary-dark,#4338CA)] transition-colors"
             >
               Go to Home Page
             </Link>

@@ -717,22 +717,19 @@ export default function ConfigurablePricingManager() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading pricing configuration...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 mx-auto mb-4" style={{ borderColor: 'var(--color-primary, #5243E9)' }}></div>
+          <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Loading pricing configuration...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}>
       {/* Toast Notification */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg transition-all duration-300 ${
-          toast.type === 'success' 
-            ? 'bg-green-500 text-white' 
-            : 'bg-red-500 text-white'
-        }`}>
+        <div className={`fixed top-4 right-4 z-50 px-6 py-4 rounded-lg shadow-lg transition-all duration-300 text-white`}
+             style={{ backgroundColor: toast.type === 'success' ? 'var(--color-success, #10B981)' : 'var(--color-error, #EF4444)' }}>
           <div className="flex items-center space-x-3">
             {toast.type === 'success' ? (
               <div className="flex-shrink-0">
@@ -753,8 +750,8 @@ export default function ConfigurablePricingManager() {
       )}
 
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="relative rounded-2xl bg-gradient-to-r from-purple-600 to-blue-600 p-8 text-white shadow-2xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-blue-600/20"></div>
+        <div className="relative rounded-2xl p-8 text-white shadow-2xl overflow-hidden" style={{ backgroundColor: 'var(--color-primary, #5243E9)' }}>
+          <div className="absolute inset-0" style={{ backgroundColor: 'rgba(82, 67, 233, 0.2)' }}></div>
           <div className="relative z-10">
             <div className="flex items-center space-x-4 mb-6">
               <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
@@ -762,34 +759,34 @@ export default function ConfigurablePricingManager() {
               </div>
               <div>
                 <h1 className="text-4xl font-bold">Pricing Manager</h1>
-                <p className="text-purple-100 text-lg">Configure plans, features, and pricing with ease</p>
+                <p className="text-lg" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Configure plans, features, and pricing with ease</p>
               </div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                 <div className="flex items-center space-x-3">
-                  <Users className="w-6 h-6 text-purple-200" />
+                  <Users className="w-6 h-6" style={{ color: 'var(--color-text-secondary, #6B7280)' }} />
                   <div>
-                    <p className="text-sm text-purple-100">Active Plans</p>
+                    <p className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Active Plans</p>
                     <p className="text-2xl font-bold">{plans.filter(p => p.isActive).length}</p>
                   </div>
                 </div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                 <div className="flex items-center space-x-3">
-                  <Database className="w-6 h-6 text-purple-200" />
+                  <Database className="w-6 h-6" style={{ color: 'var(--color-text-secondary, #6B7280)' }} />
                   <div>
-                    <p className="text-sm text-purple-100">Feature Types</p>
+                    <p className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Feature Types</p>
                     <p className="text-2xl font-bold">{planFeatureTypes.length}</p>
                   </div>
                 </div>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 border border-white/20">
                 <div className="flex items-center space-x-3">
-                  <ArrowUpDown className="w-6 h-6 text-purple-200" />
+                  <ArrowUpDown className="w-6 h-6" style={{ color: 'var(--color-text-secondary, #6B7280)' }} />
                   <div>
-                    <p className="text-sm text-purple-100">Billing Cycles</p>
+                    <p className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Billing Cycles</p>
                     <p className="text-2xl font-bold">{billingCycles.length}</p>
                   </div>
                 </div>
@@ -798,17 +795,17 @@ export default function ConfigurablePricingManager() {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-200 p-2">
+        <div className="rounded-2xl shadow-lg border p-2" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
           <nav className="flex space-x-2">
             {[
-              { id: 'plans', label: 'Plans', icon: Users, color: 'bg-blue-500' },
-              { id: 'billing-cycles', label: 'Billing Cycles', icon: Calendar, color: 'bg-cyan-500' },
-              { id: 'pricing-sections', label: 'Pricing Sections', icon: Layout, color: 'bg-pink-500' },
-              { id: 'feature-pool', label: 'Feature Pool', icon: Database, color: 'bg-emerald-500' },
-              { id: 'basic-features', label: 'Basic Features', icon: CheckCircle, color: 'bg-green-500' },
-              { id: 'plan-limits', label: 'Plan Limits', icon: ArrowUpDown, color: 'bg-purple-500' },
-              { id: 'preview', label: 'Preview', icon: Globe, color: 'bg-orange-500' },
-              { id: 'comparison', label: 'Comparison', icon: Eye, color: 'bg-indigo-500' },
+              { id: 'plans', label: 'Plans', icon: Users },
+              { id: 'billing-cycles', label: 'Billing Cycles', icon: Calendar },
+              { id: 'pricing-sections', label: 'Pricing Sections', icon: Layout },
+              { id: 'feature-pool', label: 'Feature Pool', icon: Database },
+              { id: 'basic-features', label: 'Basic Features', icon: CheckCircle },
+              { id: 'plan-limits', label: 'Plan Limits', icon: ArrowUpDown },
+              { id: 'preview', label: 'Preview', icon: Globe },
+              { id: 'comparison', label: 'Comparison', icon: Eye },
             ].map((tab) => {
               const IconComponent = tab.icon;
               const isActive = activeTab === tab.id;
@@ -816,11 +813,11 @@ export default function ConfigurablePricingManager() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl font-medium text-sm transition-all duration-300 ${
-                    isActive
-                      ? `${tab.color} text-white shadow-lg transform scale-105`
-                      : 'text-gray-500 hover:text-gray-900 hover:bg-gray-50'
-                  }`}
+                  className={`flex-1 flex items-center justify-center space-x-2 py-3 px-4 rounded-xl font-medium text-sm transition-all duration-300 cursor-pointer`}
+                  style={isActive ? 
+                    { backgroundColor: 'var(--color-primary, #5243E9)', color: 'var(--color-bg-primary, #FFFFFF)' } : 
+                    { backgroundColor: 'var(--color-bg-primary, #FFFFFF)', color: 'var(--color-text-secondary, #6B7280)' }
+                  }
                 >
                   <IconComponent className="w-5 h-5" />
                   <span className="hidden sm:inline">{tab.label}</span>
@@ -832,50 +829,70 @@ export default function ConfigurablePricingManager() {
 
         {activeTab === 'plans' && (
           <div className="space-y-6">
-            <Card className="p-8 border-2 border-purple-100 bg-gradient-to-br from-white to-purple-50 shadow-xl">
+            <Card className="p-8 border-2 shadow-xl" style={{ borderColor: 'var(--color-primary-light, #E0E7FF)', backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="p-2 bg-gradient-to-r from-purple-600 to-blue-600 rounded-lg">
+                <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-primary, #5243E9)' }}>
                   <Plus className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">Create New Plan</h3>
+                <h3 className="text-xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Create New Plan</h3>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <Input
-                  placeholder="Plan Name"
-                  value={newPlan.name}
-                  onChange={(e) => setNewPlan({ ...newPlan, name: e.target.value })}
-                />
-                <Input
-                  placeholder="Description"
-                  value={newPlan.description}
-                  onChange={(e) => setNewPlan({ ...newPlan, description: e.target.value })}
-                />
-                <Input
-                  placeholder="CTA Button Text (e.g., Get Started, Choose Plan)"
-                  value={newPlan.ctaText}
-                  onChange={(e) => setNewPlan({ ...newPlan, ctaText: e.target.value })}
-                />
-                <Input
-                  placeholder="Position (for ordering)"
-                  type="number"
-                  min="0"
-                  value={newPlan.position}
-                  onChange={(e) => setNewPlan({ ...newPlan, position: parseInt(e.target.value) || 0 })}
-                />
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                                              Plan Name <span style={{ color: 'var(--color-error, #EF4444)' }}>*</span>
+                  </label>
+                  <Input
+                    placeholder="Enter plan name"
+                    value={newPlan.name}
+                    onChange={(e) => setNewPlan({ ...newPlan, name: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                    Description
+                  </label>
+                  <Input
+                    placeholder="Enter plan description"
+                    value={newPlan.description}
+                    onChange={(e) => setNewPlan({ ...newPlan, description: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                    CTA Button Text
+                  </label>
+                  <Input
+                    placeholder="e.g., Get Started, Choose Plan"
+                    value={newPlan.ctaText}
+                    onChange={(e) => setNewPlan({ ...newPlan, ctaText: e.target.value })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                    Position
+                  </label>
+                  <Input
+                    placeholder="For ordering (0, 1, 2...)"
+                    type="number"
+                    min="0"
+                    value={newPlan.position}
+                    onChange={(e) => setNewPlan({ ...newPlan, position: parseInt(e.target.value) || 0 })}
+                  />
+                </div>
               </div>
 
 
 
               {basicFeatures.length > 0 && (
                 <div className="mt-6">
-                  <h4 className="text-lg font-semibold mb-4 text-gray-900 flex items-center">
-                    <CheckCircle className="w-5 h-5 mr-2 text-green-600" />
+                  <h4 className="text-lg font-semibold mb-4 flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                    <CheckCircle className="w-5 h-5 mr-2" style={{ color: 'var(--color-success, #10B981)' }} />
                     Basic Features
                   </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-4 bg-green-50 rounded-xl border border-green-200">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 p-4 rounded-xl border" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)', borderColor: 'var(--color-success-light, #D1FAE5)' }}>
                     {basicFeatures.map((feature) => (
-                      <label key={feature.id} className="flex items-center space-x-3 p-2 hover:bg-green-100 rounded-lg cursor-pointer transition-colors">
+                      <label key={feature.id} className="flex items-center space-x-3 p-2 rounded-lg cursor-pointer transition-colors">
                         <div className="relative">
                         <input
                           type="checkbox"
@@ -897,11 +914,11 @@ export default function ConfigurablePricingManager() {
                           }}
                             className="sr-only"
                           />
-                          <div className={`w-4 h-4 rounded border-2 cursor-pointer transition-all duration-200 flex items-center justify-center ${
-                            (newPlan.basicFeatures?.includes(feature.id) || false)
-                              ? 'bg-green-600 border-green-600' 
-                              : 'bg-white border-gray-300 hover:border-green-400'
-                          }`}>
+                          <div className={`w-4 h-4 rounded border-2 cursor-pointer transition-all duration-200 flex items-center justify-center`}
+                               style={{
+                                 backgroundColor: (newPlan.basicFeatures?.includes(feature.id) || false) ? 'var(--color-success, #10B981)' : 'var(--color-bg-primary, #FFFFFF)',
+                                 borderColor: (newPlan.basicFeatures?.includes(feature.id) || false) ? 'var(--color-success, #10B981)' : 'var(--color-gray-light, #E5E7EB)'
+                               }}>
                             {(newPlan.basicFeatures?.includes(feature.id) || false) && (
                               <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                                 <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -910,9 +927,9 @@ export default function ConfigurablePricingManager() {
                           </div>
                         </div>
                         <div>
-                          <span className="text-sm font-medium text-gray-900">{feature.name}</span>
+                          <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{feature.name}</span>
                           {feature.description && (
-                            <p className="text-xs text-gray-600">{feature.description}</p>
+                            <p className="text-xs" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{feature.description}</p>
                           )}
                         </div>
                       </label>
@@ -922,59 +939,74 @@ export default function ConfigurablePricingManager() {
               )}
               
               <div className="mt-6">
-                <h4 className="text-lg font-semibold mb-4 text-gray-900">Pricing for Billing Cycles</h4>
+                <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Pricing for Billing Cycles</h4>
                 {billingCycles.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {billingCycles.map((cycle) => (
-                      <div key={cycle.id} className="border-2 border-gray-200 rounded-xl p-4 bg-white/50">
-                        <h5 className="font-semibold mb-3 text-gray-900">{cycle.label}</h5>
+                      <div key={cycle.id} className="border-2 rounded-xl p-4" style={{ borderColor: 'var(--color-gray-light, #E5E7EB)', backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}>
+                        <h5 className="font-semibold mb-3" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{cycle.label}</h5>
                         <div className="space-y-3">
-                          <Input
-                            placeholder="Price (in cents)"
-                            type="number"
-                            value={newPlanPricing[cycle.id]?.priceCents || 0}
-                            onChange={(e) => setNewPlanPricing({
-                              ...newPlanPricing,
-                              [cycle.id]: {
-                                ...newPlanPricing[cycle.id],
-                                priceCents: parseInt(e.target.value) || 0
-                              }
-                            })}
-                          />
-                          <Input
-                            placeholder="Stripe Price ID"
-                            value={newPlanPricing[cycle.id]?.stripePriceId || ''}
-                            onChange={(e) => setNewPlanPricing({
-                              ...newPlanPricing,
-                              [cycle.id]: {
-                                ...newPlanPricing[cycle.id],
-                                stripePriceId: e.target.value
-                              }
-                            })}
-                          />
-                          <Input
-                            placeholder="CTA URL (e.g., https://checkout.stripe.com/...)"
-                            value={newPlanPricing[cycle.id]?.ctaUrl || ''}
-                            onChange={(e) => setNewPlanPricing({
-                              ...newPlanPricing,
-                              [cycle.id]: {
-                                ...newPlanPricing[cycle.id],
-                                ctaUrl: e.target.value
-                              }
-                            })}
-                          />
+                          <div className="space-y-2">
+                            <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                              Price (in cents)
+                            </label>
+                            <Input
+                              placeholder="Enter price in cents (e.g., 2900 for $29.00)"
+                              type="number"
+                              value={newPlanPricing[cycle.id]?.priceCents || 0}
+                              onChange={(e) => setNewPlanPricing({
+                                ...newPlanPricing,
+                                [cycle.id]: {
+                                  ...newPlanPricing[cycle.id],
+                                  priceCents: parseInt(e.target.value) || 0
+                                }
+                              })}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                              Stripe Price ID
+                            </label>
+                            <Input
+                              placeholder="Enter Stripe price ID"
+                              value={newPlanPricing[cycle.id]?.stripePriceId || ''}
+                              onChange={(e) => setNewPlanPricing({
+                                ...newPlanPricing,
+                                [cycle.id]: {
+                                  ...newPlanPricing[cycle.id],
+                                  stripePriceId: e.target.value
+                                }
+                              })}
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                              CTA URL
+                            </label>
+                            <Input
+                              placeholder="e.g., https://checkout.stripe.com/..."
+                              value={newPlanPricing[cycle.id]?.ctaUrl || ''}
+                              onChange={(e) => setNewPlanPricing({
+                                ...newPlanPricing,
+                                [cycle.id]: {
+                                  ...newPlanPricing[cycle.id],
+                                  ctaUrl: e.target.value
+                                }
+                              })}
+                            />
+                          </div>
                           
                           {/* Billing Cycle Events Section */}
-                          <div className="mt-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                            <h6 className="text-sm font-medium text-blue-900 mb-2">
+                          <div className="mt-3 p-3 rounded-lg border" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)', borderColor: 'var(--color-accent-light, #E0F2FE)' }}>
+                            <h6 className="text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                               {cycle.label} Events
                             </h6>
                             <div className="space-y-2">
                               {(newPlanPricing[cycle.id]?.events || []).map((event: any, index: number) => (
-                                <div key={index} className="flex items-center space-x-2 p-2 bg-white rounded border">
-                                  <span className="text-xs text-gray-600 font-medium">{event.eventType}</span>
-                                  <span className="text-xs text-gray-400">→</span>
-                                  <span className="text-xs text-gray-600">{event.functionName}</span>
+                                <div key={index} className="flex items-center space-x-2 p-2 rounded border" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
+                                  <span className="text-xs font-medium" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{event.eventType}</span>
+                                  <span className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>→</span>
+                                  <span className="text-xs" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{event.functionName}</span>
                                   <button
                                     type="button"
                                     onClick={() => {
@@ -987,31 +1019,43 @@ export default function ConfigurablePricingManager() {
                                         }
                                       });
                                     }}
-                                    className="text-red-500 hover:text-red-700 text-xs ml-auto"
+                                                                            className="text-xs ml-auto"
+                                        style={{ color: 'var(--color-error, #EF4444)' }}
                                   >
                                     Remove
                                   </button>
                                 </div>
                               ))}
                               <div className="flex space-x-2">
-                                <select
-                                  value={newEvent.eventType}
-                                  onChange={(e) => setNewEvent({...newEvent, eventType: e.target.value})}
-                                  className="text-xs border rounded px-2 py-1 flex-1"
-                                >
-                                  <option value="">Select Event</option>
-                                  {eventTypes.map((type) => (
-                                    <option key={type.value} value={type.value}>
-                                      {type.label}
-                                    </option>
-                                  ))}
-                                </select>
-                                <Input
-                                  placeholder="Function Name"
-                                  value={newEvent.functionName}
-                                  onChange={(e) => setNewEvent({...newEvent, functionName: e.target.value})}
-                                  className="text-xs flex-1"
-                                />
+                                <div className="flex-1 space-y-1">
+                                  <label className="block text-xs font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                                    Select Event
+                                  </label>
+                                                                        <select
+                                        value={newEvent.eventType}
+                                        onChange={(e) => setNewEvent({...newEvent, eventType: e.target.value})}
+                                        className="text-xs border rounded px-4 h-11 w-full"
+                                        style={{ borderColor: 'var(--color-gray-light, #E5E7EB)', color: 'var(--color-text-primary, #1F2937)' }}
+                                      >
+                                    <option value="">Choose event type</option>
+                                    {eventTypes.map((type) => (
+                                      <option key={type.value} value={type.value}>
+                                        {type.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                                <div className="flex-1 space-y-1">
+                                  <label className="block text-xs font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                                    Function Name
+                                  </label>
+                                  <Input
+                                    placeholder="Enter function name"
+                                    value={newEvent.functionName}
+                                    onChange={(e) => setNewEvent({...newEvent, functionName: e.target.value})}
+                                    className="text-xs flex-1"
+                                  />
+                                </div>
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -1027,7 +1071,8 @@ export default function ConfigurablePricingManager() {
                                       setNewEvent({ eventType: '', functionName: '' });
                                     }
                                   }}
-                                  className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                                  className="text-white px-2 py-1 rounded text-xs"
+                                  style={{ backgroundColor: 'var(--color-accent, #06B6D4)' }}
                                 >
                                   Add
                                 </button>
@@ -1042,11 +1087,11 @@ export default function ConfigurablePricingManager() {
                   <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 bg-gray-50 text-center">
                     <div className="flex items-center justify-center mb-4">
                       <div className="p-2 bg-gray-200 rounded-lg">
-                        <Calendar className="w-6 h-6 text-gray-600" />
+                        <Calendar className="w-6 h-6" style={{ color: 'var(--color-text-secondary, #6B7280)' }} />
                       </div>
                     </div>
-                    <h5 className="text-lg font-semibold text-gray-900 mb-2">No Billing Cycles Found</h5>
-                    <p className="text-gray-600 mb-4">
+                                          <h5 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>No Billing Cycles Found</h5>
+                      <p className="mb-4" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                       You need to create billing cycles first to set up pricing for your plans.
                     </p>
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-left">
@@ -1087,7 +1132,7 @@ export default function ConfigurablePricingManager() {
                         )}
                       </div>
                     </div>
-                    <span className="text-gray-900 font-medium">Active</span>
+                                            <span className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Active</span>
                   </label>
                   <label className="flex items-center space-x-3 cursor-pointer">
                     <div className="relative">
@@ -1112,13 +1157,14 @@ export default function ConfigurablePricingManager() {
                         )}
                       </div>
                     </div>
-                    <span className="text-gray-900 font-medium">Popular</span>
+                                            <span className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Popular</span>
                   </label>
                 </div>
                 <Button 
                   onClick={handleCreatePlan} 
                   disabled={!newPlan.name || loading}
-                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+                style={{ backgroundColor: 'var(--color-primary, #5243E9)' }}
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Create Plan
@@ -1128,123 +1174,171 @@ export default function ConfigurablePricingManager() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {plans.map((plan) => (
-                <Card key={plan.id} className="p-6 hover:shadow-xl transition-all duration-300 bg-white border border-gray-200">
+                <Card key={plan.id} className="p-6 hover:shadow-xl transition-all duration-300 border" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
                   {editingPlan === plan.id ? (
                     <div className="space-y-4">
-                      <Input
-                        placeholder="Plan Name"
-                        value={editPlanData?.name || ''}
-                        onChange={(e) => setEditPlanData({...editPlanData, name: e.target.value})}
-                      />
-                      <Input
-                        placeholder="Description"
-                        value={editPlanData?.description || ''}
-                        onChange={(e) => setEditPlanData({...editPlanData, description: e.target.value})}
-                      />
-                      <Input
-                        placeholder="CTA Button Text"
-                        value={editPlanData?.ctaText || ''}
-                        onChange={(e) => setEditPlanData({...editPlanData, ctaText: e.target.value})}
-                      />
-                      <Input
-                        placeholder="Position (for ordering)"
-                        type="number"
-                        min="0"
-                        value={editPlanData?.position || 0}
-                        onChange={(e) => setEditPlanData({...editPlanData, position: parseInt(e.target.value) || 0})}
-                      />
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                          Plan Name <span style={{ color: 'var(--color-error, #EF4444)' }}>*</span>
+                        </label>
+                        <Input
+                          placeholder="Enter plan name"
+                          value={editPlanData?.name || ''}
+                          onChange={(e) => setEditPlanData({...editPlanData, name: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                          Description
+                        </label>
+                        <Input
+                          placeholder="Enter plan description"
+                          value={editPlanData?.description || ''}
+                          onChange={(e) => setEditPlanData({...editPlanData, description: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                          CTA Button Text
+                        </label>
+                        <Input
+                          placeholder="e.g., Get Started, Choose Plan"
+                          value={editPlanData?.ctaText || ''}
+                          onChange={(e) => setEditPlanData({...editPlanData, ctaText: e.target.value})}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                          Position
+                        </label>
+                        <Input
+                          placeholder="For ordering (0, 1, 2...)"
+                          type="number"
+                          min="0"
+                          value={editPlanData?.position || 0}
+                          onChange={(e) => setEditPlanData({...editPlanData, position: parseInt(e.target.value) || 0})}
+                        />
+                      </div>
                       
 
                       
                       <div className="space-y-2">
-                        <h5 className="font-medium text-sm text-gray-900">Pricing:</h5>
+                        <h5 className="font-medium text-sm" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Pricing:</h5>
                         {billingCycles.length > 0 ? (
                           billingCycles.map((cycle) => (
-                            <div key={cycle.id} className="border rounded p-3 bg-gray-50">
-                              <label className="text-xs text-gray-600 font-medium">{cycle.label}</label>
-                              <div className="flex space-x-2 mt-1">
-                                <Input
-                                  placeholder="Price (cents)"
-                                  type="number"
-                                  value={editPlanPricing[cycle.id]?.priceCents || 0}
-                                  onChange={(e) => setEditPlanPricing({
-                                    ...editPlanPricing,
-                                    [cycle.id]: {
-                                      ...editPlanPricing[cycle.id],
-                                      priceCents: parseInt(e.target.value) || 0
-                                    }
-                                  })}
-                                  className="text-sm"
-                                />
-                                <Input
-                                  placeholder="Stripe ID"
-                                  value={editPlanPricing[cycle.id]?.stripePriceId || ''}
-                                  onChange={(e) => setEditPlanPricing({
-                                    ...editPlanPricing,
-                                    [cycle.id]: {
-                                      ...editPlanPricing[cycle.id],
-                                      stripePriceId: e.target.value
-                                    }
-                                  })}
-                                  className="text-sm"
-                                />
+                            <div key={cycle.id} className="border rounded p-3" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
+                              <label className="text-xs font-medium" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{cycle.label}</label>
+                              <div className="space-y-2 mt-1">
+                                <div className="space-y-1">
+                                  <label className="block text-xs font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                                    Price (in cents)
+                                  </label>
+                                  <Input
+                                    placeholder="Enter price in cents (e.g., 2900 for $29.00)"
+                                    type="number"
+                                    value={editPlanPricing[cycle.id]?.priceCents || 0}
+                                    onChange={(e) => setEditPlanPricing({
+                                      ...editPlanPricing,
+                                      [cycle.id]: {
+                                        ...editPlanPricing[cycle.id],
+                                        priceCents: parseInt(e.target.value) || 0
+                                      }
+                                    })}
+                                    className="text-sm"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="block text-xs font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                                    Stripe Price ID
+                                  </label>
+                                  <Input
+                                    placeholder="Enter Stripe price ID"
+                                    value={editPlanPricing[cycle.id]?.stripePriceId || ''}
+                                    onChange={(e) => setEditPlanPricing({
+                                      ...editPlanPricing,
+                                      [cycle.id]: {
+                                        ...editPlanPricing[cycle.id],
+                                        stripePriceId: e.target.value
+                                      }
+                                    })}
+                                    className="text-sm"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <label className="block text-xs font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                                    CTA URL
+                                  </label>
+                                  <Input
+                                    placeholder="e.g., https://checkout.stripe.com/..."
+                                    value={editPlanPricing[cycle.id]?.ctaUrl || ''}
+                                    onChange={(e) => setEditPlanPricing({
+                                      ...editPlanPricing,
+                                      [cycle.id]: {
+                                        ...editPlanPricing[cycle.id],
+                                        ctaUrl: e.target.value
+                                      }
+                                    })}
+                                    className="text-sm"
+                                  />
+                                </div>
                               </div>
-                              <Input
-                                placeholder="CTA URL"
-                                value={editPlanPricing[cycle.id]?.ctaUrl || ''}
-                                onChange={(e) => setEditPlanPricing({
-                                  ...editPlanPricing,
-                                  [cycle.id]: {
-                                    ...editPlanPricing[cycle.id],
-                                    ctaUrl: e.target.value
-                                  }
-                                })}
-                                className="text-sm mt-2"
-                              />
                               
                               {/* Billing Cycle Events Section */}
-                              <div className="mt-3 p-2 bg-blue-50 rounded border border-blue-200">
-                                <h6 className="text-xs font-medium text-blue-900 mb-2">
+                              <div className="mt-3 p-2 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)', borderColor: 'var(--color-accent-light, #E0F2FE)' }}>
+                                <h6 className="text-xs font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                                   {cycle.label} Events
                                 </h6>
                                 <div className="space-y-2">
                                   {(editPlanPricingEvents[cycle.id] || []).map((event, index) => (
-                                    <div key={index} className="flex items-center space-x-2 p-1 bg-white rounded border">
-                                      <span className="text-xs text-gray-600 font-medium">{event.eventType}</span>
-                                      <span className="text-xs text-gray-400">→</span>
-                                      <span className="text-xs text-gray-600">{event.functionName}</span>
+                                    <div key={index} className="flex items-center space-x-2 p-1 rounded border" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
+                                      <span className="text-xs font-medium" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{event.eventType}</span>
+                                      <span className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>→</span>
+                                      <span className="text-xs" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{event.functionName}</span>
                                       <button
                                         type="button"
                                         onClick={() => removeEditPricingEvent(cycle.id, index)}
-                                        className="text-red-500 hover:text-red-700 text-xs ml-auto"
+                                        className="text-xs ml-auto"
+                                        style={{ color: 'var(--color-error, #EF4444)' }}
                                       >
                                         Remove
                                       </button>
                                     </div>
                                   ))}
                                   <div className="flex space-x-2">
-                                    <select
-                                      value={newEvent.eventType}
-                                      onChange={(e) => setNewEvent({...newEvent, eventType: e.target.value})}
-                                      className="text-xs border rounded px-1 py-1 flex-1"
-                                    >
-                                      <option value="">Select Event</option>
-                                      {eventTypes.map((type) => (
-                                        <option key={type.value} value={type.value}>
-                                          {type.label}
-                                        </option>
-                                      ))}
-                                    </select>
-                                    <Input
-                                      placeholder="Function Name"
-                                      value={newEvent.functionName}
-                                      onChange={(e) => setNewEvent({...newEvent, functionName: e.target.value})}
-                                      className="text-xs flex-1"
-                                    />
+                                    <div className="flex-1 space-y-1">
+                                      <label className="block text-xs font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                                        Select Event
+                                      </label>
+                                      <select
+                                        value={newEvent.eventType}
+                                        onChange={(e) => setNewEvent({...newEvent, eventType: e.target.value})}
+                                        className="text-xs border rounded px-4 h-11 w-full"
+                                        style={{ borderColor: 'var(--color-gray-light, #E5E7EB)', color: 'var(--color-text-primary, #1F2937)' }}
+                                      >
+                                        <option value="">Choose event type</option>
+                                        {eventTypes.map((type) => (
+                                          <option key={type.value} value={type.value}>
+                                            {type.label}
+                                          </option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                    <div className="flex-1 space-y-1">
+                                      <label className="block text-xs font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                                        Function Name
+                                      </label>
+                                      <Input
+                                        placeholder="Enter function name"
+                                        value={newEvent.functionName}
+                                        onChange={(e) => setNewEvent({...newEvent, functionName: e.target.value})}
+                                        className="text-xs flex-1"
+                                      />
+                                    </div>
                                     <button
                                       type="button"
                                       onClick={() => addEditPricingEvent(cycle.id)}
-                                      className="bg-blue-500 text-white px-2 py-1 rounded text-xs hover:bg-blue-600"
+                                      className="text-white px-2 py-1 rounded text-xs"
+                                      style={{ backgroundColor: 'var(--color-accent, #06B6D4)' }}
                                     >
                                       Add
                                     </button>
@@ -1255,8 +1349,8 @@ export default function ConfigurablePricingManager() {
                           ))
                         ) : (
                           <div className="border border-dashed border-gray-300 rounded-lg p-4 bg-gray-50 text-center">
-                            <p className="text-sm text-gray-600 mb-2">No billing cycles available</p>
-                            <p className="text-xs text-gray-500">Create billing cycles to set up pricing</p>
+                                                    <p className="mb-2" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>No billing cycles available</p>
+                        <p className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Create billing cycles to set up pricing</p>
                           </div>
                         )}
                       </div>
@@ -1318,14 +1412,16 @@ export default function ConfigurablePricingManager() {
                         <Button 
                           onClick={handleUpdatePlan} 
                           disabled={loading}
-                          className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm"
+                          className="px-4 py-2 rounded-lg text-sm"
+                          style={{ backgroundColor: 'var(--color-success, #10B981)', color: 'var(--color-bg-primary, #FFFFFF)' }}
                         >
                           <Save className="w-4 h-4 mr-1" />
                           Save
                         </Button>
                         <Button 
                           onClick={handleCancelEdit}
-                          className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm"
+                          className="px-4 py-2 rounded-lg text-sm"
+                          style={{ backgroundColor: 'var(--color-text-muted, #9CA3AF)', color: 'var(--color-bg-primary, #FFFFFF)' }}
                         >
                           <X className="w-4 h-4 mr-1" />
                           Cancel
@@ -1336,33 +1432,36 @@ export default function ConfigurablePricingManager() {
                     <>
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-3">
-                        <h4 className="text-xl font-bold text-gray-900">{plan.name}</h4>
-                          <Badge className="bg-blue-50 text-blue-700 text-xs">
+                        <h4 className="text-xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{plan.name}</h4>
+                          <Badge className="text-xs" style={{ backgroundColor: 'var(--color-info-light, #DBEAFE)', color: 'var(--color-info-dark, #1E40AF)' }}>
                             Position: {plan.position}
                           </Badge>
                         </div>
                         <div className="flex space-x-2">
                           {plan.isPopular && (
-                            <Badge className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-2 py-1 text-xs rounded-full">
+                            <Badge className="text-white px-2 py-1 text-xs rounded-full" style={{ backgroundColor: 'var(--color-primary, #5243E9)' }}>
                               Popular
                             </Badge>
                           )}
-                          <Badge className={plan.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+                          <Badge className="text-xs" style={plan.isActive ? 
+                            { backgroundColor: 'var(--color-success-light, #D1FAE5)', color: 'var(--color-success-dark, #065F46)' } : 
+                            { backgroundColor: 'var(--color-gray-light, #E5E7EB)', color: 'var(--color-text-secondary, #6B7280)' }
+                          }>
                             {plan.isActive ? 'Active' : 'Inactive'}
                           </Badge>
                         </div>
                       </div>
                       
-                      <p className="text-gray-600 mb-4">{plan.description}</p>
+                      <p className="mb-4" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{plan.description}</p>
                       
                       <div className="space-y-2 mb-6">
-                        <h5 className="font-semibold text-sm text-gray-900">Pricing:</h5>
+                        <h5 className="font-semibold text-sm" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Pricing:</h5>
                         {billingCycles.map((cycle) => {
                           const pricing = getPlanPricing(plan.id, cycle.id);
                           return (
-                            <div key={cycle.id} className="flex justify-between text-sm bg-gray-50 p-2 rounded">
-                              <span className="text-gray-600">{cycle.label}:</span>
-                              <span className="font-semibold text-gray-900">
+                            <div key={cycle.id} className="flex justify-between text-sm p-2 rounded" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}>
+                                                          <span style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{cycle.label}:</span>
+                            <span className="font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                                 {pricing ? formatPrice(pricing.priceCents) : 'Not set'}
                               </span>
                             </div>
@@ -1373,14 +1472,16 @@ export default function ConfigurablePricingManager() {
                       <div className="flex space-x-2">
                         <Button 
                           onClick={() => handleEditPlan(plan)}
-                          className="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm flex-1"
+                          className="px-4 py-2 rounded-lg text-sm flex-1"
+                          style={{ backgroundColor: 'var(--color-primary, #5243E9)', color: 'var(--color-bg-primary, #FFFFFF)' }}
                         >
                           <Edit className="w-4 h-4 mr-1" />
                           Edit
                         </Button>
                         <Button 
                           onClick={() => handleDeletePlan(plan.id)}
-                          className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm"
+                          className="px-4 py-2 rounded-lg text-sm"
+                          style={{ backgroundColor: 'var(--color-error, #EF4444)', color: 'var(--color-bg-primary, #FFFFFF)' }}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -1395,17 +1496,17 @@ export default function ConfigurablePricingManager() {
 
         {activeTab === 'billing-cycles' && (
           <div className="space-y-6">
-            <Card className="p-8 border-2 border-cyan-100 bg-gradient-to-br from-white to-cyan-50 shadow-xl">
+            <Card className="p-8 border-2 shadow-xl" style={{ borderColor: 'var(--color-accent, #06B6D4)', backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="p-2 bg-gradient-to-r from-cyan-600 to-blue-600 rounded-lg">
+                <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-accent, #06B6D4)' }}>
                   <Plus className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">Create New Billing Cycle</h3>
+                <h3 className="text-xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Create New Billing Cycle</h3>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Label (e.g., Monthly, Yearly)
                   </label>
                   <Input
@@ -1415,7 +1516,7 @@ export default function ConfigurablePricingManager() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Multiplier (e.g., 1 for monthly, 12 for yearly)
                   </label>
                   <Input
@@ -1436,11 +1537,11 @@ export default function ConfigurablePricingManager() {
                         onChange={(e) => setNewBillingCycle({ ...newBillingCycle, isDefault: e.target.checked })}
                         className="sr-only"
                       />
-                      <div className={`w-5 h-5 rounded border-2 cursor-pointer transition-all duration-200 flex items-center justify-center ${
-                        newBillingCycle.isDefault 
-                          ? 'bg-cyan-600 border-cyan-600' 
-                          : 'bg-white border-gray-300 hover:border-cyan-400'
-                      }`}>
+                      <div className={`w-5 h-5 rounded border-2 cursor-pointer transition-all duration-200 flex items-center justify-center`}
+                           style={{
+                             backgroundColor: newBillingCycle.isDefault ? 'var(--color-accent, #06B6D4)' : 'var(--color-bg-primary, #FFFFFF)',
+                             borderColor: newBillingCycle.isDefault ? 'var(--color-accent, #06B6D4)' : 'var(--color-gray-light, #E5E7EB)'
+                           }}>
                         {newBillingCycle.isDefault && (
                           <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -1448,7 +1549,7 @@ export default function ConfigurablePricingManager() {
                         )}
                       </div>
                     </div>
-                    <span className="text-gray-900 font-medium">Set as Default</span>
+                    <span className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Set as Default</span>
                   </label>
                 </div>
               </div>
@@ -1457,7 +1558,8 @@ export default function ConfigurablePricingManager() {
                 <Button 
                   onClick={handleCreateBillingCycle} 
                   disabled={!newBillingCycle.label || newBillingCycle.multiplier <= 0}
-                  className="bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+                style={{ backgroundColor: 'var(--color-accent, #06B6D4)' }}
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Create Billing Cycle
@@ -1467,7 +1569,7 @@ export default function ConfigurablePricingManager() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {billingCycles.filter(cycle => cycle && cycle.id).map((cycle) => (
-                <Card key={cycle.id} className="p-6 hover:shadow-xl transition-all duration-300 bg-white border border-gray-200">
+                <Card key={cycle.id} className="p-6 hover:shadow-xl transition-all duration-300 border" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
                   {editingBillingCycle === cycle.id ? (
                     <div className="space-y-4">
                       <Input
@@ -1503,7 +1605,7 @@ export default function ConfigurablePricingManager() {
                             )}
                           </div>
                         </div>
-                        <span className="text-gray-900 font-medium">Default</span>
+                        <span className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Default</span>
                       </label>
                       
                       <div className="flex space-x-2">
@@ -1516,7 +1618,8 @@ export default function ConfigurablePricingManager() {
                         </Button>
                         <Button
                           onClick={handleCancelEditBillingCycle}
-                          className="flex-1 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg"
+                          className="flex-1 px-4 py-2 rounded-lg"
+                          style={{ backgroundColor: 'var(--color-text-muted, #9CA3AF)', color: 'var(--color-bg-primary, #FFFFFF)' }}
                         >
                           <X className="w-4 h-4 mr-2" />
                           Cancel
@@ -1528,7 +1631,7 @@ export default function ConfigurablePricingManager() {
                       <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center space-x-2">
                           <Calendar className="w-5 h-5 text-cyan-600" />
-                          <h4 className="text-lg font-semibold text-gray-900">{cycle.label || 'Unnamed Cycle'}</h4>
+                          <h4 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{cycle.label || 'Unnamed Cycle'}</h4>
                           {cycle.isDefault && (
                             <Badge className="bg-cyan-100 text-cyan-800">
                               Default
@@ -1538,7 +1641,11 @@ export default function ConfigurablePricingManager() {
                         <div className="flex space-x-2">
                           <Button
                             onClick={() => handleEditBillingCycle(cycle)}
-                            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded"
+                            className="p-2 rounded"
+                        style={{ 
+                          color: 'var(--color-text-secondary, #6B7280)',
+                          backgroundColor: 'transparent'
+                        }}
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
@@ -1553,11 +1660,11 @@ export default function ConfigurablePricingManager() {
                       
                       <div className="space-y-2">
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Multiplier:</span>
+                          <span style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Multiplier:</span>
                           <span className="font-medium">{cycle.multiplier || 1}x</span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-gray-600">Created:</span>
+                          <span style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Created:</span>
                           <span className="font-medium">{cycle.createdAt ? new Date(cycle.createdAt).toLocaleDateString() : 'N/A'}</span>
                         </div>
                       </div>
@@ -1578,17 +1685,17 @@ export default function ConfigurablePricingManager() {
 
         {activeTab === 'feature-pool' && (
           <div className="space-y-6">
-            <Card className="p-8 border-2 border-emerald-100 bg-gradient-to-br from-white to-emerald-50 shadow-xl">
+            <Card className="p-8 border-2 shadow-xl" style={{ borderColor: 'var(--color-success, #10B981)', backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="p-2 bg-gradient-to-r from-emerald-600 to-teal-600 rounded-lg">
+                <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-success, #10B981)' }}>
                   <Plus className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">Create New Feature Type</h3>
+                <h3 className="text-xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Create New Feature Type</h3>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Feature Name
                   </label>
                   <Input
@@ -1598,7 +1705,7 @@ export default function ConfigurablePricingManager() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Unit (e.g., 'per month')
                   </label>
                   <Input
@@ -1610,7 +1717,7 @@ export default function ConfigurablePricingManager() {
               </div>
               
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Feature Icon
                 </label>
                 <div className="flex items-start space-x-4">
@@ -1632,7 +1739,7 @@ export default function ConfigurablePricingManager() {
               </div>
               
               <div className="mt-4">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Custom PNG Icon (Optional)
                 </label>
                 <div className="flex items-center space-x-4">
@@ -1645,11 +1752,11 @@ export default function ConfigurablePricingManager() {
                   {iconPreview && (
                     <div className="flex items-center space-x-2">
                       <img src={iconPreview} alt="Icon preview" className="w-8 h-8 object-contain border border-gray-200 rounded" />
-                      <span className="text-sm text-gray-600">Preview</span>
+                      <span className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Preview</span>
                     </div>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                   Upload a PNG, JPG, or SVG icon. If provided, this will override the selected Lucide icon.
                 </p>
               </div>
@@ -1658,7 +1765,8 @@ export default function ConfigurablePricingManager() {
                 <Button 
                   onClick={handleCreateFeatureType} 
                   disabled={!newFeatureType.name}
-                  className="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+                style={{ backgroundColor: 'var(--color-success, #10B981)' }}
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Create Feature Type
@@ -1671,12 +1779,12 @@ export default function ConfigurablePricingManager() {
                 .filter(ft => ft.isActive)
                 .sort((a, b) => a.sortOrder - b.sortOrder)
                 .map((featureType) => (
-                  <Card key={featureType.id} className="p-6 hover:shadow-xl transition-all duration-300 bg-white border border-gray-200">
+                  <Card key={featureType.id} className="p-6 hover:shadow-xl transition-all duration-300 border" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
                     {editingFeatureType === featureType.id ? (
                       <div className="space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                               Feature Name
                             </label>
                             <Input
@@ -1686,7 +1794,7 @@ export default function ConfigurablePricingManager() {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                               Unit
                             </label>
                             <Input
@@ -1698,7 +1806,7 @@ export default function ConfigurablePricingManager() {
                         </div>
                         
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                             Feature Icon
                           </label>
                           <div className="flex items-start space-x-4">
@@ -1748,7 +1856,7 @@ export default function ConfigurablePricingManager() {
                         </div>
                         
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                             Custom Icon (Optional)
                           </label>
                           <div className="flex items-center space-x-4">
@@ -1768,14 +1876,16 @@ export default function ConfigurablePricingManager() {
                           <Button 
                             onClick={handleUpdateFeatureType} 
                             disabled={!editFeatureTypeData?.name}
-                            className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm flex-1"
+                            className="px-4 py-2 rounded-lg text-sm flex-1"
+                          style={{ backgroundColor: 'var(--color-success, #10B981)', color: 'var(--color-bg-primary, #FFFFFF)' }}
                           >
                             <Save className="w-4 h-4 mr-1" />
                             Save
                           </Button>
                           <Button 
                             onClick={handleCancelEditFeatureType}
-                            className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm"
+                            className="px-4 py-2 rounded-lg text-sm"
+                          style={{ backgroundColor: 'var(--color-text-muted, #9CA3AF)', color: 'var(--color-bg-primary, #FFFFFF)' }}
                           >
                             <X className="w-4 h-4 mr-1" />
                             Cancel
@@ -1788,16 +1898,19 @@ export default function ConfigurablePricingManager() {
                           <div className="flex items-center space-x-3">
                             {getIcon(featureType.icon, featureType.iconUrl)}
                             <div>
-                              <h4 className="text-lg font-semibold text-gray-900">{featureType.name}</h4>
-                              <p className="text-sm text-gray-600">{featureType.unit}</p>
+                              <h4 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{featureType.name}</h4>
+                              <p className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{featureType.unit}</p>
                             </div>
                           </div>
-                          <Badge className={featureType.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+                                                      <Badge className="text-xs" style={featureType.isActive ? 
+                              { backgroundColor: 'var(--color-success-light, #D1FAE5)', color: 'var(--color-success-dark, #065F46)' } : 
+                              { backgroundColor: 'var(--color-gray-light, #E5E7EB)', color: 'var(--color-text-secondary, #6B7280)' }
+                            }>
                             {featureType.isActive ? 'Active' : 'Inactive'}
                           </Badge>
                         </div>
                         
-                        <p className="text-gray-600 mb-4">{featureType.description}</p>
+                        <p className="mb-4" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{featureType.description}</p>
                         
                         <div className="flex space-x-2">
                           <Button 
@@ -1809,7 +1922,8 @@ export default function ConfigurablePricingManager() {
                           </Button>
                           <Button 
                             onClick={() => handleDeleteFeatureType(featureType.id)}
-                            className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm"
+                            className="px-4 py-2 rounded-lg text-sm"
+                          style={{ backgroundColor: 'var(--color-error, #EF4444)', color: 'var(--color-bg-primary, #FFFFFF)' }}
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -1824,12 +1938,12 @@ export default function ConfigurablePricingManager() {
 
         {activeTab === 'basic-features' && (
           <div className="space-y-6">
-            <Card className="p-8 border-2 border-green-100 bg-gradient-to-br from-white to-green-50 shadow-xl">
+            <Card className="p-8 border-2 shadow-xl" style={{ borderColor: 'var(--color-success, #10B981)', backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="p-2 bg-gradient-to-r from-green-600 to-emerald-600 rounded-lg">
+                <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-success, #10B981)' }}>
                   <Plus className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">Create New Basic Feature</h3>
+                <h3 className="text-xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Create New Basic Feature</h3>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1849,7 +1963,8 @@ export default function ConfigurablePricingManager() {
                 <Button 
                   onClick={handleCreateBasicFeature} 
                   disabled={!newBasicFeature.name}
-                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+                  className="text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 shadow-lg hover:shadow-xl"
+                style={{ backgroundColor: 'var(--color-success, #10B981)' }}
                 >
                   <Plus className="w-4 h-4 mr-2" />
                   Create Basic Feature
@@ -1862,23 +1977,26 @@ export default function ConfigurablePricingManager() {
                 .filter(bf => bf.isActive)
                 .sort((a, b) => a.sortOrder - b.sortOrder)
                 .map((feature) => (
-                  <Card key={feature.id} className="p-6 hover:shadow-xl transition-all duration-300 bg-white border border-gray-200">
+                  <Card key={feature.id} className="p-6 hover:shadow-xl transition-all duration-300 border" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
                     <div className="flex items-center justify-between mb-4">
                       <div className="flex items-center space-x-3">
                         <CheckCircle className="w-5 h-5 text-green-600" />
                         <div>
-                          <h4 className="text-lg font-semibold text-gray-900">{feature.name}</h4>
+                                                      <h4 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{feature.name}</h4>
                         </div>
                       </div>
-                      <Badge className={feature.isActive ? "bg-green-100 text-green-800" : "bg-gray-100 text-gray-800"}>
+                                                  <Badge className="text-xs" style={feature.isActive ? 
+                              { backgroundColor: 'var(--color-success-light, #D1FAE5)', color: 'var(--color-success-dark, #065F46)' } : 
+                              { backgroundColor: 'var(--color-gray-light, #E5E7EB)', color: 'var(--color-text-secondary, #6B7280)' }
+                            }>
                         {feature.isActive ? 'Active' : 'Inactive'}
                       </Badge>
                     </div>
                     
-                    <p className="text-gray-600 mb-4">{feature.description}</p>
+                    <p className="mb-4" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{feature.description}</p>
                     
                     <div className="mb-4">
-                      <h5 className="text-sm font-semibold text-gray-900 mb-2">Assigned to Plans:</h5>
+                                              <h5 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Assigned to Plans:</h5>
                       <div className="flex flex-wrap gap-2">
                         {plans.filter(plan => isPlanBasicFeatureEnabled(plan.id, feature.id)).map(plan => (
                           <Badge key={plan.id} className="bg-blue-100 text-blue-800 text-xs">
@@ -1886,13 +2004,13 @@ export default function ConfigurablePricingManager() {
                           </Badge>
                         ))}
                         {plans.filter(plan => isPlanBasicFeatureEnabled(plan.id, feature.id)).length === 0 && (
-                          <span className="text-sm text-gray-500">Not assigned to any plans</span>
+                          <span className="text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Not assigned to any plans</span>
                         )}
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <h5 className="text-sm font-semibold text-gray-900">Quick Assign:</h5>
+                                              <h5 className="text-sm font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Quick Assign:</h5>
                       <div className="flex flex-wrap gap-2">
                         {plans.filter(p => p.isActive).sort((a, b) => a.position - b.position).map(plan => (
                           <label key={plan.id} className="flex items-center space-x-2 text-sm cursor-pointer">
@@ -1918,7 +2036,7 @@ export default function ConfigurablePricingManager() {
                                 )}
                               </div>
                             </div>
-                            <span className="text-gray-700">{plan.name}</span>
+                            <span style={{ color: 'var(--color-text-primary, #1F2937)' }}>{plan.name}</span>
                           </label>
                         ))}
                       </div>
@@ -1931,7 +2049,8 @@ export default function ConfigurablePricingManager() {
                       </Button>
                       <Button 
                         onClick={() => handleDeleteBasicFeature(feature.id)}
-                        className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm"
+                                                  className="px-4 py-2 rounded-lg text-sm"
+                          style={{ backgroundColor: 'var(--color-error, #EF4444)', color: 'var(--color-bg-primary, #FFFFFF)' }}
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -1944,46 +2063,39 @@ export default function ConfigurablePricingManager() {
 
         {activeTab === 'plan-limits' && (
           <div className="space-y-6">
-            <Card className="p-8 shadow-xl bg-white border border-gray-200">
+            <Card className="p-8 shadow-xl border" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="p-2 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg">
+                <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-primary, #5243E9)' }}>
                   <ArrowUpDown className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">Plan Feature Limits</h3>
+                <h3 className="text-xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Plan Feature Limits</h3>
               </div>
               
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
+                  <thead style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}>
                     <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                         Feature
                       </th>
                       {plans.filter(p => p.isActive).map((plan) => (
-                        <th key={plan.id} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th key={plan.id} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                           {plan.name}
                         </th>
                       ))}
                     </tr>
                   </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                  <tbody className="divide-y divide-gray-200" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}>
                     {planFeatureTypes
                       .filter(ft => ft.isActive)
-                      .filter(featureType => {
-                        // Only show feature types that have at least one limit configured
-                        return plans.filter(p => p.isActive).some(plan => {
-                          const limit = getPlanLimit(plan.id, featureType.id);
-                          return limit && (limit.value > 0 || limit.isUnlimited);
-                        });
-                      })
                       .map((featureType) => (
-                      <tr key={featureType.id} className="hover:bg-gray-50 transition-colors">
+                      <tr key={featureType.id} className="transition-colors">
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="flex items-center space-x-3">
                             {getIcon(featureType.icon, featureType.iconUrl)}
                             <div>
-                              <div className="text-sm font-medium text-gray-900">{featureType.name}</div>
-                              <div className="text-sm text-gray-600">{featureType.unit}</div>
+                                                        <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{featureType.name}</div>
+                          <div className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{featureType.unit}</div>
                             </div>
                           </div>
                         </td>
@@ -1992,7 +2104,7 @@ export default function ConfigurablePricingManager() {
                           return (
                             <td key={plan.id} className="px-6 py-4 whitespace-nowrap">
                               <LimitEditor
-                                limit={limit}
+                                limit={limit || { value: 0, isUnlimited: false }}
                                 onUpdate={(value, isUnlimited) => 
                                   handleUpdateLimit(plan.id, featureType.id, value, isUnlimited)
                                 }
@@ -2011,13 +2123,13 @@ export default function ConfigurablePricingManager() {
 
         {activeTab === 'preview' && (
           <div className="space-y-6">
-            <Card className="p-8 shadow-xl bg-white border border-gray-200">
+            <Card className="p-8 shadow-xl border" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg">
+                  <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-warning, #F59E0B)' }}>
                     <Eye className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">Pricing Preview</h3>
+                  <h3 className="text-xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Pricing Preview</h3>
                 </div>
                 
                 <div className="flex space-x-2">
@@ -2025,11 +2137,11 @@ export default function ConfigurablePricingManager() {
                     <button
                       key={cycle.id}
                       onClick={() => setSelectedBillingCycle(cycle.id)}
-                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                        selectedBillingCycle === cycle.id
-                          ? 'bg-purple-600 text-white shadow-lg'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      }`}
+                      className={`px-4 py-2 rounded-lg text-sm font-medium transition-all`}
+                      style={{
+                        backgroundColor: selectedBillingCycle === cycle.id ? 'var(--color-primary, #5243E9)' : 'var(--color-bg-secondary, #F9FAFB)',
+                        color: selectedBillingCycle === cycle.id ? 'var(--color-bg-primary, #FFFFFF)' : 'var(--color-text-secondary, #6B7280)'
+                      }}
                     >
                       {cycle.label}
                     </button>
@@ -2045,38 +2157,38 @@ export default function ConfigurablePricingManager() {
                   return (
                     <div
                       key={plan.id}
-                      className={`relative p-6 rounded-xl border-2 transition-all ${
-                        plan.isPopular
-                          ? 'border-purple-600 bg-gradient-to-br from-purple-50 to-blue-50 shadow-lg'
-                          : 'border-gray-200 bg-white hover:border-purple-300'
-                      }`}
+                      className={`relative p-6 rounded-xl border-2 transition-all`}
+                      style={plan.isPopular ? 
+                        { borderColor: 'var(--color-primary, #5243E9)', backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' } : 
+                        { borderColor: 'var(--color-gray-light, #E5E7EB)', backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }
+                      }
                     >
                       {plan.isPopular && (
                         <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                          <span className="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
+                          <span className="text-white px-3 py-1 rounded-full text-sm font-semibold" style={{ backgroundColor: 'var(--color-primary, #5243E9)' }}>
                             Most Popular
                           </span>
                         </div>
                       )}
                       
                       <div className="text-center mb-6">
-                        <h4 className="text-xl font-bold text-purple-600 mb-2">{plan.name}</h4>
+                        <h4 className="text-xl font-bold mb-2" style={{ color: 'var(--color-primary, #5243E9)' }}>{plan.name}</h4>
                         
                         <div className="mb-4">
-                          <span className="text-4xl font-bold text-gray-900">
+                          <span className="text-4xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                             {pricing ? formatPrice(pricing.priceCents) : '$0.00'}
                           </span>
-                          <span className="text-gray-600 ml-1">
+                          <span className="ml-1" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                             /{billingCycles.find(c => c.id === selectedBillingCycle)?.label.replace('ly', '')}
                           </span>
                         </div>
                         
                         <Button 
-                          className={`w-full py-3 rounded-lg font-medium transition-all duration-300 mb-6 ${
-                            plan.isPopular 
-                              ? 'bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white shadow-lg hover:shadow-xl'
-                              : 'bg-purple-600 hover:bg-purple-700 text-white'
-                          }`}
+                          className={`w-full py-3 rounded-lg font-medium transition-all duration-300 mb-6`}
+                          style={plan.isPopular ? 
+                            { backgroundColor: 'var(--color-primary, #5243E9)', color: 'var(--color-bg-primary, #FFFFFF)' } : 
+                            { backgroundColor: 'var(--color-primary, #5243E9)', color: 'var(--color-bg-primary, #FFFFFF)' }
+                          }
                           onClick={() => {
                             const pricing = getPlanPricing(plan.id, selectedBillingCycle);
                             if (pricing?.ctaUrl) {
@@ -2101,12 +2213,12 @@ export default function ConfigurablePricingManager() {
 
                             
                             return (
-                              <div key={featureType.id} className="bg-gray-50 rounded-lg p-3 text-center">
+                              <div key={featureType.id} className="rounded-lg p-3 text-center" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}>
                                 <div className="flex items-center justify-center mb-1">
                                   {getIcon(featureType.icon, featureType.iconUrl)}
-                                  <span className="ml-1 text-sm font-medium text-gray-700">{featureType.name}</span>
+                                  <span className="ml-1 text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{featureType.name}</span>
                                 </div>
-                                <div className="text-xl font-bold text-gray-900">{limitValue}</div>
+                                <div className="text-xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{limitValue}</div>
                               </div>
                             );
                           })}
@@ -2116,12 +2228,12 @@ export default function ConfigurablePricingManager() {
                       <div className="space-y-2">
                         {getEnabledBasicFeatures(plan.id).map((feature) => (
                           <div key={feature.id} className="flex items-center space-x-2">
-                            <Check className="w-4 h-4 text-purple-600" />
-                            <span className="text-sm text-gray-700">{feature.name}</span>
+                            <Check className="w-4 h-4" style={{ color: 'var(--color-primary, #5243E9)' }} />
+                            <span className="text-sm" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{feature.name}</span>
                           </div>
                         ))}
                         {getEnabledBasicFeatures(plan.id).length === 0 && (
-                          <div className="text-sm text-gray-500 italic">
+                          <div className="text-sm italic" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                             No basic features assigned to this plan
                           </div>
                         )}
@@ -2136,13 +2248,13 @@ export default function ConfigurablePricingManager() {
 
         {activeTab === 'comparison' && (
           <div className="space-y-6">
-            <Card className="p-8 shadow-xl bg-white border border-gray-200">
+            <Card className="p-8 shadow-xl border" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg">
+                  <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-primary, #5243E9)' }}>
                     <Eye className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900">Plan Comparison</h3>
+                  <h3 className="text-xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Plan Comparison</h3>
                 </div>
                 
                 <div className="flex space-x-2">
@@ -2153,8 +2265,12 @@ export default function ConfigurablePricingManager() {
                       className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                         selectedBillingCycle === cycle.id
                           ? 'bg-indigo-600 text-white shadow-lg'
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                          : 'hover:bg-gray-200'
                       }`}
+                      style={{
+                        backgroundColor: selectedBillingCycle === cycle.id ? undefined : 'var(--color-bg-secondary, #F9FAFB)',
+                        color: selectedBillingCycle === cycle.id ? undefined : 'var(--color-text-secondary, #6B7280)'
+                      }}
                     >
                       {cycle.label}
                     </button>
@@ -2166,27 +2282,33 @@ export default function ConfigurablePricingManager() {
                 <table className="min-w-full">
                   <thead>
                     <tr className="border-b-2 border-gray-200">
-                      <th className="text-left py-4 px-6 font-semibold text-gray-900 bg-gray-50 rounded-tl-lg">
+                      <th className="text-left py-4 px-6 font-semibold rounded-tl-lg" style={{ 
+                      color: 'var(--color-text-primary, #1F2937)',
+                      backgroundColor: 'var(--color-bg-secondary, #F9FAFB)'
+                    }}>
                         Features
                       </th>
                       {plans.filter(p => p.isActive).sort((a, b) => a.position - b.position).map((plan) => (
-                        <th key={plan.id} className="text-center py-4 px-6 font-semibold text-gray-900 bg-gray-50 relative">
+                        <th key={plan.id} className="text-center py-4 px-6 font-semibold relative" style={{ 
+                          color: 'var(--color-text-primary, #1F2937)',
+                          backgroundColor: 'var(--color-bg-secondary, #F9FAFB)'
+                        }}>
                           {plan.isPopular && (
                             <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
-                              <span className="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-2 py-1 rounded-full text-xs font-semibold">
+                              <span className="text-white px-2 py-1 rounded-full text-xs font-semibold" style={{ backgroundColor: 'var(--color-primary, #5243E9)' }}>
                                 Most Popular
                               </span>
                             </div>
                           )}
                           <div className="mt-2">
                             <div className="text-lg font-bold text-indigo-600">{plan.name}</div>
-                            <div className="text-2xl font-bold text-gray-900 mt-1">
+                            <div className="text-2xl font-bold mt-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                               {(() => {
                                 const pricing = getPlanPricing(plan.id, selectedBillingCycle);
                                 return pricing ? formatPrice(pricing.priceCents) : '$0.00';
                               })()}
                             </div>
-                            <div className="text-sm text-gray-600">
+                            <div className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                               /{billingCycles.find(c => c.id === selectedBillingCycle)?.label.replace('ly', '')}
                             </div>
                           </div>
@@ -2196,8 +2318,8 @@ export default function ConfigurablePricingManager() {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {/* Feature Limits Section */}
-                    <tr className="bg-gray-50">
-                      <td colSpan={plans.filter(p => p.isActive).length + 1} className="px-6 py-3 text-sm font-semibold text-gray-900 uppercase tracking-wider">
+                                            <tr style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}>
+                      <td colSpan={plans.filter(p => p.isActive).length + 1} className="px-6 py-3 text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                         Feature Limits
                       </td>
                     </tr>
@@ -2209,14 +2331,14 @@ export default function ConfigurablePricingManager() {
                       )
                       .sort((a, b) => a.sortOrder - b.sortOrder)
                       .map((featureType) => (
-                      <tr key={featureType.id} className="hover:bg-gray-50 transition-colors">
-                                                 <td className="px-6 py-4 font-medium text-gray-900">
+                      <tr key={featureType.id}>
+                                                 <td className="px-6 py-4 font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                            <div className="flex items-center space-x-3">
                              {getIcon(featureType.icon, featureType.iconUrl)}
                              <div>
                                <div className="font-semibold">{featureType.name}</div>
                                {featureType.description && (
-                                 <div className="text-sm text-gray-600">{featureType.description}</div>
+                                 <div className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{featureType.description}</div>
                                )}
                              </div>
                            </div>
@@ -2227,13 +2349,13 @@ export default function ConfigurablePricingManager() {
                           
                           return (
                             <td key={plan.id} className="px-6 py-4 text-center">
-                              <div className="text-lg font-bold text-gray-900">
+                              <div className="text-lg font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                                 {limitValue}
                               </div>
                               {featureType.unit && 
                                featureType.unit !== limitValue && 
                                !/^\d+$/.test(featureType.unit) && (
-                                <div className="text-xs text-gray-500">{featureType.unit}</div>
+                                <div className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>{featureType.unit}</div>
                               )}
                             </td>
                           );
@@ -2244,8 +2366,8 @@ export default function ConfigurablePricingManager() {
                     {/* Basic Features Section */}
                     {basicFeatures.filter(bf => bf.isActive).length > 0 && (
                       <>
-                        <tr className="bg-gray-50">
-                          <td colSpan={plans.filter(p => p.isActive).length + 1} className="px-6 py-3 text-sm font-semibold text-gray-900 uppercase tracking-wider">
+                        <tr style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}>
+                          <td colSpan={plans.filter(p => p.isActive).length + 1} className="px-6 py-3 text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                             Basic Features
                           </td>
                         </tr>
@@ -2253,14 +2375,14 @@ export default function ConfigurablePricingManager() {
                           .filter(bf => bf.isActive)
                           .sort((a, b) => a.sortOrder - b.sortOrder)
                           .map((feature) => (
-                            <tr key={feature.id} className="hover:bg-gray-50 transition-colors">
-                              <td className="px-6 py-4 font-medium text-gray-900">
+                            <tr key={feature.id} className="transition-colors">
+                              <td className="px-6 py-4 font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                                 <div className="flex items-center space-x-3">
                                   <CheckCircle className="w-5 h-5 text-green-600" />
                                   <div>
                                     <div className="font-semibold">{feature.name}</div>
                                     {feature.description && (
-                                      <div className="text-sm text-gray-600">{feature.description}</div>
+                                      <div className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{feature.description}</div>
                                     )}
                                   </div>
                                 </div>
@@ -2297,9 +2419,10 @@ export default function ConfigurablePricingManager() {
                       <Button 
                         className={`w-full py-3 rounded-lg font-medium transition-all duration-300 ${
                           plan.isPopular 
-                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl'
+                            ? 'text-white shadow-lg hover:shadow-xl'
                             : 'bg-indigo-600 hover:bg-indigo-700 text-white'
                         }`}
+                        style={plan.isPopular ? { backgroundColor: 'var(--color-primary, #5243E9)' } : {}}
                           onClick={() => {
                             if (pricing?.ctaUrl) {
                               window.open(pricing.ctaUrl, '_blank');
@@ -2356,11 +2479,11 @@ function LimitEditor({ limit, onUpdate }: {
               }}
               className="sr-only"
             />
-            <div className={`w-4 h-4 rounded border-2 cursor-pointer transition-all duration-200 flex items-center justify-center ${
-              isUnlimited
-                ? 'bg-purple-600 border-purple-600' 
-                : 'bg-white border-gray-300 hover:border-purple-400'
-            }`}>
+            <div className={`w-4 h-4 rounded border-2 cursor-pointer flex items-center justify-center`}
+                 style={{
+                   backgroundColor: isUnlimited ? 'var(--color-primary, #5243E9)' : 'var(--color-bg-primary, #FFFFFF)',
+                   borderColor: isUnlimited ? 'var(--color-primary, #5243E9)' : 'var(--color-gray-light, #E5E7EB)'
+                 }}>
               {isUnlimited && (
                 <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -2368,7 +2491,7 @@ function LimitEditor({ limit, onUpdate }: {
               )}
         </div>
           </div>
-          <span className="text-xs text-gray-600">Unlimited</span>
+          <span className="text-xs" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Unlimited</span>
         </label>
         {!isUnlimited && (
           <Input
@@ -2382,13 +2505,15 @@ function LimitEditor({ limit, onUpdate }: {
         <div className="flex space-x-1">
           <Button 
             onClick={handleSave}
-            className="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded text-xs"
+            className="px-2 py-1 rounded text-xs"
+            style={{ backgroundColor: 'var(--color-success, #10B981)', color: 'var(--color-bg-primary, #FFFFFF)' }}
           >
             <Check className="w-3 h-3" />
           </Button>
           <Button 
             onClick={handleCancel}
-            className="bg-gray-500 hover:bg-gray-600 text-white px-2 py-1 rounded text-xs"
+            className="px-2 py-1 rounded text-xs"
+            style={{ backgroundColor: 'var(--color-text-muted, #9CA3AF)', color: 'var(--color-bg-primary, #FFFFFF)' }}
           >
             <X className="w-3 h-3" />
           </Button>
@@ -2400,12 +2525,16 @@ function LimitEditor({ limit, onUpdate }: {
   return (
     <button
       onClick={() => setEditing(true)}
-      className="text-left p-2 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors w-full border border-gray-200 hover:border-purple-300"
+      className="text-left p-2 rounded-lg w-full border"
+      style={{ 
+        backgroundColor: 'var(--color-bg-secondary, #F9FAFB)', 
+        borderColor: 'var(--color-gray-light, #E5E7EB)'
+      }}
     >
-      <div className="text-sm font-medium text-gray-900">
+      <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
         {limit?.isUnlimited ? '∞ Unlimited' : (limit?.value || 'Not set')}
       </div>
-      <div className="text-xs text-gray-600">Click to edit</div>
+      <div className="text-xs" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Click to edit</div>
     </button>
   );
 }

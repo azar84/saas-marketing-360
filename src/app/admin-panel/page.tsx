@@ -30,7 +30,7 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { useDesignSystem, getAdminPanelColors } from '@/hooks/useDesignSystem';
+import { useDesignSystem, getAdminPanelColors, getAdminPanelColorsWithDesignSystem } from '@/hooks/useDesignSystem';
 import { useAdminApi } from '@/hooks/useApi';
 
 import HeroManager from './components/HeroManager';
@@ -63,32 +63,37 @@ export const dynamic = 'force-dynamic';
 
 type Section = 'dashboard' | 'pages' | 'page-builder' | 'home-hero' | 'hero-sections' | 'features-management' | 'media-sections' | 'media-library' | 'pricing' | 'testimonials' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'html-sections' | 'script-installation' | 'menu-management' | 'seo-manager' | 'users' | 'analytics' | 'site-settings' | 'cta-manager' | 'design-system' | 'scheduler' | 'team-sections';
 
-const navigation = [
-  { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard, color: 'text-blue-600' },
-  { id: 'pages', name: 'Pages', icon: FileText, color: 'text-green-600' },
-  { id: 'page-builder', name: 'Page Builder', icon: Layers, color: 'text-violet-600' },
-  { id: 'cta-manager', name: 'CTA Buttons', icon: MousePointer, color: 'text-teal-600' },
-  { id: 'home-hero', name: 'Home Page Hero', icon: Home, color: 'text-rose-600' },
-  { id: 'hero-sections', name: 'Hero Sections', icon: Image, color: 'text-purple-600' },
-  { id: 'features-management', name: 'Features Management', icon: Star, color: 'text-amber-600' },
-  { id: 'team-sections', name: 'Team Sections', icon: Users, color: 'text-indigo-600' },
-  { id: 'media-sections', name: 'Media Sections', icon: Play, color: 'text-red-600' },
-  { id: 'media-library', name: 'Media Library', icon: FolderOpen, color: 'text-blue-600' },
-  { id: 'pricing', name: 'Pricing Plans', icon: DollarSign, color: 'text-green-600' },
-  { id: 'faq-management', name: 'FAQ Management', icon: MessageSquare, color: 'text-cyan-600' },
-  { id: 'contact-management', name: 'Forms Management', icon: Mail, color: 'text-blue-600' },
-  { id: 'newsletter-management', name: 'Newsletter Subscribers', icon: Users, color: 'text-green-600' },
-  { id: 'html-sections', name: 'HTML Sections', icon: Grid, color: 'text-purple-600' },
-  { id: 'script-installation', name: 'Script Installation', icon: Zap, color: 'text-orange-600' },
-  { id: 'menu-management', name: 'Menu Management', icon: Menu, color: 'text-indigo-600' },
-  { id: 'seo-manager', name: 'SEO Manager', icon: Globe, color: 'text-emerald-600' },
-  { id: 'testimonials', name: 'Testimonials', icon: Users, color: 'text-indigo-600' },
-  { id: 'users', name: 'Users', icon: Users, color: 'text-pink-600' },
-  { id: 'analytics', name: 'Analytics', icon: BarChart3, color: 'text-emerald-600' },
-  { id: 'scheduler', name: 'Scheduler', icon: Clock, color: 'text-orange-600' },
-  { id: 'design-system', name: 'Design System', icon: Layers, color: 'text-blue-600' },
-  { id: 'site-settings', name: 'Site Settings', icon: Settings, color: 'text-gray-600' },
-];
+// Navigation items with design system colors
+const getNavigationItems = (designSystem: any) => {
+  const colors = getAdminPanelColorsWithDesignSystem(designSystem);
+  
+  return [
+    { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard, color: colors.primary },
+    { id: 'pages', name: 'Pages', icon: FileText, color: colors.success },
+    { id: 'page-builder', name: 'Page Builder', icon: Layers, color: colors.secondary },
+    { id: 'cta-manager', name: 'CTA Buttons', icon: MousePointer, color: colors.accent },
+    { id: 'home-hero', name: 'Home Page Hero', icon: Home, color: colors.error },
+    { id: 'hero-sections', name: 'Hero Sections', icon: Image, color: colors.secondary },
+    { id: 'features-management', name: 'Features Management', icon: Star, color: colors.warning },
+    { id: 'team-sections', name: 'Team Sections', icon: Users, color: colors.info },
+    { id: 'media-sections', name: 'Media Sections', icon: Play, color: colors.error },
+    { id: 'media-library', name: 'Media Library', icon: FolderOpen, color: colors.primary },
+    { id: 'pricing', name: 'Pricing Plans', icon: DollarSign, color: colors.success },
+    { id: 'faq-management', name: 'FAQ Management', icon: MessageSquare, color: colors.accent },
+    { id: 'contact-management', name: 'Forms Management', icon: Mail, color: colors.primary },
+    { id: 'newsletter-management', name: 'Newsletter Subscribers', icon: Users, color: colors.success },
+    { id: 'html-sections', name: 'HTML Sections', icon: Grid, color: colors.secondary },
+    { id: 'script-installation', name: 'Script Installation', icon: Zap, color: colors.warning },
+    { id: 'menu-management', name: 'Menu Management', icon: Menu, color: colors.info },
+    { id: 'seo-manager', name: 'SEO Manager', icon: Globe, color: colors.success },
+    { id: 'testimonials', name: 'Testimonials', icon: Users, color: colors.info },
+    { id: 'users', name: 'Users', icon: Users, color: colors.error },
+    { id: 'analytics', name: 'Analytics', icon: BarChart3, color: colors.success },
+    { id: 'scheduler', name: 'Scheduler', icon: Clock, color: colors.warning },
+    { id: 'design-system', name: 'Design System', icon: Layers, color: colors.primary },
+    { id: 'site-settings', name: 'Site Settings', icon: Settings, color: colors.textSecondary },
+  ];
+};
 
 interface SiteSettings {
   id?: number;
@@ -107,8 +112,8 @@ export default function AdminPanel() {
   const { user: authUser, isLoading: authLoading, isAuthenticated, logout: authLogout } = useAuth();
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const { designSystem } = useDesignSystem();
-  const adminColors = getAdminPanelColors();
+  const { designSystem, loading: designSystemLoading } = useDesignSystem();
+  const adminColors = getAdminPanelColorsWithDesignSystem(designSystem);
   const { get } = useAdminApi();
   const [user, setUser] = useState<any>(null);
   const router = useRouter();
@@ -168,8 +173,8 @@ export default function AdminPanel() {
     }
   }, [get, isAuthenticated]);
 
-  // Show loading while checking authentication
-  if (authLoading) {
+  // Show loading while checking authentication or loading design system
+  if (authLoading || designSystemLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -191,127 +196,184 @@ export default function AdminPanel() {
     switch (activeSection) {
       case 'pages':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <PagesManager />
           </div>
         );
       case 'page-builder':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <PageBuilder />
           </div>
         );
       case 'cta-manager':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <CTAManager />
           </div>
         );
       case 'home-hero':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <HomeHeroManager />
           </div>
         );
       case 'hero-sections':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <HeroSectionsManager />
           </div>
         );
       case 'features-management':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <FeaturesManagement />
           </div>
         );
       case 'site-settings':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <SiteSettingsManager />
           </div>
         );
       case 'design-system':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <DesignSystemManager />
           </div>
         );
       case 'media-sections':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <MediaSectionsManager />
           </div>
         );
       case 'media-library':
         return (
-          <div className="h-full">
+          <div 
+            className="h-full"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <MediaLibraryManager onClose={() => setActiveSection('dashboard')} />
           </div>
         );
       case 'pricing':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <ConfigurablePricingManager />
           </div>
         );
       case 'faq-management':
         return (
-          <div className="space-y-8">
+          <div 
+            className="space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <FAQManager />
           </div>
         );
       case 'contact-management':
         return (
-          <div className="space-y-8">
+          <div 
+            className="space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <ContactManager />
           </div>
         );
       case 'newsletter-management':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <NewsletterManager />
           </div>
         );
       case 'html-sections':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <HtmlSectionsManager />
           </div>
         );
       case 'script-installation':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <ScriptSectionManager />
           </div>
         );
       case 'menu-management':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <MenuManager />
           </div>
         );
       case 'seo-manager':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <SEOManager />
           </div>
         );
       case 'testimonials':
         return (
-          <div className="p-8">
+          <div 
+            className="p-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <div className="text-center py-12">
               <Users 
                 className="w-16 h-16 mx-auto mb-4" 
-                style={{ color: adminColors.textMuted }}
+                style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
               />
               <h2 
                 className="text-2xl font-bold mb-2"
-                style={{ color: adminColors.textPrimary }}
+                style={{ color: 'var(--color-text-primary, #1F2937)' }}
               >
                 Testimonials
               </h2>
-              <p style={{ color: adminColors.textSecondary }}>
+              <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                 Testimonials management coming soon...
               </p>
             </div>
@@ -319,25 +381,31 @@ export default function AdminPanel() {
         );
       case 'users':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <UserManagement />
           </div>
         );
       case 'analytics':
         return (
-          <div className="p-8">
+          <div 
+            className="p-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <div className="text-center py-12">
               <BarChart3 
                 className="w-16 h-16 mx-auto mb-4" 
-                style={{ color: adminColors.textMuted }}
+                style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
               />
               <h2 
                 className="text-2xl font-bold mb-2"
-                style={{ color: adminColors.textPrimary }}
+                style={{ color: 'var(--color-text-primary, #1F2937)' }}
               >
                 Analytics
               </h2>
-              <p style={{ color: adminColors.textSecondary }}>
+              <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                 Analytics dashboard coming soon...
               </p>
             </div>
@@ -345,20 +413,29 @@ export default function AdminPanel() {
         );
       case 'scheduler':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <SchedulerManager />
           </div>
         );
       case 'team-sections':
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             <TeamSectionsManager />
           </div>
         );
       case 'dashboard':
       default:
         return (
-          <div className="p-8 space-y-8">
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
             {/* Welcome Section */}
             <div 
               className="rounded-xl p-8 text-white"
@@ -369,7 +446,7 @@ export default function AdminPanel() {
               <h1 className="text-3xl font-bold mb-2">
                 Welcome to {siteSettings?.footerCompanyName || 'Your Company'} Admin
               </h1>
-              <p style={{ color: '#E2E8F0' }}>Manage your website content, pages, and settings from this central dashboard.</p>
+              <p style={{ color: 'var(--color-text-muted, #E2E8F0)' }}>Manage your website content, pages, and settings from this central dashboard.</p>
             </div>
 
             {/* Quick Stats */}
@@ -377,8 +454,8 @@ export default function AdminPanel() {
               <Card className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p style={{ color: adminColors.textSecondary }} className="text-sm font-medium">Total Pages</p>
-                    <p style={{ color: adminColors.textPrimary }} className="text-2xl font-bold">
+                    <p style={{ color: 'var(--color-text-secondary, #6B7280)' }} className="text-sm font-medium">Total Pages</p>
+                    <p style={{ color: 'var(--color-text-primary, #1F2937)' }} className="text-2xl font-bold">
                       {loadingStats ? '...' : dashboardStats.totalPages}
                     </p>
                   </div>
@@ -405,8 +482,8 @@ export default function AdminPanel() {
               <Card className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p style={{ color: adminColors.textSecondary }} className="text-sm font-medium">Hero Sections</p>
-                    <p style={{ color: adminColors.textPrimary }} className="text-2xl font-bold">
+                    <p style={{ color: 'var(--color-text-secondary, #6B7280)' }} className="text-sm font-medium">Hero Sections</p>
+                    <p style={{ color: 'var(--color-text-primary, #1F2937)' }} className="text-2xl font-bold">
                       {loadingStats ? '...' : dashboardStats.heroSections}
                     </p>
                   </div>
@@ -433,8 +510,8 @@ export default function AdminPanel() {
               <Card className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p style={{ color: adminColors.textSecondary }} className="text-sm font-medium">Features</p>
-                    <p style={{ color: adminColors.textPrimary }} className="text-2xl font-bold">
+                    <p style={{ color: 'var(--color-text-secondary, #6B7280)' }} className="text-sm font-medium">Features</p>
+                    <p style={{ color: 'var(--color-text-primary, #1F2937)' }} className="text-2xl font-bold">
                       {loadingStats ? '...' : dashboardStats.features}
                     </p>
                   </div>
@@ -461,8 +538,8 @@ export default function AdminPanel() {
               <Card className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p style={{ color: adminColors.textSecondary }} className="text-sm font-medium">Pricing Plans</p>
-                    <p style={{ color: adminColors.textPrimary }} className="text-2xl font-bold">
+                    <p style={{ color: 'var(--color-text-secondary, #6B7280)' }} className="text-sm font-medium">Pricing Plans</p>
+                    <p style={{ color: 'var(--color-text-primary, #1F2937)' }} className="text-2xl font-bold">
                       {loadingStats ? '...' : dashboardStats.pricingPlans}
                     </p>
                   </div>
@@ -498,28 +575,44 @@ export default function AdminPanel() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <Button
                   onClick={() => setActiveSection('pages')}
-                  className="bg-green-600 hover:bg-green-700 text-white h-12 flex items-center justify-center space-x-2"
+                  className="h-12 flex items-center justify-center space-x-2"
+                  style={{
+                    backgroundColor: 'var(--color-success, #10B981)',
+                    color: '#FFFFFF'
+                  }}
                 >
                   <FileText className="w-4 h-4" />
                   <span>Manage Pages</span>
                 </Button>
                 <Button
                   onClick={() => setActiveSection('hero-sections')}
-                  className="bg-purple-600 hover:bg-purple-700 text-white h-12 flex items-center justify-center space-x-2"
+                  className="h-12 flex items-center justify-center space-x-2"
+                  style={{
+                    backgroundColor: 'var(--color-primary, #5243E9)',
+                    color: '#FFFFFF'
+                  }}
                 >
                   <Image className="w-4 h-4" />
                   <span>Edit Heroes</span>
                 </Button>
                 <Button
                   onClick={() => setActiveSection('media-library')}
-                  className="bg-blue-600 hover:bg-blue-700 text-white h-12 flex items-center justify-center space-x-2"
+                  className="h-12 flex items-center justify-center space-x-2"
+                  style={{
+                    backgroundColor: 'var(--color-info, #3B82F6)',
+                    color: '#FFFFFF'
+                  }}
                 >
                   <FolderOpen className="w-4 h-4" />
                   <span>Media Library</span>
                 </Button>
                 <Button
                   onClick={() => setActiveSection('site-settings')}
-                  className="bg-gray-600 hover:bg-gray-700 text-white h-12 flex items-center justify-center space-x-2"
+                  className="h-12 flex items-center justify-center space-x-2"
+                  style={{
+                    backgroundColor: 'var(--color-text-secondary, #6B7280)',
+                    color: '#FFFFFF'
+                  }}
                 >
                   <Settings className="w-4 h-4" />
                   <span>Site Settings</span>
@@ -644,12 +737,24 @@ export default function AdminPanel() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div 
+      className="min-h-screen flex w-full"
+      style={{ 
+        backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+        color: 'var(--color-text-primary, #1F2937)'
+      }}
+    >
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
+      <div 
+        className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}
+        style={{ backgroundColor: 'var(--color-bg-dark, #1F2937)' }}
+      >
         <div 
           className="flex items-center justify-between h-16 px-6 border-b"
-          style={{ borderColor: adminColors.border }}
+          style={{ 
+            borderColor: 'var(--color-gray-light, #E5E7EB)',
+            backgroundColor: 'var(--color-bg-dark, #1F2937)'
+          }}
         >
           <div className="flex items-center space-x-2">
             {siteSettings?.faviconUrl ? (
@@ -671,7 +776,7 @@ export default function AdminPanel() {
             <div className="flex flex-col">
               <span 
                 className="text-sm font-bold truncate max-w-[120px]"
-                style={{ color: adminColors.textPrimary }}
+                style={{ color: '#FFFFFF' }}
                 title={siteSettings?.footerCompanyName || 'Your Company'}
               >
                 {siteSettings?.footerCompanyName || 'Your Company'}
@@ -680,7 +785,8 @@ export default function AdminPanel() {
                 href="/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-blue-600 hover:text-blue-800 transition-colors"
+                className="text-xs transition-colors"
+                style={{ color: 'var(--color-primary, #5243E9)' }}
                 title="Open website in new tab"
               >
                 View Website →
@@ -690,14 +796,16 @@ export default function AdminPanel() {
           <div className="flex items-center space-x-2">
             <button
               onClick={logout}
-              className="p-1 rounded-md text-gray-400 hover:text-gray-600"
+              className="p-1 rounded-md transition-colors"
+              style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
               title="Logout"
             >
               <LogOut className="w-4 h-4" />
             </button>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1 rounded-md text-gray-400 hover:text-gray-600"
+              className="lg:hidden p-1 rounded-md transition-colors"
+              style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
             >
               <X className="w-5 h-5" />
             </button>
@@ -706,7 +814,7 @@ export default function AdminPanel() {
         
         <nav className="mt-6 px-3">
           <div className="space-y-1">
-            {navigation.map((item) => {
+            {getNavigationItems(designSystem).map((item) => {
               const Icon = item.icon;
               return (
                 <button
@@ -715,26 +823,22 @@ export default function AdminPanel() {
                     setActiveSection(item.id as Section);
                     setSidebarOpen(false);
                   }}
-                  className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                    activeSection === item.id
-                      ? 'text-white'
-                      : 'hover:bg-gray-100'
-                  }`}
+                  className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors`}
                   style={{
                     backgroundColor: activeSection === item.id 
-                      ? designSystem?.primaryColor || '#5243E9'
+                      ? 'var(--color-bg-secondary, #F9FAFB)'
                       : 'transparent',
                     color: activeSection === item.id 
-                      ? 'white'
-                      : adminColors.textSecondary
+                      ? 'var(--color-text-primary, #1F2937)'
+                      : '#FFFFFF'
                   }}
                 >
                   <Icon 
                     className="mr-3 w-5 h-5" 
                     style={{ 
                       color: activeSection === item.id 
-                        ? 'white' 
-                        : designSystem?.primaryColor || '#5243E9'
+                        ? 'var(--color-text-primary, #1F2937)'
+                        : '#FFFFFF'
                     }} 
                   />
                   {item.name}
@@ -746,17 +850,23 @@ export default function AdminPanel() {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 lg:ml-0">
+      <div 
+        className="flex-1 lg:ml-0 w-full"
+        style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+      >
         {/* Top Bar */}
         <div 
-          className="bg-white shadow-sm border-b px-6 py-4 lg:hidden"
-          style={{ borderColor: adminColors.border }}
+          className="shadow-sm border-b px-6 py-4 lg:hidden"
+                      style={{ 
+              backgroundColor: 'var(--color-bg-dark, #1F2937)',
+              borderColor: 'var(--color-gray-light, #E5E7EB)'
+            }}
         >
           <div className="flex items-center justify-between">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-md hover:text-gray-600"
-              style={{ color: adminColors.textSecondary }}
+              className="p-2 rounded-md transition-colors"
+              style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -779,7 +889,7 @@ export default function AdminPanel() {
               )}
               <span 
                 className="text-sm font-bold truncate max-w-[120px]"
-                style={{ color: adminColors.textPrimary }}
+                style={{ color: '#FFFFFF' }}
                 title={siteSettings?.footerCompanyName || 'Your Company'}
               >
                 {siteSettings?.footerCompanyName || 'Your Company'}
@@ -789,7 +899,13 @@ export default function AdminPanel() {
         </div>
 
         {/* Page Content */}
-        <main className="flex-1 h-screen overflow-auto">
+        <main 
+          className="flex-1 h-screen overflow-auto"
+          style={{ 
+            backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+            color: 'var(--color-text-primary, #1F2937)'
+          }}
+        >
           {renderContent()}
         </main>
       </div>

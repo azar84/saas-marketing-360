@@ -289,16 +289,16 @@ export default function FormFieldTypes({ onFieldSelect, primaryColor = '#5243E9'
           return (
             <Card
               key={fieldType.type}
-              className="p-4 cursor-pointer hover:shadow-md transition-shadow border-2 border-dashed border-gray-200"
+              className="p-4 cursor-pointer hover:shadow-md transition-shadow border-2 border-dashed"
               style={{
-                borderColor: '#e5e7eb', // default gray-200
+                borderColor: 'var(--color-gray-light, #E5E7EB)',
                 transition: 'all 0.2s ease-in-out'
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.borderColor = `${primaryColor}80`;
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = '#e5e7eb';
+                e.currentTarget.style.borderColor = 'var(--color-gray-light, #E5E7EB)';
               }}
               onClick={() => onFieldSelect(fieldType)}
             >
@@ -307,10 +307,16 @@ export default function FormFieldTypes({ onFieldSelect, primaryColor = '#5243E9'
                   <Icon className="h-6 w-6" style={{ color: primaryColor }} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-medium text-gray-900 truncate">
+                  <h3 
+                    className="text-sm font-medium truncate"
+                    style={{ color: 'var(--color-text-primary, #1F2937)' }}
+                  >
                     {fieldType.label}
                   </h3>
-                  <p className="text-xs text-gray-500 truncate">
+                  <p 
+                    className="text-xs truncate"
+                    style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+                  >
                     {fieldType.description}
                   </p>
                 </div>

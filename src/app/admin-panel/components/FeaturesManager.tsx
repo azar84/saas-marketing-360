@@ -80,12 +80,21 @@ interface GlobalFeature {
 }
 
 const categoryColors = {
-  integration: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 border-blue-200 dark:border-blue-800',
-  ai: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300 border-purple-200 dark:border-purple-800',
-  automation: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
-  analytics: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300 border-orange-200 dark:border-orange-800',
-  security: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300 border-red-200 dark:border-red-800',
-  support: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-300 border-indigo-200 dark:border-indigo-800',
+  integration: 'px-3 py-1 text-xs border rounded-full font-medium',
+  ai: 'px-3 py-1 text-xs border rounded-full font-medium',
+  automation: 'px-3 py-1 text-xs border rounded-full font-medium',
+  analytics: 'px-3 py-1 text-xs border rounded-full font-medium',
+  security: 'px-3 py-1 text-xs border rounded-full font-medium',
+  support: 'px-3 py-1 text-xs border rounded-full font-medium',
+};
+
+const categoryStyles = {
+  integration: { backgroundColor: 'var(--color-info-light, #DBEAFE)', color: 'var(--color-info-dark, #1E40AF)', borderColor: 'var(--color-info, #3B82F6)' },
+  ai: { backgroundColor: 'var(--color-purple-light, #F3E8FF)', color: 'var(--color-purple-dark, #581C87)', borderColor: 'var(--color-purple, #A855F7)' },
+  automation: { backgroundColor: 'var(--color-success-light, #D1FAE5)', color: 'var(--color-success-dark, #065F46)', borderColor: 'var(--color-success, #10B981)' },
+  analytics: { backgroundColor: 'var(--color-warning-light, #FEF3C7)', color: 'var(--color-warning-dark, #92400E)', borderColor: 'var(--color-warning, #F59E0B)' },
+  security: { backgroundColor: 'var(--color-error-light, #FEE2E2)', color: 'var(--color-error-dark, #991B1B)', borderColor: 'var(--color-error, #EF4444)' },
+  support: { backgroundColor: 'var(--color-primary-light, #E0E7FF)', color: 'var(--color-primary-dark, #3730A3)', borderColor: 'var(--color-primary, #5243E9)' },
 };
 
 const FeaturesManager: React.FC = () => {
@@ -115,7 +124,7 @@ const FeaturesManager: React.FC = () => {
     // Use the universal renderIcon utility
     // If iconName doesn't include a library prefix, assume it's a Lucide icon
     const iconString = iconName.includes(':') ? iconName : `lucide:${iconName}`;
-    return renderIcon(iconString, { className: 'w-5 h-5 text-blue-600' }) || renderIcon('lucide:Star', { className: 'w-5 h-5 text-blue-600' });
+    return renderIcon(iconString, { className: 'w-5 h-5', style: { color: 'var(--color-primary, #5243E9)' } }) || renderIcon('lucide:Star', { className: 'w-5 h-5', style: { color: 'var(--color-primary, #5243E9)' } });
   };
 
   const fetchFeatures = async () => {
@@ -254,12 +263,15 @@ const FeaturesManager: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Features Manager</h2>
-          <p className="text-gray-600 mt-1">Manage website features and capabilities</p>
+          <h2 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Features Manager</h2>
+          <p className="mt-1" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Manage website features and capabilities</p>
         </div>
         <Button
           onClick={() => setShowCreateForm(true)}
-          className="bg-emerald-600 hover:bg-emerald-700 text-white"
+          style={{
+            backgroundColor: 'var(--color-success, #10B981)',
+            color: 'var(--color-bg-primary, #FFFFFF)'
+          }}
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Feature
@@ -273,11 +285,18 @@ const FeaturesManager: React.FC = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className={`flex items-center gap-2 p-4 rounded-lg ${
-              message.type === 'success' 
-                ? 'bg-green-50 text-green-800 border border-green-200' 
-                : 'bg-red-50 text-red-800 border border-red-200'
-            }`}
+            className="flex items-center gap-2 p-4 rounded-lg border"
+            style={{
+              backgroundColor: message.type === 'success' 
+                ? 'var(--color-success-light, #D1FAE5)' 
+                : 'var(--color-error-light, #FEE2E2)',
+              color: message.type === 'success' 
+                ? 'var(--color-success-dark, #065F46)' 
+                : 'var(--color-error-dark, #991B1B)',
+              borderColor: message.type === 'success' 
+                ? 'var(--color-success, #10B981)' 
+                : 'var(--color-error, #EF4444)'
+            }}
           >
             {message.type === 'success' ? (
               <CheckCircle className="w-5 h-5" />
@@ -291,16 +310,16 @@ const FeaturesManager: React.FC = () => {
 
       {/* Create/Edit Form */}
       {showCreateForm && (
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        <div className="rounded-xl p-6 shadow-sm border" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-xl font-semibold text-gray-900">
+            <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
               {editingFeature ? 'Edit Feature' : 'Create New Feature'}
             </h3>
             <Button
               variant="ghost"
               size="sm"
               onClick={resetForm}
-              className="text-gray-500 hover:text-gray-700"
+              style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
             >
               <X className="w-4 h-4" />
             </Button>
@@ -309,7 +328,7 @@ const FeaturesManager: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Feature Title *
                 </label>
                 <Input
@@ -323,7 +342,7 @@ const FeaturesManager: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Category
                 </label>
                 <select
@@ -332,19 +351,24 @@ const FeaturesManager: React.FC = () => {
                     const value = e.target.value as 'integration' | 'ai' | 'automation' | 'analytics' | 'security' | 'support';
                     setFormData({ ...formData, category: value });
                   }}
-                  className="w-full h-12 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-gray-900"
+                  className="w-full h-12 px-4 border rounded-lg"
+                  style={{
+                    borderColor: 'var(--color-gray-light, #E5E7EB)',
+                    backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                    color: 'var(--color-text-primary, #1F2937)'
+                  }}
                 >
-                  <option value="integration" className="bg-white text-gray-900">Integration</option>
-                  <option value="ai" className="bg-white text-gray-900">AI</option>
-                  <option value="automation" className="bg-white text-gray-900">Automation</option>
-                  <option value="analytics" className="bg-white text-gray-900">Analytics</option>
-                  <option value="security" className="bg-white text-gray-900">Security</option>
-                  <option value="support" className="bg-white text-gray-900">Support</option>
+                  <option value="integration" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', color: 'var(--color-text-primary, #1F2937)' }}>Integration</option>
+                  <option value="ai" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', color: 'var(--color-text-primary, #1F2937)' }}>AI</option>
+                  <option value="automation" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', color: 'var(--color-text-primary, #1F2937)' }}>Automation</option>
+                  <option value="analytics" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', color: 'var(--color-text-primary, #1F2937)' }}>Analytics</option>
+                  <option value="security" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', color: 'var(--color-text-primary, #1F2937)' }}>Security</option>
+                  <option value="support" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', color: 'var(--color-text-primary, #1F2937)' }}>Support</option>
                 </select>
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Description *
                 </label>
                 <textarea
@@ -352,13 +376,18 @@ const FeaturesManager: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Describe the feature and its benefits..."
                   required
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white text-gray-900 placeholder-gray-500"
+                  className="w-full p-3 border rounded-lg resize-none"
+                  style={{
+                    borderColor: 'var(--color-gray-light, #E5E7EB)',
+                    backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                    color: 'var(--color-text-primary, #1F2937)'
+                  }}
                   rows={3}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Icon
                 </label>
                 <IconPicker
@@ -368,7 +397,7 @@ const FeaturesManager: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Sort Order
                 </label>
                 <Input
@@ -387,9 +416,13 @@ const FeaturesManager: React.FC = () => {
                 id="isVisible"
                 checked={formData.isVisible}
                 onChange={(e) => setFormData({ ...formData, isVisible: e.target.checked })}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="w-4 h-4 border rounded"
+                style={{
+                  color: 'var(--color-primary, #5243E9)',
+                  borderColor: 'var(--color-gray-light, #E5E7EB)'
+                }}
               />
-              <label htmlFor="isVisible" className="text-sm font-medium text-gray-700">
+              <label htmlFor="isVisible" className="text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Visible (Show on website)
               </label>
             </div>
@@ -398,7 +431,10 @@ const FeaturesManager: React.FC = () => {
               <Button
                 type="submit"
                 disabled={saving}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white"
+                style={{
+                  backgroundColor: 'var(--color-success, #10B981)',
+                  color: 'var(--color-bg-primary, #FFFFFF)'
+                }}
               >
                 {saving ? (
                   <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
@@ -425,15 +461,20 @@ const FeaturesManager: React.FC = () => {
           return (
             <div
               key={feature.id}
-              className={`border-2 rounded-xl p-6 transition-all duration-200 ${
-                feature.isVisible
-                  ? 'border-gray-200 bg-white hover:shadow-lg'
-                  : 'border-gray-100 bg-gray-50 opacity-60'
-              }`}
+              className="border-2 rounded-xl p-6 transition-all duration-200"
+              style={{
+                borderColor: feature.isVisible
+                  ? 'var(--color-gray-light, #E5E7EB)'
+                  : 'var(--color-gray-lighter, #F3F4F6)',
+                backgroundColor: feature.isVisible
+                  ? 'var(--color-bg-primary, #FFFFFF)'
+                  : 'var(--color-bg-secondary, #F9FAFB)',
+                opacity: feature.isVisible ? 1 : 0.6
+              }}
             >
               <div className="flex items-center justify-between mb-3">
-                <div className="inline-flex px-3 py-1 text-xs border rounded-full font-medium">
-                  <span className={categoryColors[feature.category]}>
+                <div className="inline-flex px-3 py-1 text-xs border rounded-full font-medium" style={categoryStyles[feature.category]}>
+                  <span>
                     {feature.category}
                   </span>
                 </div>
@@ -442,7 +483,7 @@ const FeaturesManager: React.FC = () => {
                     size="sm"
                     variant="ghost"
                     onClick={() => startEdit(feature)}
-                    className="p-1 text-gray-600 hover:text-gray-700"
+                    style={{ color: 'var(--color-text-secondary, #6B7280)' }}
                   >
                     <Edit2 className="w-4 h-4" />
                   </Button>
@@ -450,7 +491,7 @@ const FeaturesManager: React.FC = () => {
                     size="sm"
                     variant="ghost"
                     onClick={() => handleDelete(feature.id)}
-                    className="p-1 text-red-600 hover:text-red-700"
+                    style={{ color: 'var(--color-error, #EF4444)' }}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -458,17 +499,17 @@ const FeaturesManager: React.FC = () => {
               </div>
 
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary-light, #E0E7FF)' }}>
                   {getIconComponent(feature.iconName)}
                 </div>
-                <h4 className="font-semibold text-gray-900">{feature.title}</h4>
+                <h4 className="font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{feature.title}</h4>
               </div>
               
-              <p className="text-sm text-gray-600 mb-4 line-clamp-3">{feature.description}</p>
+              <p className="text-sm mb-4 line-clamp-3" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{feature.description}</p>
               
-              <div className="flex items-center justify-between text-xs text-gray-500">
+              <div className="flex items-center justify-between text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                 <span>Order: {feature.sortOrder}</span>
-                <span className={feature.isVisible ? 'text-green-600' : 'text-red-600'}>
+                <span style={{ color: feature.isVisible ? 'var(--color-success, #10B981)' : 'var(--color-error, #EF4444)' }}>
                   {feature.isVisible ? 'Visible' : 'Hidden'}
                 </span>
               </div>
@@ -479,9 +520,9 @@ const FeaturesManager: React.FC = () => {
 
       {features.length === 0 && (
         <div className="text-center py-12">
-          <Star className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No features yet</h3>
-          <p className="text-gray-500">Create your first feature to get started.</p>
+          <Star className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
+          <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>No features yet</h3>
+          <p style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Create your first feature to get started.</p>
         </div>
       )}
     </div>

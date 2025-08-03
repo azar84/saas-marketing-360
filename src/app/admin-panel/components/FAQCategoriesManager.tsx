@@ -320,7 +320,7 @@ export default function FAQCategoriesManager() {
             </div>
 
             {category.description && (
-              <p className="text-sm text-gray-600 mb-3">{category.description}</p>
+                              <p className="text-sm mb-3" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{category.description}</p>
             )}
 
             <div className="flex items-center justify-between text-sm text-gray-500">

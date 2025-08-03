@@ -714,7 +714,7 @@ Allow: /uploads/media/`;
             <div key={page.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
               <div className="flex-1">
                 <div className="flex items-center space-x-3">
-                  <h4 className="font-medium text-gray-900">{page.title}</h4>
+                  <h4 className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{page.title}</h4>
                   <span className="text-sm text-gray-500">/{page.slug}</span>
                 </div>
                 <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
@@ -1187,7 +1187,7 @@ Allow: /uploads/media/`;
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-semibold text-gray-900">{pageTitle}</h3>
+                          <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{pageTitle}</h3>
                           <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
                             {pageType}
                           </span>
@@ -1531,7 +1531,7 @@ Allow: /uploads/media/`;
               <div className="flex items-start">
                 <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="font-medium text-gray-900">Optimize Page Titles</p>
+                  <p className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Optimize Page Titles</p>
                   <p>Keep titles under 60 characters and include your target keywords.</p>
                 </div>
               </div>

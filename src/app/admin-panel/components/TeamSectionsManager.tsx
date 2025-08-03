@@ -30,9 +30,9 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allow
     { name: 'Warning', value: designSystem?.warningColor || '#F59E0B' },
     { name: 'Error', value: designSystem?.errorColor || '#EF4444' },
     { name: 'Info', value: designSystem?.infoColor || '#3B82F6' },
-    { name: 'Text Primary', value: designSystem?.textPrimary || '#000000' },
-    { name: 'Text Secondary', value: designSystem?.textSecondary || '#666666' },
-    { name: 'Text Muted', value: designSystem?.textMuted || '#999999' },
+    { name: 'Text Primary', value: designSystem?.textPrimary || '#1F2937' },
+    { name: 'Text Secondary', value: designSystem?.textSecondary || '#6B7280' },
+    { name: 'Text Muted', value: designSystem?.textMuted || '#9CA3AF' },
     { name: 'Background Primary', value: designSystem?.backgroundPrimary || '#FFFFFF' },
     { name: 'Background Secondary', value: designSystem?.backgroundSecondary || '#F9FAFB' },
     { name: 'Gray Light', value: designSystem?.grayLight || '#F3F4F6' },
@@ -55,7 +55,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allow
     onChange(newColor);
   };
 
-  const currentValue = value || '#000000';
+  const currentValue = value || '#1F2937';
 
   return (
     <div className="relative">
@@ -70,7 +70,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allow
           type="button"
           onClick={() => setShowPicker(!showPicker)}
           className="w-10 h-10 border-2 border-gray-300 rounded-lg shadow-sm hover:border-gray-400 transition-colors"
-          style={{ backgroundColor: currentValue === 'transparent' ? '#f3f4f6' : currentValue }}
+          style={{ backgroundColor: currentValue === 'transparent' ? (designSystem?.grayLight || '#f3f4f6') : currentValue }}
         >
           {currentValue === 'transparent' && (
             <div className="w-full h-full flex items-center justify-center text-xs text-gray-500">
@@ -83,11 +83,11 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allow
           value={currentValue}
           onChange={(e) => onChange(e.target.value)}
           className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          placeholder="#000000 or transparent"
-          style={{ 
-            color: designSystem?.textPrimary || '#000000',
-            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
-          }}
+          placeholder="#1F2937 or transparent"
+                      style={{ 
+              color: designSystem?.textPrimary || '#1F2937',
+              backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+            }}
         />
       </div>
 
@@ -128,7 +128,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, allow
                   />
                   <span 
                     className="text-xs text-center leading-tight"
-                    style={{ color: designSystem?.textSecondary || '#666666' }}
+                    style={{ color: designSystem?.textSecondary || '#6B7280' }}
                   >
                     {color.name}
                   </span>

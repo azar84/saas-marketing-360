@@ -5,6 +5,7 @@ import { Mail, Database } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import FormBuilder from './FormBuilder';
 import FormSubmissionsManager from './FormSubmissionsManager';
+import { useDesignSystem, getAdminPanelColorsWithDesignSystem } from '@/hooks/useDesignSystem';
 
 type ContactTab = 'forms' | 'submissions';
 
@@ -24,20 +25,34 @@ const tabs = [
 ];
 
 export default function ContactManager() {
+  const { designSystem } = useDesignSystem();
+  const adminColors = getAdminPanelColorsWithDesignSystem(designSystem);
+  
   const [activeTab, setActiveTab] = useState<ContactTab>('forms');
 
   return (
     <div className="p-6 space-y-6">
       {/* Header */}
-      <div className="border-b border-gray-200 pb-6">
-        <h1 className="text-2xl font-bold text-gray-900 mb-2">Forms Management</h1>
-        <p className="text-gray-600">
+      <div 
+        className="border-b pb-6"
+        style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}
+      >
+        <h1 
+          className="text-2xl font-bold mb-2"
+          style={{ color: 'var(--color-text-primary, #1F2937)' }}
+        >
+          Forms Management
+        </h1>
+        <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
           Build and manage dynamic contact forms with custom fields and validation
         </p>
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200">
+      <div 
+        className="border-b"
+        style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}
+      >
         <nav className="-mb-px flex space-x-8">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -47,18 +62,23 @@ export default function ContactManager() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-                  isActive
-                    ? 'border-green-500 text-green-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className="group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                style={{
+                  borderColor: isActive 
+                    ? 'var(--color-success, #10B981)' 
+                    : 'transparent',
+                  color: isActive 
+                    ? 'var(--color-success, #10B981)' 
+                    : 'var(--color-text-secondary, #6B7280)'
+                }}
               >
                 <Icon
-                  className={`mr-2 h-5 w-5 transition-colors ${
-                    isActive
-                      ? 'text-green-500'
-                      : 'text-gray-400 group-hover:text-gray-500'
-                  }`}
+                  className="mr-2 h-5 w-5 transition-colors"
+                  style={{
+                    color: isActive 
+                      ? 'var(--color-success, #10B981)' 
+                      : 'var(--color-text-muted, #9CA3AF)'
+                  }}
                 />
                 {tab.name}
               </button>
@@ -68,8 +88,14 @@ export default function ContactManager() {
       </div>
 
       {/* Tab Description */}
-      <div className="bg-green-50 rounded-lg p-4">
-        <p className="text-green-800 text-sm">
+      <div 
+        className="rounded-lg p-4"
+        style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}
+      >
+        <p 
+          className="text-sm"
+          style={{ color: 'var(--color-success, #10B981)' }}
+        >
           {tabs.find(tab => tab.id === activeTab)?.description}
         </p>
       </div>

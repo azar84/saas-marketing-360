@@ -166,8 +166,8 @@ export default function CTAManagerSimplified() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">CTA Button Manager</h2>
-          <p className="text-gray-600 mt-2">Manage call-to-action buttons for your website header</p>
+          <h2 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>CTA Button Manager</h2>
+          <p className="mt-2" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Manage call-to-action buttons for your website header</p>
         </div>
         <Button onClick={startCreate} className="bg-emerald-600 hover:bg-emerald-700">
           <Plus className="w-4 h-4 mr-2" />

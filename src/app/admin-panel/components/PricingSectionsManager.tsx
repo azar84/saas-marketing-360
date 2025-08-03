@@ -518,7 +518,7 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading pricing sections...</p>
+          <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Loading pricing sections...</p>
         </div>
       </div>
     );
@@ -527,17 +527,14 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
   return (
     <div className="space-y-8">
       {/* Create New Pricing Section */}
-      <Card className="overflow-hidden border-0 shadow-2xl bg-gradient-to-br from-slate-50 via-white to-blue-50/30">
+      <Card className="p-8 border-2 shadow-xl" style={{ borderColor: 'var(--color-accent, #06B6D4)', backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}>
         {/* Header */}
-        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 px-8 py-6">
-          <div className="flex items-center space-x-4">
-            <div className="p-3 bg-white/20 backdrop-blur-sm rounded-xl">
-              <Plus className="w-6 h-6 text-white" />
-          </div>
-            <div>
-              <h3 className="text-2xl font-bold text-white">Create New Pricing Section</h3>
-              <p className="text-blue-100 mt-1">Design and configure a new pricing section for your website</p>
+                  <div className="mb-6">
+          <div className="flex items-center space-x-3 mb-6">
+            <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-accent, #06B6D4)' }}>
+              <Plus className="w-5 h-5 text-white" />
             </div>
+            <h3 className="text-xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Create New Pricing Section</h3>
           </div>
         </div>
         
@@ -546,14 +543,14 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
           {/* Basic Information */}
           <div className="space-y-6">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
-              <h4 className="text-lg font-semibold text-gray-900">Basic Information</h4>
+              <div className="w-1 h-6 rounded-full" style={{ backgroundColor: 'var(--color-primary, #5243E9)' }}></div>
+              <h4 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Basic Information</h4>
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Internal Name <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                  Internal Name <span style={{ color: 'var(--color-error, #EF4444)' }}>*</span>
                 </label>
           <Input
                   placeholder="e.g., 'Home Page Pricing', 'Enterprise Plans'"
@@ -561,12 +558,12 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
             onChange={(e) => setNewSection({ ...newSection, name: e.target.value })}
                   className="h-12 text-base"
           />
-                <p className="text-xs text-gray-500">Used internally for organization</p>
+                <p className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Used internally for organization</p>
               </div>
               
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">
-                  Display Heading <span className="text-red-500">*</span>
+                <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                  Display Heading <span style={{ color: 'var(--color-error, #EF4444)' }}>*</span>
                 </label>
           <Input
                   placeholder="e.g., 'Choose Your Plan', 'Pricing Plans'"
@@ -574,12 +571,12 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
             onChange={(e) => setNewSection({ ...newSection, heading: e.target.value })}
                   className="h-12 text-base"
           />
-                <p className="text-xs text-gray-500">Main heading shown to visitors</p>
+                <p className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Main heading shown to visitors</p>
               </div>
         </div>
 
             <div className="space-y-2">
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Subheading
               </label>
           <Input
@@ -588,19 +585,19 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
             onChange={(e) => setNewSection({ ...newSection, subheading: e.target.value })}
                 className="h-12 text-base"
           />
-              <p className="text-xs text-gray-500">Optional subtitle to provide more context</p>
+              <p className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Optional subtitle to provide more context</p>
             </div>
         </div>
 
           {/* Layout Selection */}
           <div className="space-y-6">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-1 h-6 bg-gradient-to-b from-green-500 to-emerald-500 rounded-full"></div>
-              <h4 className="text-lg font-semibold text-gray-900">Layout Configuration</h4>
+              <div className="w-1 h-6 rounded-full" style={{ backgroundColor: 'var(--color-success, #10B981)' }}></div>
+              <h4 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Layout Configuration</h4>
             </div>
             
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-4">Choose Layout Type</label>
+              <label className="block text-sm font-medium mb-4" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Choose Layout Type</label>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {layoutOptions.map((layout) => {
               const IconComponent = layout.icon;
@@ -609,33 +606,33 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                 <button
                   key={layout.value}
                   onClick={() => setNewSection({ ...newSection, layoutType: layout.value })}
-                      className={`group relative p-6 rounded-2xl border-2 transition-all duration-300 ${
-                    isSelected
-                          ? 'border-blue-500 bg-blue-50 shadow-lg shadow-blue-100'
-                          : 'border-gray-200 hover:border-gray-300 hover:shadow-md bg-white'
-                      }`}
+                      className={`group relative p-6 rounded-2xl border-2 transition-all duration-300`}
+                      style={isSelected ? 
+                        { borderColor: 'var(--color-primary, #5243E9)', backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' } : 
+                        { borderColor: 'var(--color-gray-light, #E5E7EB)', backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }
+                      }
                     >
                       {isSelected && (
-                        <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
+                        <div className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary, #5243E9)' }}>
                           <Check className="w-4 h-4 text-white" />
                         </div>
                       )}
                       <div className="text-center">
-                        <div className={`p-3 rounded-xl mb-3 mx-auto w-fit ${
-                          isSelected ? 'bg-blue-100' : 'bg-gray-100 group-hover:bg-gray-200'
-                        }`}>
-                          <IconComponent className={`w-8 h-8 ${
-                            isSelected ? 'text-blue-600' : 'text-gray-600'
-                          }`} />
+                        <div className={`p-3 rounded-xl mb-3 mx-auto w-fit`} style={{
+                          backgroundColor: isSelected ? 'var(--color-bg-secondary, #F9FAFB)' : 'var(--color-gray-light, #E5E7EB)'
+                        }}>
+                          <IconComponent className="w-8 h-8" style={{ 
+                            color: isSelected ? 'var(--color-primary, #5243E9)' : 'var(--color-text-secondary, #6B7280)' 
+                          }} />
                         </div>
-                        <div className={`text-sm font-semibold mb-1 ${
-                          isSelected ? 'text-blue-700' : 'text-gray-900'
-                        }`}>
+                        <div className="text-sm font-semibold mb-1" style={{ 
+                          color: isSelected ? 'var(--color-primary, #5243E9)' : 'var(--color-text-primary, #1F2937)' 
+                        }}>
                           {layout.label}
                         </div>
-                        <div className={`text-xs ${
-                          isSelected ? 'text-blue-600' : 'text-gray-500'
-                        }`}>
+                        <div className="text-xs" style={{ 
+                          color: isSelected ? 'var(--color-primary, #5243E9)' : 'var(--color-text-muted, #9CA3AF)' 
+                        }}>
                           {layout.description}
                         </div>
                       </div>
@@ -649,14 +646,14 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
           {/* Background Colors */}
           <div className="space-y-6">
             <div className="flex items-center space-x-3 mb-6">
-              <div className="w-1 h-6 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full"></div>
-              <h4 className="text-lg font-semibold text-gray-900">Visual Styling</h4>
+              <div className="w-1 h-6 rounded-full" style={{ backgroundColor: 'var(--color-accent, #F59E0B)' }}></div>
+              <h4 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Visual Styling</h4>
             </div>
             
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               <div className="space-y-4">
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Pricing Cards Background
                   </label>
                   <ColorSelector
@@ -670,7 +667,7 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
               
               <div className="space-y-4">
                 <div className="space-y-3">
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Comparison Table Background
                   </label>
                   <ColorSelector
@@ -686,13 +683,14 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
 
           {/* Action Buttons */}
           <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-            <div className="text-sm text-gray-500">
-              <span className="text-red-500">*</span> Required fields
+            <div className="text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+              <span style={{ color: 'var(--color-error, #EF4444)' }}>*</span> Required fields
             </div>
           <Button
             onClick={handleCreateSection}
             disabled={loading || !newSection.name.trim() || !newSection.heading.trim()}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-3 h-12 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+              className="px-8 py-3 h-12 text-base font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+              style={{ backgroundColor: 'var(--color-primary, #5243E9)', color: 'var(--color-bg-primary, #FFFFFF)' }}
           >
               {loading ? (
                 <div className="flex items-center space-x-2">
@@ -721,27 +719,27 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
           return (
             <Card key={section.id} className="overflow-hidden border-0 shadow-xl hover:shadow-2xl transition-all duration-300 bg-white">
               {/* Section Header */}
-              <div className="bg-gradient-to-r from-slate-50 via-blue-50/50 to-indigo-50/30 px-6 py-6 border-b border-gray-100">
+              <div className="px-6 py-6 border-b" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <div className="p-3 bg-gradient-to-br from-blue-100 to-purple-100 rounded-xl shadow-sm">
-                      <LayoutIcon className="w-6 h-6 text-blue-600" />
+                    <div className="p-3 rounded-xl shadow-sm" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}>
+                      <LayoutIcon className="w-6 h-6" style={{ color: 'var(--color-primary, #5243E9)' }} />
                     </div>
                     <div>
                       {isEditing ? (
-                        <div className="bg-white rounded-xl p-6 shadow-lg border border-gray-200">
+                        <div className="rounded-xl p-6 shadow-lg border" style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)', borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
                           <div className="space-y-6">
                             {/* Basic Information */}
                             <div className="space-y-4">
                               <div className="flex items-center space-x-3 mb-4">
-                                <div className="w-1 h-5 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
-                                <h5 className="text-base font-semibold text-gray-900">Edit Information</h5>
+                                <div className="w-1 h-5 rounded-full" style={{ backgroundColor: 'var(--color-primary, #5243E9)' }}></div>
+                                <h5 className="text-base font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Edit Information</h5>
                               </div>
                               
                               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    Internal Name <span className="text-red-500">*</span>
+                                  <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                                    Internal Name <span style={{ color: 'var(--color-error, #EF4444)' }}>*</span>
                                   </label>
                           <Input
                             value={editSectionData?.name || ''}
@@ -752,8 +750,8 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                                 </div>
                                 
                                 <div className="space-y-2">
-                                  <label className="block text-sm font-medium text-gray-700">
-                                    Display Heading <span className="text-red-500">*</span>
+                                  <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                                    Display Heading <span style={{ color: 'var(--color-error, #EF4444)' }}>*</span>
                                   </label>
                           <Input
                             value={editSectionData?.heading || ''}
@@ -765,7 +763,7 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                               </div>
                               
                               <div className="space-y-2">
-                                <label className="block text-sm font-medium text-gray-700">
+                                <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                                   Subheading
                                 </label>
                           <Input
@@ -780,8 +778,8 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                             {/* Layout Selection */}
                             <div className="space-y-4">
                               <div className="flex items-center space-x-3 mb-4">
-                                <div className="w-1 h-5 bg-gradient-to-b from-green-500 to-emerald-500 rounded-full"></div>
-                                <h5 className="text-base font-semibold text-gray-900">Layout Type</h5>
+                                <div className="w-1 h-5 rounded-full" style={{ backgroundColor: 'var(--color-success, #10B981)' }}></div>
+                                <h5 className="text-base font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Layout Type</h5>
                               </div>
                               
                               <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
@@ -792,28 +790,28 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                                     <button
                                       key={layout.value}
                                       onClick={() => setEditSectionData({ ...editSectionData, layoutType: layout.value })}
-                                      className={`group relative p-4 rounded-xl border-2 transition-all duration-200 ${
-                                        isSelected
-                                          ? 'border-blue-500 bg-blue-50 shadow-md'
-                                          : 'border-gray-200 hover:border-gray-300 hover:shadow-sm bg-white'
-                                      }`}
+                                      className={`group relative p-4 rounded-xl border-2 transition-all duration-200`}
+                                      style={isSelected ? 
+                                        { borderColor: 'var(--color-primary, #5243E9)', backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' } : 
+                                        { borderColor: 'var(--color-gray-light, #E5E7EB)', backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }
+                                      }
                                     >
                                       {isSelected && (
-                                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                                        <div className="absolute -top-1 -right-1 w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary, #5243E9)' }}>
                                           <Check className="w-3 h-3 text-white" />
                                         </div>
                                       )}
                                       <div className="text-center">
-                                        <div className={`p-2 rounded-lg mb-2 mx-auto w-fit ${
-                                          isSelected ? 'bg-blue-100' : 'bg-gray-100 group-hover:bg-gray-200'
-                                        }`}>
-                                          <IconComponent className={`w-6 h-6 ${
-                                            isSelected ? 'text-blue-600' : 'text-gray-600'
-                                          }`} />
+                                        <div className={`p-2 rounded-lg mb-2 mx-auto w-fit`} style={{
+                                          backgroundColor: isSelected ? 'var(--color-bg-secondary, #F9FAFB)' : 'var(--color-gray-light, #E5E7EB)'
+                                        }}>
+                                          <IconComponent className="w-6 h-6" style={{ 
+                                            color: isSelected ? 'var(--color-primary, #5243E9)' : 'var(--color-text-secondary, #6B7280)' 
+                                          }} />
                                         </div>
-                                        <div className={`text-xs font-medium mb-1 ${
-                                          isSelected ? 'text-blue-700' : 'text-gray-900'
-                                        }`}>
+                                        <div className="text-xs font-medium mb-1" style={{ 
+                                          color: isSelected ? 'var(--color-primary, #5243E9)' : 'var(--color-text-primary, #1F2937)' 
+                                        }}>
                                           {layout.label}
                                         </div>
                                       </div>
@@ -826,13 +824,13 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                             {/* Background Colors */}
                             <div className="space-y-4">
                               <div className="flex items-center space-x-3 mb-4">
-                                <div className="w-1 h-5 bg-gradient-to-b from-purple-500 to-pink-500 rounded-full"></div>
-                                <h5 className="text-base font-semibold text-gray-900">Background Colors</h5>
+                                <div className="w-1 h-5 rounded-full" style={{ backgroundColor: 'var(--color-accent, #F59E0B)' }}></div>
+                                <h5 className="text-base font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Background Colors</h5>
                               </div>
                               
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-3">
-                                  <label className="block text-sm font-medium text-gray-700">
+                                  <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                                     Pricing Cards Background
                                   </label>
                                   <ColorSelector
@@ -844,7 +842,7 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                                 </div>
                                 
                                 <div className="space-y-3">
-                                  <label className="block text-sm font-medium text-gray-700">
+                                  <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                                     Comparison Table Background
                                   </label>
                                   <ColorSelector
@@ -859,21 +857,23 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
 
                             {/* Action Buttons */}
                             <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                              <div className="text-sm text-gray-500">
-                                <span className="text-red-500">*</span> Required fields
+                              <div className="text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+                                <span style={{ color: 'var(--color-error, #EF4444)' }}>*</span> Required fields
                               </div>
                               <div className="flex space-x-3">
                                 <Button
                                   onClick={handleCancelEdit}
                                   variant="outline"
-                                  className="px-6 py-2 h-10 text-sm font-medium border-gray-300 hover:bg-gray-50"
+                                  className="px-6 py-2 h-10 text-sm font-medium"
+                                  style={{ borderColor: 'var(--color-gray-light, #E5E7EB)', color: 'var(--color-text-primary, #1F2937)' }}
                                 >
                                   <X className="w-4 h-4 mr-2" />
                                   Cancel
                                 </Button>
                                 <Button
                                   onClick={handleUpdateSection}
-                                  className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-2 h-10 text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+                                  className="px-6 py-2 h-10 text-sm font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+                                  style={{ backgroundColor: 'var(--color-success, #10B981)', color: 'var(--color-bg-primary, #FFFFFF)' }}
                                 >
                                   {loading ? (
                                     <div className="flex items-center space-x-2">
@@ -894,11 +894,11 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                       ) : (
                         <div className="space-y-4">
                         <div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">{section.name}</h3>
+                            <h3 className="text-xl font-bold mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{section.name}</h3>
                             <div className="space-y-1">
-                              <p className="text-gray-700 font-medium">"{section.heading}"</p>
+                              <p className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>"{section.heading}"</p>
                           {section.subheading && (
-                                <p className="text-sm text-gray-500 italic">"{section.subheading}"</p>
+                                <p className="text-sm italic" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>"{section.subheading}"</p>
                           )}
                             </div>
                           </div>
@@ -923,14 +923,14 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                           {/* Background Color Preview */}
                           <div className="flex items-center space-x-4 pt-2">
                             <div className="flex items-center space-x-2">
-                              <span className="text-xs text-gray-500">Cards BG:</span>
+                              <span className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Cards BG:</span>
                               <div 
                                 className="w-4 h-4 rounded border border-gray-300"
                                 style={{ backgroundColor: section.pricingCardsBackgroundColor || '#FFFFFF' }}
                               ></div>
                             </div>
                             <div className="flex items-center space-x-2">
-                              <span className="text-xs text-gray-500">Table BG:</span>
+                              <span className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Table BG:</span>
                               <div 
                                 className="w-4 h-4 rounded border border-gray-300"
                                 style={{ backgroundColor: section.comparisonTableBackgroundColor || '#F9FAFB' }}
@@ -1013,11 +1013,11 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
               {isExpanded && (
                 <div className="p-6 space-y-6">
                   <div className="flex items-center justify-between">
-                    <h4 className="text-lg font-bold text-gray-900 flex items-center">
-                      <Settings className="w-5 h-5 mr-2 text-pink-600" />
+                    <h4 className="text-lg font-bold flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                      <Settings className="w-5 h-5 mr-2" style={{ color: 'var(--color-primary, #5243E9)' }} />
                       Plan Management
                     </h4>
-                    <div className="text-sm text-gray-500">
+                    <div className="text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                       {section.sectionPlans.length} of {availablePlans.length} plans selected
                     </div>
                   </div>
@@ -1025,26 +1025,30 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                   {/* Available Plans Grid */}
                   {availablePlansForSection.length > 0 && (
                     <div>
-                      <h5 className="text-md font-semibold text-gray-800 mb-4 flex items-center">
-                        <Plus className="w-4 h-4 mr-2 text-green-600" />
+                      <h5 className="text-md font-semibold mb-4 flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                        <Plus className="w-4 h-4 mr-2" style={{ color: 'var(--color-success, #10B981)' }} />
                         Available Plans to Add ({availablePlansForSection.length})
                       </h5>
                       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                         {availablePlansForSection.map((plan) => (
                           <Card
                             key={plan.id}
-                            className="p-4 hover:shadow-md border-2 border-dashed border-gray-200 hover:border-green-300 transition-all cursor-pointer bg-gradient-to-br from-white to-green-50/30"
+                            className="p-4 hover:shadow-md border-2 border-dashed transition-all cursor-pointer"
+                            style={{ 
+                              borderColor: 'var(--color-gray-light, #E5E7EB)', 
+                              backgroundColor: 'var(--color-bg-primary, #FFFFFF)' 
+                            }}
                             onClick={() => handleAddPlanToSection(section.id, plan.id)}
                           >
                             <div className="flex items-start justify-between mb-3">
                               <div className="flex-1">
                                 <div className="flex items-center space-x-2 mb-1">
-                                  <h6 className="font-semibold text-gray-900">{plan.name}</h6>
+                                  <h6 className="font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{plan.name}</h6>
                                   {plan.isPopular && (
-                                    <Crown className="w-4 h-4 text-yellow-500 fill-current" />
+                                    <Crown className="w-4 h-4 fill-current" style={{ color: 'var(--color-warning, #F59E0B)' }} />
                                   )}
                                 </div>
-                                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                                <div className="flex items-center space-x-2 text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                                   <DollarSign className="w-3 h-3" />
                                   <span className="font-medium">{formatPlanPrice(plan)}</span>
                                   <span>•</span>
@@ -1053,7 +1057,8 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                               </div>
                               <Button
                                 size="sm"
-                                className="bg-green-600 text-white hover:bg-green-700 ml-2"
+                                className="ml-2"
+                                style={{ backgroundColor: 'var(--color-success, #10B981)', color: 'var(--color-bg-primary, #FFFFFF)' }}
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   handleAddPlanToSection(section.id, plan.id);
@@ -1064,13 +1069,13 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                               </Button>
                             </div>
                             {plan.description && (
-                              <p className="text-xs text-gray-500 line-clamp-2">{plan.description}</p>
+                              <p className="text-xs line-clamp-2" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>{plan.description}</p>
                             )}
-                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                            <div className="flex items-center justify-between mt-3 pt-3 border-t" style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
                               <Badge variant={plan.isActive ? 'default' : 'secondary'} className="text-xs">
                                 {plan.isActive ? 'Active' : 'Inactive'}
                               </Badge>
-                              <div className="text-xs text-gray-400">
+                              <div className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                                 Position: {plan.position}
                               </div>
                             </div>
@@ -1082,8 +1087,8 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
 
                   {/* Current Plans in Section */}
                   <div>
-                    <h5 className="text-md font-semibold text-gray-800 mb-4 flex items-center">
-                      <CheckCircle2 className="w-4 h-4 mr-2 text-blue-600" />
+                    <h5 className="text-md font-semibold mb-4 flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                      <CheckCircle2 className="w-4 h-4 mr-2" style={{ color: 'var(--color-info, #3B82F6)' }} />
                       Plans in This Section ({section.sectionPlans.length})
                     </h5>
                     
@@ -1092,17 +1097,21 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                         {section.sectionPlans.map((sectionPlan) => (
                           <Card
                             key={sectionPlan.id}
-                            className="p-4 bg-gradient-to-br from-blue-50 to-purple-50 border-2 border-blue-200"
+                            className="p-4 border-2"
+                            style={{ 
+                              backgroundColor: 'var(--color-bg-secondary, #F9FAFB)', 
+                              borderColor: 'var(--color-primary, #5243E9)' 
+                            }}
                           >
                             <div className="flex items-start justify-between mb-3">
                               <div className="flex-1">
                                 <div className="flex items-center space-x-2 mb-1">
-                                  <h6 className="font-semibold text-gray-900">{sectionPlan.plan.name}</h6>
+                                  <h6 className="font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{sectionPlan.plan.name}</h6>
                                   {sectionPlan.plan.isPopular && (
-                                    <Crown className="w-4 h-4 text-yellow-500 fill-current" />
+                                    <Crown className="w-4 h-4 fill-current" style={{ color: 'var(--color-warning, #F59E0B)' }} />
                                   )}
                                 </div>
-                                <div className="flex items-center space-x-2 text-sm text-gray-600">
+                                <div className="flex items-center space-x-2 text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                                   <DollarSign className="w-3 h-3" />
                                   <span className="font-medium">{formatPlanPrice(sectionPlan.plan)}</span>
                                   <span>•</span>
@@ -1112,7 +1121,8 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                               <Button
                                 size="sm"
                                 variant="outline"
-                                className="text-red-600 hover:bg-red-50 border-red-200 ml-2"
+                                className="ml-2"
+                                style={{ color: 'var(--color-error, #EF4444)', borderColor: 'var(--color-error, #EF4444)' }}
                                 onClick={() => handleRemovePlanFromSection(sectionPlan.id, section.id)}
                               >
                                 <X className="w-3 h-3 mr-1" />
@@ -1126,10 +1136,10 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                                   {sectionPlan.isVisible ? 'Visible' : 'Hidden'}
                                 </Badge>
                                 {sectionPlan.plan.isPopular && (
-                                  <Badge className="text-xs bg-yellow-100 text-yellow-800">Popular</Badge>
+                                  <Badge className="text-xs" style={{ backgroundColor: 'var(--color-warning-light, #FEF3C7)', color: 'var(--color-warning-dark, #92400E)' }}>Popular</Badge>
                                 )}
                               </div>
-                              <div className="text-xs text-gray-500">
+                              <div className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                                 Order: {sectionPlan.sortOrder}
                               </div>
                             </div>
@@ -1139,8 +1149,8 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
                     ) : (
                       <Card className="p-8 text-center border-2 border-dashed border-gray-200 bg-gray-50">
                         <Package className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                        <h6 className="font-semibold text-gray-700 mb-1">No Plans Added Yet</h6>
-                        <p className="text-sm text-gray-500 mb-4">
+                        <h6 className="font-semibold mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>No Plans Added Yet</h6>
+                        <p className="text-sm mb-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                           Add plans from the available list above to populate this pricing section
                         </p>
                         {availablePlansForSection.length > 0 && (
@@ -1166,8 +1176,8 @@ export default function PricingSectionsManager({ onSuccess, onError }: PricingSe
       {pricingSections.length === 0 && !loading && (
         <Card className="p-12 text-center">
           <Layout className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">No Pricing Sections Yet</h3>
-          <p className="text-gray-600 mb-6">Create your first pricing section to get started organizing your pricing displays.</p>
+          <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>No Pricing Sections Yet</h3>
+          <p className="mb-6" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Create your first pricing section to get started organizing your pricing displays.</p>
         </Card>
       )}
     </div>

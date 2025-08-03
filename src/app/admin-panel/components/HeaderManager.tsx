@@ -264,8 +264,8 @@ const HeaderManager = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-3xl font-bold text-gray-900">Header Configuration</h2>
-          <p className="text-gray-600 mt-2">Configure navigation items and CTA buttons for your website header</p>
+          <h2 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Header Configuration</h2>
+          <p className="mt-2" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Configure navigation items and CTA buttons for your website header</p>
         </div>
         <button
           onClick={saveHeaderConfig}
@@ -279,7 +279,7 @@ const HeaderManager = () => {
       {/* Navigation Items Section */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex justify-between items-center mb-6">
-          <h3 className="text-xl font-semibold text-gray-900">Navigation Items</h3>
+          <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Navigation Items</h3>
           <button
             onClick={addNavItem}
             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium"
@@ -456,7 +456,7 @@ const HeaderManager = () => {
         {/* Selected CTA Buttons */}
         {selectedCTAs.length > 0 && (
           <div>
-            <h4 className="text-lg font-medium text-gray-900 mb-4">Selected for Header</h4>
+            <h4 className="text-lg font-medium mb-4" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Selected for Header</h4>
             <div className="space-y-2">
               {selectedCTAs.map((item, index) => {
                 const cta = ctaButtons.find(c => c.id === item.ctaId);

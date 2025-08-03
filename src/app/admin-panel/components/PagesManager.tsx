@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
+import { useDesignSystem, getAdminPanelColorsWithDesignSystem } from '@/hooks/useDesignSystem';
 import { 
   Plus, 
   Edit, 
@@ -49,6 +50,9 @@ interface PageFormData {
 }
 
 export default function PagesManager() {
+  const { designSystem } = useDesignSystem();
+  const adminColors = getAdminPanelColorsWithDesignSystem(designSystem);
+  
   const [pages, setPages] = useState<Page[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -237,12 +241,25 @@ export default function PagesManager() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Pages Manager</h1>
-          <p className="text-gray-600 mt-2">Manage your website pages and content structure</p>
+          <h1 
+            className="text-3xl font-bold"
+            style={{ color: adminColors.textPrimary }}
+          >
+            Pages Manager
+          </h1>
+          <p 
+            className="mt-2"
+            style={{ color: adminColors.textSecondary }}
+          >
+            Manage your website pages and content structure
+          </p>
         </div>
         <Button
           onClick={() => setShowForm(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
+          style={{
+            backgroundColor: adminColors.primary,
+            color: '#FFFFFF'
+          }}
         >
           <Plus className="w-4 h-4 mr-2" />
           Add New Page
@@ -251,40 +268,72 @@ export default function PagesManager() {
 
       {/* Message */}
       {message && (
-        <div className={`p-4 rounded-lg ${
-          message.type === 'success' 
-            ? 'bg-green-50 text-green-800 border border-green-200' 
-            : 'bg-red-50 text-red-800 border border-red-200'
-        }`}>
+        <div 
+          className="p-4 rounded-lg border"
+          style={{
+            backgroundColor: message.type === 'success' 
+              ? adminColors.backgroundSecondary
+              : adminColors.backgroundSecondary,
+            color: adminColors.textPrimary,
+            borderColor: message.type === 'success' 
+              ? adminColors.success
+              : adminColors.error
+          }}
+        >
           {message.text}
         </div>
       )}
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/4 text-gray-400 w-5 h-5" />
+        <Search 
+          className="absolute left-3 top-1/2 transform -translate-y-1/4 w-5 h-5" 
+          style={{ color: adminColors.textMuted }}
+        />
         <Input
           type="text"
           placeholder="Search pages..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           className="pl-10"
+          style={{
+            backgroundColor: adminColors.backgroundSecondary,
+            color: adminColors.textPrimary,
+            borderColor: adminColors.border
+          }}
         />
       </div>
 
       {/* Pages Grid */}
       <div className="grid gap-6">
         {filteredPages.length === 0 ? (
-          <Card className="p-12 text-center">
-            <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No pages found</h3>
-            <p className="text-gray-600 mb-6">
+          <Card 
+            className="p-12 text-center"
+            style={{ backgroundColor: adminColors.backgroundSecondary }}
+          >
+            <FileText 
+              className="w-12 h-12 mx-auto mb-4" 
+              style={{ color: adminColors.textMuted }}
+            />
+            <h3 
+              className="text-lg font-medium mb-2"
+              style={{ color: adminColors.textPrimary }}
+            >
+              No pages found
+            </h3>
+            <p 
+              className="mb-6"
+              style={{ color: adminColors.textSecondary }}
+            >
               {searchTerm ? 'No pages match your search criteria.' : 'Get started by creating your first page.'}
             </p>
             {!searchTerm && (
               <Button
                 onClick={() => setShowForm(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                style={{
+                  backgroundColor: adminColors.primary,
+                  color: '#FFFFFF'
+                }}
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Your First Page
@@ -293,32 +342,66 @@ export default function PagesManager() {
           </Card>
         ) : (
           filteredPages.map((page) => (
-            <Card key={page.id} className="p-6 hover:shadow-lg transition-shadow">
+            <Card 
+              key={page.id} 
+              className="p-6 hover:shadow-lg transition-shadow"
+              style={{ backgroundColor: adminColors.backgroundSecondary }}
+            >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-3">
-                    <h3 className="text-xl font-semibold text-gray-900">{page.title}</h3>
+                    <h3 
+                      className="text-xl font-semibold"
+                      style={{ color: adminColors.textPrimary }}
+                    >
+                      {page.title}
+                    </h3>
                     {page.slug === 'home' && (
-                      <span className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded-full">
+                      <span 
+                        className="px-2 py-1 text-xs font-medium rounded-full"
+                        style={{
+                          backgroundColor: `${adminColors.primary}20`,
+                          color: adminColors.primary
+                        }}
+                      >
                         Default Home Page
                       </span>
                     )}
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <div 
+                      className="flex items-center gap-2 text-sm"
+                      style={{ color: adminColors.textSecondary }}
+                    >
                       <ArrowUpDown className="w-4 h-4" />
                       <span>Order: {page.sortOrder}</span>
                     </div>
                   </div>
                   
                   <div className="flex items-center gap-2 mb-3">
-                    <Globe className="w-4 h-4 text-gray-400" />
-                    <span className="text-sm text-gray-600">/{page.slug}</span>
+                    <Globe 
+                      className="w-4 h-4" 
+                      style={{ color: adminColors.textMuted }}
+                    />
+                    <span 
+                      className="text-sm"
+                      style={{ color: adminColors.textSecondary }}
+                    >
+                      /{page.slug}
+                    </span>
                   </div>
 
                   {page.metaDesc && (
-                    <p className="text-gray-600 mb-4 line-clamp-2">{page.metaDesc}</p>
+                    <p 
+                      className="mb-4 line-clamp-2"
+                      style={{ color: adminColors.textSecondary }}
+                    >
+                      {page.metaDesc}
+                    </p>
                   )}
 
-                  <div className="flex items-center gap-6 text-sm text-gray-500">
+                  <div 
+                    className="flex items-center gap-6 text-sm"
+                    style={{ color: adminColors.textSecondary }}
+                  >
                     <div className="flex items-center gap-1">
                       <Hash className="w-4 h-4" />
                       <span>{page._count?.features || 0} Features</span>
@@ -339,7 +422,11 @@ export default function PagesManager() {
                     onClick={() => window.open(`/${page.slug}`, '_blank')}
                     variant="outline"
                     size="sm"
-                    className="text-green-600 border-green-200 hover:bg-green-50"
+                    style={{
+                      color: adminColors.success,
+                      borderColor: adminColors.success,
+                      backgroundColor: 'transparent'
+                    }}
                     title="View page in frontend"
                   >
                     <ExternalLink className="w-4 h-4" />
@@ -348,7 +435,11 @@ export default function PagesManager() {
                     onClick={() => handleEdit(page)}
                     variant="outline"
                     size="sm"
-                    className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                    style={{
+                      color: adminColors.primary,
+                      borderColor: adminColors.primary,
+                      backgroundColor: 'transparent'
+                    }}
                   >
                     <Edit className="w-4 h-4" />
                   </Button>
@@ -357,10 +448,16 @@ export default function PagesManager() {
                     variant="outline"
                     size="sm"
                     disabled={page.slug === 'home'}
-                    className={page.slug === 'home' 
-                      ? "text-gray-400 border-gray-200 cursor-not-allowed" 
-                      : "text-red-600 border-red-200 hover:bg-red-50"
-                    }
+                    style={{
+                      color: page.slug === 'home' 
+                        ? adminColors.textMuted
+                        : adminColors.error,
+                      borderColor: page.slug === 'home' 
+                        ? adminColors.textMuted
+                        : adminColors.error,
+                      backgroundColor: 'transparent',
+                      cursor: page.slug === 'home' ? 'not-allowed' : 'pointer'
+                    }}
                     title={page.slug === 'home' ? 'Home page cannot be deleted' : 'Delete page'}
                   >
                     <Trash2 className="w-4 h-4" />
@@ -375,17 +472,30 @@ export default function PagesManager() {
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="p-6 border-b border-gray-200">
+          <div 
+            className="rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
+            style={{ backgroundColor: adminColors.backgroundSecondary }}
+          >
+            <div 
+              className="p-6 border-b"
+              style={{ borderColor: adminColors.border }}
+            >
               <div className="flex items-center justify-between">
-                <h2 className="text-xl font-semibold text-gray-900">
+                <h2 
+                  className="text-xl font-semibold"
+                  style={{ color: adminColors.textPrimary }}
+                >
                   {editingPage ? 'Edit Page' : 'Create New Page'}
                 </h2>
                 <Button
                   onClick={handleCloseForm}
                   variant="outline"
                   size="sm"
-                  className="text-gray-500 hover:text-gray-700"
+                  style={{
+                    color: adminColors.textMuted,
+                    borderColor: adminColors.border,
+                    backgroundColor: 'transparent'
+                  }}
                 >
                   <X className="w-4 h-4" />
                 </Button>
@@ -395,7 +505,10 @@ export default function PagesManager() {
             <form onSubmit={handleSubmit} className="p-6 space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label 
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: adminColors.textSecondary }}
+                  >
                     Page Title *
                   </label>
                   <Input
@@ -405,11 +518,19 @@ export default function PagesManager() {
                     placeholder="Enter page title"
                     required
                     className="w-full"
+                    style={{
+                      backgroundColor: adminColors.backgroundSecondary,
+                      color: adminColors.textPrimary,
+                      borderColor: adminColors.border
+                    }}
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label 
+                    className="block text-sm font-medium mb-2"
+                    style={{ color: adminColors.textSecondary }}
+                  >
                     Navigation Order
                   </label>
                   <Input
@@ -419,15 +540,26 @@ export default function PagesManager() {
                     placeholder="0 = hidden, 1 = first, 2 = second..."
                     min="0"
                     className="w-full"
+                    style={{
+                      backgroundColor: adminColors.backgroundSecondary,
+                      color: adminColors.textPrimary,
+                      borderColor: adminColors.border
+                    }}
                   />
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p 
+                    className="text-xs mt-1"
+                    style={{ color: adminColors.textMuted }}
+                  >
                     0 = Hidden from navigation, 1 = First position, 2 = Second position, etc.
                   </p>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label 
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: adminColors.textSecondary }}
+                >
                   URL Slug *
                 </label>
                 <Input
@@ -438,8 +570,16 @@ export default function PagesManager() {
                   required
                   disabled={editingPage?.slug === 'home'}
                   className="w-full"
+                  style={{
+                    backgroundColor: adminColors.backgroundSecondary,
+                    color: adminColors.textPrimary,
+                    borderColor: adminColors.border
+                  }}
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p 
+                  className="text-xs mt-1"
+                  style={{ color: adminColors.textMuted }}
+                >
                   {editingPage?.slug === 'home' 
                     ? 'The home page slug cannot be changed as it maps to the base URL (/)' 
                     : `This will be the URL path: /${formData.slug}`
@@ -448,7 +588,10 @@ export default function PagesManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label 
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: adminColors.textSecondary }}
+                >
                   Meta Title
                 </label>
                 <Input
@@ -457,11 +600,19 @@ export default function PagesManager() {
                   onChange={(e) => handleInputChange('metaTitle', e.target.value)}
                   placeholder="SEO title for search engines"
                   className="w-full"
+                  style={{
+                    backgroundColor: adminColors.backgroundSecondary,
+                    color: adminColors.textPrimary,
+                    borderColor: adminColors.border
+                  }}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label 
+                  className="block text-sm font-medium mb-2"
+                  style={{ color: adminColors.textSecondary }}
+                >
                   Meta Description
                 </label>
                 <textarea
@@ -469,13 +620,23 @@ export default function PagesManager() {
                   onChange={(e) => handleInputChange('metaDesc', e.target.value)}
                   placeholder="Brief description for search engines (150-160 characters)"
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                  className="w-full px-3 py-2 border rounded-lg resize-none"
+                  style={{
+                    backgroundColor: adminColors.backgroundSecondary,
+                    color: adminColors.textPrimary,
+                    borderColor: adminColors.border
+                  }}
                 />
               </div>
 
               {/* Navigation Visibility */}
               <div className="space-y-4">
-                <h3 className="text-sm font-medium text-gray-700">Navigation Visibility</h3>
+                <h3 
+                  className="text-sm font-medium"
+                  style={{ color: adminColors.textSecondary }}
+                >
+                  Navigation Visibility
+                </h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="flex items-center space-x-3">
                     <div className="relative">
@@ -484,8 +645,18 @@ export default function PagesManager() {
                         id="showInHeader"
                         checked={formData.showInHeader}
                         onChange={(e) => handleInputChange('showInHeader', e.target.checked)}
-                        className="w-4 h-4 appearance-none bg-white border border-gray-300 rounded cursor-pointer focus:ring-2 focus:ring-blue-500 focus:border-blue-500 checked:bg-blue-600 checked:border-blue-600"
-                        style={{ appearance: 'none' }}
+                        className="w-4 h-4 appearance-none rounded cursor-pointer"
+                        style={{ 
+                          appearance: 'none',
+                          backgroundColor: adminColors.backgroundSecondary,
+                          borderColor: adminColors.border,
+                          borderWidth: '1px',
+                          borderStyle: 'solid',
+                          ...(formData.showInHeader && {
+                            backgroundColor: adminColors.primary,
+                            borderColor: adminColors.primary
+                          })
+                        }}
                       />
                       {formData.showInHeader && (
                         <svg
@@ -501,7 +672,11 @@ export default function PagesManager() {
                         </svg>
                       )}
                     </div>
-                    <label htmlFor="showInHeader" className="text-sm text-gray-700 cursor-pointer">
+                    <label 
+                      htmlFor="showInHeader" 
+                      className="text-sm cursor-pointer"
+                      style={{ color: adminColors.textSecondary }}
+                    >
                       Show in Header Navigation
                     </label>
                   </div>
@@ -512,8 +687,18 @@ export default function PagesManager() {
                         id="showInFooter"
                         checked={formData.showInFooter}
                         onChange={(e) => handleInputChange('showInFooter', e.target.checked)}
-                        className="w-4 h-4 appearance-none bg-white border border-gray-300 rounded cursor-pointer focus:ring-2 focus:ring-blue-500 focus:border-blue-500 checked:bg-blue-600 checked:border-blue-600"
-                        style={{ appearance: 'none' }}
+                        className="w-4 h-4 appearance-none rounded cursor-pointer"
+                        style={{ 
+                          appearance: 'none',
+                          backgroundColor: adminColors.backgroundSecondary,
+                          borderColor: adminColors.border,
+                          borderWidth: '1px',
+                          borderStyle: 'solid',
+                          ...(formData.showInFooter && {
+                            backgroundColor: adminColors.primary,
+                            borderColor: adminColors.primary
+                          })
+                        }}
                       />
                       {formData.showInFooter && (
                         <svg
@@ -529,21 +714,34 @@ export default function PagesManager() {
                         </svg>
                       )}
                     </div>
-                    <label htmlFor="showInFooter" className="text-sm text-gray-700 cursor-pointer">
+                    <label 
+                      htmlFor="showInFooter" 
+                      className="text-sm cursor-pointer"
+                      style={{ color: adminColors.textSecondary }}
+                    >
                       Show in Footer Navigation
                     </label>
                   </div>
                 </div>
-                <p className="text-xs text-gray-500">
+                <p 
+                  className="text-xs"
+                  style={{ color: adminColors.textMuted }}
+                >
                   Control where this page appears in your site navigation. Pages can appear in both, one, or neither location.
                 </p>
               </div>
 
-              <div className="flex items-center gap-3 pt-4 border-t border-gray-200">
+              <div 
+                className="flex items-center gap-3 pt-4 border-t"
+                style={{ borderColor: adminColors.border }}
+              >
                 <Button
                   type="submit"
                   disabled={saving}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  style={{
+                    backgroundColor: adminColors.primary,
+                    color: '#FFFFFF'
+                  }}
                 >
                   {saving ? (
                     <>
@@ -562,6 +760,11 @@ export default function PagesManager() {
                   onClick={handleCloseForm}
                   variant="outline"
                   disabled={saving}
+                  style={{
+                    color: adminColors.textSecondary,
+                    borderColor: adminColors.border,
+                    backgroundColor: 'transparent'
+                  }}
                 >
                   Cancel
                 </Button>

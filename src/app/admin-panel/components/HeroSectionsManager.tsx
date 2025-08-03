@@ -809,15 +809,18 @@ const HeroSectionsManager: React.FC = () => {
       {/* Form Modal */}
       {showForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+               style={{
+                 backgroundColor: 'var(--color-bg-primary, #FFFFFF)'
+               }}>
             <div className="p-6">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-semibold" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   {editingHero ? 'Edit Hero Section' : 'Add New Hero Section'}
                 </h3>
                 <button
                   onClick={resetForm}
-                  style={{ color: designSystem?.textMuted || '#999999' }}
+                  style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
                   className="hover:opacity-70"
                 >
                   <X size={24} />
@@ -826,8 +829,8 @@ const HeroSectionsManager: React.FC = () => {
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Basic Information */}
-                <div className="p-4 rounded-lg" style={{ backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>
-                  <h4 className="font-medium mb-4 flex items-center" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}>
+                  <h4 className="font-medium mb-4 flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     <Settings size={20} className="mr-2" />
                     Basic Information
                   </h4>
@@ -835,39 +838,41 @@ const HeroSectionsManager: React.FC = () => {
                   {/* Name and Section Height */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                         Section Name *
                       </label>
                       <input
                         type="text"
                         value={formData.name || ''}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full p-2 border rounded-lg"
                         placeholder="Enter a name to identify this hero section"
                         style={{ 
-                          color: designSystem?.textPrimary || '#000000',
-                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          borderColor: 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                          color: 'var(--color-text-primary, #1F2937)'
                         }}
                         required
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                         Section Height
                       </label>
                       <input
                         type="text"
                         value={formData.sectionHeight || ''}
                         onChange={(e) => setFormData({ ...formData, sectionHeight: e.target.value })}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full p-2 border rounded-lg"
                         placeholder="e.g., 100vh, 80vh, 600px"
                         style={{ 
-                          color: designSystem?.textPrimary || '#000000',
-                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          borderColor: 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                          color: 'var(--color-text-primary, #1F2937)'
                         }}
                       />
-                      <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
+                      <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                         Use CSS units: vh (viewport height), px (pixels), % (percentage)
                       </p>
                     </div>
@@ -875,16 +880,17 @@ const HeroSectionsManager: React.FC = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                         Layout Type
                       </label>
                       <select
                         value={formData.layoutType}
                         onChange={(e) => setFormData({ ...formData, layoutType: e.target.value as any })}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full p-2 border rounded-lg"
                         style={{ 
-                          color: designSystem?.textPrimary || '#000000',
-                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          borderColor: 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                          color: 'var(--color-text-primary, #1F2937)'
                         }}
                       >
                         <option value="split">Split Layout</option>
@@ -894,16 +900,17 @@ const HeroSectionsManager: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                         Text Alignment
                       </label>
                       <select
                         value={formData.textAlignment}
                         onChange={(e) => setFormData({ ...formData, textAlignment: e.target.value as any })}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full p-2 border rounded-lg"
                         style={{ 
-                          color: designSystem?.textPrimary || '#000000',
-                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          borderColor: 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                          color: 'var(--color-text-primary, #1F2937)'
                         }}
                       >
                         <option value="left">Left</option>
@@ -914,68 +921,71 @@ const HeroSectionsManager: React.FC = () => {
                   </div>
 
                   <div className="mt-4">
-                    <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       Tagline
                     </label>
                     <input
                       type="text"
                       value={formData.tagline || ''}
                       onChange={(e) => setFormData({ ...formData, tagline: e.target.value })}
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full p-2 border rounded-lg"
                       placeholder="Optional badge or label"
                       style={{ 
-                        color: designSystem?.textPrimary || '#000000',
-                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        borderColor: 'var(--color-gray-light, #E5E7EB)',
+                        backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                        color: 'var(--color-text-primary, #1F2937)'
                       }}
                     />
                   </div>
 
                   <div className="mt-4">
-                    <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       Headline *
                     </label>
                     <input
                       type="text"
                       value={formData.headline}
                       onChange={(e) => setFormData({ ...formData, headline: e.target.value })}
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full p-2 border rounded-lg"
                       placeholder="Main title"
                       style={{ 
-                        color: designSystem?.textPrimary || '#000000',
-                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        borderColor: 'var(--color-gray-light, #E5E7EB)',
+                        backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                        color: 'var(--color-text-primary, #1F2937)'
                       }}
                       required
                     />
                   </div>
 
                   <div className="mt-4">
-                    <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       Subheading
                     </label>
                     <textarea
                       value={formData.subheading || ''}
                       onChange={(e) => setFormData({ ...formData, subheading: e.target.value })}
-                      className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full p-2 border rounded-lg"
                       rows={3}
                       placeholder="Supporting text"
                       style={{ 
-                        color: designSystem?.textPrimary || '#000000',
-                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        borderColor: 'var(--color-gray-light, #E5E7EB)',
+                        backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                        color: 'var(--color-text-primary, #1F2937)'
                       }}
                     />
                   </div>
                 </div>
 
                 {/* CTA References */}
-                <div className="p-4 rounded-lg" style={{ backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>
-                  <h4 className="font-medium mb-4 flex items-center" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}>
+                  <h4 className="font-medium mb-4 flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     <ExternalLink size={20} className="mr-2" />
                     CTA Buttons
-                    <span className="ml-2 text-xs" style={{ color: designSystem?.textMuted || '#999999' }}>({availableCTAs.length} available)</span>
+                    <span className="ml-2 text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>({availableCTAs.length} available)</span>
                   </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                         Primary CTA
                       </label>
                       <select
@@ -987,10 +997,11 @@ const HeroSectionsManager: React.FC = () => {
                             ctaPrimaryId: value && value !== '' ? parseInt(value) : null 
                           });
                         }}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full p-2 border rounded-lg"
                         style={{ 
-                          color: designSystem?.textPrimary || '#000000',
-                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          borderColor: 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                          color: 'var(--color-text-primary, #1F2937)'
                         }}
                       >
                         <option value="">No primary CTA</option>
@@ -1069,7 +1080,7 @@ const HeroSectionsManager: React.FC = () => {
                               </div>
                             </div>
                           )}
-                          <p className="text-xs mt-2 truncate" style={{ color: designSystem?.textMuted || '#999999' }}>
+                          <p className="text-xs mt-2 truncate" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                             {formData.mediaItem?.filename || 'Media file'}
                           </p>
                         </div>
@@ -1093,16 +1104,17 @@ const HeroSectionsManager: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                         Media Type
                       </label>
                       <select
                         value={formData.mediaType}
                         onChange={(e) => setFormData({ ...formData, mediaType: e.target.value as any })}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full p-2 border rounded-lg"
                         style={{ 
-                          color: designSystem?.textPrimary || '#000000',
-                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          borderColor: 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                          color: 'var(--color-text-primary, #1F2937)'
                         }}
                       >
                         <option value="image">Image</option>
@@ -1113,53 +1125,56 @@ const HeroSectionsManager: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                         Media Alt Text
                       </label>
                       <input
                         type="text"
                         value={formData.mediaAlt || ''}
                         onChange={(e) => setFormData({ ...formData, mediaAlt: e.target.value })}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full p-2 border rounded-lg"
                         placeholder="Alt text for accessibility"
                         style={{ 
-                          color: designSystem?.textPrimary || '#000000',
-                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          borderColor: 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                          color: 'var(--color-text-primary, #1F2937)'
                         }}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                         Media Height
                       </label>
                       <input
                         type="text"
                         value={formData.mediaHeight}
                         onChange={(e) => setFormData({ ...formData, mediaHeight: e.target.value })}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full p-2 border rounded-lg"
                         placeholder="e.g., 80vh, 500px, auto"
                         style={{ 
-                          color: designSystem?.textPrimary || '#000000',
-                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          borderColor: 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                          color: 'var(--color-text-primary, #1F2937)'
                         }}
                       />
-                      <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
+                      <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                         Use CSS units: vh (viewport height), px (pixels), % (percentage), or auto
                       </p>
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                         Media Position
                       </label>
                       <select
                         value={formData.mediaPosition}
                         onChange={(e) => setFormData({ ...formData, mediaPosition: e.target.value as any })}
-                        className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full p-2 border rounded-lg"
                         style={{ 
-                          color: designSystem?.textPrimary || '#000000',
-                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          borderColor: 'var(--color-gray-light, #E5E7EB)',
+                          backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                          color: 'var(--color-text-primary, #1F2937)'
                         }}
                       >
                         <option value="left">Left</option>

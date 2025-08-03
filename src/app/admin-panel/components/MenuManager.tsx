@@ -1483,7 +1483,7 @@ export default function MenuManager() {
       <Card className="p-6">
         <div className="flex items-center mb-6">
           <Palette className="w-6 h-6 mr-3 text-blue-600" />
-          <h3 className="text-xl font-semibold text-gray-900">Header Configuration</h3>
+          <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Header Configuration</h3>
         </div>
         
         <div className="space-y-6">
@@ -2230,8 +2230,8 @@ export default function MenuManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Menu & Header Management</h2>
-          <p className="text-gray-600">Create menus, organize navigation items, and configure header settings</p>
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Menu & Header Management</h2>
+                      <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Create menus, organize navigation items, and configure header settings</p>
         </div>
         {activeTab === 'menus' && (
           <Button onClick={handleCreateMenu}>
@@ -2696,7 +2696,7 @@ export default function MenuManager() {
                               </div>
                               
                               {menu.description && (
-                                <p className="text-sm text-gray-600 mb-2">{menu.description}</p>
+                                <p className="text-sm mb-2" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{menu.description}</p>
                               )}
                               
                               <div className="flex items-center space-x-4 text-xs text-gray-500">

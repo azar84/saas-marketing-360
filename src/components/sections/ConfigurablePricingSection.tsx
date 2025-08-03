@@ -687,7 +687,7 @@ export default function ConfigurablePricingSection({
                   )
                   .sort((a, b) => a.sortOrder - b.sortOrder)
                   .map((featureType) => (
-                    <tr key={featureType.id} className="hover:opacity-90 transition-all">
+                    <tr key={featureType.id} style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}>
                       <td 
                         className="px-6 py-4 font-medium"
                         style={{ color: designSystem?.textPrimary || '#111827' }}
@@ -756,7 +756,7 @@ export default function ConfigurablePricingSection({
                       .filter(bf => bf.isActive)
                       .sort((a, b) => a.sortOrder - b.sortOrder)
                       .map((feature) => (
-                          <tr key={feature.id} className="hover:opacity-90 transition-all">
+                          <tr key={feature.id} style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}>
                             <td 
                               className="px-6 py-4 font-medium"
                               style={{ color: designSystem?.textPrimary || '#111827' }}

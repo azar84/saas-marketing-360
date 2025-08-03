@@ -22,6 +22,7 @@ interface DesignSystem {
   // Background Colors
   backgroundPrimary: string;
   backgroundSecondary: string;
+  backgroundDark: string;
 
   // Text Colors
   textPrimary: string;
@@ -125,6 +126,7 @@ const applyDesignSystemToRoot = (ds: DesignSystem) => {
   // Background colors
   root.style.setProperty('--color-bg-primary', ds.backgroundPrimary);
   root.style.setProperty('--color-bg-secondary', ds.backgroundSecondary);
+  root.style.setProperty('--color-bg-dark', ds.backgroundDark || '#1F2937');
   
   // Neutral colors
   root.style.setProperty('--color-gray-light', ds.grayLight);
@@ -151,11 +153,11 @@ const applyDesignSystemToRoot = (ds: DesignSystem) => {
     }
     
     ::-webkit-scrollbar-thumb {
-      background: ${ds.primaryColor} !important;
+      background: ${ds.textMuted} !important;
     }
     
     ::-webkit-scrollbar-thumb:hover {
-      background: ${ds.primaryColor} !important;
+      background: ${ds.textSecondary} !important;
     }
     
     .gradient-text {

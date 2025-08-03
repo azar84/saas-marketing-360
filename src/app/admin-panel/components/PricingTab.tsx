@@ -133,7 +133,7 @@ export default function PricingTab() {
   return (
     <div className="space-y-6">
       <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-        <h3 className="text-lg font-semibold text-green-900 mb-2">💰 Pricing Management</h3>
+        <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>💰 Pricing Management</h3>
         <p className="text-green-800">
           Set prices for each plan across different billing cycles. Include Stripe price IDs for payment integration.
         </p>
@@ -141,10 +141,10 @@ export default function PricingTab() {
 
       {/* Add New Pricing */}
       <Card className="p-6">
-        <h3 className="text-lg font-semibold mb-4">➕ Add Pricing</h3>
+                  <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary, #1F2937)' }}>➕ Add Pricing</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Plan</label>
+                          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Plan</label>
             <select
               value={newPricing.planId}
               onChange={(e) => setNewPricing({ ...newPricing, planId: e.target.value })}
@@ -158,7 +158,7 @@ export default function PricingTab() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Billing Cycle</label>
+                          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Billing Cycle</label>
             <select
               value={newPricing.billingCycleId}
               onChange={(e) => setNewPricing({ ...newPricing, billingCycleId: e.target.value })}
@@ -172,7 +172,7 @@ export default function PricingTab() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Price (cents)</label>
+                          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Price (cents)</label>
             <Input
               type="number"
               placeholder="999 (for $9.99)"
@@ -182,7 +182,7 @@ export default function PricingTab() {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Stripe Price ID</label>
+                          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Stripe Price ID</label>
             <Input
               placeholder="price_1234567890"
               value={newPricing.stripePriceId}
@@ -211,21 +211,21 @@ export default function PricingTab() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Plan
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Billing Cycle
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Price
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Stripe Price ID
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
+                                      <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+                      Plan
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+                      Billing Cycle
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+                      Price
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+                      Stripe Price ID
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+                      Actions
+                    </th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
@@ -235,14 +235,14 @@ export default function PricingTab() {
                   return (
                     <tr key={pricing.id}>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm font-medium text-gray-900">
-                          {getPlanName(pricing.planId)}
-                        </div>
+                                              <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                        {getPlanName(pricing.planId)}
+                      </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
-                          {getBillingCycleLabel(pricing.billingCycleId)}
-                        </div>
+                                              <div className="text-sm" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                        {getBillingCycleLabel(pricing.billingCycleId)}
+                      </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         {isEditing ? (
@@ -257,9 +257,9 @@ export default function PricingTab() {
                             className="w-24"
                           />
                         ) : (
-                          <div className="text-sm font-medium text-gray-900">
-                            {formatPrice(pricing.priceCents)}
-                          </div>
+                                                <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
+                        {formatPrice(pricing.priceCents)}
+                      </div>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -275,9 +275,9 @@ export default function PricingTab() {
                             className="w-32"
                           />
                         ) : (
-                          <div className="text-sm text-gray-600">
-                            {pricing.stripePriceId || 'Not set'}
-                          </div>
+                                                <div className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
+                        {pricing.stripePriceId || 'Not set'}
+                      </div>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -324,8 +324,8 @@ export default function PricingTab() {
             </table>
           </div>
         ) : (
-          <div className="text-center py-12 text-gray-500">
-            <DollarSign className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+          <div className="text-center py-12" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+            <DollarSign className="w-16 h-16 mx-auto mb-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
             <p>No pricing set yet. Add pricing above!</p>
           </div>
         )}
@@ -334,16 +334,16 @@ export default function PricingTab() {
       {/* Pricing Matrix Preview */}
       {plans.length > 0 && billingCycles.length > 0 && (
         <Card className="p-6">
-          <h3 className="text-lg font-semibold mb-4">📊 Pricing Matrix</h3>
+          <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary, #1F2937)' }}>📊 Pricing Matrix</h3>
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                     Plan
                   </th>
                   {billingCycles.map((cycle) => (
-                    <th key={cycle.id} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th key={cycle.id} className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                       {cycle.label}
                     </th>
                   ))}
@@ -358,8 +358,8 @@ export default function PricingTab() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div>
-                            <div className="text-sm font-medium text-gray-900">{plan.name}</div>
-                            <div className="text-sm text-gray-500">{plan.description}</div>
+                            <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{plan.name}</div>
+                            <div className="text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>{plan.description}</div>
                           </div>
                           {plan.isPopular && (
                             <Badge variant="success" className="ml-2">Popular</Badge>
@@ -371,16 +371,16 @@ export default function PricingTab() {
                         return (
                           <td key={cycle.id} className="px-6 py-4 whitespace-nowrap">
                             {pricing ? (
-                              <div className="text-sm text-gray-900">
+                              <div className="text-sm" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                                 {formatPrice(pricing.priceCents)}
                                 {cycle.multiplier > 1 && (
-                                  <div className="text-xs text-gray-500">
+                                  <div className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                                     {formatPrice(pricing.priceCents / cycle.multiplier)}/month
                                   </div>
                                 )}
                               </div>
                             ) : (
-                              <span className="text-sm text-gray-400">Not set</span>
+                              <span className="text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Not set</span>
                             )}
                           </td>
                         );

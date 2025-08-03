@@ -485,8 +485,11 @@ const HomeHeroManager: React.FC = () => {
           <div className="grid lg:grid-cols-2 gap-8">
             {/* Main Content */}
             <div className="space-y-6">
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                <h3 className="text-lg font-semibold mb-4" style={{ color: designSystem?.textPrimary || '#000000' }}>Main Content</h3>
+              <div 
+                className="rounded-xl p-6 shadow-sm border border-gray-200"
+                style={{ backgroundColor: designSystem?.backgroundSecondary || '#F9FAFB' }}
+              >
+                <h3 className="text-lg font-semibold mb-4" style={{ color: designSystem?.textPrimary || '#1F2937' }}>Main Content</h3>
                 
                 <div className="space-y-4">
                   <div>
@@ -499,6 +502,10 @@ const HomeHeroManager: React.FC = () => {
                       onChange={(e) => setHeroData({ ...heroData, heading: e.target.value })}
                       placeholder="Enter your hero heading"
                       className="w-full"
+                      style={{
+                        color: designSystem?.textPrimary || '#1F2937',
+                        backgroundColor: designSystem?.backgroundSecondary || '#F9FAFB'
+                      }}
                     />
                   </div>
                   
@@ -513,8 +520,8 @@ const HomeHeroManager: React.FC = () => {
                       rows={3}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                       style={{ 
-                        color: designSystem?.textPrimary || '#000000',
-                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        color: designSystem?.textPrimary || '#1F2937',
+                        backgroundColor: designSystem?.backgroundSecondary || '#F9FAFB'
                       }}
                     />
                   </div>
@@ -535,7 +542,10 @@ const HomeHeroManager: React.FC = () => {
               </div>
 
               {/* Styling */}
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div 
+                className="rounded-xl p-6 shadow-sm border border-gray-200"
+                style={{ backgroundColor: designSystem?.backgroundSecondary || '#F9FAFB' }}
+              >
                 <div className="flex items-center space-x-3 mb-6">
                   <div className="p-2 bg-indigo-100 rounded-lg">
                     <Palette className="w-5 h-5 text-indigo-600" />
@@ -778,12 +788,16 @@ const HomeHeroManager: React.FC = () => {
               </div>
 
               {/* Creatives Configuration */}
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="rounded-xl p-6 shadow-sm border"
+                   style={{
+                     backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                     borderColor: 'var(--color-gray-light, #E5E7EB)'
+                   }}>
                 <h3 className="text-lg font-semibold mb-4" style={{ color: designSystem?.textPrimary || '#000000' }}>Creatives & Layout Configuration</h3>
                 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       Creatives Type
                     </label>
                     <select
@@ -792,10 +806,11 @@ const HomeHeroManager: React.FC = () => {
                         console.log('🔍 Changing animationType to:', e.target.value);
                         setHeroData({ ...heroData, animationType: e.target.value });
                       }}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      style={{ 
-                        color: designSystem?.textPrimary || '#000000',
-                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                      className="w-full p-3 border rounded-lg"
+                      style={{
+                        borderColor: 'var(--color-gray-light, #E5E7EB)',
+                        backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                        color: 'var(--color-text-primary, #1F2937)'
                       }}
                     >
                       <option value="">No Creatives Needed</option>
@@ -808,10 +823,10 @@ const HomeHeroManager: React.FC = () => {
                   
                   {heroData.animationType === 'video' && (
                     <div className="space-y-4">
-                      <h4 className="font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>Video Configuration</h4>
+                      <h4 className="font-medium mb-3" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Video Configuration</h4>
                       
                       <div>
-                        <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                        <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                           Video URL
                         </label>
                         <input
@@ -822,13 +837,14 @@ const HomeHeroManager: React.FC = () => {
                             animationData: { ...heroData.animationData, videoUrl: e.target.value }
                           })}
                           placeholder="https://example.com/video.mp4"
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          style={{ 
-                            color: designSystem?.textPrimary || '#000000',
-                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          className="w-full p-3 border rounded-lg"
+                          style={{
+                            borderColor: 'var(--color-gray-light, #E5E7EB)',
+                            backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                            color: 'var(--color-text-primary, #1F2937)'
                           }}
                         />
-                        <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
+                        <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                           Enter the URL of your video file (MP4, WebM, etc.)
                         </p>
                       </div>
@@ -843,9 +859,13 @@ const HomeHeroManager: React.FC = () => {
                               ...heroData,
                               animationData: { ...heroData.animationData, autoplay: e.target.checked }
                             })}
-                            className="w-4 h-4 text-[#5243E9] border-gray-300 rounded focus:ring-[#5243E9]"
+                            className="w-4 h-4 border rounded"
+                            style={{
+                              color: 'var(--color-primary, #5243E9)',
+                              borderColor: 'var(--color-gray-light, #E5E7EB)'
+                            }}
                           />
-                          <label htmlFor="autoplay" className="text-sm ml-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                          <label htmlFor="autoplay" className="text-sm ml-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                             Autoplay video
                           </label>
                         </div>
@@ -859,9 +879,13 @@ const HomeHeroManager: React.FC = () => {
                               ...heroData,
                               animationData: { ...heroData.animationData, loop: e.target.checked }
                             })}
-                            className="w-4 h-4 text-[#5243E9] border-gray-300 rounded focus:ring-[#5243E9]"
+                            className="w-4 h-4 border rounded"
+                            style={{
+                              color: 'var(--color-primary, #5243E9)',
+                              borderColor: 'var(--color-gray-light, #E5E7EB)'
+                            }}
                           />
-                          <label htmlFor="loop" className="text-sm ml-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                          <label htmlFor="loop" className="text-sm ml-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                             Loop video
                           </label>
                         </div>
@@ -885,10 +909,11 @@ const HomeHeroManager: React.FC = () => {
                           })}
                           placeholder="<div>Your HTML content here...</div>"
                           rows={6}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm"
-                          style={{ 
-                            color: designSystem?.textPrimary || '#000000',
-                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          className="w-full p-3 border rounded-lg resize-none font-mono text-sm"
+                          style={{
+                            borderColor: 'var(--color-gray-light, #E5E7EB)',
+                            backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                            color: 'var(--color-text-primary, #1F2937)'
                           }}
                         />
                       </div>
@@ -911,10 +936,11 @@ const HomeHeroManager: React.FC = () => {
                           })}
                           placeholder="// Your JavaScript code here..."
                           rows={6}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none font-mono text-sm"
-                          style={{ 
-                            color: designSystem?.textPrimary || '#000000',
-                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          className="w-full p-3 border rounded-lg resize-none font-mono text-sm"
+                          style={{
+                            borderColor: 'var(--color-gray-light, #E5E7EB)',
+                            backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                            color: 'var(--color-text-primary, #1F2937)'
                           }}
                         />
                       </div>
@@ -945,7 +971,7 @@ const HomeHeroManager: React.FC = () => {
                           allowMultiple={false}
                           acceptedTypes={['image']}
                         />
-                        <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
+                        <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                           Choose an image to display in your hero section
                         </p>
                       </div>
@@ -953,64 +979,68 @@ const HomeHeroManager: React.FC = () => {
                   )}
 
                   {/* Layout and Positioning Controls */}
-                  <div className="space-y-4 pt-4 border-t border-gray-200">
-                    <h4 className="font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>Layout & Positioning</h4>
+                  <div className="space-y-4 pt-4 border-t"
+                       style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
+                    <h4 className="font-medium mb-3" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Layout & Positioning</h4>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                           Layout Type
                         </label>
                         <select
                           value={heroData.layoutType || 'split'}
                           onChange={(e) => setHeroData(prev => ({ ...prev, layoutType: e.target.value }))}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          style={{ 
-                            color: designSystem?.textPrimary || '#000000',
-                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          className="w-full p-3 border rounded-lg"
+                          style={{
+                            borderColor: 'var(--color-gray-light, #E5E7EB)',
+                            backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                            color: 'var(--color-text-primary, #1F2937)'
                           }}
                         >
                           <option value="split">Split (Text and media side by side)</option>
                           <option value="centered">Centered (Text centered, media below)</option>
                           <option value="overlay">Overlay (Text overlaid on media)</option>
                         </select>
-                        <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
+                        <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                           Choose how text and media are arranged
                         </p>
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                           Media Position
                         </label>
                         <select
                           value={heroData.mediaPosition || 'right'}
                           onChange={(e) => setHeroData(prev => ({ ...prev, mediaPosition: e.target.value }))}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          style={{ 
-                            color: designSystem?.textPrimary || '#000000',
-                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          className="w-full p-3 border rounded-lg"
+                          style={{
+                            borderColor: 'var(--color-gray-light, #E5E7EB)',
+                            backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                            color: 'var(--color-text-primary, #1F2937)'
                           }}
                         >
                           <option value="right">Right (Media on the right)</option>
                           <option value="left">Left (Media on the left)</option>
                         </select>
-                        <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
+                        <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                           Only applies to split layout
                         </p>
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                           Media Size
                         </label>
                         <select
                           value={heroData.mediaSize || 'full'}
                           onChange={(e) => setHeroData(prev => ({ ...prev, mediaSize: e.target.value }))}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          style={{ 
-                            color: designSystem?.textPrimary || '#000000',
-                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          className="w-full p-3 border rounded-lg"
+                          style={{
+                            borderColor: 'var(--color-gray-light, #E5E7EB)',
+                            backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                            color: 'var(--color-text-primary, #1F2937)'
                           }}
                         >
                           <option value="full">Full (Fill available space)</option>
@@ -1020,7 +1050,7 @@ const HomeHeroManager: React.FC = () => {
                           <option value="medium">Medium (Balanced size)</option>
                           <option value="large">Large (Prominent size)</option>
                         </select>
-                        <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
+                        <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                           Control how the media is sized
                         </p>
                       </div>
@@ -1030,7 +1060,11 @@ const HomeHeroManager: React.FC = () => {
               </div>
 
               {/* Call-to-Action Buttons */}
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="rounded-xl p-6 shadow-sm border"
+                   style={{
+                     backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                     borderColor: 'var(--color-gray-light, #E5E7EB)'
+                   }}>
                 <h3 className="text-lg font-semibold mb-4" style={{ color: designSystem?.textPrimary || '#000000' }}>Call-to-Action Buttons</h3>
                 
                 <div className="space-y-6">
@@ -1045,10 +1079,11 @@ const HomeHeroManager: React.FC = () => {
                         <select
                           value={heroData.primaryCtaId || ''}
                           onChange={(e) => setHeroData({ ...heroData, primaryCtaId: e.target.value ? parseInt(e.target.value) : null })}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          style={{ 
-                            color: designSystem?.textPrimary || '#000000',
-                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          className="w-full p-3 border rounded-lg"
+                          style={{
+                            borderColor: 'var(--color-gray-light, #E5E7EB)',
+                            backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                            color: 'var(--color-text-primary, #1F2937)'
                           }}
                         >
                           <option value="">No Primary CTA</option>
@@ -1059,7 +1094,10 @@ const HomeHeroManager: React.FC = () => {
                       </div>
                       
                       {heroData.primaryCtaId && (
-                        <div className="text-sm bg-gray-100 p-3 rounded" style={{ color: designSystem?.textSecondary || '#666666', backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>
+                        <div className="text-sm p-3 rounded" style={{ 
+                          color: 'var(--color-text-secondary, #6B7280)', 
+                          backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' 
+                        }}>
                           <strong>Selected:</strong> {getSelectedCTA(heroData.primaryCtaId)?.text}
                         </div>
                       )}
@@ -1077,10 +1115,11 @@ const HomeHeroManager: React.FC = () => {
                         <select
                           value={heroData.secondaryCtaId || ''}
                           onChange={(e) => setHeroData({ ...heroData, secondaryCtaId: e.target.value ? parseInt(e.target.value) : null })}
-                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                          style={{ 
-                            color: designSystem?.textPrimary || '#000000',
-                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          className="w-full p-3 border rounded-lg"
+                          style={{
+                            borderColor: 'var(--color-gray-light, #E5E7EB)',
+                            backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                            color: 'var(--color-text-primary, #1F2937)'
                           }}
                         >
                           <option value="">No Secondary CTA</option>
@@ -1091,7 +1130,10 @@ const HomeHeroManager: React.FC = () => {
                       </div>
                       
                       {heroData.secondaryCtaId && (
-                        <div className="text-sm bg-gray-100 p-3 rounded" style={{ color: designSystem?.textSecondary || '#666666', backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>
+                        <div className="text-sm p-3 rounded" style={{ 
+                          color: 'var(--color-text-secondary, #6B7280)', 
+                          backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' 
+                        }}>
                           <strong>Selected:</strong> {getSelectedCTA(heroData.secondaryCtaId)?.text}
                         </div>
                       )}
@@ -1103,9 +1145,13 @@ const HomeHeroManager: React.FC = () => {
 
             {/* Trust Indicators */}
             <div className="space-y-6">
-              <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+              <div className="rounded-xl p-6 shadow-sm border"
+                   style={{
+                     backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                     borderColor: 'var(--color-gray-light, #E5E7EB)'
+                   }}>
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold" style={{ color: designSystem?.textPrimary || '#000000' }}>Trust Indicators</h3>
+                  <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Trust Indicators</h3>
                   <Button
                     onClick={addTrustIndicator}
                     size="sm"
@@ -1118,16 +1164,24 @@ const HomeHeroManager: React.FC = () => {
 
                 <div className="space-y-4">
                   {(heroData.trustIndicators || []).map((indicator, index) => (
-                    <div key={index} className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <div key={index} className="p-4 rounded-lg border"
+                         style={{
+                           backgroundColor: 'var(--color-bg-secondary, #F9FAFB)',
+                           borderColor: 'var(--color-gray-light, #E5E7EB)'
+                         }}>
                       <div className="flex items-center gap-3 mb-3">
-                        <GripVertical className="w-4 h-4" style={{ color: designSystem?.textMuted || '#999999' }} />
-                        <input
-                          type="checkbox"
-                          checked={indicator.isVisible}
-                          onChange={(e) => updateTrustIndicator(index, 'isVisible', e.target.checked)}
-                          className="w-4 h-4 text-[#5243E9] border-gray-300 rounded focus:ring-[#5243E9]"
-                        />
-                        <div className="flex items-center gap-2" style={{ color: designSystem?.textSecondary || '#666666' }}>
+                        <GripVertical className="w-4 h-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
+                                                  <input
+                            type="checkbox"
+                            checked={indicator.isVisible}
+                            onChange={(e) => updateTrustIndicator(index, 'isVisible', e.target.checked)}
+                            className="w-4 h-4 border rounded"
+                            style={{
+                              color: 'var(--color-primary, #5243E9)',
+                              borderColor: 'var(--color-gray-light, #E5E7EB)'
+                            }}
+                          />
+                        <div className="flex items-center gap-2" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                           {React.createElement(getIconComponent(indicator.iconName), { className: "w-4 h-4" })}
                           <span className="text-sm font-medium">{indicator.text}</span>
                         </div>
@@ -1135,7 +1189,11 @@ const HomeHeroManager: React.FC = () => {
                           onClick={() => removeTrustIndicator(index)}
                           size="sm"
                           variant="outline"
-                          className="ml-auto text-red-600 hover:text-red-700 hover:bg-red-50"
+                          className="ml-auto"
+                          style={{
+                            color: 'var(--color-error, #EF4444)',
+                            borderColor: 'var(--color-error, #EF4444)'
+                          }}
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -1143,7 +1201,7 @@ const HomeHeroManager: React.FC = () => {
 
                       <div className="space-y-3">
                         <div>
-                          <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                             Icon
                           </label>
                           <UniversalIconPicker
@@ -1151,27 +1209,28 @@ const HomeHeroManager: React.FC = () => {
                             onChange={(iconName) => updateTrustIndicator(index, 'iconName', iconName)}
                             placeholder="Select an icon..."
                             className="w-full"
-                            textPrimary={designSystem?.textPrimary || '#000000'}
-                            textSecondary={designSystem?.textSecondary || '#666666'}
-                            textMuted={designSystem?.textMuted || '#999999'}
-                            backgroundPrimary={designSystem?.backgroundPrimary || '#ffffff'}
-                            backgroundSecondary={designSystem?.backgroundSecondary || '#f9fafb'}
+                            textPrimary="var(--color-text-primary, #1F2937)"
+                            textSecondary="var(--color-text-secondary, #6B7280)"
+                            textMuted="var(--color-text-muted, #9CA3AF)"
+                            backgroundPrimary="var(--color-bg-primary, #FFFFFF)"
+                            backgroundSecondary="var(--color-bg-secondary, #F9FAFB)"
                           />
                         </div>
 
                         <div>
-                          <label className="block text-sm font-medium mb-1" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                          <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                             Text
                           </label>
                           <input
                             type="text"
                             value={indicator.text}
                             onChange={(e) => updateTrustIndicator(index, 'text', e.target.value)}
-                            className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent"
+                            className="w-full p-2 border rounded-lg"
                             placeholder="99.9% Uptime"
-                            style={{ 
-                              color: designSystem?.textPrimary || '#000000',
-                              backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                            style={{
+                              borderColor: 'var(--color-gray-light, #E5E7EB)',
+                              backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                              color: 'var(--color-text-primary, #1F2937)'
                             }}
                           />
                         </div>
@@ -1180,7 +1239,7 @@ const HomeHeroManager: React.FC = () => {
                   ))}
                   
                   {(heroData.trustIndicators || []).length === 0 && (
-                    <div className="text-center py-8" style={{ color: designSystem?.textMuted || '#999999' }}>
+                    <div className="text-center py-8" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                       No trust indicators added yet. Click "Add Trust Indicator" to get started.
                     </div>
                   )}

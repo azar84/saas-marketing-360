@@ -5,13 +5,13 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '@/lib/utils';
 
 const inputVariants = cva(
-  'flex w-full rounded-lg border bg-transparent px-4 py-2.5 text-sm transition-all duration-200 placeholder:text-[#94A3B8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50',
+  'flex w-full rounded-lg border bg-transparent px-4 py-2.5 text-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-50',
   {
     variants: {
       variant: {
-        default: 'border-[#E2E8F0] text-[#1E2A3B] focus-visible:ring-[#5243E9] focus-visible:border-[#5243E9]',
-        filled: 'bg-[#F6F8FC] border-transparent text-[#1E2A3B] focus-visible:ring-[#5243E9] focus-visible:bg-white focus-visible:border-[#5243E9]',
-        ghost: 'border-transparent text-[#1E2A3B] focus-visible:ring-[#5243E9] focus-visible:border-[#5243E9]',
+        default: 'focus-visible:ring-opacity-20',
+        filled: 'focus-visible:ring-opacity-20',
+        ghost: 'focus-visible:ring-opacity-20',
       },
       size: {
         sm: 'h-9 px-3 text-xs',
@@ -62,7 +62,8 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <label 
             htmlFor={inputId}
-            className="block text-sm font-medium text-[#1E2A3B] mb-2"
+            className="block text-sm font-medium mb-2"
+            style={{ color: 'var(--color-text-primary, #1F2937)' }}
           >
             {label}
           </label>
@@ -70,7 +71,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         
         <div className="relative">
           {leftIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/4 text-[#64748B]">
+            <div 
+              className="absolute left-3 top-1/2 -translate-y-1/4"
+              style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+            >
               {leftIcon}
             </div>
           )}
@@ -83,12 +87,20 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
               leftIcon && 'pl-10',
               rightIcon && 'pr-10'
             )}
+            style={{
+              backgroundColor: variant === 'filled' ? 'var(--color-bg-secondary, #F9FAFB)' : 'transparent',
+              borderColor: hasError ? 'var(--color-error, #EF4444)' : 'var(--color-gray-light, #E5E7EB)',
+              color: 'var(--color-text-primary, #1F2937)'
+            }}
             ref={ref}
             {...props}
           />
           
           {rightIcon && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/4 text-[#64748B]">
+            <div 
+              className="absolute right-3 top-1/2 -translate-y-1/4"
+              style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+            >
               {rightIcon}
             </div>
           )}
@@ -97,12 +109,18 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
         {(error || description) && (
           <div className="mt-2">
             {error && (
-              <p className="text-sm text-[#EF4444] font-medium">
+              <p 
+                className="text-sm font-medium"
+                style={{ color: 'var(--color-error, #EF4444)' }}
+              >
                 {error}
               </p>
             )}
             {description && !error && (
-              <p className="text-sm text-[#64748B]">
+              <p 
+                className="text-sm"
+                style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+              >
                 {description}
               </p>
             )}

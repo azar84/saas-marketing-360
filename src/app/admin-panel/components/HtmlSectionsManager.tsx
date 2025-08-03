@@ -481,7 +481,7 @@ const HtmlSectionsManager: React.FC = () => {
                       <div>
                         <h4 className="font-medium text-gray-900">{section.name}</h4>
                         {section.description && (
-                          <p className="text-sm text-gray-600">{section.description}</p>
+                          <p className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{section.description}</p>
                         )}
                       </div>
                     </div>

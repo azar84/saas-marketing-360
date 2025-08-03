@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
+import { useDesignSystem, getAdminPanelColorsWithDesignSystem } from '@/hooks/useDesignSystem';
 import { 
   Mail, 
   Calendar, 
@@ -56,6 +57,9 @@ interface FormSubmission {
 }
 
 const FormSubmissionsManager: React.FC = () => {
+  const { designSystem } = useDesignSystem();
+  const adminColors = getAdminPanelColorsWithDesignSystem(designSystem);
+  
   const [submissions, setSubmissions] = useState<FormSubmission[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedSubmission, setSelectedSubmission] = useState<FormSubmission | null>(null);
@@ -197,8 +201,16 @@ const FormSubmissionsManager: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 animate-spin text-blue-600" />
-        <span className="ml-2 text-gray-600">Loading submissions...</span>
+        <RefreshCw 
+          className="w-8 h-8 animate-spin"
+          style={{ color: 'var(--color-primary, #5243E9)' }}
+        />
+        <span 
+          className="ml-2"
+          style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+        >
+          Loading submissions...
+        </span>
       </div>
     );
   }
@@ -208,8 +220,15 @@ const FormSubmissionsManager: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Form Submissions</h2>
-          <p className="text-gray-600">Monitor and debug form submissions and email delivery</p>
+          <h2 
+            className="text-2xl font-bold"
+            style={{ color: 'var(--color-text-primary, #1F2937)' }}
+          >
+            Form Submissions
+          </h2>
+          <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
+            Monitor and debug form submissions and email delivery
+          </p>
         </div>
         <div className="flex space-x-2">
           <Button onClick={fetchSubmissions} variant="outline" size="sm">

@@ -42,8 +42,8 @@ const FeaturesManagement: React.FC = () => {
     <div className="max-w-7xl mx-auto">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Features Management</h1>
-        <p className="text-gray-600">Manage feature groups and individual features for your website</p>
+        <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Features Management</h1>
+        <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Manage feature groups and individual features for your website</p>
       </div>
 
       {/* Tab Navigation */}
@@ -57,15 +57,16 @@ const FeaturesManagement: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors duration-200 ${
-                  isActive
-                    ? 'border-[#5243E9] text-[#5243E9]'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className={`group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors duration-200`}
+                style={{
+                  borderColor: isActive ? 'var(--color-primary, #5243E9)' : 'transparent',
+                  color: isActive ? 'var(--color-primary, #5243E9)' : 'var(--color-text-muted, #9CA3AF)',
+                  borderBottomColor: isActive ? 'var(--color-primary, #5243E9)' : 'transparent'
+                }}
               >
-                <Icon className={`mr-2 h-5 w-5 ${
-                  isActive ? 'text-[#5243E9]' : 'text-gray-400 group-hover:text-gray-500'
-                }`} />
+                <Icon className="mr-2 h-5 w-5" style={{ 
+                  color: isActive ? 'var(--color-primary, #5243E9)' : 'var(--color-text-muted, #9CA3AF)' 
+                }} />
                 <span>{tab.name}</span>
               </button>
             );
@@ -83,7 +84,11 @@ const FeaturesManagement: React.FC = () => {
               key={tab.id}
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="flex items-center space-x-3 text-sm text-gray-600 bg-gray-50 px-4 py-3 rounded-lg"
+              className="flex items-center space-x-3 text-sm px-4 py-3 rounded-lg"
+              style={{ 
+                color: 'var(--color-text-secondary, #6B7280)',
+                backgroundColor: 'var(--color-bg-secondary, #F9FAFB)'
+              }}
             >
               <tab.icon className="h-4 w-4" />
               <span>{tab.description}</span>

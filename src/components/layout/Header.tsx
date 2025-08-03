@@ -116,7 +116,7 @@ export default function Header() {
   }, []);
 
   if (loading) {
-    return <div className="h-16 bg-white"></div>; // Loading placeholder
+    return <div className="h-16 bg-[var(--color-bg-primary,#FFFFFF)]"></div>; // Loading placeholder
   }
 
   // Generate navigation items from header configuration

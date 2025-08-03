@@ -153,7 +153,19 @@ export const getThemeDefaults = (designSystem: DesignSystem | null) => {
 };
 
 // Helper function to get reliable admin panel colors (always light theme)
-export const getAdminPanelColors = () => {
+export const getAdminPanelColors = (designSystem?: DesignSystem | null) => {
+  if (designSystem) {
+    return {
+      textPrimary: designSystem.textPrimary,
+      textSecondary: designSystem.textSecondary,
+      textMuted: designSystem.textMuted,
+      background: designSystem.backgroundPrimary,
+      backgroundSecondary: designSystem.backgroundSecondary,
+      border: designSystem.grayLight || '#E5E7EB'
+    };
+  }
+
+  // Fallback to design system defaults
   return {
     textPrimary: '#1F2937',
     textSecondary: '#6B7280',
@@ -161,5 +173,39 @@ export const getAdminPanelColors = () => {
     background: '#FFFFFF',
     backgroundSecondary: '#F9FAFB',
     border: '#E5E7EB'
+  };
+};
+
+// Helper function to get admin panel colors with design system priority
+export const getAdminPanelColorsWithDesignSystem = (designSystem: DesignSystem | null) => {
+  return {
+    // Text Colors
+    textPrimary: designSystem?.textPrimary || '#1F2937',
+    textSecondary: designSystem?.textSecondary || '#6B7280',
+    textMuted: designSystem?.textMuted || '#9CA3AF',
+    
+    // Background Colors
+    backgroundPrimary: designSystem?.backgroundPrimary || '#FFFFFF',
+    backgroundSecondary: designSystem?.backgroundSecondary || '#F9FAFB',
+    backgroundDark: designSystem?.backgroundDark || '#1F2937',
+    
+    // Brand Colors
+    primary: designSystem?.primaryColor || '#5243E9',
+    secondary: designSystem?.secondaryColor || '#7C3AED',
+    accent: designSystem?.accentColor || '#06B6D4',
+    
+    // Semantic Colors
+    success: designSystem?.successColor || '#10B981',
+    warning: designSystem?.warningColor || '#F59E0B',
+    error: designSystem?.errorColor || '#EF4444',
+    info: designSystem?.infoColor || '#3B82F6',
+    
+    // Neutral Colors
+    grayLight: designSystem?.grayLight || '#E5E7EB',
+    grayMedium: designSystem?.grayMedium || '#9CA3AF',
+    grayDark: designSystem?.grayDark || '#374151',
+    
+    // Border Colors
+    border: designSystem?.grayLight || '#E5E7EB'
   };
 }; 
