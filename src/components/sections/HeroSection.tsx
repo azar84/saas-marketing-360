@@ -421,10 +421,56 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
   const getLineSpacingClasses = () => {
     const lineSpacing = heroData?.lineSpacing || '4';
     
-    // If it's a number, use it directly as gap
+    // Map numeric values to predefined Tailwind classes
     if (!isNaN(parseInt(lineSpacing))) {
-      const spacingValue = parseInt(lineSpacing) * 0.25; // Convert to rem (4 = 1rem)
-      return `flex flex-col gap-[${spacingValue}rem]`;
+      const spacingValue = parseInt(lineSpacing);
+      // Map spacing values to Tailwind gap classes
+      switch (spacingValue) {
+        case 0:
+          return 'flex flex-col gap-0';
+        case 1:
+          return 'flex flex-col gap-1';
+        case 2:
+          return 'flex flex-col gap-2';
+        case 3:
+          return 'flex flex-col gap-3';
+        case 4:
+          return 'flex flex-col gap-4';
+        case 5:
+          return 'flex flex-col gap-5';
+        case 6:
+          return 'flex flex-col gap-6';
+        case 7:
+          return 'flex flex-col gap-7';
+        case 8:
+          return 'flex flex-col gap-8';
+        case 9:
+          return 'flex flex-col gap-9';
+        case 10:
+          return 'flex flex-col gap-10';
+        case 11:
+          return 'flex flex-col gap-11';
+        case 12:
+          return 'flex flex-col gap-12';
+        case 13:
+          return 'flex flex-col gap-14';
+        case 14:
+          return 'flex flex-col gap-16';
+        case 15:
+          return 'flex flex-col gap-20';
+        case 16:
+          return 'flex flex-col gap-24';
+        case 17:
+          return 'flex flex-col gap-28';
+        case 18:
+          return 'flex flex-col gap-32';
+        case 19:
+          return 'flex flex-col gap-36';
+        case 20:
+          return 'flex flex-col gap-40';
+        default:
+          return 'flex flex-col gap-4';
+      }
     }
     
     // Fallback for legacy string values
