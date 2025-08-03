@@ -360,6 +360,9 @@ const DynamicPageRenderer: React.FC<DynamicPageRendererProps> = ({
             backgroundColor: section.featureGroup.backgroundColor
           };
 
+          console.log('🎯 DynamicPageRenderer - Feature Group layoutType:', section.featureGroup.layoutType);
+          console.log('🎯 DynamicPageRenderer - Passing layoutType to FeaturesSection:', propsToPass.layoutType);
+
           return wrapWithSectionDiv(
             <FeaturesSection
               {...propsToPass}

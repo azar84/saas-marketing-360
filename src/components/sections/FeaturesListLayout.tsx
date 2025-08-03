@@ -27,14 +27,9 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
   features, 
   heading, 
   subheading,
-  backgroundColor = '#ffffff'
+  backgroundColor = 'var(--color-bg-secondary)'
 }) => {
-  console.log('🎨 FeaturesListLayout rendered with:', {
-    featuresCount: features.length,
-    heading,
-    subheading,
-    backgroundColor
-  });
+
   const { designSystem } = useDesignSystem();
   const sectionRef = useRef<HTMLElement>(null);
   const particlesRef = useRef<HTMLDivElement>(null);
@@ -293,14 +288,14 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
         <div className="text-center mb-16">
           <h1 
             className="text-4xl md:text-6xl font-bold mb-8"
-            style={{ color: textPrimary }}
+            style={{ color: 'var(--color-text-primary)' }}
           >
             {heading}
           </h1>
           {subheading && (
             <p 
               className="text-xl md:text-2xl max-w-4xl mx-auto"
-              style={{ color: textSecondary }}
+              style={{ color: 'var(--color-text-secondary)' }}
             >
               {subheading}
             </p>
@@ -373,16 +368,15 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
             </div>
           </div>
 
-          {/* Features Grid */}
-          <div className="relative z-10 grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-16">
+          {/* Features List */}
+          <div className="relative z-10 flex flex-col space-y-8 max-w-4xl mx-auto">
             {features.map((feature, index) => (
               <div
                 key={feature.id}
-                className="feature-card relative rounded-3xl p-10 cursor-pointer overflow-hidden"
+                className="feature-card relative rounded-xl p-8 cursor-pointer overflow-hidden"
                 style={{
-                  background: `rgba(255, 255, 255, 0.05)`,
-                  backdropFilter: 'blur(20px)',
-                  border: `1px solid rgba(255, 255, 255, 0.1)`,
+                  background: 'var(--color-bg-secondary)',
+                  border: '1px solid var(--color-gray-light)',
                   transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                   animation: `fadeInUp 0.8s ease-out forwards ${index * 0.1}s, pulse 2s ease-in-out infinite`,
                   opacity: 0
@@ -405,35 +399,41 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
 
                 {/* Content */}
                 <div className="relative z-5">
-                  {/* Morphing Icon */}
-                  <div className="w-20 h-20 mx-auto mb-8 relative flex items-center justify-center">
-                    <div 
-                      className="absolute inset-0 rounded-full"
-                      style={{
-                        background: `linear-gradient(45deg, ${primaryColor}, ${index % 2 === 0 ? secondaryColor : accentColor})`,
-                        animation: 'morphIcon 6s ease-in-out infinite'
-                      }}
-                    />
-                    <div className="relative z-5 text-white">
-                      {getIconComponent(feature.iconName)}
+                  {/* Feature Content - Horizontal Layout */}
+                  <div className="flex items-center space-x-6">
+                    {/* Morphing Icon */}
+                    <div className="w-16 h-16 relative flex items-center justify-center flex-shrink-0">
+                      <div 
+                        className="absolute inset-0 rounded-full"
+                        style={{
+                          background: `linear-gradient(45deg, ${primaryColor}, ${index % 2 === 0 ? secondaryColor : accentColor})`,
+                          animation: 'morphIcon 6s ease-in-out infinite'
+                        }}
+                      />
+                      <div className="relative z-5 text-white">
+                        {getIconComponent(feature.iconName)}
+                      </div>
+                    </div>
+
+                    {/* Text Content */}
+                    <div className="flex-1">
+                      {/* Title */}
+                      <h3 
+                        className="text-xl font-bold mb-2"
+                        style={{ color: 'var(--color-text-primary)' }}
+                      >
+                        {feature.title}
+                      </h3>
+
+                      {/* Description */}
+                      <p 
+                        className="text-base leading-relaxed"
+                        style={{ color: 'var(--color-text-secondary)' }}
+                      >
+                        {feature.description}
+                      </p>
                     </div>
                   </div>
-
-                  {/* Title */}
-                  <h3 
-                    className="text-2xl font-bold mb-6 text-center"
-                    style={{ color: textPrimary }}
-                  >
-                    {feature.title}
-                  </h3>
-
-                  {/* Description */}
-                  <p 
-                    className="text-center text-lg leading-relaxed mb-8"
-                    style={{ color: textSecondary }}
-                  >
-                    {feature.description}
-                  </p>
                 </div>
               </div>
             ))}

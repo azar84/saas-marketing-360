@@ -11,7 +11,7 @@ This guide standardizes the frontend design system for the HiQSense website, ens
 - **Hero & Banner**: `Dark Background`
 - **Main Section Background**: `Primary Background`
 - **Section Alternates**: `Secondary Background`
-- **Card Background**: `Primary Background`
+- **Card Background**: `Secondary Background`
 - **Footer Background**: `Dark Background`
 - **Overlay Background**: `Semi-transparent Black`
 - **Disabled Background**: `Gray Light`
@@ -57,7 +57,7 @@ Always use muted color for all placeholder content:
 - **Disabled**: `Gray Light` background, `Muted Text`
 
 ### Cards
-- **Default**: `Primary Background`, `Gray Light` border
+- **Default**: `Secondary Background`, `Gray Light` border
 - **Hover**: subtle `shadow-md`, transition on hover
 - **Rounded**: `rounded-lg` or `rounded-xl`
 
@@ -184,7 +184,7 @@ Always use muted color for all placeholder content:
 - Background: `Secondary Background`
 - Text: `Primary` for names, `Secondary` for messages
 - Quote Icon: `Muted` or `Primary`
-- Cards: `Primary Background`, border `Gray Light`, `rounded-lg`
+- Cards: `Secondary Background`, border `Gray Light`, `rounded-lg`
 
 ---
 
@@ -213,7 +213,7 @@ Always use muted color for all placeholder content:
 
 ## 🧾 Pricing Tables
 
-- Card Background: `Primary Background`
+- Card Background: `Secondary Background`
 - Header: `Primary`
 - Features: `Secondary Text`
 - CTA: `Primary` background button

@@ -320,9 +320,6 @@ async function fetchPageSections(pageSlug: string): Promise<PageSection[]> {
               include: {
                 feature: true
               },
-              where: {
-                isVisible: true
-              },
               orderBy: {
                 sortOrder: 'asc'
               }
@@ -420,6 +417,13 @@ async function fetchPageSections(pageSlug: string): Promise<PageSection[]> {
         }
       }
     }
+
+    // Debug: Log feature group data from database
+    sections.forEach(section => {
+      if (section.featureGroup) {
+        console.log('🎯 Database - Feature Group:', section.featureGroup.name, 'layoutType:', section.featureGroup.layoutType);
+      }
+    });
 
     return sections as unknown as PageSection[];
   } catch (error) {
@@ -922,6 +926,17 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
             }))
             .sort((a, b) => a.sortOrder - b.sortOrder);
 
+          console.log('🎯 ServerDynamicPageRenderer - Features count:', features.length);
+          console.log('🎯 ServerDynamicPageRenderer - All items count:', section.featureGroup.items.length);
+          console.log('🎯 ServerDynamicPageRenderer - Visible items count:', section.featureGroup.items.filter(item => item.isVisible).length);
+          console.log('🎯 ServerDynamicPageRenderer - All items:', section.featureGroup.items.map(item => ({
+            id: item.id,
+            isVisible: item.isVisible,
+            featureName: item.feature.name
+          })));
+
+          console.log('🎯 ServerDynamicPageRenderer - Feature Group layoutType from database:', section.featureGroup.layoutType);
+          
           return wrapWithSectionDiv(
             <FeaturesSection 
               key={section.id} 

@@ -244,38 +244,24 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
 
   // Smart color calculation based on background color
   const getTextColor = () => {
-    if (!heroData?.backgroundColor) return 'text-[var(--color-text-primary,#1F2937)]'; // Default dark text
-    
-    const hex = heroData.backgroundColor.replace('#', '');
-    const r = parseInt(hex.substr(0, 2), 16);
-    const g = parseInt(hex.substr(2, 2), 16);
-    const b = parseInt(hex.substr(4, 2), 16);
-    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
-    return brightness > 128 ? 'text-[var(--color-text-primary,#1F2937)]' : 'text-white';
+    // According to frontend design system: Headline Text should use Primary Text
+    return 'text-[var(--color-text-primary)]';
   };
 
-  // Get secondary text color based on background
+  // Get secondary text color based on design system
   const getSecondaryTextColor = () => {
-    const primaryColor = getTextColor();
-    return primaryColor === 'text-white' ? 'text-white/90' : 'text-[var(--color-text-secondary,#6B7280)]';
+    // According to frontend design system: Body Text should use Secondary Text
+    return 'text-[var(--color-text-secondary)]';
   };
 
-  // Get trust indicator colors based on background
+  // Get trust indicator colors based on design system
   const getTrustIndicatorColors = () => {
-    const primaryColor = getTextColor();
-    if (primaryColor === 'text-white') {
-      return {
-        text: 'text-white/90',
-        background: 'bg-white/10',
-        border: 'border-white/20',
-        icon: 'text-white'
-      };
-    }
+    // According to frontend design system: Use consistent colors for trust indicators
     return {
-      text: 'text-[var(--color-text-primary,#1F2937)]',
-      background: 'bg-white/60',
-      border: 'border-white/40',
-      icon: 'text-[var(--color-primary,#5243E9)]'
+      text: 'text-[var(--color-text-secondary)]',
+      background: 'bg-[var(--color-bg-secondary)]',
+      border: 'border-[var(--color-gray-light)]',
+      icon: 'text-[var(--color-primary)]'
     };
   };
 
@@ -685,7 +671,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
               })()
             ) : (
                       <div className={`${getMediaContentClasses()} bg-[var(--color-bg-secondary,#F9FAFB)] rounded-2xl flex items-center justify-center`}>
-          <span className="text-[var(--color-text-muted,#9CA3AF)]">No video URL provided</span>
+                              <span className="text-[var(--color-text-muted)]">No video URL provided</span>
         </div>
             )}
           </motion.div>
@@ -705,7 +691,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 htmlContent={heroData?.animationData?.htmlContent || ''}
                 fallback={
                   <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-[var(--color-text-muted,#9CA3AF)]">
+                    <span className="text-[var(--color-text-muted)]">
                       {heroData?.animationData?.htmlContent ? 'Loading animated content...' : 'No HTML content provided'}
                     </span>
                   </div>
@@ -742,8 +728,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 />
               </>
             ) : (
-              <div className={`${getMediaContentClasses()} bg-[var(--color-bg-secondary,#F9FAFB)] rounded-2xl flex items-center justify-center`}>
-                <span className="text-[var(--color-text-muted,#9CA3AF)]">No script content provided</span>
+              <div className={`${getMediaContentClasses()} bg-[var(--color-bg-primary)] rounded-2xl flex items-center justify-center border`} style={{ borderColor: 'var(--color-gray-light)' }}>
+                <span className="text-[var(--color-text-muted)]">No script content provided</span>
               </div>
             )}
           </motion.div>
@@ -766,7 +752,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                     />
                   ) : (
                     <div className={`${getMediaContentClasses()} flex items-center justify-center`}>
-                      <span className="text-[var(--color-text-muted,#9CA3AF)]">No image selected</span>
+                      <span className="text-[var(--color-text-muted)]">No image selected</span>
                     </div>
                   )}
                 </motion.div>
@@ -787,11 +773,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
             whileHover={{ scale: 1.02 }}
           >
             <div className="text-center">
-              <div className="w-16 h-16 bg-[var(--color-bg-secondary,#F9FAFB)] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Video className="w-8 h-8 text-[var(--color-text-muted,#9CA3AF)]" />
+              <div className="w-16 h-16 bg-[var(--color-bg-primary)] rounded-full flex items-center justify-center mx-auto mb-4 border" style={{ borderColor: 'var(--color-gray-light)' }}>
+                <Video className="w-8 h-8 text-[var(--color-text-muted)]" />
               </div>
-              <h3 className="text-lg font-medium text-[var(--color-text-primary,#1F2937)] mb-2">No Content Selected</h3>
-              <p className="text-[var(--color-text-muted,#9CA3AF)]">Please select a content type from the admin panel</p>
+              <h3 className="text-lg font-medium text-[var(--color-text-primary)] mb-2">No Content Selected</h3>
+              <p className="text-[var(--color-text-muted)]">Please select a content type from the admin panel</p>
             </div>
           </motion.div>
         );
@@ -897,7 +883,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
       <motion.section 
         ref={heroRef}
         style={{ 
-          backgroundColor: heroData?.backgroundColor || 'var(--color-background)',
+          backgroundColor: heroData?.backgroundColor || 'var(--color-bg-primary)',
           backgroundImage: heroData?.backgroundImage ? `url(${heroData.backgroundImage})` : 'none',
           backgroundSize: heroData?.backgroundSize || 'cover',
           backgroundPosition: 'center',

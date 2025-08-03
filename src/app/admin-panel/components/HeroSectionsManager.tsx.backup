@@ -629,15 +629,15 @@ const HeroSectionsManager: React.FC = () => {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold" style={{ color: designSystem?.textPrimary || '#000000' }}>Hero Sections</h2>
-          <p style={{ color: designSystem?.textSecondary || '#666666' }}>Manage hero sections with advanced layouts and features</p>
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Hero Sections</h2>
+          <p style={{ color: 'var(--color-text-secondary)' }}>Manage hero sections with advanced layouts and features</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
           className="px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
           style={{ 
-            backgroundColor: designSystem?.primaryColor || '#5243E9',
-            color: '#ffffff'
+            backgroundColor: 'var(--color-primary)',
+            color: 'var(--color-text-primary)'
           }}
         >
           <Plus size={20} />
@@ -647,29 +647,40 @@ const HeroSectionsManager: React.FC = () => {
 
       {/* Message */}
       {message && (
-        <div className={`p-4 rounded-lg ${
-          message.type === 'success' ? 'bg-green-50 text-green-800' : 'bg-red-50 text-red-800'
-        }`}>
+        <div className="p-4 rounded-lg" style={{
+          backgroundColor: message.type === 'success' ? 'var(--color-success-light)' : 'var(--color-error-light)',
+          color: message.type === 'success' ? 'var(--color-success-dark)' : 'var(--color-error-dark)',
+          borderColor: message.type === 'success' ? 'var(--color-success)' : 'var(--color-error)'
+        }}>
           {message.text}
         </div>
       )}
 
       {/* Hero Sections List */}
-      <div className="space-y-4">
+      <div className="rounded-xl p-6 shadow-sm border" style={{ 
+        backgroundColor: 'var(--color-bg-secondary)',
+        borderColor: 'var(--color-gray-light)'
+      }}>
         {heroSections.length === 0 ? (
-          <div className="text-center py-8" style={{ color: designSystem?.textMuted || '#999999' }}>
+          <div className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>
             No hero sections found. Create your first hero section to get started.
           </div>
         ) : (
-          heroSections.map((hero) => (
-            <div 
-              key={hero.id} 
-              className="rounded-lg border overflow-hidden"
-              style={{
-                backgroundColor: 'var(--color-bg-primary)',
-                borderColor: 'var(--color-gray-light)'
-              }}
-            >
+          <div className="space-y-4">
+            {heroSections.map((hero) => (
+              <div 
+                key={hero.id} 
+                className="rounded-lg border-2 transition-all duration-200 overflow-hidden"
+                style={{
+                  backgroundColor: hero.visible 
+                    ? 'var(--color-bg-primary)' 
+                    : 'var(--color-bg-secondary)',
+                  borderColor: hero.visible 
+                    ? 'var(--color-gray-light)' 
+                    : 'var(--color-text-muted)',
+                  opacity: hero.visible ? 1 : 0.6
+                }}
+              >
               {/* Header */}
               <div className="p-4 border-b" style={{ borderColor: 'var(--color-gray-light)' }}>
                 <div className="flex items-center justify-between">
@@ -722,12 +733,12 @@ const HeroSectionsManager: React.FC = () => {
 
               {/* Expanded Details */}
               {hero.id && expandedSections.has(hero.id) && (
-                <div className="p-4 space-y-4" style={{ backgroundColor: designSystem?.backgroundSecondary || '#f9fafb' }}>
+                <div className="p-4 space-y-4" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {/* Basic Info */}
                     <div>
-                      <h4 className="font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>Basic Information</h4>
-                      <div className="space-y-1 text-sm" style={{ color: designSystem?.textSecondary || '#666666' }}>
+                      <h4 className="font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Basic Information</h4>
+                      <div className="space-y-1 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                         {hero.tagline && <p><span className="font-medium">Tagline:</span> {hero.tagline}</p>}
                         {hero.subheading && <p><span className="font-medium">Subheading:</span> {hero.subheading}</p>}
                         <p><span className="font-medium">Text Alignment:</span> {hero.textAlignment}</p>
@@ -736,17 +747,17 @@ const HeroSectionsManager: React.FC = () => {
 
                     {/* CTA Information */}
                     <div>
-                      <h4 className="font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>CTA Buttons</h4>
-                      <div className="space-y-1 text-sm" style={{ color: designSystem?.textSecondary || '#666666' }}>
+                      <h4 className="font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>CTA Buttons</h4>
+                      <div className="space-y-1 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                         {hero.ctaPrimary ? (
                           <p><span className="font-medium">Primary:</span> {hero.ctaPrimary.text}</p>
                         ) : (
-                          <p style={{ color: designSystem?.textMuted || '#999999' }}>No primary CTA</p>
+                          <p style={{ color: 'var(--color-text-muted)' }}>No primary CTA</p>
                         )}
                         {hero.ctaSecondary ? (
                           <p><span className="font-medium">Secondary:</span> {hero.ctaSecondary.text}</p>
                         ) : (
-                          <p style={{ color: designSystem?.textMuted || '#999999' }}>No secondary CTA</p>
+                          <p style={{ color: 'var(--color-text-muted)' }}>No secondary CTA</p>
                         )}
                       </div>
                     </div>
@@ -809,8 +820,8 @@ const HeroSectionsManager: React.FC = () => {
                 </div>
               )}
             </div>
-          ))
-        )}
+          ))}
+        </div>
       </div>
 
       {/* Form Modal */}

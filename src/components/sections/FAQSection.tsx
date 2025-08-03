@@ -56,8 +56,8 @@ export default function FAQSection({
   showCategories = true,
   defaultCategory,
   className = "",
-  backgroundColor = "#f8fafc",
-  heroBackgroundColor = "#6366f1",
+  backgroundColor = "var(--color-bg-secondary)",
+  heroBackgroundColor = "var(--color-bg-primary)",
   heroHeight = "80vh",
   faqCategoryId,
   showHero = true
@@ -170,8 +170,8 @@ export default function FAQSection({
       <div className={className} style={{ backgroundColor }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-            <p className="text-gray-600">Loading FAQ data...</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: 'var(--color-primary)' }}></div>
+            <p style={{ color: 'var(--color-text-secondary)' }}>Loading FAQ data...</p>
           </div>
         </div>
       </div>
@@ -184,11 +184,15 @@ export default function FAQSection({
       <div className={className} style={{ backgroundColor }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
           <div className="text-center">
-            <p className="text-red-600 mb-4">Error loading FAQ data: {error}</p>
-            <button 
-              onClick={() => window.location.reload()}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-            >
+            <p style={{ color: 'var(--color-error-dark)', marginBottom: '1rem' }}>Error loading FAQ data: {error}</p>
+                          <button 
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 rounded-lg hover:opacity-90 transition-opacity"
+                style={{ 
+                  backgroundColor: 'var(--color-primary)', 
+                  color: 'var(--color-bg-primary)'
+                }}
+              >
               Retry
             </button>
           </div>
@@ -203,8 +207,8 @@ export default function FAQSection({
       <div className={className} style={{ backgroundColor }}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
           <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">{heading}</h2>
-            <p className="text-gray-600">No FAQ data available at the moment.</p>
+            <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--color-text-primary)' }}>{heading}</h2>
+            <p style={{ color: 'var(--color-text-secondary)' }}>No FAQ data available at the moment.</p>
           </div>
         </div>
       </div>
@@ -220,6 +224,11 @@ export default function FAQSection({
 
   return (
     <div className={className} style={{ backgroundColor }}>
+      <style jsx>{`
+        input::placeholder {
+          color: var(--color-text-muted) !important;
+        }
+      `}</style>
       {showHero && (
         <div 
           className="relative pb-20 px-4 sm:px-6 lg:px-8 flex items-center justify-center"
@@ -229,29 +238,33 @@ export default function FAQSection({
           }}
         >
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold mb-6" style={{ color: 'var(--color-bg-primary)' }}>
               {heroTitle}
             </h1>
-            <p className="text-xl text-white/90 mb-8 max-w-2xl mx-auto">
+            <p className="text-xl mb-8 max-w-2xl mx-auto" style={{ color: 'var(--color-bg-primary)', opacity: 0.9 }}>
               {heroSubtitle}
             </p>
             
             <div className="max-w-2xl mx-auto relative">
               <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/4 text-gray-400 w-5 h-5" />
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/4 w-5 h-5" style={{ color: 'var(--color-text-muted)' }} />
                 <input
                   type="text"
                   placeholder={searchPlaceholder}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 text-lg border-0 rounded-lg shadow-lg focus:ring-2 focus:ring-white/20 focus:outline-none"
-                  style={{ backgroundColor: 'white' }}
+                  className="w-full pl-12 pr-4 py-4 text-lg border-0 rounded-lg shadow-lg focus:ring-2 focus:outline-none"
+                  style={{ 
+                    backgroundColor: 'var(--color-bg-primary)',
+                    color: 'var(--color-text-primary)'
+                  }}
                 />
               </div>
               {searchTerm && (
                 <button
                   onClick={clearSearch}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/4 text-gray-400 hover:text-gray-600"
+                  className="absolute right-4 top-1/2 transform -translate-y-1/4"
+                  style={{ color: 'var(--color-text-muted)' }}
                 >
                   <Plus className="w-5 h-5 rotate-45" />
                 </button>
@@ -266,8 +279,11 @@ export default function FAQSection({
           
           {showCategories && !faqCategoryId && sortedCategories.length > 0 && (
             <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 sticky top-8">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              <div className="rounded-lg shadow-sm border p-6 sticky top-8" style={{ 
+              backgroundColor: 'var(--color-bg-secondary)', 
+              borderColor: 'var(--color-gray-light)' 
+            }}>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
                   Quick Navigation
                 </h3>
                 
@@ -276,9 +292,14 @@ export default function FAQSection({
                     onClick={() => handleCategoryChange(null)}
                     className={'w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ' + 
                       (selectedCategory === null
-                        ? 'bg-blue-50 text-blue-700 border-l-4 border-blue-500'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50')
+                        ? 'border-l-4'
+                        : 'hover:bg-[var(--color-bg-primary)]')
                     }
+                    style={{
+                      backgroundColor: selectedCategory === null ? 'var(--color-primary-light)' : 'transparent',
+                      color: selectedCategory === null ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+                      borderLeftColor: selectedCategory === null ? 'var(--color-primary)' : 'transparent'
+                    }}
                   >
                     All Questions
                   </button>
@@ -290,10 +311,11 @@ export default function FAQSection({
                       className={'w-full text-left px-3 py-2 rounded-md text-sm font-medium transition-colors ' +
                         (selectedCategory === category.id
                           ? 'text-white border-l-4'
-                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50')
+                          : 'hover:bg-[var(--color-bg-primary)]')
                       }
                       style={{
                         backgroundColor: selectedCategory === category.id ? category.color : 'transparent',
+                        color: selectedCategory === category.id ? 'var(--color-bg-primary)' : 'var(--color-text-secondary)',
                         borderLeftColor: selectedCategory === category.id ? category.color : 'transparent'
                       }}
                     >
@@ -309,16 +331,16 @@ export default function FAQSection({
             
             {!searchTerm && (
               <div className="mb-8">
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>
                   {currentCategoryName || heading}
                 </h2>
                 {subheading && !currentCategoryName && (
-                  <p className="text-gray-600">
+                  <p style={{ color: 'var(--color-text-secondary)' }}>
                     {subheading}
                   </p>
                 )}
                 {currentCategoryName && (
-                  <p className="text-gray-600">
+                  <p style={{ color: 'var(--color-text-secondary)' }}>
                     {sortedCategories.find(cat => cat.id === (faqCategoryId || selectedCategory))?.description || 
                      'Questions related to ' + currentCategoryName}
                   </p>
@@ -328,10 +350,10 @@ export default function FAQSection({
 
             {searchTerm && (
               <div className="mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                <h2 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
                   Search Results for "{searchTerm}"
                 </h2>
-                <p className="text-gray-600">
+                <p style={{ color: 'var(--color-text-secondary)' }}>
                   {filteredAndSearchedFAQs.length} result{filteredAndSearchedFAQs.length !== 1 ? 's' : ''} found
                 </p>
               </div>
@@ -341,29 +363,33 @@ export default function FAQSection({
               {filteredAndSearchedFAQs.map((faq) => (
                 <div
                   key={faq.id}
-                  className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                  className="border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+                  style={{ 
+                    backgroundColor: 'var(--color-bg-primary)', 
+                    borderColor: 'var(--color-gray-light)' 
+                  }}
                 >
                   <button
                     onClick={() => toggleFAQ(faq.id)}
-                    className="w-full px-6 py-5 text-left flex items-start justify-between hover:bg-gray-50 transition-colors"
+                    className="w-full px-6 py-5 text-left flex items-start justify-between transition-colors hover:bg-[var(--color-bg-secondary)]"
                   >
                     <div className="flex-1 pr-4">
-                      <h3 className="text-lg font-medium text-gray-900 mb-1">
+                      <h3 className="text-lg font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>
                         {faq.question}
                       </h3>
                     </div>
                     <div className="flex-shrink-0 ml-4">
                       {openFAQ === faq.id ? (
-                        <Minus className="w-5 h-5 text-gray-400" />
+                        <Minus className="w-5 h-5" style={{ color: 'var(--color-text-muted)' }} />
                       ) : (
-                        <Plus className="w-5 h-5 text-gray-400" />
+                        <Plus className="w-5 h-5" style={{ color: 'var(--color-text-muted)' }} />
                       )}
                     </div>
                   </button>
                   
                   {openFAQ === faq.id && (
-                    <div className="px-6 pb-5 border-t border-gray-100">
-                      <div className="pt-4 text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    <div className="px-6 pb-5 border-t" style={{ borderColor: 'var(--color-gray-light)' }}>
+                      <div className="pt-4 leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--color-text-secondary)' }}>
                         {faq.answer}
                       </div>
                     </div>
@@ -374,12 +400,15 @@ export default function FAQSection({
 
             {filteredAndSearchedFAQs.length === 0 && (
               <div className="text-center py-12">
-                <div className="bg-white rounded-lg border border-gray-200 p-8">
-                  <Search className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                <div className="rounded-lg border p-8" style={{ 
+                  backgroundColor: 'var(--color-bg-secondary)', 
+                  borderColor: 'var(--color-gray-light)' 
+                }}>
+                  <Search className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-muted)' }} />
+                  <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                     {searchTerm ? 'No results found' : 'No questions available'}
                   </h3>
-                  <p className="text-gray-600 mb-4">
+                  <p className="mb-4" style={{ color: 'var(--color-text-secondary)' }}>
                     {searchTerm 
                       ? 'We could not find any questions matching "' + searchTerm + '". Try different keywords or browse categories.'
                       : (faqCategoryId || selectedCategory)
@@ -390,7 +419,12 @@ export default function FAQSection({
                   {searchTerm && (
                     <button
                       onClick={clearSearch}
-                      className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      className="inline-flex items-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium hover:bg-[var(--color-bg-secondary)]"
+                      style={{ 
+                        borderColor: 'var(--color-gray-light)',
+                        color: 'var(--color-text-secondary)',
+                        backgroundColor: 'var(--color-bg-primary)'
+                      }}
                     >
                       Clear search
                     </button>
