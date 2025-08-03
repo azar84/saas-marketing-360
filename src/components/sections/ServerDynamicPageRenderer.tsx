@@ -540,16 +540,21 @@ async function fetchHomeHeroData() {
       heading: homeHero.headline,
       subheading: homeHero.subheading,
       backgroundColor: homeHero.backgroundColor || '#FFFFFF',
-      backgroundImage: homeHero.backgroundImage || '',
       backgroundSize: homeHero.backgroundSize || 'cover',
       backgroundOverlay: homeHero.backgroundOverlay || '',
+      layoutType: homeHero.layoutType || 'split',
+      mediaPosition: homeHero.mediaPosition || 'right',
+      mediaSize: homeHero.mediaSize || 'full',
+      heroHeight: homeHero.heroHeight || 'auto',
+      lineSpacing: homeHero.lineSpacing || '4',
+
       primaryCtaId: homeHero.ctaPrimaryId || null,
       secondaryCtaId: homeHero.ctaSecondaryId || null,
       primaryCta: homeHero.ctaPrimary || null,
       secondaryCta: homeHero.ctaSecondary || null,
 
       isActive: homeHero.isActive,
-      animationType: homeHero.animationType || 'conversation',
+              animationType: homeHero.animationType || 'conversation',
       animationData: homeHero.animationData ? JSON.parse(homeHero.animationData) : {
         conversationFlow: [
           {

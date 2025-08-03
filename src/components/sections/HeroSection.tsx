@@ -279,6 +279,190 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
     };
   };
 
+  // Get layout classes based on layoutType and mediaPosition
+  const getLayoutClasses = () => {
+    const layoutType = heroData?.layoutType || 'split';
+    const mediaPosition = heroData?.mediaPosition || 'right';
+    
+    switch (layoutType) {
+      case 'centered':
+        return 'text-center max-w-5xl mx-auto';
+      case 'overlay':
+        return 'relative z-10';
+      case 'split':
+      default:
+        const isMediaLeft = mediaPosition === 'left';
+        return `grid grid-cols-1 lg:grid-cols-2 gap-16 items-center ${isMediaLeft ? 'lg:flex-row-reverse' : ''}`;
+    }
+  };
+
+  // Get text content classes based on layout
+  const getTextContentClasses = () => {
+    const layoutType = heroData?.layoutType || 'split';
+    const mediaPosition = heroData?.mediaPosition || 'right';
+    
+    switch (layoutType) {
+      case 'centered':
+        return 'text-center max-w-4xl mx-auto';
+      case 'overlay':
+        return 'text-center max-w-4xl mx-auto';
+      case 'split':
+      default:
+        const isMediaLeft = mediaPosition === 'left';
+        return `${isMediaLeft ? 'lg:order-2' : ''}`;
+    }
+  };
+
+  // Get animation direction based on media position
+  const getTextAnimationDirection = () => {
+    const mediaPosition = heroData?.mediaPosition || 'right';
+    return mediaPosition === 'left' ? 50 : -50;
+  };
+
+  // Get media size classes based on mediaSize setting
+  const getMediaSizeClasses = () => {
+    const mediaSize = heroData?.mediaSize || 'full';
+    
+    switch (mediaSize) {
+      case 'full':
+        return 'w-full h-full';
+      case 'original':
+        return 'w-full h-full';
+      case 'contained':
+        return 'w-full h-full object-contain';
+      case 'small':
+        return 'w-full h-[15vh] object-contain';
+      case 'medium':
+        return 'w-full h-[25vh] object-contain';
+      case 'large':
+        return 'w-full max-w-4xl h-auto object-contain';
+      default:
+        return 'w-full h-full';
+    }
+  };
+
+  // Get media container classes based on layout and size
+  const getMediaContainerClasses = () => {
+    const layoutType = heroData?.layoutType || 'split';
+    const mediaSize = heroData?.mediaSize || 'full';
+    
+    // For overlay mode, always center the media regardless of size
+    if (layoutType === 'overlay') {
+      return 'w-full h-full flex items-center justify-center';
+    }
+    
+    // For other layouts, use the size classes with centering
+    return `${getMediaSizeClasses()} flex items-center justify-center`;
+  };
+
+  // Get media content classes for the actual media elements (video, image, etc.)
+  const getMediaContentClasses = () => {
+    const layoutType = heroData?.layoutType || 'split';
+    const mediaSize = heroData?.mediaSize || 'full';
+    
+    // For overlay mode, use the size classes but ensure it fits in the centered container
+    if (layoutType === 'overlay') {
+      switch (mediaSize) {
+        case 'small':
+          return 'w-[400px] h-[300px] object-cover';
+        case 'medium':
+          return 'w-[600px] h-[450px] object-cover';
+        case 'large':
+          return 'w-full max-w-4xl h-auto object-cover';
+        case 'original':
+          return 'w-full aspect-[3/2] object-contain';
+        case 'contained':
+          return 'w-full h-full object-contain';
+        case 'full':
+        default:
+          return 'w-full h-full object-cover';
+      }
+    }
+    
+    // For other layouts, use the size classes to ensure proper sizing
+    switch (mediaSize) {
+      case 'small':
+        return 'w-[300px] h-[200px] object-cover mx-auto';
+      case 'medium':
+        return 'w-[500px] h-[350px] object-cover mx-auto';
+      case 'large':
+        return 'w-[800px] h-[600px] object-cover mx-auto';
+      case 'original':
+        return 'w-full aspect-[3/2] object-contain mx-auto';
+      case 'contained':
+        return 'w-full h-full object-contain mx-auto';
+      case 'full':
+      default:
+        return 'w-full h-full object-cover mx-auto';
+    }
+  };
+
+  // Get hero height classes
+  const getHeroHeightClasses = () => {
+    const heroHeight = heroData?.heroHeight || 'auto';
+    
+    switch (heroHeight) {
+      case 'auto':
+        return 'min-h-[500px]';
+      case '50vh':
+        return 'h-[50vh]';
+      case '60vh':
+        return 'h-[60vh]';
+      case '70vh':
+        return 'h-[70vh]';
+      case '80vh':
+        return 'h-[80vh]';
+      case '90vh':
+        return 'h-[90vh]';
+      case '100vh':
+        return 'h-screen';
+      case '400px':
+        return 'h-[400px]';
+      case '500px':
+        return 'h-[500px]';
+      case '600px':
+        return 'h-[600px]';
+      case '700px':
+        return 'h-[700px]';
+      case '800px':
+        return 'h-[800px]';
+      default:
+        return 'min-h-[500px]';
+    }
+  };
+
+  // Get line spacing styles
+  const getLineSpacingStyles = () => {
+    const lineSpacing = heroData?.lineSpacing || '4';
+    
+    // If it's a number, use it directly as gap
+    if (!isNaN(parseInt(lineSpacing))) {
+      const spacingValue = parseInt(lineSpacing) * 0.25; // Convert to rem (4 = 1rem)
+      return { 
+        display: 'flex',
+        flexDirection: 'column',
+        gap: `${spacingValue}rem`
+      };
+    }
+    
+    // Fallback for legacy string values
+    switch (lineSpacing) {
+      case 'tight':
+        return { display: 'flex', flexDirection: 'column', gap: '0.5rem' };
+      case 'normal':
+        return { display: 'flex', flexDirection: 'column', gap: '1rem' };
+      case 'relaxed':
+        return { display: 'flex', flexDirection: 'column', gap: '1.5rem' };
+      case 'loose':
+        return { display: 'flex', flexDirection: 'column', gap: '2rem' };
+      default:
+        return { display: 'flex', flexDirection: 'column', gap: '1rem' };
+    }
+  };
+
+  // Get horizontal spacing styles
+
+
   // Get button styles based on background
   // Use unified CTA styling from utils
   const getButtonStyles = (style: string) => {
@@ -398,15 +582,66 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
     return icons[iconName] || Shield;
   };
 
+  // Render media section based on layout
+  const renderMediaSection = () => {
+    const layoutType = heroData?.layoutType || 'split';
+    const mediaPosition = heroData?.mediaPosition || 'right';
+    
+    // Check if animation should be rendered
+    const animationContent = renderAnimation();
+    
+    if (!animationContent) {
+      return null; // Don't render anything when no creatives are needed
+    }
+    
+    switch (layoutType) {
+      case 'centered':
+        return (
+          <motion.div 
+            className="mt-10 lg:mt-14"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.6 }}
+          >
+            {animationContent}
+          </motion.div>
+        );
+
+      case 'overlay':
+        return (
+          <div className="absolute inset-0 -z-10 flex items-center justify-center">
+            {animationContent}
+          </div>
+        );
+
+      case 'split':
+      default:
+        const isMediaLeft = mediaPosition === 'left';
+        return (
+          <motion.div 
+            className={`${isMediaLeft ? 'lg:order-1' : ''} relative ${getMediaContainerClasses()} min-h-[500px]`}
+            initial={{ opacity: 0, x: isMediaLeft ? -50 : 50 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            {animationContent}
+          </motion.div>
+        );
+    }
+  };
+
   // Render different animation types
   const renderAnimation = () => {
-    const animationType = heroData?.animationType || 'video';
+    const animationType = heroData?.animationType || 'conversation';
+    
+    console.log('🔍 renderAnimation - animationType:', animationType);
+    console.log('🔍 renderAnimation - heroData:', heroData);
     
     switch (animationType) {
       case 'video':
         return (
           <motion.div 
-            className="w-full max-w-4xl aspect-video overflow-hidden"
+            className={`${getMediaContainerClasses()} overflow-hidden`}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -428,7 +663,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                   return (
                     <iframe
                       src={embedUrl}
-                      className="w-full h-full rounded-2xl"
+                      className={`${getMediaContentClasses()} rounded-2xl`}
                       frameBorder="0"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
@@ -439,7 +674,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                   // It's a direct video file URL
                   return (
                     <video 
-                      className="w-full h-full rounded-2xl object-cover"
+                      className={`${getMediaContentClasses()} rounded-2xl`}
                       controls={!heroData?.animationData?.autoplay}
                       muted={heroData?.animationData?.autoplay}
                       autoPlay={heroData?.animationData?.autoplay}
@@ -453,7 +688,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 }
               })()
             ) : (
-              <div className="w-full h-full bg-gray-200 rounded-2xl flex items-center justify-center">
+              <div className={`${getMediaContentClasses()} bg-gray-200 rounded-2xl flex items-center justify-center`}>
                 <span className="text-gray-500">No video URL provided</span>
               </div>
             )}
@@ -463,29 +698,31 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
       case 'html':
         return (
           <motion.div 
-            className="w-full max-w-4xl h-full min-h-[500px] overflow-hidden p-6"
+            className={`${getMediaContainerClasses()} min-h-[500px] overflow-hidden p-6`}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
             whileHover={{ scale: 1.02 }}
           >
-            <ClientOnlyHTML 
-              htmlContent={heroData?.animationData?.htmlContent || ''}
-              fallback={
-                <div className="w-full h-full flex items-center justify-center">
-                  <span className="text-gray-500">
-                    {heroData?.animationData?.htmlContent ? 'Loading animated content...' : 'No HTML content provided'}
-                  </span>
-                </div>
-              }
-            />
+            <div className={`${getMediaContentClasses()}`}>
+              <ClientOnlyHTML 
+                htmlContent={heroData?.animationData?.htmlContent || ''}
+                fallback={
+                  <div className="w-full h-full flex items-center justify-center">
+                    <span className="text-gray-500">
+                      {heroData?.animationData?.htmlContent ? 'Loading animated content...' : 'No HTML content provided'}
+                    </span>
+                  </div>
+                }
+              />
+            </div>
           </motion.div>
         );
 
       case 'script':
         return (
           <motion.div 
-            className="w-full max-w-4xl h-full min-h-[500px] overflow-hidden"
+            className={`${getMediaContainerClasses()} min-h-[500px] overflow-hidden`}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -493,7 +730,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
           >
             {heroData?.animationData?.scriptContent ? (
               <>
-                <div id="custom-animation-container" className="w-full h-full" />
+                <div id="custom-animation-container" className={`${getMediaContentClasses()}`} />
                 <script
                   dangerouslySetInnerHTML={{
                     __html: `
@@ -509,7 +746,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 />
               </>
             ) : (
-              <div className="w-full h-full bg-gray-200 rounded-2xl flex items-center justify-center">
+              <div className={`${getMediaContentClasses()} bg-gray-200 rounded-2xl flex items-center justify-center`}>
                 <span className="text-gray-500">No script content provided</span>
               </div>
             )}
@@ -519,30 +756,35 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                   case 'image':
               return (
                 <motion.div
-                  className="w-full h-full overflow-hidden"
+                  className={`${getMediaContainerClasses()} overflow-hidden`}
                   initial={{ opacity: 0, scale: 0.95 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.6, delay: 0.4 }}
                   whileHover={{ scale: 1.02 }}
                 >
-            {(heroData?.animationData?.imageUrl || heroData?.animationData?.imageItem?.publicUrl) ? (
-              <img 
-                src={heroData.animationData.imageUrl || heroData.animationData.imageItem.publicUrl}
-                alt={heroData.animationData.imageAlt || heroData.animationData.imageItem?.alt || 'Hero animation'}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <span className="text-gray-500">No image selected</span>
-              </div>
-            )}
-          </motion.div>
-        );
+                  {(heroData?.animationData?.imageUrl || heroData?.animationData?.imageItem?.publicUrl) ? (
+                    <img 
+                      src={heroData.animationData.imageUrl || heroData.animationData.imageItem.publicUrl}
+                      alt={heroData.animationData.imageAlt || heroData.animationData.imageItem?.alt || 'Hero animation'}
+                      className={`${getMediaContentClasses()}`}
+                    />
+                  ) : (
+                    <div className={`${getMediaContentClasses()} flex items-center justify-center`}>
+                      <span className="text-gray-500">No image selected</span>
+                    </div>
+                  )}
+                </motion.div>
+              );
 
       default:
+        // If animationType is empty (No Creatives Needed), return null
+        if (!animationType || animationType === '') {
+          return null;
+        }
+        
         return (
           <motion.div 
-            className="w-full max-w-4xl h-full min-h-[500px] overflow-hidden flex items-center justify-center"
+            className={`${getMediaContainerClasses()} min-h-[500px] overflow-hidden flex items-center justify-center`}
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -562,10 +804,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
 
 
 
-  // Debug logging
-  console.log('HeroSection rendering with heroData:', heroData);
-  console.log('Background image:', heroData?.backgroundImage);
-  console.log('Background size:', heroData?.backgroundSize);
+
 
   return (
     <>
@@ -668,7 +907,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat'
         }}
-        className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 sm:pt-20 lg:pt-24"
+        className={`relative flex items-center justify-center overflow-hidden pt-16 sm:pt-20 lg:pt-24 ${getHeroHeightClasses()}`}
       >
       {/* Background Overlay */}
       {heroData?.backgroundOverlay && (
@@ -706,18 +945,19 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
         <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-[var(--color-primary-light)]/6 to-[var(--color-accent)]/4 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative z-10 w-full px-6 lg:px-8 pb-8 lg:pb-0">
-        <div className="grid lg:grid-cols-2 gap-16 items-center max-w-7xl mx-auto">
+      <div className="relative z-10 w-full pb-8 lg:pb-0">
+        <div className={`${getLayoutClasses()} max-w-7xl mx-auto`}>
           
-          {/* Left Side - Refined Text & Actions */}
+          {/* Text Content */}
           <motion.div
-            initial={{ opacity: 0, x: -40 }}
+            initial={{ opacity: 0, x: getTextAnimationDirection() }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className="space-y-8"
+            className={`${getTextContentClasses()}`}
+            style={getLineSpacingStyles()}
           >
             {/* Tighter Main Headline with Refined Typography */}
-            <div className="space-y-4">
+            <div>
               <motion.h1 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -729,14 +969,16 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
             </div>
 
             {/* Refined Subheading */}
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.6 }}
-              className={`text-lg ${getSecondaryTextColor()} leading-relaxed max-w-lg font-medium`}
-            >
-              {heroData?.subheading || 'Deploy intelligent assistants to SMS, WhatsApp, and your website in minutes. Transform customer support while you focus on growth.'}
-            </motion.p>
+            {heroData?.subheading && (
+              <motion.p
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.7, delay: 0.6 }}
+                className={`text-lg ${getSecondaryTextColor()} leading-relaxed max-w-lg font-medium mx-auto`}
+              >
+                {heroData.subheading}
+              </motion.p>
+            )}
 
             {/* Enhanced CTAs */}
             <motion.div
@@ -1059,7 +1301,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 1.0 }}
-                className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4"
+                className="grid grid-cols-1 sm:grid-cols-3 gap-4"
               >
                 {visibleTrustIndicators.map((indicator: any, index: number) => {
                   const IconComponent = getIconComponent(indicator.iconName);
@@ -1081,19 +1323,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
             )}
           </motion.div>
 
-          {/* Right Side - Dynamic Animation */}
-                      <motion.div
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className={`relative w-full h-full min-h-[500px] ${
-                heroData?.animationType === 'image' 
-                  ? 'flex items-stretch' 
-                  : 'flex items-center justify-center'
-              }`}
-            >
-            {renderAnimation()}
-          </motion.div>
+          {/* Media Section - Dynamic Animation */}
+          {renderMediaSection()}
         </div>
       </div>
       </motion.section>

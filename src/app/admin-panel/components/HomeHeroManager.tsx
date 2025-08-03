@@ -73,9 +73,13 @@ interface HomeHeroData {
   heading: string;
   subheading: string;
   backgroundColor: string;
-  backgroundImage?: string;
   backgroundSize?: string;
   backgroundOverlay?: string;
+  layoutType: string;
+  mediaPosition: string;
+  mediaSize: string;
+  heroHeight: string;
+  lineSpacing: string;
   primaryCtaId: number | null;
   secondaryCtaId: number | null;
   isActive: boolean;
@@ -94,9 +98,13 @@ const HomeHeroManager: React.FC = () => {
     heading: 'Automate Conversations, Capture Leads, Serve Customers — All Without Code',
     subheading: 'Deploy intelligent assistants to SMS, WhatsApp, and your website in minutes. Transform customer support while you focus on growth.',
     backgroundColor: '#FFFFFF',
-    backgroundImage: '',
     backgroundSize: 'cover',
     backgroundOverlay: '',
+    layoutType: 'split',
+    mediaPosition: 'right',
+    mediaSize: 'full',
+    heroHeight: 'auto',
+    lineSpacing: '4',
     primaryCtaId: null,
     secondaryCtaId: null,
     isActive: true,
@@ -197,9 +205,13 @@ const HomeHeroManager: React.FC = () => {
           const heroData = {
             ...result.data,
             backgroundColor: result.data.backgroundColor || '#FFFFFF',
-            backgroundImage: result.data.backgroundImage || '',
             backgroundSize: result.data.backgroundSize || 'cover',
             backgroundOverlay: result.data.backgroundOverlay || '',
+            layoutType: result.data.layoutType || 'split',
+            mediaPosition: result.data.mediaPosition || 'right',
+            mediaSize: result.data.mediaSize || 'full',
+            heroHeight: result.data.heroHeight || 'auto',
+            lineSpacing: result.data.lineSpacing || '4',
             trustIndicators: result.data.trustIndicators || []
           };
           setHeroData(heroData);
@@ -232,13 +244,17 @@ const HomeHeroManager: React.FC = () => {
         // Handle the new API response format
         if (result.success && result.data) {
           console.log('Fetched hero data from API:', result.data);
-          // Ensure trustIndicators is always an array and preserve background image fields
+          // Ensure trustIndicators is always an array and preserve background fields
           const heroData = {
             ...result.data,
             backgroundColor: result.data.backgroundColor || '#FFFFFF',
-            backgroundImage: result.data.backgroundImage || '',
             backgroundSize: result.data.backgroundSize || 'cover',
             backgroundOverlay: result.data.backgroundOverlay || '',
+            layoutType: result.data.layoutType || 'split',
+            mediaPosition: result.data.mediaPosition || 'right',
+            mediaSize: result.data.mediaSize || 'full',
+            heroHeight: result.data.heroHeight || 'auto',
+            lineSpacing: result.data.lineSpacing || '4',
             trustIndicators: result.data.trustIndicators || []
           };
           console.log('Processed hero data:', heroData);
@@ -598,67 +614,7 @@ const HomeHeroManager: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Background Image */}
-                  <div>
-                    <label className="block text-sm font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>
-                      Background Image
-                    </label>
-                    <p className="text-xs mb-4" style={{ color: designSystem?.textMuted || '#999999' }}>
-                      Add a background image to your hero section. This will overlay on top of the background color.
-                    </p>
-                    
-                    <MediaSelector
-                      onChange={(media: any) => {
-                        console.log('MediaSelector onChange called with:', media);
-                        if (media && !Array.isArray(media)) {
-                          console.log('Setting background image to:', media.publicUrl);
-                          setHeroData(prev => ({ 
-                            ...prev, 
-                            backgroundImage: media.publicUrl
-                          }));
-                        }
-                      }}
-                      acceptedTypes={['image']}
-                      designSystem={designSystem || undefined}
-                    />
-                    
-                    {heroData.backgroundImage && (
-                      <div className="mt-4">
-                        <img
-                          src={heroData.backgroundImage}
-                          alt="Background preview"
-                          className="w-32 h-20 object-cover rounded-lg border"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setHeroData(prev => ({ ...prev, backgroundImage: '' }))}
-                          className="mt-2 text-sm text-red-600 hover:text-red-800"
-                        >
-                          Remove Image
-                        </button>
-                      </div>
-                    )}
-                  </div>
 
-                  {/* Background Image Size */}
-                  <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
-                      Image Size
-                    </label>
-                    <select
-                      value={heroData.backgroundSize || 'cover'}
-                      onChange={(e) => setHeroData(prev => ({ ...prev, backgroundSize: e.target.value }))}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      style={{ 
-                        color: designSystem?.textPrimary || '#000000',
-                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
-                      }}
-                    >
-                      <option value="cover">Cover (Fill entire section)</option>
-                      <option value="contain">Contain (Fit within section)</option>
-                      <option value="auto">Auto (Original size)</option>
-                    </select>
-                  </div>
 
                   {/* Background Overlay */}
                   <div>
@@ -733,12 +689,97 @@ const HomeHeroManager: React.FC = () => {
                       </button>
                     </div>
                   </div>
+
+                  {/* Hero Height */}
+                  <div>
+                    <label className="block text-sm font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      Hero Height
+                    </label>
+                    <p className="text-xs mb-4" style={{ color: designSystem?.textMuted || '#999999' }}>
+                      Set the height of the hero section.
+                    </p>
+                    <select
+                      value={heroData.heroHeight || 'auto'}
+                      onChange={(e) => setHeroData(prev => ({ ...prev, heroHeight: e.target.value }))}
+                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      style={{ 
+                        color: designSystem?.textPrimary || '#000000',
+                        backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                      }}
+                    >
+                      <option value="auto">Auto (Content-based)</option>
+                      <option value="50vh">50% Viewport Height</option>
+                      <option value="60vh">60% Viewport Height</option>
+                      <option value="70vh">70% Viewport Height</option>
+                      <option value="80vh">80% Viewport Height</option>
+                      <option value="90vh">90% Viewport Height</option>
+                      <option value="100vh">Full Viewport Height</option>
+                      <option value="400px">400px</option>
+                      <option value="500px">500px</option>
+                      <option value="600px">600px</option>
+                      <option value="700px">700px</option>
+                      <option value="800px">800px</option>
+                    </select>
+                  </div>
+
+                  {/* Line Spacing */}
+                  <div>
+                    <label className="block text-sm font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                      Line Spacing (Vertical Spacing)
+                    </label>
+                    <p className="text-xs mb-4" style={{ color: designSystem?.textMuted || '#999999' }}>
+                      Control the vertical spacing between text elements.
+                    </p>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentValue = parseInt(heroData.lineSpacing) || 4;
+                          setHeroData(prev => ({ ...prev, lineSpacing: Math.max(0, currentValue - 1).toString() }));
+                        }}
+                        className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-blue-500"
+                        style={{ color: designSystem?.textPrimary || '#000000' }}
+                      >
+                        -
+                      </button>
+                      <input
+                        type="number"
+                        value={heroData.lineSpacing || '4'}
+                        onChange={(e) => setHeroData(prev => ({ ...prev, lineSpacing: e.target.value }))}
+                        min="0"
+                        max="20"
+                        className="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center"
+                        style={{ 
+                          color: designSystem?.textPrimary || '#000000',
+                          backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                        }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const currentValue = parseInt(heroData.lineSpacing) || 4;
+                          setHeroData(prev => ({ ...prev, lineSpacing: Math.min(20, currentValue + 1).toString() }));
+                        }}
+                        className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 focus:ring-2 focus:ring-blue-500"
+                        style={{ color: designSystem?.textPrimary || '#000000' }}
+                      >
+                        +
+                      </button>
+                    </div>
+                    <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
+                      Adjust the spacing value (0-20). The unit is automatically applied as "space-y-[value]".
+                    </p>
+                  </div>
+
+
+
+
                 </div>
               </div>
 
               {/* Creatives Configuration */}
               <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                <h3 className="text-lg font-semibold mb-4" style={{ color: designSystem?.textPrimary || '#000000' }}>Creatives Configuration</h3>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: designSystem?.textPrimary || '#000000' }}>Creatives & Layout Configuration</h3>
                 
                 <div className="space-y-4">
                   <div>
@@ -747,14 +788,17 @@ const HomeHeroManager: React.FC = () => {
                     </label>
                     <select
                       value={heroData.animationType || ''}
-                      onChange={(e) => setHeroData({ ...heroData, animationType: e.target.value })}
+                      onChange={(e) => {
+                        console.log('🔍 Changing animationType to:', e.target.value);
+                        setHeroData({ ...heroData, animationType: e.target.value });
+                      }}
                       className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                       style={{ 
                         color: designSystem?.textPrimary || '#000000',
                         backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
                       }}
                     >
-                      <option value="">No Animation</option>
+                      <option value="">No Creatives Needed</option>
                       <option value="video">Video</option>
                       <option value="html">HTML Content</option>
                       <option value="script">Custom Script</option>
@@ -907,6 +951,81 @@ const HomeHeroManager: React.FC = () => {
                       </div>
                     </div>
                   )}
+
+                  {/* Layout and Positioning Controls */}
+                  <div className="space-y-4 pt-4 border-t border-gray-200">
+                    <h4 className="font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>Layout & Positioning</h4>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                          Layout Type
+                        </label>
+                        <select
+                          value={heroData.layoutType || 'split'}
+                          onChange={(e) => setHeroData(prev => ({ ...prev, layoutType: e.target.value }))}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          style={{ 
+                            color: designSystem?.textPrimary || '#000000',
+                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          }}
+                        >
+                          <option value="split">Split (Text and media side by side)</option>
+                          <option value="centered">Centered (Text centered, media below)</option>
+                          <option value="overlay">Overlay (Text overlaid on media)</option>
+                        </select>
+                        <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
+                          Choose how text and media are arranged
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                          Media Position
+                        </label>
+                        <select
+                          value={heroData.mediaPosition || 'right'}
+                          onChange={(e) => setHeroData(prev => ({ ...prev, mediaPosition: e.target.value }))}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          style={{ 
+                            color: designSystem?.textPrimary || '#000000',
+                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          }}
+                        >
+                          <option value="right">Right (Media on the right)</option>
+                          <option value="left">Left (Media on the left)</option>
+                        </select>
+                        <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
+                          Only applies to split layout
+                        </p>
+                      </div>
+
+                      <div>
+                        <label className="block text-sm font-medium mb-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
+                          Media Size
+                        </label>
+                        <select
+                          value={heroData.mediaSize || 'full'}
+                          onChange={(e) => setHeroData(prev => ({ ...prev, mediaSize: e.target.value }))}
+                          className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          style={{ 
+                            color: designSystem?.textPrimary || '#000000',
+                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                          }}
+                        >
+                          <option value="full">Full (Fill available space)</option>
+                          <option value="original">Original (Maintain aspect ratio)</option>
+                          <option value="contained">Contained (Fit within bounds)</option>
+                          <option value="small">Small (Compact size)</option>
+                          <option value="medium">Medium (Balanced size)</option>
+                          <option value="large">Large (Prominent size)</option>
+                        </select>
+                        <p className="text-xs mt-1" style={{ color: designSystem?.textMuted || '#999999' }}>
+                          Control how the media is sized
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
 

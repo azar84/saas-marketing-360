@@ -422,13 +422,17 @@ model HomePageHero {
   ctaSecondaryUrl   String?
   mediaUrl          String?
   backgroundColor   String?  @default("#FFFFFF")
+  layoutType        String   @default("split")
+  mediaPosition     String   @default("right")
+  mediaSize         String   @default("full")
+  heroHeight        String?  @default("auto")
+  lineSpacing       String?  @default("normal")
   isActive          Boolean  @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   animationData     String?
   animationType     String?  @default("conversation")
   trustIndicators   String?
-  backgroundImage   String?
   backgroundOverlay String?
   backgroundSize    String   @default("cover")
   ctaPrimary        CTA?     @relation("HomeHeroPrimaryCTA", fields: [ctaPrimaryId], references: [id])

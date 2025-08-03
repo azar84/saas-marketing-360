@@ -21,15 +21,19 @@ export async function GET() {
         heading: 'Automate Conversations, Capture Leads, Serve Customers — All Without Code',
         subheading: 'Deploy intelligent assistants to SMS, WhatsApp, and your website in minutes. Transform customer support while you focus on growth.',
         backgroundColor: '#FFFFFF',
-        backgroundImage: '',
         backgroundSize: 'cover',
         backgroundOverlay: '',
+        layoutType: 'split',
+        mediaPosition: 'right',
+        mediaSize: 'full',
+        heroHeight: 'auto',
+              lineSpacing: '4',
         primaryCtaId: null,
         secondaryCtaId: null,
         primaryCta: null,
         secondaryCta: null,
         isActive: true,
-        animationType: 'video',
+        animationType: '',
         animationData: {
           videoUrl: '',
           autoplay: false,
@@ -54,15 +58,19 @@ export async function GET() {
       heading: homeHero.headline,           // Map headline -> heading
       subheading: homeHero.subheading,
       backgroundColor: homeHero.backgroundColor || '#FFFFFF',
-      backgroundImage: homeHero.backgroundImage || '',
       backgroundSize: homeHero.backgroundSize || 'cover',
       backgroundOverlay: homeHero.backgroundOverlay || '',
+      layoutType: homeHero.layoutType || 'split',
+      mediaPosition: homeHero.mediaPosition || 'right',
+      mediaSize: homeHero.mediaSize || 'full',
+      heroHeight: homeHero.heroHeight || 'auto',
+      lineSpacing: homeHero.lineSpacing || '4',
       primaryCtaId: homeHero.ctaPrimaryId || null,    // Use actual CTA ID from database
       secondaryCtaId: homeHero.ctaSecondaryId || null, // Use actual CTA ID from database
       primaryCta: homeHero.ctaPrimary || null,         // Include actual CTA button data
       secondaryCta: homeHero.ctaSecondary || null,     // Include actual CTA button data
       isActive: homeHero.isActive,
-      animationType: homeHero.animationType || 'video',
+      animationType: homeHero.animationType || 'conversation',
       animationData: homeHero.animationData ? JSON.parse(homeHero.animationData) : {
         videoUrl: '',
         autoplay: false,
@@ -134,9 +142,9 @@ export async function POST(request: NextRequest) {
       backgroundColor: homeHero.backgroundColor,
       primaryCtaId: homeHero.ctaPrimaryId,
       secondaryCtaId: homeHero.ctaSecondaryId,
-      isActive: homeHero.isActive,
-      animationType: homeHero.animationType || 'conversation',
-      animationData: homeHero.animationData ? JSON.parse(homeHero.animationData) : body.animationData,
+              isActive: homeHero.isActive,
+        animationType: homeHero.animationType || 'conversation',
+        animationData: homeHero.animationData ? JSON.parse(homeHero.animationData) : body.animationData,
       trustIndicators: homeHero.trustIndicators ? JSON.parse(homeHero.trustIndicators) : body.trustIndicators
     };
 
@@ -175,9 +183,14 @@ export async function PUT(request: NextRequest) {
           headline: updateData.heading || 'Welcome to Our Platform',  // Map heading -> headline
           subheading: updateData.subheading || null,
           backgroundColor: updateData.backgroundColor || '#FFFFFF',
-          backgroundImage: updateData.backgroundImage || null,
           backgroundSize: updateData.backgroundSize || 'cover',
           backgroundOverlay: updateData.backgroundOverlay || null,
+          layoutType: updateData.layoutType || 'split',
+          mediaPosition: updateData.mediaPosition || 'right',
+          mediaSize: updateData.mediaSize || 'full',
+          heroHeight: updateData.heroHeight || 'auto',
+          lineSpacing: updateData.lineSpacing || '4',
+
           ctaPrimaryId: updateData.primaryCtaId || null,     // Store CTA ID
           ctaSecondaryId: updateData.secondaryCtaId || null, // Store CTA ID
           ctaPrimaryText: null,    // These will be fetched from CTA table when needed
@@ -185,7 +198,7 @@ export async function PUT(request: NextRequest) {
           ctaSecondaryText: null,
           ctaSecondaryUrl: null,
           mediaUrl: null,
-          animationType: updateData.animationType || 'video',
+          animationType: updateData.animationType || 'conversation',
           animationData: updateData.animationData ? JSON.stringify(updateData.animationData) : null,
           isActive: updateData.isActive !== undefined ? updateData.isActive : true,
           trustIndicators: JSON.stringify(updateData.trustIndicators || [
@@ -202,13 +215,18 @@ export async function PUT(request: NextRequest) {
         heading: homeHero.headline,
         subheading: homeHero.subheading,
         backgroundColor: homeHero.backgroundColor,
-        backgroundImage: homeHero.backgroundImage,
         backgroundSize: homeHero.backgroundSize,
         backgroundOverlay: homeHero.backgroundOverlay,
+        layoutType: homeHero.layoutType,
+        mediaPosition: homeHero.mediaPosition,
+        mediaSize: homeHero.mediaSize,
+        heroHeight: homeHero.heroHeight,
+        lineSpacing: homeHero.lineSpacing,
+
         primaryCtaId: homeHero.ctaPrimaryId,
         secondaryCtaId: homeHero.ctaSecondaryId,
         isActive: homeHero.isActive,
-        animationType: homeHero.animationType || 'video',
+        animationType: homeHero.animationType || '',
         animationData: homeHero.animationData ? JSON.parse(homeHero.animationData) : updateData.animationData,
         trustIndicators: homeHero.trustIndicators ? JSON.parse(homeHero.trustIndicators) : updateData.trustIndicators
       };
@@ -226,9 +244,14 @@ export async function PUT(request: NextRequest) {
         ...(updateData.heading !== undefined && { headline: updateData.heading }),  // Map heading -> headline
         ...(updateData.subheading !== undefined && { subheading: updateData.subheading }),
         ...(updateData.backgroundColor !== undefined && { backgroundColor: updateData.backgroundColor }),
-        ...(updateData.backgroundImage !== undefined && { backgroundImage: updateData.backgroundImage }),
         ...(updateData.backgroundSize !== undefined && { backgroundSize: updateData.backgroundSize }),
         ...(updateData.backgroundOverlay !== undefined && { backgroundOverlay: updateData.backgroundOverlay }),
+        ...(updateData.layoutType !== undefined && { layoutType: updateData.layoutType }),
+        ...(updateData.mediaPosition !== undefined && { mediaPosition: updateData.mediaPosition }),
+        ...(updateData.mediaSize !== undefined && { mediaSize: updateData.mediaSize }),
+        ...(updateData.heroHeight !== undefined && { heroHeight: updateData.heroHeight }),
+        ...(updateData.lineSpacing !== undefined && { lineSpacing: updateData.lineSpacing }),
+
         ...(updateData.primaryCtaId !== undefined && { ctaPrimaryId: updateData.primaryCtaId }),     // Store CTA ID
         ...(updateData.secondaryCtaId !== undefined && { ctaSecondaryId: updateData.secondaryCtaId }), // Store CTA ID
         ...(updateData.animationType !== undefined && { animationType: updateData.animationType }),
@@ -245,13 +268,18 @@ export async function PUT(request: NextRequest) {
       heading: homeHero.headline,
       subheading: homeHero.subheading,
       backgroundColor: homeHero.backgroundColor,
-      backgroundImage: homeHero.backgroundImage,
       backgroundSize: homeHero.backgroundSize,
       backgroundOverlay: homeHero.backgroundOverlay,
+      layoutType: homeHero.layoutType,
+      mediaPosition: homeHero.mediaPosition,
+      mediaSize: homeHero.mediaSize,
+      heroHeight: homeHero.heroHeight,
+      lineSpacing: homeHero.lineSpacing,
+      
       primaryCtaId: homeHero.ctaPrimaryId,
       secondaryCtaId: homeHero.ctaSecondaryId,
       isActive: homeHero.isActive,
-      animationType: homeHero.animationType || 'conversation',
+      animationType: homeHero.animationType || '',
       animationData: homeHero.animationData ? JSON.parse(homeHero.animationData) : updateData.animationData,
       trustIndicators: homeHero.trustIndicators ? JSON.parse(homeHero.trustIndicators) : (updateData.trustIndicators || [
         { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
