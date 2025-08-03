@@ -95,6 +95,28 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
             ref={ref}
             {...props}
           />
+          <style jsx>{`
+            input::placeholder {
+              color: var(--color-text-muted, #9CA3AF) !important;
+              opacity: 1;
+            }
+            input::-webkit-input-placeholder {
+              color: var(--color-text-muted, #9CA3AF) !important;
+              opacity: 1;
+            }
+            input::-moz-placeholder {
+              color: var(--color-text-muted, #9CA3AF) !important;
+              opacity: 1;
+            }
+            input:-ms-input-placeholder {
+              color: var(--color-text-muted, #9CA3AF) !important;
+              opacity: 1;
+            }
+            input:-moz-placeholder {
+              color: var(--color-text-muted, #9CA3AF) !important;
+              opacity: 1;
+            }
+          `}</style>
           
           {rightIcon && (
             <div 

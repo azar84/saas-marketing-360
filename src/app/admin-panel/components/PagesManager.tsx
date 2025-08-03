@@ -590,7 +590,7 @@ export default function PagesManager() {
               <div>
                 <label 
                   className="block text-sm font-medium mb-2"
-                  style={{ color: adminColors.textSecondary }}
+                  style={{ color: 'var(--color-text-primary, #1F2937)' }}
                 >
                   Meta Title
                 </label>
@@ -611,7 +611,7 @@ export default function PagesManager() {
               <div>
                 <label 
                   className="block text-sm font-medium mb-2"
-                  style={{ color: adminColors.textSecondary }}
+                  style={{ color: 'var(--color-text-primary, #1F2937)' }}
                 >
                   Meta Description
                 </label>
@@ -627,6 +627,28 @@ export default function PagesManager() {
                     borderColor: adminColors.border
                   }}
                 />
+                <style jsx>{`
+                  textarea::placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea::-webkit-input-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea::-moz-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea:-ms-input-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea:-moz-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                `}</style>
               </div>
 
               {/* Navigation Visibility */}

@@ -36,7 +36,8 @@ import {
   Gift,
   Rocket
 } from 'lucide-react';
-import { Button, Input, IconPicker } from '@/components/ui';
+import { Button, Input } from '@/components/ui';
+import UniversalIconPicker from '@/components/ui/UniversalIconPicker';
 import { renderIcon } from '@/lib/iconUtils';
 
 // Available icons for features
@@ -384,15 +385,44 @@ const FeaturesManager: React.FC = () => {
                   }}
                   rows={3}
                 />
+                <style jsx>{`
+                  textarea::placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea::-webkit-input-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea::-moz-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea:-ms-input-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea:-moz-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                `}</style>
               </div>
 
               <div>
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Icon
                 </label>
-                <IconPicker
+                <UniversalIconPicker
                   value={formData.iconName}
-                  onChange={(value) => setFormData({ ...formData, iconName: value })}
+                  onChange={(iconName) => setFormData({ ...formData, iconName })}
+                  placeholder="Select an icon..."
+                  className="w-full"
+                  textPrimary="var(--color-text-primary, #1F2937)"
+                  textSecondary="var(--color-text-secondary, #6B7280)"
+                  textMuted="var(--color-text-muted, #9CA3AF)"
+                  backgroundPrimary="var(--color-bg-primary, #FFFFFF)"
+                  backgroundSecondary="var(--color-bg-secondary, #F9FAFB)"
                 />
               </div>
 

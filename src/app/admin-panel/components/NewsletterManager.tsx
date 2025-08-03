@@ -194,8 +194,8 @@ export default function NewsletterManager() {
             <Mail className="w-6 h-6" style={{ color: getPrimaryColor() }} />
           </div>
           <div>
-            <h1 className="text-2xl font-bold" style={{ color: adminColors.textPrimary }}>Newsletter Subscribers</h1>
-            <p style={{ color: adminColors.textSecondary }}>Manage your newsletter subscriber list</p>
+                    <h1 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Newsletter Subscribers</h1>
+        <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Manage your newsletter subscriber list</p>
           </div>
         </div>
         
@@ -218,8 +218,8 @@ export default function NewsletterManager() {
               <Users className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <p className="text-sm" style={{ color: adminColors.textSecondary }}>Total Subscribers</p>
-              <p className="text-2xl font-bold" style={{ color: adminColors.textPrimary }}>{pagination.total}</p>
+                              <p className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Total Subscribers</p>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{pagination.total}</p>
             </div>
           </div>
         </Card>
@@ -230,8 +230,8 @@ export default function NewsletterManager() {
               <UserCheck className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <p className="text-sm" style={{ color: adminColors.textSecondary }}>Active Subscribers</p>
-              <p className="text-2xl font-bold" style={{ color: adminColors.textPrimary }}>
+                              <p className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Active Subscribers</p>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 {subscribers.filter(s => s.subscribed).length}
               </p>
             </div>
@@ -244,8 +244,8 @@ export default function NewsletterManager() {
               <UserX className="w-5 h-5 text-red-600" />
             </div>
             <div>
-              <p className="text-sm" style={{ color: adminColors.textSecondary }}>Unsubscribed</p>
-              <p className="text-2xl font-bold" style={{ color: adminColors.textPrimary }}>
+                              <p className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Unsubscribed</p>
+                <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 {subscribers.filter(s => !s.subscribed).length}
               </p>
             </div>
@@ -258,7 +258,7 @@ export default function NewsletterManager() {
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/4 text-gray-400 w-4 h-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/4 w-4 h-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
               <Input
                 placeholder="Search by email address..."
                 value={searchTerm}
@@ -270,11 +270,12 @@ export default function NewsletterManager() {
           </div>
           
           <div className="flex items-center space-x-2">
-            <Filter className="w-4 h-4 text-gray-400" />
+            <Filter className="w-4 h-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
             <select
               value={filterSubscribed}
               onChange={(e) => setFilterSubscribed(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:border-transparent"
+              className="px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent"
+              style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}
             >
               <option value="all">All Subscribers</option>
               <option value="true">Subscribed Only</option>
@@ -293,24 +294,24 @@ export default function NewsletterManager() {
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr style={{ borderBottomColor: adminColors.border }} className="border-b">
-                <th className="text-left py-3 px-4 font-medium" style={{ color: adminColors.textPrimary }}>Email</th>
-                <th className="text-left py-3 px-4 font-medium" style={{ color: adminColors.textPrimary }}>Status</th>
-                <th className="text-left py-3 px-4 font-medium" style={{ color: adminColors.textPrimary }}>Subscribed Date</th>
-                <th className="text-left py-3 px-4 font-medium" style={{ color: adminColors.textPrimary }}>Last Updated</th>
-                <th className="text-right py-3 px-4 font-medium" style={{ color: adminColors.textPrimary }}>Actions</th>
+              <tr style={{ borderBottomColor: 'var(--color-gray-light, #E5E7EB)' }} className="border-b">
+                <th className="text-left py-3 px-4 font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Email</th>
+                <th className="text-left py-3 px-4 font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Status</th>
+                <th className="text-left py-3 px-4 font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Subscribed Date</th>
+                <th className="text-left py-3 px-4 font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Last Updated</th>
+                <th className="text-right py-3 px-4 font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-8" style={{ color: adminColors.textSecondary }}>
+                  <td colSpan={5} className="text-center py-8" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                     Loading subscribers...
                   </td>
                 </tr>
               ) : subscribers.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="text-center py-8" style={{ color: adminColors.textSecondary }}>
+                  <td colSpan={5} className="text-center py-8" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                     No subscribers found
                   </td>
                 </tr>
@@ -318,11 +319,11 @@ export default function NewsletterManager() {
                 subscribers.map((subscriber) => {
                   const StatusIcon = getStatusIcon(subscriber.subscribed);
                   return (
-                    <tr key={subscriber.id} style={{ borderBottomColor: adminColors.border }} className="border-b hover:bg-gray-50">
+                    <tr key={subscriber.id} style={{ borderBottomColor: 'var(--color-gray-light, #E5E7EB)' }} className="border-b">
                       <td className="py-3 px-4">
                         <div className="flex items-center space-x-2">
-                          <Mail className="w-4 h-4 text-gray-400" />
-                          <span className="font-medium" style={{ color: adminColors.textPrimary }}>{subscriber.email}</span>
+                          <Mail className="w-4 h-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
+                          <span className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{subscriber.email}</span>
                         </div>
                       </td>
                       <td className="py-3 px-4">
@@ -339,10 +340,10 @@ export default function NewsletterManager() {
                           </span>
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-sm" style={{ color: adminColors.textSecondary }}>
+                      <td className="py-3 px-4 text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                         {formatDate(subscriber.createdAt)}
                       </td>
-                      <td className="py-3 px-4 text-sm" style={{ color: adminColors.textSecondary }}>
+                      <td className="py-3 px-4 text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                         {formatDate(subscriber.updatedAt)}
                       </td>
                       <td className="py-3 px-4">
@@ -375,8 +376,8 @@ export default function NewsletterManager() {
 
         {/* Pagination */}
         {pagination.totalPages > 1 && (
-          <div className="flex items-center justify-between mt-6 pt-6" style={{ borderTopColor: adminColors.border, borderTopWidth: '1px' }}>
-            <div className="text-sm" style={{ color: adminColors.textSecondary }}>
+                      <div className="flex items-center justify-between mt-6 pt-6" style={{ borderTopColor: 'var(--color-gray-light, #E5E7EB)', borderTopWidth: '1px' }}>
+              <div className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
               Showing {((pagination.page - 1) * pagination.limit) + 1} to{' '}
               {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
               {pagination.total} subscribers
@@ -393,7 +394,7 @@ export default function NewsletterManager() {
                 Previous
               </Button>
               
-              <span className="text-sm" style={{ color: adminColors.textSecondary }}>
+                              <span className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                 Page {pagination.page} of {pagination.totalPages}
               </span>
               

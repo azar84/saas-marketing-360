@@ -783,6 +783,28 @@ export default function CTAManager() {
                       color: 'var(--color-text-primary, #1F2937)'
                     }}
                   />
+                  <style jsx>{`
+                    textarea::placeholder {
+                      color: var(--color-text-muted, #9CA3AF) !important;
+                      opacity: 1;
+                    }
+                    textarea::-webkit-input-placeholder {
+                      color: var(--color-text-muted, #9CA3AF) !important;
+                      opacity: 1;
+                    }
+                    textarea::-moz-placeholder {
+                      color: var(--color-text-muted, #9CA3AF) !important;
+                      opacity: 1;
+                    }
+                    textarea:-ms-input-placeholder {
+                      color: var(--color-text-muted, #9CA3AF) !important;
+                      opacity: 1;
+                    }
+                    textarea:-moz-placeholder {
+                      color: var(--color-text-muted, #9CA3AF) !important;
+                      opacity: 1;
+                    }
+                  `}</style>
                 </div>
               )}
 
@@ -1092,100 +1114,7 @@ export default function CTAManager() {
         </Card>
       )}
 
-      {/* Header CTAs Section */}
-      <Card className="p-6">
-        <h3 
-          className="text-xl font-semibold mb-4 flex items-center"
-          style={{ color: 'var(--color-text-primary, #1F2937)' }}
-        >
-          <ExternalLink 
-            className="w-5 h-5 mr-2"
-            style={{ color: 'var(--color-primary, #5243E9)' }}
-          />
-          CTAs Currently in Header
-        </h3>
-        
-        {!Array.isArray(headerCtas) || headerCtas.length === 0 ? (
-          <p 
-            className="text-center py-8"
-            style={{ color: 'var(--color-text-secondary, #6B7280)' }}
-          >
-            No CTA buttons in header yet
-          </p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {headerCtas.map((headerCta) => (
-              <div
-                key={headerCta.id}
-                className="border rounded-lg p-4"
-                style={{ 
-                  borderColor: 'var(--color-gray-light, #E5E7EB)',
-                  background: 'linear-gradient(to bottom right, var(--color-bg-secondary, #F9FAFB), var(--color-bg-primary, #FFFFFF))'
-                }}
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <Badge className={getStyleColor(headerCta.cta.style)}>
-                    {headerCta.cta.style}
-                  </Badge>
-                  <div className="flex space-x-1">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => toggleHeaderVisibility(headerCta.id, headerCta.isVisible)}
-                      className="p-1"
-                    >
-                      {headerCta.isVisible ? (
-                        <Eye 
-                          className="w-4 h-4"
-                          style={{ color: 'var(--color-success, #10B981)' }}
-                        />
-                      ) : (
-                        <EyeOff 
-                          className="w-4 h-4"
-                          style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
-                        />
-                      )}
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => removeFromHeader(headerCta.id)}
-                      className="p-1"
-                      style={{ color: 'var(--color-error, #EF4444)' }}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 mb-1">
-                  {headerCta.cta.icon && renderIcon(headerCta.cta.icon, { 
-                    className: 'w-4 h-4',
-                    style: { color: 'var(--color-primary, #5243E9)' }
-                  } as any)}
-                  <h4 
-                    className="font-semibold"
-                    style={{ color: 'var(--color-text-primary, #1F2937)' }}
-                  >
-                    {headerCta.cta.text}
-                  </h4>
-                </div>
-                <p 
-                  className="text-sm truncate"
-                  style={{ color: 'var(--color-text-secondary, #6B7280)' }}
-                >
-                  {headerCta.cta.url}
-                </p>
-                <p 
-                  className="text-xs mt-1"
-                  style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
-                >
-                  Order: {headerCta.sortOrder} | {headerCta.isVisible ? 'Visible' : 'Hidden'}
-                </p>
-              </div>
-            ))}
-          </div>
-        )}
-      </Card>
+
 
       {/* All CTAs Section */}
       <Card className="p-6">
@@ -1239,18 +1168,7 @@ export default function CTAManager() {
                     )}
                   </div>
                   <div className="flex space-x-1">
-                    {!isCtaInHeader(cta.id) && cta.isActive && (
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => addToHeader(cta.id)}
-                        className="p-1"
-                        style={{ color: 'var(--color-primary, #5243E9)' }}
-                        title="Add to Header"
-                      >
-                        <Plus className="w-4 h-4" />
-                      </Button>
-                    )}
+
                     <Button
                       size="sm"
                       variant="ghost"
@@ -1273,23 +1191,24 @@ export default function CTAManager() {
                 </div>
 
                 <div className="flex items-center gap-2 mb-2">
-                  {cta.icon && renderIcon(cta.icon, { className: 'w-4 h-4 text-gray-600' })}
-                  <h4 className="font-semibold text-gray-900">{cta.text}</h4>
+                  {cta.icon && renderIcon(cta.icon, { 
+                    className: 'w-4 h-4',
+                    style: { color: 'var(--color-text-secondary, #6B7280)' }
+                  } as any)}
+                  <h4 className="font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{cta.text}</h4>
                 </div>
-                <p className="text-sm text-gray-600 mb-3 break-all">{cta.url}</p>
+                <p className="text-sm mb-3 break-all" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{cta.url}</p>
                 
-                <div className="flex items-center justify-between text-xs text-gray-500">
+                <div className="flex items-center justify-between text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                   <span>Target: {cta.target}</span>
-                  <span className={cta.isActive ? 'text-green-600' : 'text-red-600'}>
+                  <span style={{ 
+                    color: cta.isActive ? 'var(--color-success-dark, #065F46)' : 'var(--color-error-dark, #991B1B)' 
+                  }}>
                     {cta.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
                 
-                {isCtaInHeader(cta.id) && (
-                  <div className="mt-3 px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full text-center">
-                    In Header
-                  </div>
-                )}
+
               </div>
             ))}
           </div>

@@ -208,13 +208,16 @@ const DropIndicator: React.FC<DropIndicatorProps> = ({ depth, isVisible }) => {
 
   return (
     <div 
-      className="h-1 bg-blue-500 rounded-full opacity-80 transition-all duration-200 mb-1"
+      className="h-1 rounded-full opacity-80 transition-all duration-200 mb-1"
       style={{ 
+        backgroundColor: 'var(--color-primary)',
         marginLeft: `${depth * 24 + 12}px`,
         width: `calc(100% - ${depth * 24 + 12}px)`
       }}
     >
-      <div className="h-full bg-gradient-to-r from-blue-500 to-blue-400 rounded-full animate-pulse" />
+      <div className="h-full rounded-full animate-pulse" style={{ 
+        background: 'linear-gradient(to right, var(--color-primary), var(--color-primary-light))'
+      }} />
     </div>
   );
 };
@@ -314,25 +317,27 @@ const SortableItem: React.FC<SortableItemProps> = ({
     >
       <div
         className={`
-          flex items-center gap-2 p-3 bg-white border border-gray-200 rounded-lg mb-2 
+          flex items-center gap-2 p-3 border rounded-lg mb-2 
           hover:shadow-sm transition-all duration-200 group
-          ${isDragging ? 'shadow-lg ring-2 ring-blue-500 bg-blue-50' : ''}
-          ${isOverItem ? 'ring-2 ring-blue-300 bg-blue-25' : ''}
+          ${isDragging ? 'shadow-lg ring-2' : ''}
+          ${isOverItem ? 'ring-2' : ''}
           ${disableSelection ? 'select-none' : ''}
           ${clone ? 'shadow-xl' : ''}
-          ${dragOverlay ? 'ring-2 ring-blue-400 shadow-2xl' : ''}
+          ${dragOverlay ? 'ring-2 shadow-2xl' : ''}
         `}
-        style={{ paddingLeft: `${effectiveDepth * indentationWidth + 12}px` }}
+        style={{ 
+          paddingLeft: `${effectiveDepth * indentationWidth + 12}px`,
+          backgroundColor: 'var(--color-bg-secondary)',
+          borderColor: isDragging || isOverItem ? 'var(--color-primary)' : 'var(--color-gray-light)'
+        }}
       >
         {/* Drag Handle */}
         <button
           ref={setActivatorNodeRef}
-          className={`
-            flex items-center justify-center w-5 h-5 text-gray-400 hover:text-gray-600 
-            cursor-grab active:cursor-grabbing transition-colors duration-200
-            ${isDragging ? 'text-blue-600' : ''}
-            group-hover:text-gray-600
-          `}
+          className="flex items-center justify-center w-5 h-5 cursor-grab active:cursor-grabbing transition-colors duration-200"
+          style={{ 
+            color: isDragging ? 'var(--color-primary)' : 'var(--color-text-muted)'
+          }}
           {...listeners}
           {...handleProps}
           title="Drag to reorder"
@@ -346,9 +351,9 @@ const SortableItem: React.FC<SortableItemProps> = ({
             {Array.from({ length: effectiveDepth }).map((_, index) => (
               <div key={index} className="w-4 h-4 flex items-center justify-center">
                 {index === effectiveDepth - 1 ? (
-                  <ArrowRight className="w-3 h-3 text-gray-300" />
+                  <ArrowRight className="w-3 h-3" style={{ color: 'var(--color-text-muted)' }} />
                 ) : (
-                  <div className="w-px h-4 bg-gray-200" />
+                  <div className="w-px h-4" style={{ backgroundColor: 'var(--color-gray-light)' }} />
                 )}
               </div>
             ))}
@@ -359,7 +364,8 @@ const SortableItem: React.FC<SortableItemProps> = ({
         {childCount > 0 && (
           <button
             onClick={() => onToggleExpanded(item.id)}
-            className="flex items-center justify-center w-5 h-5 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+            className="flex items-center justify-center w-5 h-5 transition-colors duration-200"
+            style={{ color: 'var(--color-text-muted)' }}
             title={isExpanded ? 'Collapse' : 'Expand'}
           >
             {isExpanded ? (
@@ -371,7 +377,7 @@ const SortableItem: React.FC<SortableItemProps> = ({
         )}
 
         {/* Icon */}
-        <div className="flex items-center justify-center w-5 h-5 text-blue-600">
+        <div className="flex items-center justify-center w-5 h-5" style={{ color: 'var(--color-primary)' }}>
           {getIconComponent(item.icon)}
         </div>
 
@@ -379,23 +385,25 @@ const SortableItem: React.FC<SortableItemProps> = ({
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
-              <div className="font-medium text-gray-900 truncate">{item.label}</div>
-              <div className="text-sm text-gray-500 truncate">
+              <div className="font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>{item.label}</div>
+              <div className="text-sm truncate" style={{ color: 'var(--color-text-secondary)' }}>
                 {item.url} {item.page && `(${item.page.title})`}
               </div>
             </div>
 
             <div className="flex items-center space-x-2 ml-4">
-              <span className={`px-2 py-1 text-xs rounded-full transition-colors duration-200 ${
-                item.isActive 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-gray-100 text-gray-800'
-              }`}>
+              <span className="px-2 py-1 text-xs rounded-full transition-colors duration-200" style={{
+                backgroundColor: item.isActive ? 'var(--color-success-light)' : 'var(--color-bg-secondary)',
+                color: item.isActive ? 'var(--color-success-dark)' : 'var(--color-text-secondary)'
+              }}>
                 {item.isActive ? 'Active' : 'Inactive'}
               </span>
               
               {childCount > 0 && (
-                <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
+                <span className="px-2 py-1 text-xs rounded-full" style={{
+                  backgroundColor: 'var(--color-info-light)',
+                  color: 'var(--color-info-dark)'
+                }}>
                   {childCount} child{childCount !== 1 ? 'ren' : ''}
                 </span>
               )}
@@ -411,7 +419,11 @@ const SortableItem: React.FC<SortableItemProps> = ({
                       e.stopPropagation();
                       onMoveUp?.(item);
                     }}
-                    className="hover:bg-blue-50 hover:text-blue-600"
+                    style={{ 
+                      backgroundColor: 'transparent',
+                      color: 'var(--color-text-muted)' 
+                    }}
+                    className="hover:bg-opacity-10"
                     title="Move up"
                   >
                     <ChevronUp className="w-4 h-4" />
@@ -425,7 +437,11 @@ const SortableItem: React.FC<SortableItemProps> = ({
                       e.stopPropagation();
                       onMoveDown?.(item);
                     }}
-                    className="hover:bg-blue-50 hover:text-blue-600"
+                    style={{ 
+                      backgroundColor: 'transparent',
+                      color: 'var(--color-text-muted)' 
+                    }}
+                    className="hover:bg-opacity-10"
                     title="Move down"
                   >
                     <ChevronDown className="w-4 h-4" />
@@ -440,7 +456,11 @@ const SortableItem: React.FC<SortableItemProps> = ({
                       onOutdent?.(item);
                     }}
                     disabled={effectiveDepth === 0}
-                    className={`${effectiveDepth === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-orange-50 hover:text-orange-600'}`}
+                    className={`${effectiveDepth === 0 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-opacity-10'}`}
+                    style={{ 
+                      backgroundColor: 'transparent',
+                      color: effectiveDepth === 0 ? 'var(--color-text-muted)' : 'var(--color-warning)' 
+                    }}
                     title={effectiveDepth === 0 ? "Can't outdent root-level item" : "Move left (outdent)"}
                   >
                     <ChevronLeft className="w-4 h-4" />
@@ -455,7 +475,11 @@ const SortableItem: React.FC<SortableItemProps> = ({
                       onIndent?.(item);
                     }}
                     disabled={effectiveDepth >= 2}
-                    className={`${effectiveDepth >= 2 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-green-50 hover:text-green-600'}`}
+                    className={`${effectiveDepth >= 2 ? 'opacity-30 cursor-not-allowed' : 'hover:bg-opacity-10'}`}
+                    style={{ 
+                      backgroundColor: 'transparent',
+                      color: effectiveDepth >= 2 ? 'var(--color-text-muted)' : 'var(--color-success)' 
+                    }}
                     title={effectiveDepth >= 2 ? "Maximum nesting depth reached" : "Move right (indent)"}
                   >
                     <ChevronRight className="w-4 h-4" />
@@ -484,7 +508,8 @@ const SortableItem: React.FC<SortableItemProps> = ({
                   e.stopPropagation();
                   onDelete(item);
                 }}
-                className="text-red-600 hover:text-red-800 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                style={{ color: 'var(--color-error)' }}
                 disabled={disableInteraction}
                 title="Delete item"
               >
@@ -497,7 +522,10 @@ const SortableItem: React.FC<SortableItemProps> = ({
 
       {/* Projected depth indicator for drag overlay */}
       {projected && dragOverlay && (
-        <div className="absolute -top-2 -left-2 bg-blue-600 text-white text-xs px-2 py-1 rounded-full shadow-lg">
+        <div className="absolute -top-2 -left-2 text-xs px-2 py-1 rounded-full shadow-lg" style={{
+          backgroundColor: 'var(--color-primary)',
+          color: 'var(--color-bg-primary)'
+        }}>
           Level {projected.depth + 1}
         </div>
       )}
@@ -1117,7 +1145,7 @@ export default function MenuManager() {
     if (iconName) {
       return renderIcon(iconName, { className: "w-5 h-5" });
     }
-    return <MenuIcon className="w-5 h-5 text-gray-400" />;
+    return <MenuIcon className="w-5 h-5" style={{ color: 'var(--color-text-muted)' }} />;
   };
 
   const handleSaveHeaderConfig = async () => {
@@ -1390,42 +1418,57 @@ export default function MenuManager() {
   };
 
   const renderMenuForm = () => (
-    <Card className="p-6 mb-6">
-      <h3 className="text-lg font-semibold mb-4">
+    <Card className="p-6 mb-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+      <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
         {editingMenu ? 'Edit Menu' : 'Create Menu'}
       </h3>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
             Menu Name
           </label>
           <Input
             value={menuFormData.name}
             onChange={(e) => setMenuFormData(prev => ({ ...prev, name: e.target.value }))}
             placeholder="e.g., Main Navigation, Footer Links"
+            style={{ 
+              color: 'var(--color-text-primary)',
+              backgroundColor: 'var(--color-bg-primary)',
+              borderColor: 'var(--color-gray-light)'
+            }}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
             Description (Optional)
           </label>
           <Input
             value={menuFormData.description}
             onChange={(e) => setMenuFormData(prev => ({ ...prev, description: e.target.value }))}
             placeholder="Brief description of this menu"
+            style={{ 
+              color: 'var(--color-text-primary)',
+              backgroundColor: 'var(--color-bg-primary)',
+              borderColor: 'var(--color-gray-light)'
+            }}
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
             Sort Order
           </label>
           <Input
             type="number"
             value={menuFormData.sortOrder}
             onChange={(e) => setMenuFormData(prev => ({ ...prev, sortOrder: parseInt(e.target.value) || 0 }))}
+            style={{ 
+              color: 'var(--color-text-primary)',
+              backgroundColor: 'var(--color-bg-primary)',
+              borderColor: 'var(--color-gray-light)'
+            }}
           />
         </div>
       </div>
@@ -1436,9 +1479,13 @@ export default function MenuManager() {
             type="checkbox"
             checked={menuFormData.isActive}
             onChange={(e) => setMenuFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 appearance-none bg-white border-2 checked:bg-blue-600 checked:border-blue-600 relative checked:after:content-['✓'] checked:after:text-white checked:after:text-xs checked:after:absolute checked:after:top-0 checked:after:left-0.5"
+            className="w-4 h-4 rounded focus:ring-2 focus:ring-blue-500"
+            style={{ 
+              borderColor: 'var(--color-gray-light)',
+              backgroundColor: menuFormData.isActive ? 'var(--color-primary)' : 'var(--color-bg-primary)'
+            }}
           />
-          <span className="text-sm font-medium text-gray-700">Active</span>
+          <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Active</span>
         </label>
       </div>
 
@@ -1480,22 +1527,22 @@ export default function MenuManager() {
 
   const renderHeaderConfigTab = () => (
     <div className="space-y-6">
-      <Card className="p-6">
+      <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
         <div className="flex items-center mb-6">
-          <Palette className="w-6 h-6 mr-3 text-blue-600" />
-          <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Header Configuration</h3>
+          <Palette className="w-6 h-6 mr-3" style={{ color: 'var(--color-primary)' }} />
+          <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Header Configuration</h3>
         </div>
         
         <div className="space-y-6">
           {/* Background Color */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
               Background Color
             </label>
             
             {/* Theme Color Options */}
             <div className="mb-4">
-              <p className="text-sm text-gray-600 mb-3">Choose from your design system:</p>
+              <p className="text-sm mb-3" style={{ color: 'var(--color-text-secondary)' }}>Choose from your design system:</p>
               <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
                 {getDesignSystemColors().map((color) => (
                   <button
@@ -1504,21 +1551,26 @@ export default function MenuManager() {
                       ...prev, 
                       backgroundColor: color.value 
                     }))}
-                    className={`group relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
-                      headerFormData.backgroundColor === color.value 
-                        ? 'border-blue-500 ring-2 ring-blue-200' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                    className="group relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105"
+                    style={{
+                      backgroundColor: 'var(--color-bg-primary)',
+                      borderColor: headerFormData.backgroundColor === color.value 
+                        ? 'var(--color-primary)' 
+                        : 'var(--color-gray-light)'
+                    }}
                     title={color.name}
                   >
                     <div 
                       className="w-full h-8 rounded-md mb-2 shadow-sm border"
-                      style={{ backgroundColor: color.value }}
+                      style={{ 
+                        backgroundColor: color.value,
+                        borderColor: 'var(--color-gray-light)'
+                      }}
                     />
-                    <p className="text-xs font-medium text-gray-700 group-hover:text-gray-900">
+                    <p className="text-xs font-medium" style={{ color: 'var(--color-text-primary)' }}>
                       {color.name}
                     </p>
-                    <p className="text-xs text-gray-500 font-mono">
+                    <p className="text-xs font-mono" style={{ color: 'var(--color-text-secondary)' }}>
                       {color.value}
                     </p>
                   </button>
@@ -1527,8 +1579,8 @@ export default function MenuManager() {
             </div>
 
             {/* Custom Color Input */}
-            <div className="border-t pt-4">
-              <p className="text-sm text-gray-600 mb-3">Or enter a custom color:</p>
+            <div className="border-t pt-4" style={{ borderColor: 'var(--color-gray-light)' }}>
+              <p className="text-sm mb-3" style={{ color: 'var(--color-text-secondary)' }}>Or enter a custom color:</p>
               <div className="flex items-center space-x-3">
                 <input
                   type="color"
@@ -1537,7 +1589,8 @@ export default function MenuManager() {
                     ...prev, 
                     backgroundColor: e.target.value 
                   }))}
-                  className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer shadow-sm"
+                  className="w-12 h-10 border rounded-lg cursor-pointer shadow-sm"
+                  style={{ borderColor: 'var(--color-gray-light)' }}
                 />
                 <Input
                   value={headerFormData.backgroundColor}
@@ -1547,6 +1600,11 @@ export default function MenuManager() {
                   }))}
                   placeholder="#ffffff"
                   className="flex-1 font-mono"
+                  style={{ 
+                    color: 'var(--color-text-primary)',
+                    backgroundColor: 'var(--color-bg-primary)',
+                    borderColor: 'var(--color-gray-light)'
+                  }}
                 />
               </div>
             </div>
@@ -1554,12 +1612,12 @@ export default function MenuManager() {
 
           {/* Menu Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              <MenuIcon className="w-4 h-4 inline mr-2" />
+            <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
+              <MenuIcon className="w-4 h-4 inline mr-2" style={{ color: 'var(--color-text-primary)' }} />
               Navigation Menu
             </label>
             <div className="space-y-3">
-              <p className="text-sm text-gray-600">
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                 Select which menu to display in the header navigation
               </p>
               <select
@@ -1568,7 +1626,12 @@ export default function MenuManager() {
                   ...prev, 
                   selectedMenuId: e.target.value ? parseInt(e.target.value) : null 
                 }))}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 shadow-sm bg-white"
+                className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm"
+                style={{ 
+                  color: 'var(--color-text-primary)',
+                  backgroundColor: 'var(--color-bg-primary)',
+                  borderColor: 'var(--color-gray-light)'
+                }}
               >
                 <option value="">No Menu Selected</option>
                 {menus.filter(menu => menu.isActive).map(menu => (
@@ -1578,10 +1641,14 @@ export default function MenuManager() {
                 ))}
               </select>
               {menus.filter(menu => menu.isActive).length === 0 && (
-                <div className="text-center py-4 text-gray-500 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                  <MenuIcon className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                  <p className="text-sm">No active menus found.</p>
-                  <p className="text-xs mt-1">Create a menu in the "Menu Management" tab first.</p>
+                <div className="text-center py-4 rounded-lg border border-dashed" style={{ 
+                  color: 'var(--color-text-secondary)',
+                  backgroundColor: 'var(--color-bg-secondary)',
+                  borderColor: 'var(--color-gray-light)'
+                }}>
+                  <MenuIcon className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--color-text-muted)' }} />
+                  <p className="text-sm" style={{ color: 'var(--color-text-primary)' }}>No active menus found.</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>Create a menu in the "Menu Management" tab first.</p>
                 </div>
               )}
             </div>
@@ -1589,8 +1656,8 @@ export default function MenuManager() {
 
           {/* CTA Buttons */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              <Settings className="w-4 h-4 inline mr-2" />
+            <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
+              <Settings className="w-4 h-4 inline mr-2" style={{ color: 'var(--color-text-primary)' }} />
               CTA Buttons ({headerFormData.selectedCtas.length} selected)
             </label>
             
@@ -1602,22 +1669,23 @@ export default function MenuManager() {
                   return (
                     <div
                       key={cta.id}
-                      className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
-                        isSelected 
-                          ? 'border-blue-500 bg-blue-50 shadow-md' 
-                          : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
-                      }`}
+                      className="relative p-4 border-2 rounded-lg cursor-pointer transition-all duration-200"
+                      style={{
+                        borderColor: isSelected ? 'var(--color-primary)' : 'var(--color-gray-light)',
+                        backgroundColor: isSelected ? 'var(--color-primary)' : 'var(--color-bg-secondary)',
+                        boxShadow: isSelected ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : 'none'
+                      }}
                       onClick={() => handleCtaToggle(cta.id)}
                     >
                       {/* Enhanced Checkbox */}
                       <div className="absolute top-3 right-3">
-                        <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-                          isSelected 
-                            ? 'bg-blue-600 border-blue-600' 
-                            : 'bg-white border-gray-400 hover:border-gray-500'
-                        }`}>
+                        <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200"
+                             style={{
+                               backgroundColor: isSelected ? 'var(--color-primary)' : 'var(--color-bg-secondary)',
+                               borderColor: isSelected ? 'var(--color-primary)' : 'var(--color-gray-light)'
+                             }}>
                           {isSelected && (
-                            <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{ color: 'var(--color-bg-primary)' }}>
                               <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                             </svg>
                           )}
@@ -1628,17 +1696,22 @@ export default function MenuManager() {
                       <div className="pr-8">
                         <div className="mb-3">
                           <div
-                            className={`inline-flex items-center space-x-2 px-3 py-1.5 text-sm font-medium rounded-md ${
-                              cta.style === 'primary' 
-                                ? 'bg-blue-600 text-white' :
-                              cta.style === 'secondary' 
-                                ? 'bg-gray-100 text-gray-900 border border-gray-300' :
-                              cta.style === 'outline' 
-                                ? 'border border-blue-600 text-blue-600 bg-white' :
-                              cta.style === 'ghost'
-                                ? 'text-gray-700 bg-gray-50' :
-                                'text-gray-700 bg-gray-100'
-                            }`}
+                            className="inline-flex items-center space-x-2 px-3 py-1.5 text-sm font-medium rounded-md"
+                            style={{
+                              backgroundColor: cta.style === 'primary' ? 'var(--color-primary)' :
+                                           cta.style === 'secondary' ? 'var(--color-bg-secondary)' :
+                                           cta.style === 'outline' ? 'var(--color-bg-primary)' :
+                                           cta.style === 'ghost' ? 'var(--color-bg-secondary)' :
+                                           'var(--color-bg-secondary)',
+                              color: cta.style === 'primary' ? 'var(--color-bg-primary)' :
+                                     cta.style === 'secondary' ? 'var(--color-text-primary)' :
+                                     cta.style === 'outline' ? 'var(--color-primary)' :
+                                     cta.style === 'ghost' ? 'var(--color-text-primary)' :
+                                     'var(--color-text-primary)',
+                              border: cta.style === 'outline' ? '1px solid var(--color-primary)' :
+                                      cta.style === 'secondary' ? '1px solid var(--color-gray-light)' :
+                                      'none'
+                            }}
                           >
                             {cta.icon && (
                               <div className="w-4 h-4">
@@ -1650,9 +1723,9 @@ export default function MenuManager() {
                         </div>
                         
                         <div className="space-y-1">
-                          <div className="text-sm font-medium text-gray-900">{cta.text}</div>
-                          <div className="text-xs text-gray-500 font-mono">{cta.url}</div>
-                          <div className="text-xs text-gray-400">{cta.style} style</div>
+                          <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>{cta.text}</div>
+                          <div className="text-xs font-mono" style={{ color: 'var(--color-text-secondary)' }}>{cta.url}</div>
+                          <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>{cta.style} style</div>
                         </div>
                       </div>
                     </div>
@@ -1660,24 +1733,27 @@ export default function MenuManager() {
                 })}
               </div>
             ) : (
-              <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                <Settings className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                <p className="text-sm text-gray-600 mb-2">No CTA buttons available</p>
-                <p className="text-xs text-gray-500">Create CTA buttons in the CTA Management section first.</p>
+              <div className="text-center py-8 rounded-lg border border-dashed" style={{ 
+                backgroundColor: 'var(--color-bg-secondary)',
+                borderColor: 'var(--color-gray-light)'
+              }}>
+                <Settings className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--color-text-muted)' }} />
+                <p className="text-sm mb-2" style={{ color: 'var(--color-text-primary)' }}>No CTA buttons available</p>
+                <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>Create CTA buttons in the CTA Management section first.</p>
               </div>
             )}
           </div>
 
           {/* Menu Item Colors */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-3">
-              <MenuIcon className="w-4 h-4 inline mr-2" />
+            <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
+              <MenuIcon className="w-4 h-4 inline mr-2" style={{ color: 'var(--color-text-primary)' }} />
               Menu Item Colors
             </label>
             
             {/* Menu Text Color */}
             <div className="mb-4">
-              <p className="text-sm text-gray-600 mb-3">Menu item text color:</p>
+              <p className="text-sm mb-3" style={{ color: 'var(--color-text-secondary)' }}>Menu item text color:</p>
               <div className="grid grid-cols-3 md:grid-cols-5 gap-3 mb-3">
                 {getDesignSystemColors().map((color) => (
                   <button
@@ -1686,22 +1762,26 @@ export default function MenuManager() {
                       ...prev, 
                       menuTextColor: color.value 
                     }))}
-                    className={`group relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
-                      headerFormData.menuTextColor === color.value 
-                        ? 'border-blue-500 ring-2 ring-blue-200' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-
+                    className="group relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105"
+                    style={{
+                      backgroundColor: 'var(--color-bg-primary)',
+                      borderColor: headerFormData.menuTextColor === color.value 
+                        ? 'var(--color-primary)' 
+                        : 'var(--color-gray-light)'
+                    }}
                   >
                     <div 
                       className="w-full h-8 rounded-md mb-2 shadow-sm border flex items-center justify-center"
-                      style={{ backgroundColor: '#ffffff' }}
+                      style={{ 
+                        backgroundColor: 'var(--color-bg-primary)',
+                        borderColor: 'var(--color-gray-light)'
+                      }}
                     >
                       <span className="text-sm font-medium" style={{ color: color.value }}>
                         Aa
                       </span>
                     </div>
-                    <p className="text-xs font-medium text-gray-700 group-hover:text-gray-900">
+                    <p className="text-xs font-medium" style={{ color: 'var(--color-text-primary)' }}>
                       {color.name}
                     </p>
                   </button>
@@ -1731,7 +1811,7 @@ export default function MenuManager() {
 
             {/* Menu Hover Color */}
             <div className="mb-4">
-              <p className="text-sm text-gray-600 mb-3">Menu item hover color:</p>
+              <p className="text-sm mb-3" style={{ color: 'var(--color-text-secondary)' }}>Menu item hover color:</p>
               <div className="grid grid-cols-3 md:grid-cols-5 gap-3 mb-3">
                 {getDesignSystemColors().map((color) => (
                   <button
@@ -1740,22 +1820,27 @@ export default function MenuManager() {
                       ...prev, 
                       menuHoverColor: color.value 
                     }))}
-                    className={`group relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
-                      headerFormData.menuHoverColor === color.value 
-                        ? 'border-blue-500 ring-2 ring-blue-200' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                    className="group relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105"
+                    style={{
+                      backgroundColor: 'var(--color-bg-primary)',
+                      borderColor: headerFormData.menuHoverColor === color.value 
+                        ? 'var(--color-primary)' 
+                        : 'var(--color-gray-light)'
+                    }}
                     title={`${color.name} - Hover`}
                   >
                     <div 
                       className="w-full h-8 rounded-md mb-2 shadow-sm border flex items-center justify-center"
-                      style={{ backgroundColor: color.value }}
+                      style={{ 
+                        backgroundColor: color.value,
+                        borderColor: 'var(--color-gray-light)'
+                      }}
                     >
-                      <span className="text-sm font-medium text-white">
+                      <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
                         Hover
                       </span>
                     </div>
-                    <p className="text-xs font-medium text-gray-700 group-hover:text-gray-900">
+                    <p className="text-xs font-medium" style={{ color: 'var(--color-text-primary)' }}>
                       {color.name}
                     </p>
                   </button>
@@ -1769,7 +1854,8 @@ export default function MenuManager() {
                     ...prev, 
                     menuHoverColor: e.target.value 
                   }))}
-                  className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer shadow-sm"
+                  className="w-12 h-10 border rounded-lg cursor-pointer shadow-sm"
+                  style={{ borderColor: 'var(--color-gray-light)' }}
                 />
                 <Input
                   value={headerFormData.menuHoverColor}
@@ -1779,13 +1865,18 @@ export default function MenuManager() {
                   }))}
                   placeholder="#5243E9"
                   className="flex-1 font-mono"
+                  style={{ 
+                    color: 'var(--color-text-primary)',
+                    backgroundColor: 'var(--color-bg-primary)',
+                    borderColor: 'var(--color-gray-light)'
+                  }}
                 />
               </div>
             </div>
 
             {/* Menu Active Color */}
             <div className="mb-4">
-              <p className="text-sm text-gray-600 mb-3">Menu item active/clicked color:</p>
+              <p className="text-sm mb-3" style={{ color: 'var(--color-text-secondary)' }}>Menu item active/clicked color:</p>
               <div className="grid grid-cols-3 md:grid-cols-5 gap-3 mb-3">
                 {getDesignSystemColors().map((color) => (
                   <button
@@ -1794,22 +1885,27 @@ export default function MenuManager() {
                       ...prev, 
                       menuActiveColor: color.value 
                     }))}
-                    className={`group relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
-                      headerFormData.menuActiveColor === color.value 
-                        ? 'border-blue-500 ring-2 ring-blue-200' 
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
+                    className="group relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105"
+                    style={{
+                      backgroundColor: 'var(--color-bg-primary)',
+                      borderColor: headerFormData.menuActiveColor === color.value 
+                        ? 'var(--color-primary)' 
+                        : 'var(--color-gray-light)'
+                    }}
                     title={`${color.name} - Active`}
                   >
                     <div 
                       className="w-full h-8 rounded-md mb-2 shadow-sm border flex items-center justify-center"
-                      style={{ backgroundColor: color.value }}
+                      style={{ 
+                        backgroundColor: color.value,
+                        borderColor: 'var(--color-gray-light)'
+                      }}
                     >
-                      <span className="text-sm font-medium text-white">
+                      <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
                         Active
                       </span>
                     </div>
-                    <p className="text-xs font-medium text-gray-700 group-hover:text-gray-900">
+                    <p className="text-xs font-medium" style={{ color: 'var(--color-text-primary)' }}>
                       {color.name}
                     </p>
                   </button>
@@ -1823,7 +1919,8 @@ export default function MenuManager() {
                     ...prev, 
                     menuActiveColor: e.target.value 
                   }))}
-                  className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer shadow-sm"
+                  className="w-12 h-10 border rounded-lg cursor-pointer shadow-sm"
+                  style={{ borderColor: 'var(--color-gray-light)' }}
                 />
                 <Input
                   value={headerFormData.menuActiveColor}
@@ -1833,6 +1930,11 @@ export default function MenuManager() {
                   }))}
                   placeholder="#5243E9"
                   className="flex-1 font-mono"
+                  style={{ 
+                    color: 'var(--color-text-primary)',
+                    backgroundColor: 'var(--color-bg-primary)',
+                    borderColor: 'var(--color-gray-light)'
+                  }}
                 />
               </div>
             </div>
@@ -1840,16 +1942,23 @@ export default function MenuManager() {
         </div>
 
         {error && (
-          <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-800 text-sm">{error}</p>
-          </div>
+                  <div className="mt-4 p-4 rounded-lg border" style={{
+          backgroundColor: 'var(--color-error-light)',
+          borderColor: 'var(--color-error)'
+        }}>
+          <p className="text-sm" style={{ color: 'var(--color-error-dark)' }}>{error}</p>
+        </div>
         )}
 
         <div className="flex flex-col items-end mt-8 pt-6 border-t space-y-3">
           <Button 
             onClick={handleSaveHeaderConfig}
             disabled={headerSaving}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 rounded-lg font-medium shadow-lg hover:shadow-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--color-text-primary)'
+            }}
           >
             {headerSaving ? (
               <>
@@ -1865,7 +1974,11 @@ export default function MenuManager() {
           </Button>
           
           {headerSaveSuccess && (
-            <div className="flex items-center space-x-2 text-green-600 bg-green-50 border border-green-200 rounded-lg p-3">
+            <div className="flex items-center space-x-2 rounded-lg p-3 border" style={{
+            color: 'var(--color-success-dark)',
+            backgroundColor: 'var(--color-success-light)',
+            borderColor: 'var(--color-success)'
+          }}>
               <CheckCircle className="w-5 h-5" />
               <span className="text-sm font-medium">Header configuration saved successfully!</span>
             </div>
@@ -1875,24 +1988,27 @@ export default function MenuManager() {
 
       {/* Preview */}
       {headerConfig && (
-        <Card className="p-6 bg-gradient-to-br from-gray-50 to-white border-2 border-gray-200">
+        <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
           <div className="flex items-center mb-6">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
-              <div className="w-6 h-6 bg-blue-600 rounded" />
-            </div>
-            <h3 className="text-xl font-semibold text-gray-900">Live Preview</h3>
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center mr-3" style={{ backgroundColor: 'var(--color-info-light)' }}>
+            <div className="w-6 h-6 rounded" style={{ backgroundColor: 'var(--color-primary)' }} />
+          </div>
+          <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Live Preview</h3>
           </div>
           
           {/* Header Preview */}
           <div className="mb-6">
             <div 
-              className="rounded-lg p-4 border-2 border-dashed border-gray-300 transition-all duration-300"
-              style={{ backgroundColor: headerFormData.backgroundColor }}
+              className="rounded-lg p-4 border-2 border-dashed transition-all duration-300"
+              style={{ 
+                borderColor: 'var(--color-gray-light)',
+                backgroundColor: headerFormData.backgroundColor 
+              }}
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">S</span>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)' }}>
+                    <span className="font-bold text-sm" style={{ color: 'var(--color-bg-primary)' }}>S</span>
                   </div>
                   <span className="font-bold text-lg">Your Company</span>
                 </div>
@@ -1930,11 +2046,17 @@ export default function MenuManager() {
                         <button
                           key={ctaId}
                           className={`px-4 py-2 text-sm rounded-lg font-medium ${
-                            cta.style === 'primary' ? 'bg-blue-600 text-white' :
-                            cta.style === 'secondary' ? 'bg-purple-600 text-white' :
-                            cta.style === 'outline' ? 'border border-gray-300 text-gray-700 bg-white' :
-                            'text-gray-600'
+                            cta.style === 'outline' ? 'border' : ''
                           }`}
+                          style={{
+                            backgroundColor: cta.style === 'primary' ? 'var(--color-primary)' :
+                                           cta.style === 'secondary' ? 'var(--color-secondary)' :
+                                           cta.style === 'outline' ? 'transparent' : 'transparent',
+                            color: cta.style === 'primary' ? 'var(--color-bg-primary)' :
+                                   cta.style === 'secondary' ? 'var(--color-bg-primary)' :
+                                   cta.style === 'outline' ? 'var(--color-text-primary)' : 'var(--color-text-secondary)',
+                            borderColor: cta.style === 'outline' ? 'var(--color-gray-light)' : 'transparent'
+                          }}
                         >
                           {cta.text}
                         </button>
@@ -1949,7 +2071,7 @@ export default function MenuManager() {
           {/* Configuration Details */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {/* Background Color */}
-            <div className="bg-white p-4 rounded-lg border">
+                          <div className="p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-bg-primary)', borderColor: 'var(--color-gray-light)' }}>
               <div className="flex items-center mb-3">
                 <Palette className="w-5 h-5 text-blue-600 mr-2" />
                 <span className="font-medium text-gray-700">Background</span>
@@ -1966,7 +2088,7 @@ export default function MenuManager() {
             </div>
 
             {/* Menu Colors */}
-            <div className="bg-white p-4 rounded-lg border">
+                          <div className="p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-bg-primary)', borderColor: 'var(--color-gray-light)' }}>
               <div className="flex items-center mb-3">
                 <MenuIcon className="w-5 h-5 text-purple-600 mr-2" />
                 <span className="font-medium text-gray-700">Menu Colors</span>
@@ -2001,7 +2123,7 @@ export default function MenuManager() {
             </div>
             
             {/* Active Menu */}
-            <div className="bg-white p-4 rounded-lg border">
+                          <div className="p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-bg-primary)', borderColor: 'var(--color-gray-light)' }}>
               <div className="flex items-center mb-3">
                 <MenuIcon className="w-5 h-5 text-green-600 mr-2" />
                 <span className="font-medium text-gray-700">Navigation</span>
@@ -2021,7 +2143,7 @@ export default function MenuManager() {
             </div>
             
             {/* Active CTAs */}
-            <div className="bg-white p-4 rounded-lg border">
+                          <div className="p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-bg-primary)', borderColor: 'var(--color-gray-light)' }}>
               <div className="flex items-center mb-3">
                 <Settings className="w-5 h-5 text-purple-600 mr-2" />
                 <span className="font-medium text-gray-700">CTA Buttons</span>
@@ -2034,11 +2156,14 @@ export default function MenuManager() {
                     return (
                       <div key={ctaId} className="flex items-center justify-between">
                         <span className="text-sm text-gray-900">{cta.text}</span>
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          cta.style === 'primary' ? 'bg-blue-100 text-blue-800' :
-                          cta.style === 'secondary' ? 'bg-purple-100 text-purple-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
+                        <span className="px-2 py-1 text-xs rounded-full" style={{
+                          backgroundColor: cta.style === 'primary' ? 'var(--color-primary-light)' :
+                                         cta.style === 'secondary' ? 'var(--color-secondary-light)' :
+                                         'var(--color-bg-secondary)',
+                          color: cta.style === 'primary' ? 'var(--color-primary-dark)' :
+                                cta.style === 'secondary' ? 'var(--color-secondary-dark)' :
+                                'var(--color-text-secondary)'
+                        }}>
                           {cta.style}
                         </span>
                       </div>
@@ -2061,7 +2186,7 @@ export default function MenuManager() {
   );
 
   const renderItemForm = () => (
-    <Card className="p-6 mb-6">
+          <Card className="p-6 mb-6" style={{ backgroundColor: 'var(--color-bg-primary)', borderColor: 'var(--color-gray-light)' }}>
       <h3 className="text-lg font-semibold mb-4">
         {editingItem ? 'Edit Menu Item' : 'Add Menu Item'}
         {selectedMenu && <span className="text-gray-500"> to "{selectedMenu.name}"</span>}
@@ -2101,7 +2226,7 @@ export default function MenuManager() {
 
         {itemFormData.linkType === 'page' ? (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
               Select Page
             </label>
             <select
@@ -2122,7 +2247,7 @@ export default function MenuManager() {
           </div>
         ) : (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
               URL
             </label>
             <Input
@@ -2197,7 +2322,12 @@ export default function MenuManager() {
             type="checkbox"
             checked={itemFormData.isActive}
             onChange={(e) => setItemFormData(prev => ({ ...prev, isActive: e.target.checked }))}
-            className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 appearance-none bg-white border-2 checked:bg-blue-600 checked:border-blue-600 relative checked:after:content-['✓'] checked:after:text-white checked:after:text-xs checked:after:absolute checked:after:top-0 checked:after:left-0.5"
+                            className="w-4 h-4 rounded appearance-none border-2 relative checked:after:content-['✓'] checked:after:text-xs checked:after:absolute checked:after:top-0 checked:after:left-0.5"
+                style={{
+                  color: 'var(--color-primary)',
+                  borderColor: 'var(--color-gray-light)',
+                  backgroundColor: 'var(--color-bg-primary)'
+                }}
           />
           <span className="text-sm font-medium text-gray-700">Active</span>
         </label>
@@ -2242,50 +2372,72 @@ export default function MenuManager() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b" style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
         <nav className="-mb-px flex space-x-8">
           <button
             onClick={() => setActiveTab('menus')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'menus'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
+            className="group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+            style={{
+              borderColor: activeTab === 'menus' 
+                ? 'var(--color-primary, #5243E9)' 
+                : 'transparent',
+              color: activeTab === 'menus' 
+                ? 'var(--color-primary, #5243E9)' 
+                : 'var(--color-text-secondary, #6B7280)'
+            }}
           >
-            <MenuIcon className="w-4 h-4 inline mr-2" />
+            <MenuIcon className="w-4 h-4 inline mr-2" style={{
+              color: activeTab === 'menus' 
+                ? 'var(--color-primary, #5243E9)' 
+                : 'var(--color-text-secondary, #6B7280)'
+            }} />
             Menu Management
           </button>
           <button
             onClick={() => setActiveTab('header')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'header'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
+            className="group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+            style={{
+              borderColor: activeTab === 'header' 
+                ? 'var(--color-primary, #5243E9)' 
+                : 'transparent',
+              color: activeTab === 'header' 
+                ? 'var(--color-primary, #5243E9)' 
+                : 'var(--color-text-secondary, #6B7280)'
+            }}
           >
-            <Settings className="w-4 h-4 inline mr-2" />
+            <Settings className="w-4 h-4 inline mr-2" style={{
+              color: activeTab === 'header' 
+                ? 'var(--color-primary, #5243E9)' 
+                : 'var(--color-text-secondary, #6B7280)'
+            }} />
             Header Configuration
           </button>
           <button
             onClick={() => setActiveTab('footer')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'footer'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
+            className="group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+            style={{
+              borderColor: activeTab === 'footer' 
+                ? 'var(--color-primary, #5243E9)' 
+                : 'transparent',
+              color: activeTab === 'footer' 
+                ? 'var(--color-primary, #5243E9)' 
+                : 'var(--color-text-secondary, #6B7280)'
+            }}
           >
-            <Globe className="w-4 h-4 inline mr-2" />
+            <Globe className="w-4 h-4 inline mr-2" style={{
+              color: activeTab === 'footer' 
+                ? 'var(--color-primary, #5243E9)' 
+                : 'var(--color-text-secondary, #6B7280)'
+            }} />
             Footer Configuration
           </button>
         </nav>
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-          <div className="flex items-center">
-            <X className="w-5 h-5 mr-2" />
-            {error}
-          </div>
+        <div className="border rounded-lg p-4 flex items-center gap-2" style={{ backgroundColor: 'var(--color-error-light)', borderColor: 'var(--color-error)' }}>
+          <X className="w-5 h-5" style={{ color: 'var(--color-error)' }} />
+          <span style={{ color: 'var(--color-error-dark)' }}>{error}</span>
         </div>
       )}
 
@@ -2298,41 +2450,48 @@ export default function MenuManager() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Menus List */}
         <div className="lg:col-span-1">
-          <h3 className="text-lg font-semibold mb-4">Menus</h3>
+          <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Menus</h3>
           <div className="space-y-2">
             {menus.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <MenuIcon className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                <p className="text-sm">No menus found. Create your first menu to get started.</p>
+              <div className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>
+                <MenuIcon className="w-12 h-12 mx-auto mb-3" style={{ color: 'var(--color-text-muted)' }} />
+                <p className="text-sm" style={{ color: 'var(--color-text-primary)' }}>No menus found. Create your first menu to get started.</p>
               </div>
             ) : (
               menus.map(menu => (
                 <div 
                   key={menu.id} 
-                  className={`
-                    border border-gray-200 rounded-lg p-4 cursor-pointer transition-all duration-200 group
-                    ${selectedMenu?.id === menu.id 
-                      ? 'bg-blue-50 border-blue-300 shadow-sm' 
-                      : 'bg-white hover:bg-gray-50 hover:shadow-sm'
-                    }
-                  `}
+                  className="border rounded-lg p-4 cursor-pointer transition-all duration-200 group"
+                  style={{
+                    borderColor: selectedMenu?.id === menu.id ? 'var(--color-primary)' : 'var(--color-gray-light)',
+                    backgroundColor: selectedMenu?.id === menu.id ? 'var(--color-primary)' : 'var(--color-bg-secondary)'
+                  }}
                   onClick={() => setSelectedMenu(menu)}
                 >
                   <div className="flex items-center justify-between">
                     <div>
-                      <div className="font-medium text-gray-900">{menu.name}</div>
+                      <div className="font-medium" style={{ 
+                        color: selectedMenu?.id === menu.id ? 'var(--color-bg-primary)' : 'var(--color-text-primary)' 
+                      }}>{menu.name}</div>
                       {menu.description && (
-                        <div className="text-sm text-gray-500 mt-1">{menu.description}</div>
+                        <div className="text-sm mt-1" style={{ 
+                          color: selectedMenu?.id === menu.id ? 'var(--color-bg-primary)' : 'var(--color-text-secondary)' 
+                        }}>{menu.description}</div>
                       )}
                       <div className="flex items-center space-x-3 mt-2">
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs" style={{ 
+                          color: selectedMenu?.id === menu.id ? 'var(--color-bg-primary)' : 'var(--color-text-muted)' 
+                        }}>
                           {menu._count?.items || 0} items
                         </div>
-                        <span className={`px-2 py-1 text-xs rounded-full ${
-                          menu.isActive 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
+                        <span className="px-2 py-1 text-xs rounded-full" style={{
+                          backgroundColor: menu.isActive 
+                            ? 'var(--color-success-light)' 
+                            : 'var(--color-gray-light)',
+                          color: menu.isActive 
+                            ? 'var(--color-success-dark)' 
+                            : 'var(--color-text-secondary)'
+                        }}>
                           {menu.isActive ? 'Active' : 'Inactive'}
                         </span>
                       </div>
@@ -2357,7 +2516,8 @@ export default function MenuManager() {
                           e.stopPropagation();
                           handleDeleteMenu(menu);
                         }}
-                        className="text-red-600 hover:text-red-800 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                        className="opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                style={{ color: 'var(--color-error)' }}
                         title="Delete menu"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -2392,7 +2552,10 @@ export default function MenuManager() {
 
               {/* Error Display */}
               {error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="mb-6 p-4 rounded-lg border" style={{
+          backgroundColor: 'var(--color-error-light)',
+          borderColor: 'var(--color-error)'
+        }}>
                   <div className="flex items-center">
                     <X className="w-5 h-5 text-red-500 mr-2" />
                     <span className="text-red-800 font-medium">Error:</span>
@@ -2490,7 +2653,10 @@ export default function MenuManager() {
 
               {/* Instructions */}
               {flattenedItems.length > 0 && (
-                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="mt-6 p-4 rounded-lg border" style={{
+          backgroundColor: 'var(--color-info-light)',
+          borderColor: 'var(--color-info)'
+        }}>
                   <h4 className="text-sm font-medium text-blue-900 mb-2">
                     <GripVertical className="w-4 h-4 inline mr-1" />
                     Menu Management Instructions
@@ -2554,20 +2720,20 @@ export default function MenuManager() {
         <div className="space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Newsletter Form */}
-            <Card className="p-6">
+            <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Mail className="w-5 h-5 text-green-600" />
+                <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-success-light)' }}>
+                  <Mail className="w-5 h-5" style={{ color: 'var(--color-success)' }} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Newsletter Signup</h3>
-                  <p className="text-gray-600 text-sm">Select a form for newsletter subscription</p>
+                  <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Newsletter Signup</h3>
+                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Select a form for newsletter subscription</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                     Newsletter Form
                   </label>
                   <select
@@ -2576,7 +2742,12 @@ export default function MenuManager() {
                       ...prev, 
                       footerNewsletterFormId: parseInt(e.target.value) || null 
                     }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    style={{ 
+                      color: 'var(--color-text-primary)',
+                      backgroundColor: 'var(--color-bg-primary)',
+                      borderColor: 'var(--color-gray-light)'
+                    }}
                   >
                     <option value="">No newsletter form</option>
                     {forms.map((form) => (
@@ -2585,28 +2756,28 @@ export default function MenuManager() {
                       </option>
                     ))}
                   </select>
-                  <p className="text-xs text-gray-500 mt-1">
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                     Choose a form from Forms Manager to display in footer
                   </p>
                 </div>
 
                 {forms.length === 0 && (
-                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                    <p className="text-sm text-amber-700">
+                  <div className="p-3 border rounded-lg" style={{ backgroundColor: 'var(--color-warning-light)', borderColor: 'var(--color-warning)' }}>
+                    <p className="text-sm" style={{ color: 'var(--color-warning-dark)' }}>
                       No forms available. Create a form in the Forms Manager first.
                     </p>
                   </div>
                 )}
 
                 {siteSettings?.footerNewsletterFormId && (
-                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                    <p className="text-sm text-green-700">
+                  <div className="p-3 border rounded-lg" style={{ backgroundColor: 'var(--color-success-light)', borderColor: 'var(--color-success)' }}>
+                    <p className="text-sm" style={{ color: 'var(--color-success-dark)' }}>
                       ✓ Newsletter form will be displayed in the footer
                     </p>
                     {(() => {
                       const selectedForm = forms.find(f => f.id === siteSettings.footerNewsletterFormId);
                       return selectedForm ? (
-                        <div className="mt-2 text-xs text-green-600">
+                        <div className="mt-2 text-xs" style={{ color: 'var(--color-success-dark)' }}>
                           <p><strong>Selected:</strong> {selectedForm.name}</p>
                           <p><strong>Fields:</strong> {selectedForm.fields?.map((f: any) => f.label || f.fieldName).join(', ') || 'No fields'}</p>
                         </div>
@@ -2616,8 +2787,8 @@ export default function MenuManager() {
                 )}
                 
                 {forms.length > 0 && !siteSettings?.footerNewsletterFormId && (
-                  <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p className="text-sm text-blue-700">
+                  <div className="p-3 border rounded-lg" style={{ backgroundColor: 'var(--color-info-light)', borderColor: 'var(--color-info)' }}>
+                    <p className="text-sm" style={{ color: 'var(--color-info-dark)' }}>
                       💡 Select a form above to enable newsletter signup in your footer
                     </p>
                   </div>
@@ -2626,27 +2797,28 @@ export default function MenuManager() {
             </Card>
 
             {/* Footer Menus - Enhanced UI */}
-            <Card className="p-6">
+            <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <MenuIcon className="w-5 h-5 text-purple-600" />
+                <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-primary-light)' }}>
+                  <MenuIcon className="w-5 h-5" style={{ color: 'var(--color-primary)' }} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Footer Navigation</h3>
-                  <p className="text-gray-600 text-sm">Select menus to display in footer navigation</p>
+                  <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Footer Navigation</h3>
+                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Select menus to display in footer navigation</p>
                 </div>
               </div>
 
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <label className="text-sm font-medium text-gray-700">
+                    <label className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
                       Available Menus ({selectedMenuIds.length} selected)
                     </label>
                     {selectedMenuIds.length > 0 && (
                       <button
                         onClick={() => setSelectedMenuIds([])}
-                        className="text-xs text-red-600 hover:text-red-800 underline"
+                        className="text-xs underline"
+                        style={{ color: 'var(--color-error)' }}
                       >
                         Clear all
                       </button>
@@ -2660,22 +2832,23 @@ export default function MenuManager() {
                         return (
                           <div 
                             key={menu.id} 
-                            className={`relative p-4 border-2 rounded-lg cursor-pointer transition-all duration-200 ${
-                              isSelected 
-                                ? 'border-blue-500 bg-blue-50 shadow-md' 
-                                : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
-                            }`}
+                            className="relative p-4 border-2 rounded-lg cursor-pointer transition-all duration-200"
+                            style={{
+                              borderColor: isSelected ? 'var(--color-primary)' : 'var(--color-gray-light)',
+                              backgroundColor: isSelected ? 'var(--color-primary)' : 'var(--color-bg-secondary)',
+                              boxShadow: isSelected ? '0 4px 6px -1px rgba(0, 0, 0, 0.1)' : 'none'
+                            }}
                             onClick={() => handleFooterMenuToggle(menu.id)}
                           >
                             {/* Selection indicator */}
                             <div className="absolute top-3 right-3">
-                              <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-                                isSelected 
-                                  ? 'bg-blue-600 border-blue-600' 
-                                  : 'bg-white border-gray-400 hover:border-gray-500'
-                              }`}>
+                              <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-all duration-200"
+                                   style={{
+                                     backgroundColor: isSelected ? 'var(--color-primary)' : 'var(--color-bg-secondary)',
+                                     borderColor: isSelected ? 'var(--color-primary)' : 'var(--color-gray-light)'
+                                   }}>
                                 {isSelected && (
-                                  <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20" style={{ color: 'var(--color-bg-primary)' }}>
                                     <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                   </svg>
                                 )}
@@ -2685,21 +2858,21 @@ export default function MenuManager() {
                             {/* Menu info */}
                             <div className="pr-8">
                               <div className="flex items-center space-x-2 mb-2">
-                                <h4 className="text-base font-semibold text-gray-900">{menu.name}</h4>
-                                <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-                                  menu.isActive 
-                                    ? 'bg-green-100 text-green-800' 
-                                    : 'bg-red-100 text-red-800'
-                                }`}>
+                                <h4 className="text-base font-semibold" style={{ color: 'var(--color-text-primary)' }}>{menu.name}</h4>
+                                <span className="px-2 py-1 text-xs rounded-full font-medium"
+                                      style={{
+                                        backgroundColor: menu.isActive ? 'var(--color-success-light)' : 'var(--color-error-light)',
+                                        color: menu.isActive ? 'var(--color-success-dark)' : 'var(--color-error-dark)'
+                                      }}>
                                   {menu.isActive ? 'Active' : 'Inactive'}
                                 </span>
                               </div>
                               
                               {menu.description && (
-                                <p className="text-sm mb-2" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{menu.description}</p>
+                                <p className="text-sm mb-2" style={{ color: 'var(--color-text-secondary)' }}>{menu.description}</p>
                               )}
                               
-                              <div className="flex items-center space-x-4 text-xs text-gray-500">
+                              <div className="flex items-center space-x-4 text-xs" style={{ color: 'var(--color-text-muted)' }}>
                                 <span className="flex items-center space-x-1">
                                   <MenuIcon className="w-3 h-3" />
                                   <span>{menu.items?.length || 0} items</span>
@@ -2720,23 +2893,29 @@ export default function MenuManager() {
                       })}
                     </div>
                   ) : (
-                    <div className="text-center py-8 bg-gray-50 rounded-lg border border-dashed border-gray-300">
-                      <MenuIcon className="w-8 h-8 mx-auto mb-2 text-gray-400" />
-                      <p className="text-sm text-gray-600 mb-2">No menus available</p>
-                      <p className="text-xs text-gray-500">Create menus in the "Menu Management" tab first.</p>
+                    <div className="text-center py-8 rounded-lg border border-dashed" style={{ 
+                      backgroundColor: 'var(--color-bg-secondary)',
+                      borderColor: 'var(--color-gray-light)'
+                    }}>
+                      <MenuIcon className="w-8 h-8 mx-auto mb-2" style={{ color: 'var(--color-text-muted)' }} />
+                      <p className="text-sm mb-2" style={{ color: 'var(--color-text-primary)' }}>No menus available</p>
+                      <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>Create menus in the "Menu Management" tab first.</p>
                     </div>
                   )}
 
                   {/* Selection summary */}
                   {selectedMenuIds.length > 0 && (
-                    <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <div className="mt-4 p-3 border rounded-lg" style={{ 
+                      backgroundColor: 'var(--color-info-light)', 
+                      borderColor: 'var(--color-info)' 
+                    }}>
                       <div className="flex items-center space-x-2 mb-2">
-                        <CheckCircle className="w-4 h-4 text-blue-600" />
-                        <span className="text-sm font-medium text-blue-900">
+                        <CheckCircle className="w-4 h-4" style={{ color: 'var(--color-info)' }} />
+                        <span className="text-sm font-medium" style={{ color: 'var(--color-info-dark)' }}>
                           {selectedMenuIds.length} menu{selectedMenuIds.length !== 1 ? 's' : ''} selected for footer navigation
                         </span>
                       </div>
-                      <div className="text-xs text-blue-700">
+                      <div className="text-xs" style={{ color: 'var(--color-info-dark)' }}>
                         Selected menus will appear as navigation sections in your footer.
                       </div>
                     </div>
@@ -2746,20 +2925,24 @@ export default function MenuManager() {
             </Card>
 
             {/* Display Options */}
-            <Card className="p-6">
+            <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="p-2 bg-orange-100 rounded-lg">
-                  <Settings className="w-5 h-5 text-orange-600" />
+                <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-warning-light)' }}>
+                  <Settings className="w-5 h-5" style={{ color: 'var(--color-warning)' }} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Display Options</h3>
-                  <p className="text-gray-600 text-sm">Configure what to show in footer</p>
+                  <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Display Options</h3>
+                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Configure what to show in footer</p>
                 </div>
               </div>
 
               <div className="space-y-6">
                 {/* Show Contact Information */}
-                <div className="flex items-start space-x-4 p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 transition-colors bg-gray-50 hover:bg-blue-50">
+                <div className="flex items-start space-x-4 p-4 border-2 rounded-lg transition-colors"
+                     style={{
+                       borderColor: 'var(--color-gray-light)',
+                       backgroundColor: 'var(--color-bg-secondary)'
+                     }}>
                   <div className="flex items-center h-6">
                     <input
                       type="checkbox"
@@ -2769,24 +2952,33 @@ export default function MenuManager() {
                         ...prev, 
                         footerShowContactInfo: e.target.checked 
                       }))}
-                      className="h-6 w-6 text-blue-600 focus:ring-blue-500 border-2 border-gray-400 rounded cursor-pointer"
+                      className="h-6 w-6 focus:ring-2 focus:ring-blue-500 border-2 rounded cursor-pointer"
+                      style={{
+                        borderColor: 'var(--color-gray-light)',
+                        backgroundColor: siteSettings?.footerShowContactInfo !== false ? 'var(--color-primary)' : 'var(--color-bg-primary)'
+                      }}
                     />
                   </div>
                   <div className="flex-1">
-                    <label htmlFor="footerShowContactInfo" className="block text-base font-semibold text-gray-900 cursor-pointer">
+                    <label htmlFor="footerShowContactInfo" className="block text-base font-semibold cursor-pointer" style={{ color: 'var(--color-text-primary)' }}>
                       Show Contact Information
                     </label>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                       Display company phone, email, and address from Site Settings in the footer
                     </p>
                   </div>
-                  <div className={`w-4 h-4 rounded-full ${
-                    siteSettings?.footerShowContactInfo !== false ? 'bg-green-500' : 'bg-gray-300'
-                  } transition-colors`}></div>
+                  <div className="w-4 h-4 rounded-full transition-colors"
+                       style={{
+                         backgroundColor: siteSettings?.footerShowContactInfo !== false ? 'var(--color-success)' : 'var(--color-gray-light)'
+                       }}></div>
                 </div>
 
                 {/* Show Social Media Links */}
-                <div className="flex items-start space-x-4 p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 transition-colors bg-gray-50 hover:bg-blue-50">
+                <div className="flex items-start space-x-4 p-4 border-2 rounded-lg transition-colors"
+                     style={{
+                       borderColor: 'var(--color-gray-light)',
+                       backgroundColor: 'var(--color-bg-secondary)'
+                     }}>
                   <div className="flex items-center h-6">
                     <input
                       type="checkbox"
@@ -2796,63 +2988,71 @@ export default function MenuManager() {
                         ...prev, 
                         footerShowSocialLinks: e.target.checked 
                       }))}
-                      className="h-6 w-6 text-blue-600 focus:ring-blue-500 border-2 border-gray-400 rounded cursor-pointer"
+                      className="h-6 w-6 focus:ring-2 focus:ring-blue-500 border-2 rounded cursor-pointer"
+                      style={{
+                        borderColor: 'var(--color-gray-light)',
+                        backgroundColor: siteSettings?.footerShowSocialLinks !== false ? 'var(--color-primary)' : 'var(--color-bg-primary)'
+                      }}
                     />
                   </div>
                   <div className="flex-1">
-                    <label htmlFor="footerShowSocialLinks" className="block text-base font-semibold text-gray-900 cursor-pointer">
+                    <label htmlFor="footerShowSocialLinks" className="block text-base font-semibold cursor-pointer" style={{ color: 'var(--color-text-primary)' }}>
                       Show Social Media Links
                     </label>
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                       Display social media icons and links from Site Settings in the footer
                     </p>
                   </div>
-                  <div className={`w-4 h-4 rounded-full ${
-                    siteSettings?.footerShowSocialLinks !== false ? 'bg-green-500' : 'bg-gray-300'
-                  } transition-colors`}></div>
+                  <div className="w-4 h-4 rounded-full transition-colors"
+                       style={{
+                         backgroundColor: siteSettings?.footerShowSocialLinks !== false ? 'var(--color-success)' : 'var(--color-gray-light)'
+                       }}></div>
                 </div>
 
                 {/* Current Status Preview */}
-                <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                  <h4 className="text-sm font-medium text-blue-900 mb-3">Footer Display Status:</h4>
+                <div className="mt-6 p-4 border rounded-lg" style={{ 
+                  backgroundColor: 'var(--color-info-light)', 
+                  borderColor: 'var(--color-info)' 
+                }}>
+                  <h4 className="text-sm font-medium mb-3" style={{ color: 'var(--color-info-dark)' }}>Footer Display Status:</h4>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-blue-800">Contact Information:</span>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        siteSettings?.footerShowContactInfo !== false
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
+                      <span className="text-sm" style={{ color: 'var(--color-info-dark)' }}>Contact Information:</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-medium"
+                            style={{
+                              backgroundColor: siteSettings?.footerShowContactInfo !== false ? 'var(--color-success-light)' : 'var(--color-error-light)',
+                              color: siteSettings?.footerShowContactInfo !== false ? 'var(--color-success-dark)' : 'var(--color-error-dark)'
+                            }}>
                         {siteSettings?.footerShowContactInfo !== false ? '✓ Visible' : '✗ Hidden'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-blue-800">Social Media Links:</span>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        siteSettings?.footerShowSocialLinks !== false
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-red-100 text-red-800'
-                      }`}>
+                      <span className="text-sm" style={{ color: 'var(--color-info-dark)' }}>Social Media Links:</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-medium"
+                            style={{
+                              backgroundColor: siteSettings?.footerShowSocialLinks !== false ? 'var(--color-success-light)' : 'var(--color-error-light)',
+                              color: siteSettings?.footerShowSocialLinks !== false ? 'var(--color-success-dark)' : 'var(--color-error-dark)'
+                            }}>
                         {siteSettings?.footerShowSocialLinks !== false ? '✓ Visible' : '✗ Hidden'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-blue-800">Newsletter Form:</span>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        siteSettings?.footerNewsletterFormId
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span className="text-sm" style={{ color: 'var(--color-info-dark)' }}>Newsletter Form:</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-medium"
+                            style={{
+                              backgroundColor: siteSettings?.footerNewsletterFormId ? 'var(--color-success-light)' : 'var(--color-gray-light)',
+                              color: siteSettings?.footerNewsletterFormId ? 'var(--color-success-dark)' : 'var(--color-text-secondary)'
+                            }}>
                         {siteSettings?.footerNewsletterFormId ? '✓ Configured' : '○ Not set'}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
-                      <span className="text-sm text-blue-800">Footer Menus:</span>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        selectedMenuIds.length > 0
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span className="text-sm" style={{ color: 'var(--color-info-dark)' }}>Footer Menus:</span>
+                      <span className="px-3 py-1 rounded-full text-xs font-medium"
+                            style={{
+                              backgroundColor: selectedMenuIds.length > 0 ? 'var(--color-success-light)' : 'var(--color-gray-light)',
+                              color: selectedMenuIds.length > 0 ? 'var(--color-success-dark)' : 'var(--color-text-secondary)'
+                            }}>
                         {selectedMenuIds.length > 0 ? `✓ ${selectedMenuIds.length} selected` : '○ None selected'}
                       </span>
                     </div>
@@ -2862,24 +3062,24 @@ export default function MenuManager() {
             </Card>
 
             {/* Footer Styling */}
-            <Card className="p-6">
+            <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
               <div className="flex items-center space-x-3 mb-6">
-                <div className="p-2 bg-indigo-100 rounded-lg">
-                  <Palette className="w-5 h-5 text-indigo-600" />
+                <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-secondary-light)' }}>
+                  <Palette className="w-5 h-5" style={{ color: 'var(--color-secondary)' }} />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">Footer Styling</h3>
-                  <p className="text-gray-600 text-sm">Customize footer colors and appearance</p>
+                  <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Footer Styling</h3>
+                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Customize footer colors and appearance</p>
                 </div>
               </div>
 
               <div className="space-y-6">
                 {/* Footer Background Color */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
                     Footer Background Color
                   </label>
-                  <p className="text-xs text-gray-500 mb-4">
+                  <p className="text-xs mb-4" style={{ color: 'var(--color-text-secondary)' }}>
                     Select a background color for the footer. The logo will automatically adjust based on the color.
                   </p>
                   
@@ -2892,21 +3092,26 @@ export default function MenuManager() {
                           ...prev, 
                           footerBackgroundColor: color.value 
                         }))}
-                        className={`group relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
-                          siteSettings?.footerBackgroundColor === color.value 
-                            ? 'border-blue-500 ring-2 ring-blue-200' 
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
+                        className="group relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105"
+                        style={{
+                          backgroundColor: 'var(--color-bg-primary)',
+                          borderColor: siteSettings?.footerBackgroundColor === color.value 
+                            ? 'var(--color-primary)' 
+                            : 'var(--color-gray-light)'
+                        }}
                         title={color.name}
                       >
                         <div 
                           className="w-full h-8 rounded-md mb-2 shadow-sm border"
-                          style={{ backgroundColor: color.value }}
+                          style={{ 
+                            backgroundColor: color.value,
+                            borderColor: 'var(--color-gray-light)'
+                          }}
                         />
-                        <p className="text-xs font-medium text-gray-700 group-hover:text-gray-900">
+                        <p className="text-xs font-medium" style={{ color: 'var(--color-text-primary)' }}>
                           {color.name}
                         </p>
-                        <p className="text-xs text-gray-500 font-mono">
+                        <p className="text-xs font-mono" style={{ color: 'var(--color-text-secondary)' }}>
                           {color.value}
                         </p>
                       </button>
@@ -2914,8 +3119,8 @@ export default function MenuManager() {
                   </div>
 
                   {/* Custom Color Input */}
-                  <div className="border-t pt-4">
-                    <p className="text-sm text-gray-600 mb-3">Or enter a custom color:</p>
+                  <div className="border-t pt-4" style={{ borderColor: 'var(--color-gray-light)' }}>
+                    <p className="text-sm mb-3" style={{ color: 'var(--color-text-secondary)' }}>Or enter a custom color:</p>
                     <div className="flex items-center space-x-3">
                       <input
                         type="color"
@@ -2924,7 +3129,8 @@ export default function MenuManager() {
                           ...prev, 
                           footerBackgroundColor: e.target.value 
                         }))}
-                        className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer shadow-sm"
+                        className="w-12 h-10 border rounded-lg cursor-pointer shadow-sm"
+                        style={{ borderColor: 'var(--color-gray-light)' }}
                       />
                       <Input
                         value={siteSettings?.footerBackgroundColor || ''}
@@ -2934,6 +3140,11 @@ export default function MenuManager() {
                         }))}
                         placeholder="#F9FAFB"
                         className="flex-1 font-mono"
+                        style={{ 
+                          color: 'var(--color-text-primary)',
+                          backgroundColor: 'var(--color-bg-primary)',
+                          borderColor: 'var(--color-gray-light)'
+                        }}
                       />
                     </div>
                   </div>
@@ -2941,10 +3152,10 @@ export default function MenuManager() {
                 
                 {/* Footer Text Color */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-3">
+                  <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
                     Footer Text Color
                   </label>
-                  <p className="text-xs text-gray-500 mb-4">
+                  <p className="text-xs mb-4" style={{ color: 'var(--color-text-secondary)' }}>
                     Select the text color for footer content (headings, links, text).
                   </p>
                   
@@ -2968,22 +3179,27 @@ export default function MenuManager() {
                           ...prev, 
                           footerTextColor: color.value 
                         }))}
-                        className={`group relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105 ${
-                          siteSettings?.footerTextColor === color.value 
-                            ? 'border-blue-500 ring-2 ring-blue-200' 
-                            : 'border-gray-200 hover:border-gray-300'
-                        }`}
+                        className="group relative p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105"
+                        style={{
+                          backgroundColor: 'var(--color-bg-primary)',
+                          borderColor: siteSettings?.footerTextColor === color.value 
+                            ? 'var(--color-primary)' 
+                            : 'var(--color-gray-light)'
+                        }}
                         title={`${color.name} - Text`}
                       >
                         <div 
                           className="w-full h-8 rounded-md mb-2 shadow-sm border flex items-center justify-center"
-                          style={{ backgroundColor: color.value }}
+                          style={{ 
+                            backgroundColor: color.value,
+                            borderColor: 'var(--color-gray-light)'
+                          }}
                         >
-                          <span className="text-sm font-medium text-white">
+                          <span className="text-sm font-medium" style={{ color: 'var(--color-bg-primary)' }}>
                             A
                           </span>
                         </div>
-                        <p className="text-xs font-medium text-gray-700 group-hover:text-gray-900">
+                        <p className="text-xs font-medium" style={{ color: 'var(--color-text-primary)' }}>
                           {color.name}
                         </p>
                       </button>
@@ -2991,8 +3207,8 @@ export default function MenuManager() {
                   </div>
                   
                   {/* Custom Text Color Input */}
-                  <div className="border-t pt-4">
-                    <p className="text-sm text-gray-600 mb-3">Or enter a custom text color:</p>
+                  <div className="border-t pt-4" style={{ borderColor: 'var(--color-gray-light)' }}>
+                    <p className="text-sm mb-3" style={{ color: 'var(--color-text-secondary)' }}>Or enter a custom text color:</p>
                     <div className="flex items-center space-x-3">
                       <input
                         type="color"
@@ -3001,7 +3217,8 @@ export default function MenuManager() {
                           ...prev, 
                           footerTextColor: e.target.value 
                         }))}
-                        className="w-12 h-10 border border-gray-300 rounded-lg cursor-pointer shadow-sm"
+                        className="w-12 h-10 border rounded-lg cursor-pointer shadow-sm"
+                        style={{ borderColor: 'var(--color-gray-light)' }}
                       />
                       <Input
                         value={siteSettings?.footerTextColor || ''}
@@ -3011,12 +3228,17 @@ export default function MenuManager() {
                         }))}
                         placeholder="#374151"
                         className="flex-1 font-mono"
+                        style={{ 
+                          color: 'var(--color-text-primary)',
+                          backgroundColor: 'var(--color-bg-primary)',
+                          borderColor: 'var(--color-gray-light)'
+                        }}
                       />
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-gray-200 space-y-3">
+                <div className="pt-4 border-t space-y-3" style={{ borderColor: 'var(--color-gray-light)' }}>
                   <Button
                     onClick={handleSaveFooterConfig}
                     disabled={footerSaving}
@@ -3036,7 +3258,11 @@ export default function MenuManager() {
                   </Button>
                   
                   {footerSaveSuccess && (
-                    <div className="flex items-center justify-center space-x-2 text-green-600 bg-green-50 border border-green-200 rounded-lg p-3">
+                    <div className="flex items-center justify-center space-x-2 rounded-lg p-3 border" style={{
+          color: 'var(--color-success-dark)',
+          backgroundColor: 'var(--color-success-light)',
+          borderColor: 'var(--color-success)'
+        }}>
                       <CheckCircle className="w-5 h-5" />
                       <span className="text-sm font-medium">Footer configuration saved successfully!</span>
                     </div>
@@ -3047,18 +3273,21 @@ export default function MenuManager() {
           </div>
 
           {/* Footer Preview */}
-          <Card className="p-6 bg-gray-50">
+          <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
             <div className="flex items-center space-x-3 mb-6">
-              <div className="p-2 bg-gray-100 rounded-lg">
-                <Globe className="w-5 h-5 text-gray-600" />
+              <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+                <Globe className="w-5 h-5" style={{ color: 'var(--color-text-secondary)' }} />
               </div>
               <div>
-                <h3 className="text-xl font-semibold text-gray-900">Footer Preview</h3>
-                <p className="text-gray-600 text-sm">Preview of how your footer will look</p>
+                <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Footer Preview</h3>
+                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Preview of how your footer will look</p>
               </div>
             </div>
 
-            <div className="bg-white border border-gray-200 rounded-lg p-6">
+            <div className="border rounded-lg p-6" style={{ 
+              backgroundColor: 'var(--color-bg-primary)',
+              borderColor: 'var(--color-gray-light)'
+            }}>
               <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
                 {/* Company Section */}
                 <div className="md:col-span-1">
@@ -3066,27 +3295,37 @@ export default function MenuManager() {
                     {siteSettings?.logoUrl ? (
                       <img src={siteSettings.logoUrl} alt="Logo" className="h-8 w-auto" />
                     ) : (
-                      <div className="text-lg font-bold text-gray-900">
+                      <div className="text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>
                         {siteSettings?.footerCompanyName || 'Your Company'}
                       </div>
                     )}
                   </div>
                   {siteSettings?.footerCompanyDescription && (
-                    <p className="text-sm text-gray-600 mb-4">
+                    <p className="text-sm mb-4" style={{ color: 'var(--color-text-secondary)' }}>
                       {siteSettings.footerCompanyDescription}
                     </p>
                   )}
                   {siteSettings?.footerNewsletterFormId && (
                     <div className="space-y-2">
-                      <p className="text-sm font-medium text-gray-900">Subscribe to our newsletter</p>
+                      <p className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Subscribe to our newsletter</p>
                       <div className="flex space-x-2">
                         <input
                           type="email"
                           placeholder="Enter your email"
-                          className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md"
+                          className="flex-1 px-3 py-2 text-sm border rounded-md"
+                          style={{ 
+                            borderColor: 'var(--color-gray-light)',
+                            backgroundColor: 'var(--color-bg-primary)',
+                            color: 'var(--color-text-primary)'
+                          }}
                           disabled
                         />
-                        <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-md" disabled>
+                        <button className="px-4 py-2 text-sm rounded-md" 
+                                style={{ 
+                                  backgroundColor: 'var(--color-primary)',
+                                  color: 'var(--color-text-primary)'
+                                }}
+                                disabled>
                           Subscribe
                         </button>
                       </div>
@@ -3101,17 +3340,17 @@ export default function MenuManager() {
                   
                   return (
                     <div key={menuId}>
-                      <h4 className="text-sm font-semibold text-gray-900 mb-3">{menu.name}</h4>
+                      <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>{menu.name}</h4>
                       <ul className="space-y-2">
                         {(menu.items || []).slice(0, 5).map((item: any, index: number) => (
                           <li key={index}>
-                            <a href="#" className="text-sm text-gray-600 hover:text-gray-900">
+                            <a href="#" className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                               {item.label}
                             </a>
                           </li>
                         ))}
                         {(menu.items || []).length > 5 && (
-                          <li className="text-xs text-gray-500">
+                          <li className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                             +{(menu.items || []).length - 5} more items
                           </li>
                         )}
@@ -3123,16 +3362,16 @@ export default function MenuManager() {
                 {/* Contact Info */}
                 {siteSettings?.footerShowContactInfo && siteSettings && (
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-900 mb-3">Contact Info</h4>
+                    <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Contact Info</h4>
                     <div className="space-y-2">
                       {siteSettings.companyEmail && (
-                        <p className="text-sm text-gray-600">{siteSettings.companyEmail}</p>
+                        <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{siteSettings.companyEmail}</p>
                       )}
                       {siteSettings.companyPhone && (
-                        <p className="text-sm text-gray-600">{siteSettings.companyPhone}</p>
+                        <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{siteSettings.companyPhone}</p>
                       )}
                       {siteSettings.companyAddress && (
-                        <p className="text-sm text-gray-600">{siteSettings.companyAddress}</p>
+                        <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{siteSettings.companyAddress}</p>
                       )}
                     </div>
                   </div>
@@ -3140,8 +3379,8 @@ export default function MenuManager() {
               </div>
 
               {/* Bottom Section */}
-              <div className="mt-8 pt-6 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center">
-                <p className="text-sm text-gray-600">
+              <div className="mt-8 pt-6 border-t flex flex-col md:flex-row justify-between items-center" style={{ borderColor: 'var(--color-gray-light)' }}>
+                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                   {siteSettings?.footerCopyrightMessage 
                     ? siteSettings.footerCopyrightMessage.replace('{year}', new Date().getFullYear().toString())
                     : `© ${new Date().getFullYear()} ${siteSettings?.footerCompanyName || 'Your Company'}. All rights reserved.`
@@ -3151,19 +3390,19 @@ export default function MenuManager() {
                 {siteSettings?.footerShowSocialLinks && siteSettings && (
                   <div className="flex space-x-4 mt-4 md:mt-0">
                     {siteSettings.socialFacebook && (
-                      <div className="w-5 h-5 bg-blue-600 rounded"></div>
+                      <div className="w-5 h-5 rounded" style={{ backgroundColor: 'var(--color-primary)' }}></div>
                     )}
                     {siteSettings.socialTwitter && (
-                      <div className="w-5 h-5 bg-blue-400 rounded"></div>
+                      <div className="w-5 h-5 rounded" style={{ backgroundColor: 'var(--color-info)' }}></div>
                     )}
                     {siteSettings.socialLinkedin && (
-                      <div className="w-5 h-5 bg-blue-700 rounded"></div>
+                      <div className="w-5 h-5 rounded" style={{ backgroundColor: 'var(--color-primary)' }}></div>
                     )}
                     {siteSettings.socialInstagram && (
-                      <div className="w-5 h-5 bg-pink-600 rounded"></div>
+                      <div className="w-5 h-5 rounded" style={{ backgroundColor: 'var(--color-secondary)' }}></div>
                     )}
                     {siteSettings.socialYoutube && (
-                      <div className="w-5 h-5 bg-red-600 rounded"></div>
+                      <div className="w-5 h-5 rounded" style={{ backgroundColor: 'var(--color-error)' }}></div>
                     )}
                   </div>
                 )}

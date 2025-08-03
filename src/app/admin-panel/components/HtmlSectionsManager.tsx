@@ -28,7 +28,7 @@ import MediaLibraryManager from './MediaLibraryManager';
 // Dynamically import TinyMCE to avoid SSR issues
 const Editor = dynamic(() => import('@tinymce/tinymce-react').then(mod => ({ default: mod.Editor })), {
   ssr: false,
-  loading: () => <div className="h-64 bg-gray-100 animate-pulse rounded-lg"></div>
+  loading: () => <div className="h-64 animate-pulse rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)' }}></div>
 });
 
 interface HtmlSection {
@@ -145,8 +145,8 @@ const HtmlSectionsManager: React.FC = () => {
     media_poster: false,
     media_dimensions: false,
     content_style: `
-      body { font-family: 'Manrope', system-ui, sans-serif; font-size: 14px; line-height: 1.6; color: #374151; }
-      h1, h2, h3, h4, h5, h6 { font-weight: 600; margin-bottom: 0.5rem; color: #1f2937; }
+      body { font-family: 'Manrope', system-ui, sans-serif; font-size: 14px; line-height: 1.6; color: var(--color-text-primary); }
+      h1, h2, h3, h4, h5, h6 { font-weight: 600; margin-bottom: 0.5rem; color: var(--color-text-primary); }
       h1 { font-size: 1.875rem; }
       h2 { font-size: 1.5rem; }
       h3 { font-size: 1.25rem; }
@@ -155,12 +155,18 @@ const HtmlSectionsManager: React.FC = () => {
       h6 { font-size: 0.875rem; }
       ul, ol { padding-left: 1.5rem; margin-bottom: 0.75rem; }
       li { margin-bottom: 0.25rem; }
-      blockquote { border-left: 4px solid #5243E9; padding-left: 1rem; margin: 1rem 0; font-style: italic; color: #6b7280; }
-      a { color: #5243E9; text-decoration: underline; }
-      a:hover { color: #4338CA; }
+      blockquote { border-left: 4px solid var(--color-primary); padding-left: 1rem; margin: 1rem 0; font-style: italic; color: var(--color-text-secondary); }
+      a { color: var(--color-primary); text-decoration: underline; }
+      a:hover { color: var(--color-primary); }
       img { max-width: 100%; height: auto; border-radius: 0.375rem; margin: 0.5rem 0; }
       video { max-width: 100%; border-radius: 0.375rem; margin: 0.5rem 0; }
       iframe { max-width: 100%; border-radius: 0.375rem; margin: 0.5rem 0; }
+      
+      /* Placeholder styling */
+      .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
+        color: var(--color-text-muted) !important;
+        opacity: 1;
+      }
       
       /* Spacing Classes */
       .margin-xs { margin: 0.25rem !important; }
@@ -425,7 +431,7 @@ const HtmlSectionsManager: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: 'var(--color-primary)' }}></div>
       </div>
     );
   }
@@ -434,12 +440,17 @@ const HtmlSectionsManager: React.FC = () => {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">HTML Sections</h2>
-          <p className="text-gray-600">Manage custom HTML code blocks for your pages</p>
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>HTML Sections</h2>
+          <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Manage custom HTML code blocks for your pages</p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+          className="px-4 py-2 rounded-lg flex items-center gap-2 font-medium hover:opacity-90 transition-opacity"
+          style={{ 
+            backgroundColor: 'var(--color-primary)', 
+            color: 'var(--color-text-primary)',
+            border: '1px solid var(--color-primary)'
+          }}
         >
           <Plus className="w-4 h-4" />
           Add HTML Section
@@ -447,24 +458,28 @@ const HtmlSectionsManager: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-2">
-          <AlertCircle className="w-5 h-5 text-red-600" />
-          <span className="text-red-800">{error}</span>
+        <div className="border rounded-lg p-4 flex items-center gap-2" style={{ backgroundColor: 'var(--color-error-light)', borderColor: 'var(--color-error)' }}>
+          <AlertCircle className="w-5 h-5" style={{ color: 'var(--color-error)' }} />
+          <span style={{ color: 'var(--color-error-dark)' }}>{error}</span>
         </div>
       )}
 
       {/* HTML Sections List */}
-      <div className="bg-white rounded-lg shadow-sm border">
-        <div className="p-6">
-          <h3 className="text-lg font-semibold mb-4">HTML Sections ({htmlSections.length})</h3>
+      <div className="rounded-xl p-6 shadow-sm border" style={{ 
+        backgroundColor: 'var(--color-bg-secondary)', 
+        borderColor: 'var(--color-gray-light)' 
+      }}>
+        <div>
+          <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>HTML Sections ({htmlSections.length})</h3>
           
           {htmlSections.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <Code className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-              <p>No HTML sections created yet.</p>
+            <div className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>
+              <Code className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-muted)' }} />
+              <p style={{ color: 'var(--color-text-primary)' }}>No HTML sections created yet.</p>
               <button
                 onClick={() => setShowForm(true)}
-                className="mt-2 text-blue-600 hover:text-blue-700"
+                className="text-sm font-medium hover:opacity-80 transition-opacity"
+                style={{ color: 'var(--color-text-primary)' }}
               >
                 Create your first HTML section
               </button>
@@ -472,36 +487,45 @@ const HtmlSectionsManager: React.FC = () => {
           ) : (
             <div className="space-y-4">
               {htmlSections.map((section) => (
-                <div key={section.id} className="border rounded-lg p-4">
+                <div key={section.id} className="border-2 rounded-lg p-4 transition-all duration-200" style={{ 
+                  borderColor: section.isActive ? 'var(--color-gray-light)' : 'var(--color-text-muted)',
+                  backgroundColor: section.isActive ? 'var(--color-bg-primary)' : 'var(--color-bg-secondary)',
+                  opacity: section.isActive ? 1 : 0.6
+                }}>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <Code className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--color-info-light)' }}>
+                        <Code className="w-5 h-5" style={{ color: 'var(--color-primary)' }} />
                       </div>
                       <div>
-                        <h4 className="font-medium text-gray-900">{section.name}</h4>
+                        <h4 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{section.name}</h4>
                         {section.description && (
-                          <p className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{section.description}</p>
+                          <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{section.description}</p>
                         )}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        section.isActive 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-gray-100 text-gray-800'
-                      }`}>
+                      <span className="px-2 py-1 rounded-full text-xs font-medium" style={{
+                        backgroundColor: section.isActive 
+                          ? 'var(--color-success-light)' 
+                          : 'var(--color-gray-light)',
+                        color: section.isActive 
+                          ? 'var(--color-success-dark)' 
+                          : 'var(--color-text-muted)'
+                      }}>
                         {section.isActive ? 'Active' : 'Inactive'}
                       </span>
                       <button
                         onClick={() => handleEdit(section)}
-                        className="p-2 text-gray-600 hover:text-blue-600"
+                        className="p-1 rounded hover:bg-gray-100 transition-colors"
+                        style={{ color: 'var(--color-text-secondary)' }}
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(section.id)}
-                        className="p-2 text-gray-600 hover:text-red-600"
+                        className="p-1 rounded hover:bg-red-50 transition-colors"
+                        style={{ color: 'var(--color-error)' }}
                         title="Delete HTML section"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -509,7 +533,7 @@ const HtmlSectionsManager: React.FC = () => {
                     </div>
                   </div>
                   
-                  <div className="text-sm text-gray-600 space-y-1">
+                  <div className="text-sm space-y-1" style={{ color: 'var(--color-text-secondary)' }}>
                     <div className="flex items-center gap-4">
                       <span>Usage: {getUsageCount(section)} pages</span>
                       <span>Sort Order: {section.sortOrder}</span>
@@ -524,7 +548,7 @@ const HtmlSectionsManager: React.FC = () => {
                               href={`/${page.slug}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-700"
+                              style={{ color: 'var(--color-primary)' }}
                             >
                               {page.title}
                             </a>
@@ -538,7 +562,7 @@ const HtmlSectionsManager: React.FC = () => {
                   <div className="mt-3 flex items-center gap-2">
                     <button
                       onClick={() => copyToClipboard(section.htmlContent)}
-                      className="text-xs text-gray-600 hover:text-gray-800 flex items-center gap-1"
+                      className="text-xs flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-50 transition-colors" style={{ color: 'var(--color-text-muted)' }}
                     >
                       <Copy className="w-3 h-3" />
                       Copy HTML
@@ -546,7 +570,7 @@ const HtmlSectionsManager: React.FC = () => {
                     {section.cssContent && (
                       <button
                         onClick={() => copyToClipboard(section.cssContent || '')}
-                        className="text-xs text-gray-600 hover:text-gray-800 flex items-center gap-1"
+                        className="text-xs flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-50 transition-colors" style={{ color: 'var(--color-text-muted)' }}
                       >
                         <Copy className="w-3 h-3" />
                         Copy CSS
@@ -555,7 +579,7 @@ const HtmlSectionsManager: React.FC = () => {
                     {section.jsContent && (
                       <button
                         onClick={() => copyToClipboard(section.jsContent || '')}
-                        className="text-xs text-gray-600 hover:text-gray-800 flex items-center gap-1"
+                        className="text-xs flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-50 transition-colors" style={{ color: 'var(--color-text-muted)' }}
                       >
                         <Copy className="w-3 h-3" />
                         Copy JS
@@ -571,16 +595,17 @@ const HtmlSectionsManager: React.FC = () => {
 
       {/* Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-6xl w-full max-h-[95vh] flex flex-col">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h3 className="text-xl font-semibold">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div className="rounded-xl shadow-xl max-w-6xl w-full max-h-[95vh] flex flex-col" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+            <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: 'var(--color-gray-light)' }}>
+              <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>
                 {editingSection ? 'Edit HTML Section' : 'Create HTML Section'}
               </h3>
               <div className="flex items-center gap-4">
                 <button
                   onClick={resetForm}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="p-1 rounded hover:bg-gray-100 transition-colors"
+                  style={{ color: 'var(--color-text-muted)' }}
                 >
                   <X className="w-6 h-6" />
                 </button>
@@ -589,47 +614,106 @@ const HtmlSectionsManager: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="flex flex-col flex-1">
               <div className="flex-1 overflow-y-auto p-6">
-                <div className="space-y-6">
+                <div className="space-y-6" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
                   {/* Basic Information */}
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                         Section Name *
                       </label>
                       <input
                         type="text"
                         value={formData.name}
                         onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{ 
+                          borderColor: 'var(--color-gray-light)',
+                          color: 'var(--color-text-primary)',
+                          backgroundColor: 'var(--color-bg-primary)'
+                        }}
                         placeholder="e.g., Custom Banner, Newsletter Signup"
                         required
                       />
+                      <style jsx>{`
+                        input::placeholder {
+                          color: var(--color-text-muted) !important;
+                          opacity: 1;
+                        }
+                        input::-webkit-input-placeholder {
+                          color: var(--color-text-muted) !important;
+                          opacity: 1;
+                        }
+                        input::-moz-placeholder {
+                          color: var(--color-text-muted) !important;
+                          opacity: 1;
+                        }
+                        input:-ms-input-placeholder {
+                          color: var(--color-text-muted) !important;
+                          opacity: 1;
+                        }
+                        input:-moz-placeholder {
+                          color: var(--color-text-muted) !important;
+                          opacity: 1;
+                        }
+                      `}</style>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                         Sort Order
                       </label>
                       <input
                         type="number"
                         value={formData.sortOrder}
                         onChange={(e) => setFormData({...formData, sortOrder: parseInt(e.target.value) || 0})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        style={{ 
+                          borderColor: 'var(--color-gray-light)',
+                          color: 'var(--color-text-primary)',
+                          backgroundColor: 'var(--color-bg-primary)'
+                        }}
                         min="0"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                       Description
                     </label>
                     <input
                       type="text"
                       value={formData.description}
                       onChange={(e) => setFormData({...formData, description: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      style={{ 
+                        borderColor: 'var(--color-gray-light)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-bg-primary)'
+                      }}
                       placeholder="Brief description of this HTML section"
                     />
+                    <style jsx>{`
+                      input::placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      input::-webkit-input-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      input::-moz-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      input:-ms-input-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      input:-moz-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                    `}</style>
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -638,9 +722,13 @@ const HtmlSectionsManager: React.FC = () => {
                       id="isActive"
                       checked={formData.isActive}
                       onChange={(e) => setFormData({...formData, isActive: e.target.checked})}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      className="w-4 h-4 rounded focus:ring-2 focus:ring-blue-500"
+                      style={{ 
+                        borderColor: 'var(--color-gray-light)',
+                        backgroundColor: formData.isActive ? 'var(--color-primary)' : 'var(--color-bg-primary)'
+                      }}
                     />
-                    <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
+                    <label htmlFor="isActive" className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
                       Active
                     </label>
                   </div>
@@ -648,53 +736,53 @@ const HtmlSectionsManager: React.FC = () => {
                   {/* Code Editor Tabs */}
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <div className="flex border-b">
+                      <div className="flex border-b" style={{ borderColor: 'var(--color-gray-light)' }}>
                         <button
                           type="button"
                           onClick={() => setActiveTab('rich-text')}
-                          className={`px-4 py-2 font-medium text-sm ${
-                            activeTab === 'rich-text'
-                              ? 'border-b-2 border-blue-600 text-blue-600'
-                              : 'text-gray-600 hover:text-gray-800'
-                          }`}
+                          className="group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                          style={{
+                            borderColor: activeTab === 'rich-text' ? 'var(--color-primary)' : 'transparent',
+                            color: activeTab === 'rich-text' ? 'var(--color-primary)' : 'var(--color-text-secondary)'
+                          }}
                         >
-                          <Type className="w-4 h-4 inline mr-2" />
+                          <Type className="mr-2 h-5 w-5 transition-colors" />
                           Rich Text Editor
                         </button>
                         <button
                           type="button"
                           onClick={() => setActiveTab('html')}
-                          className={`px-4 py-2 font-medium text-sm ${
-                            activeTab === 'html'
-                              ? 'border-b-2 border-blue-600 text-blue-600'
-                              : 'text-gray-600 hover:text-gray-800'
-                          }`}
+                          className="group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                          style={{
+                            borderColor: activeTab === 'html' ? 'var(--color-primary)' : 'transparent',
+                            color: activeTab === 'html' ? 'var(--color-primary)' : 'var(--color-text-secondary)'
+                          }}
                         >
-                          <FileText className="w-4 h-4 inline mr-2" />
+                          <FileText className="mr-2 h-5 w-5 transition-colors" />
                           HTML
                         </button>
                         <button
                           type="button"
                           onClick={() => setActiveTab('css')}
-                          className={`px-4 py-2 font-medium text-sm ${
-                            activeTab === 'css'
-                              ? 'border-b-2 border-blue-600 text-blue-600'
-                              : 'text-gray-600 hover:text-gray-800'
-                          }`}
+                          className="group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                          style={{
+                            borderColor: activeTab === 'css' ? 'var(--color-primary)' : 'transparent',
+                            color: activeTab === 'css' ? 'var(--color-primary)' : 'var(--color-text-secondary)'
+                          }}
                         >
-                          <Palette className="w-4 h-4 inline mr-2" />
+                          <Palette className="mr-2 h-5 w-5 transition-colors" />
                           CSS
                         </button>
                         <button
                           type="button"
                           onClick={() => setActiveTab('js')}
-                          className={`px-4 py-2 font-medium text-sm ${
-                            activeTab === 'js'
-                              ? 'border-b-2 border-blue-600 text-blue-600'
-                              : 'text-gray-600 hover:text-gray-800'
-                          }`}
+                          className="group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                          style={{
+                            borderColor: activeTab === 'js' ? 'var(--color-primary)' : 'transparent',
+                            color: activeTab === 'js' ? 'var(--color-primary)' : 'var(--color-text-secondary)'
+                          }}
                         >
-                          <Settings className="w-4 h-4 inline mr-2" />
+                          <Settings className="mr-2 h-5 w-5 transition-colors" />
                           JavaScript
                         </button>
                       </div>
@@ -702,7 +790,12 @@ const HtmlSectionsManager: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setPreviewMode(!previewMode)}
-                        className="flex items-center gap-2 px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+                        className="flex items-center gap-2 px-3 py-1 text-sm border rounded hover:opacity-80 transition-opacity"
+                        style={{ 
+                          borderColor: 'var(--color-gray-light)',
+                          color: 'var(--color-text-primary)',
+                          backgroundColor: 'var(--color-bg-primary)'
+                        }}
                       >
                         {previewMode ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         {previewMode ? 'Hide Preview' : 'Show Preview'}
@@ -712,7 +805,12 @@ const HtmlSectionsManager: React.FC = () => {
                         onClick={() => {
                           alert('Check browser console for HTML content');
                         }}
-                        className="flex items-center gap-2 px-3 py-1 text-sm border border-gray-300 rounded hover:bg-gray-50"
+                        className="flex items-center gap-2 px-3 py-1 text-sm border rounded hover:opacity-80 transition-opacity"
+                        style={{ 
+                          borderColor: 'var(--color-gray-light)',
+                          color: 'var(--color-text-primary)',
+                          backgroundColor: 'var(--color-bg-primary)'
+                        }}
                       >
                         <Code className="w-4 h-4" />
                         Debug HTML
@@ -724,10 +822,13 @@ const HtmlSectionsManager: React.FC = () => {
                       <div className="w-full">
                         {activeTab === 'rich-text' && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                               Rich Text Content *
                             </label>
-                            <div className="border border-gray-300 rounded-lg w-full">
+                            <div className="border-2 rounded-lg w-full" style={{ 
+                              borderColor: 'var(--color-gray-light)',
+                              backgroundColor: 'var(--color-bg-primary)'
+                            }}>
                               <Editor
                                 apiKey={process.env.NEXT_PUBLIC_TINYMCE_API_KEY || process.env.TINYMCE_API_KEY}
                                 value={formData.htmlContent}
@@ -879,15 +980,15 @@ const HtmlSectionsManager: React.FC = () => {
                                 }}
                               />
                             </div>
-                            <div className="text-xs text-gray-500 mt-2">
+                            <div className="text-xs mt-2" style={{ color: 'var(--color-text-muted)' }}>
                               <p className="mb-2">Use the rich text editor to create formatted content. The content will be automatically converted to HTML.</p>
                               <div className="flex flex-wrap gap-3">
                                 <div className="flex items-center gap-1">
-                                  <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-primary)' }}></span>
                                   <span>Click the <strong>link</strong> button to add URLs</span>
                                 </div>
                                 <div className="flex items-center gap-1">
-                                  <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-success)' }}></span>
                                   <span>Click the <strong>image</strong> button to add media from your library</span>
                                 </div>
                                 <div className="flex items-center gap-1">
@@ -899,11 +1000,11 @@ const HtmlSectionsManager: React.FC = () => {
                                   <span>Click the <strong>spacing</strong> button to add margins and padding</span>
                                 </div>
                               </div>
-                              <div className="mt-2 text-xs text-gray-600">
+                              <div className="mt-2 text-xs" style={{ color: 'var(--color-text-secondary)' }}>
                                 <strong>Tip:</strong> Select text or elements first, then apply spacing. Use "Remove All Spacing" to clear all spacing classes. Use the "Debug HTML" button to see the generated code. Spacing classes are now available on the frontend where your HTML sections are displayed.
                               </div>
                               {showMediaLibrary && (
-                                <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-blue-700">
+                                <div className="mt-2 p-2 border rounded" style={{ backgroundColor: 'var(--color-info-light)', borderColor: 'var(--color-info-light)', color: 'var(--color-info-dark)' }}>
                                   Media library is open - select an image and click "Confirm Selection"
                                 </div>
                               )}
@@ -913,44 +1014,125 @@ const HtmlSectionsManager: React.FC = () => {
 
                         {activeTab === 'html' && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                               HTML Content *
                             </label>
                             <textarea
                               value={formData.htmlContent}
                               onChange={(e) => setFormData({...formData, htmlContent: e.target.value})}
-                              className="w-full h-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                              className="w-full h-48 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
                               placeholder="<div>Your HTML content here...</div>"
                               required
+                              style={{ 
+                                borderColor: 'var(--color-gray-light)',
+                                color: 'var(--color-text-primary)',
+                                backgroundColor: 'var(--color-bg-primary)'
+                              }}
                             />
+                            <style jsx>{`
+                              textarea::placeholder {
+                                color: var(--color-text-muted) !important;
+                                opacity: 1;
+                              }
+                              textarea::-webkit-input-placeholder {
+                                color: var(--color-text-muted) !important;
+                                opacity: 1;
+                              }
+                              textarea::-moz-placeholder {
+                                color: var(--color-text-muted) !important;
+                                opacity: 1;
+                              }
+                              textarea:-ms-input-placeholder {
+                                color: var(--color-text-muted) !important;
+                                opacity: 1;
+                              }
+                              textarea:-moz-placeholder {
+                                color: var(--color-text-muted) !important;
+                                opacity: 1;
+                              }
+                            `}</style>
                           </div>
                         )}
 
                         {activeTab === 'css' && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                               CSS Styles (Optional)
                             </label>
                             <textarea
                               value={formData.cssContent}
                               onChange={(e) => setFormData({...formData, cssContent: e.target.value})}
-                              className="w-full h-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                              className="w-full h-48 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
                               placeholder=".my-class { color: blue; }"
+                              style={{ 
+                                borderColor: 'var(--color-gray-light)',
+                                color: 'var(--color-text-primary)',
+                                backgroundColor: 'var(--color-bg-primary)'
+                              }}
                             />
+                            <style jsx>{`
+                              textarea::placeholder {
+                                color: var(--color-text-muted) !important;
+                                opacity: 1;
+                              }
+                              textarea::-webkit-input-placeholder {
+                                color: var(--color-text-muted) !important;
+                                opacity: 1;
+                              }
+                              textarea::-moz-placeholder {
+                                color: var(--color-text-muted) !important;
+                                opacity: 1;
+                              }
+                              textarea:-ms-input-placeholder {
+                                color: var(--color-text-muted) !important;
+                                opacity: 1;
+                              }
+                              textarea:-moz-placeholder {
+                                color: var(--color-text-muted) !important;
+                                opacity: 1;
+                              }
+                            `}</style>
                           </div>
                         )}
 
                         {activeTab === 'js' && (
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                               JavaScript Code (Optional)
                             </label>
                             <textarea
                               value={formData.jsContent}
                               onChange={(e) => setFormData({...formData, jsContent: e.target.value})}
-                              className="w-full h-48 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                              className="w-full h-48 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
                               placeholder="console.log('Hello World!');"
+                              style={{ 
+                                borderColor: 'var(--color-gray-light)',
+                                color: 'var(--color-text-primary)',
+                                backgroundColor: 'var(--color-bg-primary)'
+                              }}
                             />
+                            <style jsx>{`
+                              textarea::placeholder {
+                                color: var(--color-text-muted) !important;
+                                opacity: 1;
+                              }
+                              textarea::-webkit-input-placeholder {
+                                color: var(--color-text-muted) !important;
+                                opacity: 1;
+                              }
+                              textarea::-moz-placeholder {
+                                color: var(--color-text-muted) !important;
+                                opacity: 1;
+                              }
+                              textarea:-ms-input-placeholder {
+                                color: var(--color-text-muted) !important;
+                                opacity: 1;
+                              }
+                              textarea:-moz-placeholder {
+                                color: var(--color-text-muted) !important;
+                                opacity: 1;
+                              }
+                            `}</style>
                           </div>
                         )}
                       </div>
@@ -958,10 +1140,14 @@ const HtmlSectionsManager: React.FC = () => {
                       {/* Preview */}
                       {previewMode && (
                         <div className="w-full">
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
+                          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                             Preview
                           </label>
-                          <div className="border border-gray-300 rounded-lg p-4 h-64 overflow-y-auto bg-gray-50">
+                          <div className="border rounded-lg p-4 h-64 overflow-y-auto" style={{ 
+                            borderColor: 'var(--color-gray-light)', 
+                            backgroundColor: 'var(--color-bg-secondary)',
+                            color: 'var(--color-text-primary)'
+                          }}>
                             <style dangerouslySetInnerHTML={{ __html: formData.cssContent }} />
                             <div dangerouslySetInnerHTML={{ __html: formData.htmlContent }} />
                             {formData.jsContent && (
@@ -976,17 +1162,30 @@ const HtmlSectionsManager: React.FC = () => {
               </div>
 
               {/* Form Actions */}
-              <div className="flex justify-end gap-3 p-6 border-t bg-gray-50 flex-shrink-0">
+              <div className="flex justify-end gap-3 p-6 border-t flex-shrink-0" style={{ 
+                borderColor: 'var(--color-gray-light)', 
+                backgroundColor: 'var(--color-bg-primary)' 
+              }}>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-4 py-2 text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="px-4 py-2 border rounded-lg font-medium hover:opacity-80 transition-opacity"
+                  style={{ 
+                    color: 'var(--color-text-primary)', 
+                    borderColor: 'var(--color-gray-light)',
+                    backgroundColor: 'var(--color-bg-primary)'
+                  }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                  className="px-4 py-2 rounded-lg flex items-center gap-2 font-medium hover:opacity-90 transition-opacity"
+                  style={{ 
+                    backgroundColor: 'var(--color-primary)', 
+                    color: 'var(--color-text-primary)',
+                    border: '1px solid var(--color-primary)'
+                  }}
                 >
                   <Save className="w-4 h-4" />
                   {editingSection ? 'Update Section' : 'Create Section'}

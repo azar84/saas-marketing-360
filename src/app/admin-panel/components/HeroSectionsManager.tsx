@@ -973,6 +973,28 @@ const HeroSectionsManager: React.FC = () => {
                         color: 'var(--color-text-primary, #1F2937)'
                       }}
                     />
+                    <style jsx>{`
+                      textarea::placeholder {
+                        color: var(--color-text-muted, #9CA3AF) !important;
+                        opacity: 1;
+                      }
+                      textarea::-webkit-input-placeholder {
+                        color: var(--color-text-muted, #9CA3AF) !important;
+                        opacity: 1;
+                      }
+                      textarea::-moz-placeholder {
+                        color: var(--color-text-muted, #9CA3AF) !important;
+                        opacity: 1;
+                      }
+                      textarea:-ms-input-placeholder {
+                        color: var(--color-text-muted, #9CA3AF) !important;
+                        opacity: 1;
+                      }
+                      textarea:-moz-placeholder {
+                        color: var(--color-text-muted, #9CA3AF) !important;
+                        opacity: 1;
+                      }
+                    `}</style>
                   </div>
                 </div>
 

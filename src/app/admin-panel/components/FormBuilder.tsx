@@ -188,7 +188,7 @@ function SortableFieldItem({
     <div
       ref={setNodeRef}
       style={style}
-      className={`flex items-center justify-between p-3 border rounded-lg bg-white ${
+      className={`flex items-center justify-between p-3 border rounded-lg var(--color-bg-primary) ${
         isDragging ? 'ring-2 ring-blue-500' : ''
       }`}
     >
@@ -196,9 +196,9 @@ function SortableFieldItem({
         <div
           {...attributes}
           {...listeners}
-          className="cursor-grab active:cursor-grabbing p-1 hover:bg-gray-100 rounded"
+          className="cursor-grab active:cursor-grabbing p-1 hover:var(--color-bg-secondary) rounded"
         >
-          <GripVertical className="h-4 w-4 text-gray-400" />
+          <GripVertical className="h-4 w-4 var(--color-text-muted)" />
         </div>
         <div 
           className="w-8 h-8 rounded-full flex items-center justify-center"
@@ -209,13 +209,13 @@ function SortableFieldItem({
           </span>
         </div>
         <div>
-          <div className="font-medium text-gray-900">{field.label}</div>
-          <div className="text-sm text-gray-500">{field.fieldName}</div>
+          <div className="font-medium var(--color-text-primary)">{field.label}</div>
+          <div className="text-sm var(--color-text-muted)">{field.fieldName}</div>
         </div>
       </div>
       <div className="flex items-center space-x-2">
         {field.isRequired && (
-          <span className="px-2 py-1 text-xs bg-red-100 text-red-600 rounded">Required</span>
+          <span className="px-2 py-1 text-xs var(--color-error-light) var(--color-error) rounded">Required</span>
         )}
         <Button
           variant="outline"
@@ -256,12 +256,12 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, desig
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium var(--color-text-primary)">
         {label}
       </label>
       <div className="flex items-center gap-2">
         <div
-          className="w-12 h-12 border-2 border-gray-300 rounded-lg cursor-pointer relative overflow-hidden"
+          className="w-12 h-12 border-2 var(--color-gray-light) rounded-lg cursor-pointer relative overflow-hidden"
           style={{ backgroundColor: value }}
         >
           <input
@@ -307,8 +307,8 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, desig
       
       {/* Design System Color Palette */}
       {showPalette && designSystemColors && (
-        <div className="mt-2 p-3 bg-gray-50 rounded-lg border">
-          <p className="text-xs font-medium text-gray-600 mb-2">Design System Colors</p>
+        <div className="mt-2 p-3 var(--color-bg-secondary) rounded-lg border">
+          <p className="text-xs font-medium var(--color-text-secondary) mb-2">Design System Colors</p>
           <div className="grid grid-cols-4 gap-2">
             {designSystemColors.map((color, index) => (
               <button
@@ -320,14 +320,14 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, desig
                   onChange(color.value);
                   setShowPalette(false);
                 }}
-                className="group flex flex-col items-center p-2 rounded-lg hover:bg-white transition-colors"
+                className="group flex flex-col items-center p-2 rounded-lg hover:var(--color-bg-primary) transition-colors"
                 title={color.description || color.name}
               >
                 <div
-                  className="w-8 h-8 rounded-full border-2 border-gray-200 group-hover:border-gray-300 transition-colors"
+                  className="w-8 h-8 rounded-full border-2 var(--color-gray-light) group-hover:var(--color-gray-light) transition-colors"
                   style={{ backgroundColor: color.value }}
                 />
-                <span className="text-xs mt-1 text-gray-600 truncate max-w-full">
+                <span className="text-xs mt-1 var(--color-text-secondary) truncate max-w-full">
                   {color.name}
                 </span>
               </button>
@@ -377,7 +377,7 @@ const ButtonStylePreview: React.FC<ButtonStylePreviewProps> = ({
       case 'outline':
         return 'font-medium rounded-lg border-2 bg-transparent transition-all';
       case 'ghost':
-        return 'font-medium rounded-lg bg-transparent hover:bg-gray-100 transition-all';
+        return 'font-medium rounded-lg bg-transparent hover:var(--color-bg-secondary) transition-all';
       default:
         return 'font-medium rounded-lg transition-all';
     }
@@ -994,7 +994,7 @@ export default function FormBuilder() {
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-medium">Form Fields ({fields.length})</h3>
-          <div className="text-sm text-gray-500 flex items-center gap-2">
+          <div className="text-sm var(--color-text-muted) flex items-center gap-2">
             <GripVertical className="h-4 w-4" />
             Drag to reorder
           </div>
@@ -1035,8 +1035,8 @@ export default function FormBuilder() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Form Builder</h1>
-          <p className="text-gray-600">Create and manage custom forms with predefined field types</p>
+          <h1 className="text-2xl font-bold var(--color-text-primary)">Form Builder</h1>
+          <p className="var(--color-text-secondary)">Create and manage custom forms with predefined field types</p>
         </div>
         <Button onClick={() => setShowCreateForm(true)}>
           <Plus className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
@@ -1051,11 +1051,11 @@ export default function FormBuilder() {
             <Card key={form.id} className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <div>
-                  <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{form.title}</h3>
-                  <p className="text-sm text-gray-500">{form.name}</p>
-                  {form.subheading && (
-                    <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{form.subheading}</p>
-                  )}
+                  <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>{form.title}</h3>
+                  <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>{form.name}</p>
+                                      {form.subheading && (
+                      <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>{form.subheading}</p>
+                    )}
                 </div>
                 <div className="flex space-x-2">
                   <Button
@@ -1074,7 +1074,7 @@ export default function FormBuilder() {
                   </Button>
                 </div>
               </div>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                 {form.fields.length} field{form.fields.length !== 1 ? 's' : ''}
               </div>
             </Card>
@@ -1098,7 +1098,7 @@ export default function FormBuilder() {
             <h3 className="text-lg font-medium mb-4">Form Details</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>
                   Internal Name
                 </label>
                 <Input
@@ -1108,7 +1108,7 @@ export default function FormBuilder() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>
                   Display Title
                 </label>
                 <Input
@@ -1118,7 +1118,7 @@ export default function FormBuilder() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>
                   Subheading (Optional)
                 </label>
                 <Input
@@ -1131,7 +1131,7 @@ export default function FormBuilder() {
 
             <div className="mt-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>
                   Success Message
                 </label>
                 <Input
@@ -1141,7 +1141,7 @@ export default function FormBuilder() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>
                   Error Message
                 </label>
                 <Input
@@ -1164,7 +1164,7 @@ export default function FormBuilder() {
             <div className="space-y-6">
                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                  <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-1">
+                   <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                      Button Text
                    </label>
                    <Input
@@ -1174,7 +1174,7 @@ export default function FormBuilder() {
                    />
                  </div>
                  <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-1">
+                   <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                      Button Icon
                    </label>
                    <IconPicker
@@ -1185,7 +1185,7 @@ export default function FormBuilder() {
                    />
                  </div>
                  <div>
-                   <label className="block text-sm font-medium text-gray-700 mb-1">
+                   <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                      Loading Text
                    </label>
                    <Input
@@ -1198,7 +1198,7 @@ export default function FormBuilder() {
 
               {/* Button Style Selection with Previews */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium var(--color-text-primary) mb-3">
                   Button Style
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -1212,8 +1212,8 @@ export default function FormBuilder() {
                       key={style.value}
                       className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
                         formData.ctaStyle === style.value
-                          ? 'border-gray-200 hover:border-gray-300'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'var(--color-gray-light) hover:var(--color-gray-light)'
+                          : 'var(--color-gray-light) hover:var(--color-gray-light)'
                       }`}
                       style={formData.ctaStyle === style.value ? { 
                         borderColor: getPrimaryColor(), 
@@ -1232,8 +1232,8 @@ export default function FormBuilder() {
                            icon={formData.ctaIcon}
                          />
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{style.label}</p>
-                          <p className="text-xs text-gray-500">{style.description}</p>
+                          <p className="text-sm font-medium var(--color-text-primary)">{style.label}</p>
+                          <p className="text-xs var(--color-text-muted)">{style.description}</p>
                         </div>
                       </div>
                     </div>
@@ -1244,13 +1244,13 @@ export default function FormBuilder() {
               {/* Button Size and Width */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                     Button Size
                   </label>
                   <select
                     value={formData.ctaSize || 'large'}
                     onChange={(e) => setFormData({...formData, ctaSize: e.target.value})}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-2 border var(--color-gray-light) rounded-md focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                   >
                     <option value="small">Small</option>
                     <option value="medium">Medium</option>
@@ -1258,13 +1258,13 @@ export default function FormBuilder() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                     Button Width
                   </label>
                   <select
                     value={formData.ctaWidth || 'auto'}
                     onChange={(e) => setFormData({...formData, ctaWidth: e.target.value})}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-2 border var(--color-gray-light) rounded-md focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                   >
                     <option value="auto">Auto Width</option>
                     <option value="fixed">Fixed Width (256px)</option>
@@ -1275,7 +1275,7 @@ export default function FormBuilder() {
 
               {/* CTA Color Customization */}
               <div className="border-t pt-6">
-                <h4 className="text-base font-medium text-gray-900 mb-4">Color Customization</h4>
+                <h4 className="text-base font-medium var(--color-text-primary) mb-4">Color Customization</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <ColorPicker
                     label="Background Color"
@@ -1298,8 +1298,8 @@ export default function FormBuilder() {
                 </div>
                 
                 {/* Hover Colors */}
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <h5 className="text-sm font-medium text-gray-700 mb-3">Hover States</h5>
+                <div className="mt-4 pt-4 border-t " style={{ borderColor: 'var(--color-gray-light)' }}>
+                  <h5 className="text-sm font-medium var(--color-text-primary) mb-3">Hover States</h5>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <ColorPicker
                       label="Hover Background"
@@ -1319,8 +1319,8 @@ export default function FormBuilder() {
 
               {/* Live Preview */}
               <div className="border-t pt-6">
-                <h4 className="text-base font-medium text-gray-900 mb-3">Live Preview</h4>
-                <div className="p-4 bg-gray-50 rounded-lg">
+                <h4 className="text-base font-medium var(--color-text-primary) mb-3">Live Preview</h4>
+                <div className="p-4 var(--color-bg-secondary) rounded-lg">
                   <div className="flex justify-center">
                                          <ButtonStylePreview
                        style={formData.ctaStyle || 'primary'}
@@ -1359,9 +1359,9 @@ export default function FormBuilder() {
                         setFormData(rest);
                       }
                     }}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded var(--color-gray-light) var(--color-primary) focus:ring-[var(--color-primary)]"
                   />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium var(--color-text-primary)">
                     Redirect after successful submission
                         </span>
                 </label>
@@ -1382,15 +1382,15 @@ export default function FormBuilder() {
                     type="checkbox"
                     checked={formData.emailNotification || false}
                     onChange={(e) => setFormData({...formData, emailNotification: e.target.checked})}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded var(--color-gray-light) var(--color-primary) focus:ring-[var(--color-primary)]"
                   />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium var(--color-text-primary)">
                     Send email notifications
                   </span>
                 </label>
                                 {formData.emailNotification && (
                   <div className="mt-2">
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm var(--color-text-muted)">
                       Email notification settings can be configured after creating the form.
                     </p>
                       </div>
@@ -1404,21 +1404,21 @@ export default function FormBuilder() {
                     type="checkbox"
                     checked={formData.newsletterAction || false}
                     onChange={(e) => setFormData({...formData, newsletterAction: e.target.checked})}
-                    className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                    className="rounded var(--color-gray-light) var(--color-success) focus:ring-[var(--color-success)]"
                   />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium var(--color-text-primary)">
                     Subscribe to newsletter
                   </span>
                 </label>
                 {formData.newsletterAction && (
                   <div className="mt-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium var(--color-text-primary) mb-2">
                       Email Field for Newsletter
                     </label>
                     <select
                       value={formData.newsletterEmailField || ''}
                       onChange={(e) => setFormData({...formData, newsletterEmailField: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white"
+                      className="w-full px-3 py-2 border var(--color-gray-light) rounded-lg focus:ring-2 focus:ring-[var(--color-success)] focus:border-[var(--color-success)] var(--color-bg-primary)"
                     >
                       <option value="">Select the email field...</option>
                       {formData.fields?.filter(field => field.fieldType === 'email').map((field, index) => (
@@ -1427,7 +1427,7 @@ export default function FormBuilder() {
                         </option>
                       ))}
                     </select>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs var(--color-text-muted) mt-1">
                       <strong>Purpose:</strong> Add the email address to your newsletter subscribers list
                     </p>
                     {formData.fields?.filter(field => field.fieldType === 'email').length === 0 && (
@@ -1455,9 +1455,9 @@ export default function FormBuilder() {
                         setFormData(rest);
                       }
                     }}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded var(--color-gray-light) var(--color-primary) focus:ring-[var(--color-primary)]"
                   />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium var(--color-text-primary)">
                     Send data to webhook URL
                   </span>
                 </label>
@@ -1468,7 +1468,7 @@ export default function FormBuilder() {
                       onChange={(e) => setFormData({...formData, webhookUrl: e.target.value})}
                       placeholder="https://api.example.com/webhook"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs var(--color-text-muted) mt-1">
                       Form data will be sent as JSON POST request
                     </p>
                   </div>
@@ -1488,17 +1488,17 @@ export default function FormBuilder() {
               {/* Toggle Contact Info Display */}
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900">Show Contact Information</h4>
-                  <p className="text-sm text-gray-500">Display contact details and social links with the form</p>
+                  <h4 className="text-sm font-medium var(--color-text-primary)">Show Contact Information</h4>
+                  <p className="text-sm var(--color-text-muted)">Display contact details and social links with the form</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleInputChange('showContactInfo', !formData.showContactInfo)}
-                  className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 cursor-pointer bg-gray-300"
+                  className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 cursor-pointer var(--color-gray-light)"
                   style={formData.showContactInfo ? { backgroundColor: getPrimaryColor() } : {}}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
+                    className={`inline-block h-4 w-4 transform rounded-full var(--color-bg-primary) transition-transform duration-300 ${
                       formData.showContactInfo ? 'translate-x-6' : 'translate-x-1'
                     }`}
                   />
@@ -1510,18 +1510,18 @@ export default function FormBuilder() {
                 <div className="space-y-4 border-t pt-4">
                   {/* Auto-populate button */}
                   {siteSettings && (siteSettings.companyPhone || siteSettings.companyEmail || siteSettings.companyAddress) && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="border rounded-lg p-4" style={{ backgroundColor: 'var(--color-info-light)', borderColor: 'var(--color-info-light)' }}>
                       <div className="flex items-center justify-between">
                         <div>
-                          <h5 className="text-sm font-medium text-blue-900">Auto-populate from Site Settings</h5>
-                          <p className="text-xs text-blue-700">Fill contact information automatically from your site settings</p>
+                          <h5 className="text-sm font-medium" style={{ color: 'var(--color-primary)' }}>Auto-populate from Site Settings</h5>
+                          <p className="text-xs" style={{ color: 'var(--color-primary)' }}>Fill contact information automatically from your site settings</p>
                         </div>
                       <Button
                           type="button"
                         variant="outline"
                         size="sm"
                           onClick={() => autoPopulateFromSiteSettings(false)}
-                          className="text-blue-600 border-blue-300 hover:bg-blue-100"
+                          style={{ color: 'var(--color-primary)', borderColor: 'var(--color-info-light)' }}
                       >
                           <Building2 className="w-4 h-4 mr-2" />
                           Auto-fill
@@ -1532,13 +1532,13 @@ export default function FormBuilder() {
 
                   {/* Contact Text Customization */}
                   <div className="space-y-4 border-b pb-4">
-                    <h5 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                    <h5 className="text-sm font-medium var(--color-text-primary) mb-3 flex items-center">
                       <Type className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                       Contact Section Text
                     </h5>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                           Section Heading
                         </label>
                         <Input
@@ -1548,7 +1548,7 @@ export default function FormBuilder() {
                         />
                   </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                           Section Description
                         </label>
                         <Input
@@ -1560,7 +1560,7 @@ export default function FormBuilder() {
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                           Phone Label
                         </label>
                         <Input
@@ -1570,7 +1570,7 @@ export default function FormBuilder() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                           Email Label
                         </label>
                         <Input
@@ -1580,7 +1580,7 @@ export default function FormBuilder() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                           Address Label
                         </label>
                         <Input
@@ -1590,7 +1590,7 @@ export default function FormBuilder() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                           Social Media Label
                         </label>
                         <Input
@@ -1603,7 +1603,7 @@ export default function FormBuilder() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                      <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                         <Phone className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                         Phone Number
                       </label>
@@ -1614,7 +1614,7 @@ export default function FormBuilder() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                      <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                         <Mail className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                         Email Address
                       </label>
@@ -1627,7 +1627,7 @@ export default function FormBuilder() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                    <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                       <MapPin className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                       Address
                     </label>
@@ -1640,10 +1640,10 @@ export default function FormBuilder() {
 
                   {/* Social Media Links */}
                   <div className="border-t pt-4">
-                    <h5 className="text-sm font-medium text-gray-900 mb-3">Social Media Links</h5>
+                    <h5 className="text-sm font-medium var(--color-text-primary) mb-3">Social Media Links</h5>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                           <Facebook className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                           Facebook
                         </label>
@@ -1654,7 +1654,7 @@ export default function FormBuilder() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                           <Twitter className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                           Twitter
                         </label>
@@ -1665,7 +1665,7 @@ export default function FormBuilder() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                           <Linkedin className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                           LinkedIn
                         </label>
@@ -1676,7 +1676,7 @@ export default function FormBuilder() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                           <Instagram className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                           Instagram
                         </label>
@@ -1687,7 +1687,7 @@ export default function FormBuilder() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                           <Youtube className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                           YouTube
                         </label>
@@ -1715,17 +1715,17 @@ export default function FormBuilder() {
               {/* Enable Captcha */}
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900">Enable Captcha</h4>
-                  <p className="text-sm text-gray-500">Add security verification to prevent spam submissions</p>
+                  <h4 className="text-sm font-medium var(--color-text-primary)">Enable Captcha</h4>
+                  <p className="text-sm var(--color-text-muted)">Add security verification to prevent spam submissions</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => handleInputChange('enableCaptcha', !formData.enableCaptcha)}
-                  className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 cursor-pointer bg-gray-300"
+                  className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 cursor-pointer var(--color-gray-light)"
                   style={formData.enableCaptcha ? { backgroundColor: getPrimaryColor() } : {}}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
+                    className={`inline-block h-4 w-4 transform rounded-full var(--color-bg-primary) transition-transform duration-300 ${
                       formData.enableCaptcha ? 'translate-x-6' : 'translate-x-1'
                     }`}
                   />
@@ -1737,7 +1737,7 @@ export default function FormBuilder() {
                 <div className="space-y-4 border-t pt-4">
                   {/* Captcha Type Selection */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium var(--color-text-primary) mb-2">
                       Captcha Type
                     </label>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -1751,8 +1751,8 @@ export default function FormBuilder() {
                           key={type.value}
                           className={`p-3 border-2 rounded-lg cursor-pointer transition-all text-center ${
                             formData.captchaType === type.value
-                              ? 'border-gray-200 hover:border-gray-300'
-                              : 'border-gray-200 hover:border-gray-300'
+                              ? 'var(--color-gray-light) hover:var(--color-gray-light)'
+                              : 'var(--color-gray-light) hover:var(--color-gray-light)'
                           }`}
                           style={formData.captchaType === type.value ? { 
                             borderColor: getPrimaryColor(), 
@@ -1766,8 +1766,8 @@ export default function FormBuilder() {
                             {type.icon === 'Target' && <Target className="w-6 h-6" style={{ color: getPrimaryColor() }} />}
                             {type.icon === 'Grid3X3' && <Grid3X3 className="w-6 h-6" style={{ color: getPrimaryColor() }} />}
                           </div>
-                          <p className="text-sm font-medium text-gray-900">{type.label}</p>
-                          <p className="text-xs text-gray-500">{type.description}</p>
+                          <p className="text-sm font-medium var(--color-text-primary)">{type.label}</p>
+                          <p className="text-xs var(--color-text-muted)">{type.description}</p>
                   </div>
                 ))}
               </div>
@@ -1775,7 +1775,7 @@ export default function FormBuilder() {
 
                   {/* Difficulty Level */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium var(--color-text-primary) mb-2">
                       Difficulty Level
                     </label>
                     <div className="grid grid-cols-3 gap-3">
@@ -1788,8 +1788,8 @@ export default function FormBuilder() {
                           key={level.value}
                           className={`p-3 border-2 rounded-lg cursor-pointer transition-all text-center ${
                             formData.captchaDifficulty === level.value
-                              ? 'border-gray-200 hover:border-gray-300'
-                              : 'border-gray-200 hover:border-gray-300'
+                              ? 'var(--color-gray-light) hover:var(--color-gray-light)'
+                              : 'var(--color-gray-light) hover:var(--color-gray-light)'
                           }`}
                           style={formData.captchaDifficulty === level.value ? { 
                             borderColor: getPrimaryColor(), 
@@ -1797,20 +1797,20 @@ export default function FormBuilder() {
                           } : {}}
                           onClick={() => handleInputChange('captchaDifficulty', level.value)}
                         >
-                          <p className="text-sm font-medium text-gray-900">{level.label}</p>
-                          <p className="text-xs text-gray-500">{level.description}</p>
+                          <p className="text-sm font-medium var(--color-text-primary)">{level.label}</p>
+                          <p className="text-xs var(--color-text-muted)">{level.description}</p>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* Captcha Preview/Info */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Current Configuration</h4>
-                    <div className="text-sm text-gray-600 space-y-1">
+                  <div className="var(--color-bg-secondary) rounded-lg p-4">
+                    <h4 className="text-sm font-medium var(--color-text-primary) mb-2">Current Configuration</h4>
+                    <div className="text-sm var(--color-text-secondary) space-y-1">
                       <p><strong>Type:</strong> {formData.captchaType || 'math'} captcha</p>
                       <p><strong>Difficulty:</strong> {formData.captchaDifficulty || 'medium'}</p>
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-xs var(--color-text-muted) mt-2">
                         The captcha will appear after form fields and must be completed before submission.
                       </p>
                     </div>
@@ -1861,7 +1861,7 @@ export default function FormBuilder() {
             <h3 className="text-lg font-medium mb-4">Form Details</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                   Internal Name
                 </label>
                 <Input
@@ -1871,7 +1871,7 @@ export default function FormBuilder() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                   Display Title
                 </label>
                 <Input
@@ -1881,7 +1881,7 @@ export default function FormBuilder() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                   Subheading (Optional)
                 </label>
                 <Input
@@ -1894,7 +1894,7 @@ export default function FormBuilder() {
 
             <div className="mt-4 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                   Success Message
                 </label>
                 <Input
@@ -1904,7 +1904,7 @@ export default function FormBuilder() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                   Error Message
                 </label>
                 <Input
@@ -1927,7 +1927,7 @@ export default function FormBuilder() {
             <div className="space-y-6">
                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                <div>
-                 <label className="block text-sm font-medium text-gray-700 mb-1">
+                 <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                    Button Text
                  </label>
                  <Input
@@ -1937,7 +1937,7 @@ export default function FormBuilder() {
                  />
                </div>
                <div>
-                 <label className="block text-sm font-medium text-gray-700 mb-1">
+                 <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                    Button Icon
                  </label>
                  <IconPicker
@@ -1948,7 +1948,7 @@ export default function FormBuilder() {
                  />
                </div>
                <div>
-                 <label className="block text-sm font-medium text-gray-700 mb-1">
+                 <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                    Loading Text
                  </label>
                  <Input
@@ -1961,7 +1961,7 @@ export default function FormBuilder() {
 
               {/* Button Style Selection with Previews */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-3">
+                <label className="block text-sm font-medium var(--color-text-primary) mb-3">
                   Button Style
                 </label>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -1975,8 +1975,8 @@ export default function FormBuilder() {
                       key={style.value}
                       className={`p-3 border-2 rounded-lg cursor-pointer transition-all ${
                         selectedForm.ctaStyle === style.value
-                          ? 'border-gray-200 hover:border-gray-300'
-                          : 'border-gray-200 hover:border-gray-300'
+                          ? 'var(--color-gray-light) hover:var(--color-gray-light)'
+                          : 'var(--color-gray-light) hover:var(--color-gray-light)'
                       }`}
                       style={selectedForm.ctaStyle === style.value ? { 
                         borderColor: getPrimaryColor(), 
@@ -1995,8 +1995,8 @@ export default function FormBuilder() {
                            icon={selectedForm.ctaIcon}
                          />
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{style.label}</p>
-                          <p className="text-xs text-gray-500">{style.description}</p>
+                          <p className="text-sm font-medium var(--color-text-primary)">{style.label}</p>
+                          <p className="text-xs var(--color-text-muted)">{style.description}</p>
                         </div>
                       </div>
                     </div>
@@ -2007,13 +2007,13 @@ export default function FormBuilder() {
               {/* Button Size and Width */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                     Button Size
                   </label>
                   <select
                     value={selectedForm.ctaSize || 'large'}
                     onChange={(e) => setSelectedForm({...selectedForm, ctaSize: e.target.value})}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-2 border var(--color-gray-light) rounded-md focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                   >
                     <option value="small">Small</option>
                     <option value="medium">Medium</option>
@@ -2021,13 +2021,13 @@ export default function FormBuilder() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                     Button Width
                   </label>
                   <select
                     value={selectedForm.ctaWidth || 'auto'}
                     onChange={(e) => setSelectedForm({...selectedForm, ctaWidth: e.target.value})}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-2 border var(--color-gray-light) rounded-md focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                   >
                     <option value="auto">Auto Width</option>
                     <option value="fixed">Fixed Width (256px)</option>
@@ -2038,7 +2038,7 @@ export default function FormBuilder() {
 
               {/* CTA Color Customization */}
               <div className="border-t pt-6">
-                <h4 className="text-base font-medium text-gray-900 mb-4">Color Customization</h4>
+                <h4 className="text-base font-medium var(--color-text-primary) mb-4">Color Customization</h4>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <ColorPicker
                     label="Background Color"
@@ -2061,8 +2061,8 @@ export default function FormBuilder() {
                 </div>
                 
                 {/* Hover Colors */}
-                <div className="mt-4 pt-4 border-t border-gray-100">
-                  <h5 className="text-sm font-medium text-gray-700 mb-3">Hover States</h5>
+                <div className="mt-4 pt-4 border-t " style={{ borderColor: 'var(--color-gray-light)' }}>
+                  <h5 className="text-sm font-medium var(--color-text-primary) mb-3">Hover States</h5>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <ColorPicker
                       label="Hover Background"
@@ -2082,8 +2082,8 @@ export default function FormBuilder() {
 
               {/* Live Preview */}
               <div className="border-t pt-6">
-                <h4 className="text-base font-medium text-gray-900 mb-3">Live Preview</h4>
-                <div className="p-4 bg-gray-50 rounded-lg">
+                <h4 className="text-base font-medium var(--color-text-primary) mb-3">Live Preview</h4>
+                <div className="p-4 var(--color-bg-secondary) rounded-lg">
                   <div className="flex justify-center">
                                          <ButtonStylePreview
                        style={selectedForm.ctaStyle || 'primary'}
@@ -2122,9 +2122,9 @@ export default function FormBuilder() {
                         setSelectedForm(rest);
                       }
                     }}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded var(--color-gray-light) var(--color-primary) focus:ring-[var(--color-primary)]"
                   />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium var(--color-text-primary)">
                     Redirect after successful submission
                         </span>
                 </label>
@@ -2145,9 +2145,9 @@ export default function FormBuilder() {
                     type="checkbox"
                     checked={selectedForm.emailNotification || false}
                     onChange={(e) => setSelectedForm({...selectedForm, emailNotification: e.target.checked})}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded var(--color-gray-light) var(--color-primary) focus:ring-[var(--color-primary)]"
                   />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium var(--color-text-primary)">
                     Send email notifications
                   </span>
                 </label>
@@ -2155,7 +2155,7 @@ export default function FormBuilder() {
                   <div className="mt-2 space-y-4">
                     {/* Static Email Recipients */}
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                         Static Email Recipients (comma-separated)
                       </label>
                       <Input
@@ -2163,14 +2163,14 @@ export default function FormBuilder() {
                         onChange={(e) => setSelectedForm({...selectedForm, emailRecipients: e.target.value})}
                         placeholder="admin@example.com, sales@example.com"
                       />
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs var(--color-text-muted) mt-1">
                         Enter email addresses separated by commas
                       </p>
                       </div>
 
                     {/* Email Recipients Configuration */}
                     <div className="border-t pt-4">
-                      <h5 className="text-sm font-medium text-gray-900 mb-4 flex items-center">
+                      <h5 className="text-sm font-medium var(--color-text-primary) mb-4 flex items-center">
                         <Mail className="w-4 h-4 mr-2" style={{ color: getPrimaryColor() }} />
                         Email Recipients
                       </h5>
@@ -2185,22 +2185,22 @@ export default function FormBuilder() {
                               type="checkbox"
                               checked={selectedForm.sendToSubmitterEmail || false}
                               onChange={(e) => setSelectedForm({...selectedForm, sendToSubmitterEmail: e.target.checked})}
-                              className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                              className="rounded var(--color-gray-light) var(--color-success) focus:ring-[var(--color-success)]"
                             />
-                            <span className="text-sm font-medium text-gray-700">
+                            <span className="text-sm font-medium var(--color-text-primary)">
                               ✅ Send confirmation email back to the person who submitted the form
                             </span>
                           </label>
                           
                           {selectedForm.sendToSubmitterEmail && (
                             <div className="ml-6">
-                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                              <label className="block text-sm font-medium var(--color-text-primary) mb-2">
                                 Submitter's Email Field
                               </label>
                               <select
                                 value={selectedForm.submitterEmailField || ''}
                                 onChange={(e) => setSelectedForm({...selectedForm, submitterEmailField: e.target.value})}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white"
+                                className="w-full px-3 py-2 border var(--color-gray-light) rounded-lg focus:ring-2 focus:ring-[var(--color-success)] focus:border-[var(--color-success)] var(--color-bg-primary)"
                               >
                                 <option value="">Select the field containing submitter's email...</option>
                                 {selectedForm.fields?.filter(field => field.fieldType === 'email').map((field, index) => (
@@ -2209,7 +2209,7 @@ export default function FormBuilder() {
                                   </option>
                                 ))}
                               </select>
-                              <p className="text-xs text-gray-500 mt-1">
+                              <p className="text-xs var(--color-text-muted) mt-1">
                                 <strong>Purpose:</strong> Send a "thank you" confirmation email to the person who filled out the form
                               </p>
                             </div>
@@ -2224,18 +2224,18 @@ export default function FormBuilder() {
               {/* Email Templates Configuration */}
               {selectedForm.emailNotification && (
                 <div className="border-t pt-6">
-                  <h4 className="text-base font-medium text-gray-900 mb-4 flex items-center">
+                  <h4 className="text-base font-medium var(--color-text-primary) mb-4 flex items-center">
                     <Type className="w-4 h-4 mr-2" style={{ color: getPrimaryColor() }} />
                     Email Templates
                   </h4>
                   
                   <div className="space-y-6">
                     {/* Admin Email Template */}
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <h5 className="text-sm font-medium text-gray-900 mb-3">Admin Notification Email</h5>
+                    <div className="var(--color-bg-secondary) rounded-lg p-4">
+                      <h5 className="text-sm font-medium var(--color-text-primary) mb-3">Admin Notification Email</h5>
               <div className="space-y-3">
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                             Subject Line
                           </label>
                           <Input
@@ -2245,23 +2245,23 @@ export default function FormBuilder() {
                           />
                         </div>
                         <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
+                          <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                             Email Template
                           </label>
                           <textarea
                             value={selectedForm.adminEmailTemplate || 'You have received a new form submission.\n\n{{FORM_DATA}}\n\nSubmitted at: {{SUBMITTED_AT}}'}
                             onChange={(e) => setSelectedForm({...selectedForm, adminEmailTemplate: e.target.value})}
                             rows={6}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                            className="w-full px-3 py-2 border var(--color-gray-light) rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] font-mono text-sm"
                             placeholder="Enter your email template..."
                           />
-                                                     <div className="mt-2 text-xs text-gray-500">
+                                                     <div className="mt-2 text-xs var(--color-text-muted)">
                              <p className="font-medium mb-1">Available variables:</p>
                              <div className="flex flex-wrap gap-2">
-                               <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">{'{{FORM_DATA}}'}</span>
-                               <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">{'{{SUBMITTED_AT}}'}</span>
-                               <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">{'{{FORM_NAME}}'}</span>
-                               <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded">{'{{SUBMITTER_EMAIL}}'}</span>
+                               <span className="px-2 py-1 var(--color-info-light) text-blue-800 rounded">{'{{FORM_DATA}}'}</span>
+                               <span className="px-2 py-1 var(--color-info-light) text-blue-800 rounded">{'{{SUBMITTED_AT}}'}</span>
+                               <span className="px-2 py-1 var(--color-info-light) text-blue-800 rounded">{'{{FORM_NAME}}'}</span>
+                               <span className="px-2 py-1 var(--color-info-light) text-blue-800 rounded">{'{{SUBMITTER_EMAIL}}'}</span>
                              </div>
                            </div>
                         </div>
@@ -2271,10 +2271,10 @@ export default function FormBuilder() {
                     {/* Submitter Confirmation Email Template */}
                     {selectedForm.sendToSubmitterEmail && (
                       <div className="bg-green-50 rounded-lg p-4">
-                        <h5 className="text-sm font-medium text-gray-900 mb-3">Submitter Confirmation Email</h5>
+                        <h5 className="text-sm font-medium var(--color-text-primary) mb-3">Submitter Confirmation Email</h5>
                         <div className="space-y-3">
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                               Subject Line
                             </label>
                             <Input
@@ -2284,17 +2284,17 @@ export default function FormBuilder() {
                             />
                           </div>
                           <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                            <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                               Email Template
                             </label>
                             <textarea
                               value={selectedForm.submitterEmailTemplate || 'Dear {{SUBMITTER_NAME}},\n\nThank you for contacting us! We have received your message and will get back to you soon.\n\nBest regards,\nThe Team'}
                               onChange={(e) => setSelectedForm({...selectedForm, submitterEmailTemplate: e.target.value})}
                               rows={6}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                              className="w-full px-3 py-2 border var(--color-gray-light) rounded-lg focus:ring-2 focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] font-mono text-sm"
                               placeholder="Enter your email template..."
                             />
-                                                         <div className="mt-2 text-xs text-gray-500">
+                                                         <div className="mt-2 text-xs var(--color-text-muted)">
                                <p className="font-medium mb-1">Available variables:</p>
                                <div className="flex flex-wrap gap-2">
                                  <span className="px-2 py-1 bg-green-100 text-green-800 rounded">{'{{SUBMITTER_NAME}}'}</span>
@@ -2311,8 +2311,8 @@ export default function FormBuilder() {
 
                     {/* Template Preview */}
                     <div className="border-t pt-4">
-                      <h5 className="text-sm font-medium text-gray-700 mb-2">Template Preview</h5>
-                      <div className="bg-white border border-gray-200 rounded-lg p-3 text-xs text-gray-600">
+                      <h5 className="text-sm font-medium var(--color-text-primary) mb-2">Template Preview</h5>
+                      <div className="var(--color-bg-primary) border var(--color-gray-light) rounded-lg p-3 text-xs var(--color-text-secondary)">
                         <p>Templates will be processed with actual form data when emails are sent.</p>
                                                  <p className="mt-1">Variables like {'{{FORM_DATA}}'} will be replaced with the actual submitted information.</p>
                       </div>
@@ -2328,21 +2328,21 @@ export default function FormBuilder() {
                     type="checkbox"
                     checked={selectedForm.newsletterAction || false}
                     onChange={(e) => setSelectedForm({...selectedForm, newsletterAction: e.target.checked})}
-                    className="rounded border-gray-300 text-green-600 focus:ring-green-500"
+                    className="rounded var(--color-gray-light) var(--color-success) focus:ring-[var(--color-success)]"
                   />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium var(--color-text-primary)">
                     Subscribe to newsletter
                   </span>
                 </label>
                 {selectedForm.newsletterAction && (
                   <div className="mt-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium var(--color-text-primary) mb-2">
                       Email Field for Newsletter
                     </label>
                     <select
                       value={selectedForm.newsletterEmailField || ''}
                       onChange={(e) => setSelectedForm({...selectedForm, newsletterEmailField: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white"
+                      className="w-full px-3 py-2 border var(--color-gray-light) rounded-lg focus:ring-2 focus:ring-[var(--color-success)] focus:border-[var(--color-success)] var(--color-bg-primary)"
                     >
                       <option value="">Select the email field...</option>
                       {selectedForm.fields?.filter(field => field.fieldType === 'email').map((field, index) => (
@@ -2351,7 +2351,7 @@ export default function FormBuilder() {
                         </option>
                       ))}
                     </select>
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs var(--color-text-muted) mt-1">
                       <strong>Purpose:</strong> Add the email address to your newsletter subscribers list
                     </p>
                     {selectedForm.fields?.filter(field => field.fieldType === 'email').length === 0 && (
@@ -2379,9 +2379,9 @@ export default function FormBuilder() {
                         setSelectedForm(rest);
                       }
                     }}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="rounded var(--color-gray-light) var(--color-primary) focus:ring-[var(--color-primary)]"
                   />
-                  <span className="text-sm font-medium text-gray-700">
+                  <span className="text-sm font-medium var(--color-text-primary)">
                     Send data to webhook URL
                         </span>
                 </label>
@@ -2392,7 +2392,7 @@ export default function FormBuilder() {
                       onChange={(e) => setSelectedForm({...selectedForm, webhookUrl: e.target.value})}
                       placeholder="https://api.example.com/webhook"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs var(--color-text-muted) mt-1">
                       Form data will be sent as JSON POST request
                     </p>
                       </div>
@@ -2412,17 +2412,17 @@ export default function FormBuilder() {
               {/* Enable Captcha */}
               <div className="flex items-center justify-between">
                       <div>
-                  <h4 className="text-sm font-medium text-gray-900">Enable Captcha</h4>
-                  <p className="text-sm text-gray-500">Add security verification to prevent spam submissions</p>
+                  <h4 className="text-sm font-medium var(--color-text-primary)">Enable Captcha</h4>
+                  <p className="text-sm var(--color-text-muted)">Add security verification to prevent spam submissions</p>
                       </div>
                 <button
                   type="button"
                   onClick={() => setSelectedForm({...selectedForm, enableCaptcha: !selectedForm.enableCaptcha})}
-                  className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 cursor-pointer bg-gray-300"
+                  className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 cursor-pointer var(--color-gray-light)"
                   style={selectedForm.enableCaptcha ? { backgroundColor: getPrimaryColor() } : {}}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
+                    className={`inline-block h-4 w-4 transform rounded-full var(--color-bg-primary) transition-transform duration-300 ${
                       selectedForm.enableCaptcha ? 'translate-x-6' : 'translate-x-1'
                     }`}
                   />
@@ -2434,7 +2434,7 @@ export default function FormBuilder() {
                 <div className="space-y-4 border-t pt-4">
                   {/* Captcha Type Selection */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium var(--color-text-primary) mb-2">
                       Captcha Type
                     </label>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -2448,8 +2448,8 @@ export default function FormBuilder() {
                           key={type.value}
                           className={`p-3 border-2 rounded-lg cursor-pointer transition-all text-center ${
                             selectedForm.captchaType === type.value
-                              ? 'border-gray-200 hover:border-gray-300'
-                              : 'border-gray-200 hover:border-gray-300'
+                              ? 'var(--color-gray-light) hover:var(--color-gray-light)'
+                              : 'var(--color-gray-light) hover:var(--color-gray-light)'
                           }`}
                           style={selectedForm.captchaType === type.value ? { 
                             borderColor: getPrimaryColor(), 
@@ -2463,8 +2463,8 @@ export default function FormBuilder() {
                             {type.icon === 'Target' && <Target className="w-6 h-6" style={{ color: getPrimaryColor() }} />}
                             {type.icon === 'Grid3X3' && <Grid3X3 className="w-6 h-6" style={{ color: getPrimaryColor() }} />}
                     </div>
-                          <p className="text-sm font-medium text-gray-900">{type.label}</p>
-                          <p className="text-xs text-gray-500">{type.description}</p>
+                          <p className="text-sm font-medium var(--color-text-primary)">{type.label}</p>
+                          <p className="text-xs var(--color-text-muted)">{type.description}</p>
                   </div>
                 ))}
                     </div>
@@ -2472,7 +2472,7 @@ export default function FormBuilder() {
 
                   {/* Difficulty Level */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium var(--color-text-primary) mb-2">
                       Difficulty Level
                     </label>
                     <div className="grid grid-cols-3 gap-3">
@@ -2485,8 +2485,8 @@ export default function FormBuilder() {
                           key={level.value}
                           className={`p-3 border-2 rounded-lg cursor-pointer transition-all text-center ${
                             selectedForm.captchaDifficulty === level.value
-                              ? 'border-gray-200 hover:border-gray-300'
-                              : 'border-gray-200 hover:border-gray-300'
+                              ? 'var(--color-gray-light) hover:var(--color-gray-light)'
+                              : 'var(--color-gray-light) hover:var(--color-gray-light)'
                           }`}
                           style={selectedForm.captchaDifficulty === level.value ? { 
                             borderColor: getPrimaryColor(), 
@@ -2494,20 +2494,20 @@ export default function FormBuilder() {
                           } : {}}
                           onClick={() => setSelectedForm({...selectedForm, captchaDifficulty: level.value})}
                         >
-                          <p className="text-sm font-medium text-gray-900">{level.label}</p>
-                          <p className="text-xs text-gray-500">{level.description}</p>
+                          <p className="text-sm font-medium var(--color-text-primary)">{level.label}</p>
+                          <p className="text-xs var(--color-text-muted)">{level.description}</p>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   {/* Captcha Preview/Info */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <h4 className="text-sm font-medium text-gray-700 mb-2">Current Configuration</h4>
-                    <div className="text-sm text-gray-600 space-y-1">
+                  <div className="var(--color-bg-secondary) rounded-lg p-4">
+                    <h4 className="text-sm font-medium var(--color-text-primary) mb-2">Current Configuration</h4>
+                    <div className="text-sm var(--color-text-secondary) space-y-1">
                       <p><strong>Type:</strong> {selectedForm.captchaType || 'math'} captcha</p>
                       <p><strong>Difficulty:</strong> {selectedForm.captchaDifficulty || 'medium'}</p>
-                      <p className="text-xs text-gray-500 mt-2">
+                      <p className="text-xs var(--color-text-muted) mt-2">
                         The captcha will appear after form fields and must be completed before submission.
                       </p>
                     </div>
@@ -2528,17 +2528,17 @@ export default function FormBuilder() {
               {/* Toggle Contact Info Display */}
               <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm font-medium text-gray-900">Show Contact Information</h4>
-                  <p className="text-sm text-gray-500">Display contact details and social links with the form</p>
+                  <h4 className="text-sm font-medium var(--color-text-primary)">Show Contact Information</h4>
+                  <p className="text-sm var(--color-text-muted)">Display contact details and social links with the form</p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setSelectedForm({...selectedForm, showContactInfo: !selectedForm.showContactInfo})}
-                  className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 cursor-pointer bg-gray-300"
+                  className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 cursor-pointer var(--color-gray-light)"
                   style={selectedForm.showContactInfo ? { backgroundColor: getPrimaryColor() } : {}}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
+                    className={`inline-block h-4 w-4 transform rounded-full var(--color-bg-primary) transition-transform duration-300 ${
                       selectedForm.showContactInfo ? 'translate-x-6' : 'translate-x-1'
                     }`}
                   />
@@ -2550,7 +2550,7 @@ export default function FormBuilder() {
                 <div className="space-y-4 border-t pt-4">
                   {/* Contact Position */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium var(--color-text-primary) mb-2">
                       Contact Information Position
                     </label>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -2564,8 +2564,8 @@ export default function FormBuilder() {
                           key={position.value}
                           className={`p-3 border-2 rounded-lg cursor-pointer transition-all text-center ${
                             selectedForm.contactPosition === position.value
-                              ? 'border-gray-200 hover:border-gray-300'
-                              : 'border-gray-200 hover:border-gray-300'
+                              ? 'var(--color-gray-light) hover:var(--color-gray-light)'
+                              : 'var(--color-gray-light) hover:var(--color-gray-light)'
                           }`}
                           style={selectedForm.contactPosition === position.value ? { 
                             borderColor: getPrimaryColor(), 
@@ -2573,8 +2573,8 @@ export default function FormBuilder() {
                           } : {}}
                           onClick={() => setSelectedForm({...selectedForm, contactPosition: position.value})}
                         >
-                          <div className="text-sm font-medium text-gray-900">{position.label}</div>
-                          <div className="text-xs text-gray-500 mt-1">{position.description}</div>
+                          <div className="text-sm font-medium var(--color-text-primary)">{position.label}</div>
+                          <div className="text-xs var(--color-text-muted) mt-1">{position.description}</div>
                         </div>
                       ))}
                     </div>
@@ -2582,18 +2582,18 @@ export default function FormBuilder() {
 
                   {/* Auto-populate button */}
                   {siteSettings && (siteSettings.companyPhone || siteSettings.companyEmail || siteSettings.companyAddress) && (
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <div className="var(--color-info-light) border border-blue-200 rounded-lg p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h5 className="text-sm font-medium text-blue-900">Auto-populate from Site Settings</h5>
-                          <p className="text-xs text-blue-700">Fill contact information automatically from your site settings</p>
+                          <h5 className="text-sm font-medium var(--color-primary)">Auto-populate from Site Settings</h5>
+                          <p className="text-xs var(--color-primary)">Fill contact information automatically from your site settings</p>
                         </div>
                       <Button
                           type="button"
                         variant="outline"
                         size="sm"
                           onClick={() => autoPopulateFromSiteSettings(true)}
-                          className="text-blue-600 border-blue-300 hover:bg-blue-100"
+                          className="var(--color-primary) border-blue-300 hover:var(--color-info-light)"
                       >
                           <Building2 className="w-4 h-4 mr-2" />
                           Auto-fill
@@ -2604,13 +2604,13 @@ export default function FormBuilder() {
                   
                   {/* Contact Text Customization */}
                   <div className="space-y-4 border-b pb-4">
-                    <h5 className="text-sm font-medium text-gray-900 mb-3 flex items-center">
+                    <h5 className="text-sm font-medium var(--color-text-primary) mb-3 flex items-center">
                       <Type className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                       Contact Section Text
                     </h5>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                           Section Heading
                         </label>
                         <Input
@@ -2620,7 +2620,7 @@ export default function FormBuilder() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                           Section Description
                         </label>
                         <Input
@@ -2632,7 +2632,7 @@ export default function FormBuilder() {
                     </div>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                           Phone Label
                         </label>
                         <Input
@@ -2642,7 +2642,7 @@ export default function FormBuilder() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                           Email Label
                         </label>
                         <Input
@@ -2652,7 +2652,7 @@ export default function FormBuilder() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                           Address Label
                         </label>
                         <Input
@@ -2662,7 +2662,7 @@ export default function FormBuilder() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                           Social Media Label
                         </label>
                         <Input
@@ -2676,7 +2676,7 @@ export default function FormBuilder() {
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                      <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                         <Phone className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                         Phone Number
                       </label>
@@ -2687,7 +2687,7 @@ export default function FormBuilder() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                      <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                         <Mail className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                         Email Address
                       </label>
@@ -2700,7 +2700,7 @@ export default function FormBuilder() {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                    <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                       <MapPin className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                       Address
                     </label>
@@ -2713,10 +2713,10 @@ export default function FormBuilder() {
 
                   {/* Social Media Links */}
                   <div className="border-t pt-4">
-                    <h5 className="text-sm font-medium text-gray-900 mb-3">Social Media Links</h5>
+                    <h5 className="text-sm font-medium var(--color-text-primary) mb-3">Social Media Links</h5>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                           <Facebook className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                           Facebook
                         </label>
@@ -2727,7 +2727,7 @@ export default function FormBuilder() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                           <Twitter className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                           Twitter
                         </label>
@@ -2738,7 +2738,7 @@ export default function FormBuilder() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                           <Linkedin className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                           LinkedIn
                         </label>
@@ -2749,7 +2749,7 @@ export default function FormBuilder() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                           <Instagram className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                           Instagram
                         </label>
@@ -2760,7 +2760,7 @@ export default function FormBuilder() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+                        <label className="block text-sm font-medium var(--color-text-primary) mb-1 flex items-center">
                           <Youtube className="h-4 w-4 mr-2" style={{ color: getPrimaryColor() }} />
                           YouTube
                         </label>
@@ -2793,19 +2793,19 @@ export default function FormBuilder() {
                   onChange={(color) => setSelectedForm({...selectedForm, sectionBackgroundColor: color})}
                   designSystemColors={getDesignSystemColors()}
                 />
-                <p className="text-xs text-gray-500 mt-1">
+                <p className="text-xs var(--color-text-muted) mt-1">
                   Background color for the entire form section
                 </p>
               </div>
               
               {/* Form Container Colors */}
               <div className="border-t pt-4">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Form Container</h4>
+                <h4 className="text-sm font-medium var(--color-text-primary) mb-3">Form Container</h4>
                 
                 {/* Show Border Toggle */}
                 <div className="mb-4">
                   <div className="flex items-center gap-3 mb-2">
-                    <h5 className="text-sm font-medium text-gray-900">Show Border</h5>
+                    <h5 className="text-sm font-medium var(--color-text-primary)">Show Border</h5>
                     <button
                       type="button"
                       onClick={() => {
@@ -2815,17 +2815,17 @@ export default function FormBuilder() {
                           formBorderColor: isCurrentlyNoBorder ? `${getPrimaryColor()}20` : 'transparent'
                         });
                       }}
-                      className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 cursor-pointer bg-gray-300"
+                      className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 cursor-pointer var(--color-gray-light)"
                       style={(selectedForm.formBorderColor !== 'transparent' && selectedForm.formBorderColor) ? { backgroundColor: getPrimaryColor() } : {}}
                     >
                       <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
+                        className={`inline-block h-4 w-4 transform rounded-full var(--color-bg-primary) transition-transform duration-300 ${
                           (selectedForm.formBorderColor !== 'transparent' && selectedForm.formBorderColor) ? 'translate-x-6' : 'translate-x-1'
                         }`}
                       />
                     </button>
                   </div>
-                  <p className="text-sm text-gray-500">Add a border around the form container</p>
+                  <p className="text-sm var(--color-text-muted)">Add a border around the form container</p>
                 </div>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -2854,7 +2854,7 @@ export default function FormBuilder() {
               
               {/* Form Fields Colors */}
               <div className="border-t pt-4">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Form Fields</h4>
+                <h4 className="text-sm font-medium var(--color-text-primary) mb-3">Form Fields</h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <ColorPicker
                     label="Background"
@@ -2893,13 +2893,13 @@ export default function FormBuilder() {
       {/* Field Editor Modal */}
       {showFieldEditor && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="var(--color-bg-primary) rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <h3 className="text-lg font-medium mb-4">Configure Field</h3>
             
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                   Field Label
                 </label>
                 <Input
@@ -2909,7 +2909,7 @@ export default function FormBuilder() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                   Field Name
                 </label>
                 <Input
@@ -2920,7 +2920,7 @@ export default function FormBuilder() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                   Placeholder
                 </label>
                 <Input
@@ -2930,7 +2930,7 @@ export default function FormBuilder() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium var(--color-text-primary) mb-1">
                   Help Text
                 </label>
                 <Input
@@ -2939,14 +2939,14 @@ export default function FormBuilder() {
                 />
               </div>
               
-              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+              <div className="flex items-center space-x-3 p-3 var(--color-bg-secondary) rounded-lg">
                 <div className="relative">
                 <input
                   type="checkbox"
                   id="required"
                   checked={fieldData.isRequired}
                   onChange={(e) => handleFieldInputChange('isRequired', e.target.checked)}
-                    className="h-4 w-4 border-2 border-gray-300 rounded bg-white checked:bg-blue-600 checked:border-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer relative"
+                    className="h-4 w-4 border-2 var(--color-gray-light) rounded var(--color-bg-primary) checked:bg-[var(--color-primary)] checked:border-[var(--color-primary)] focus:ring-2 focus:ring-[var(--color-primary)] focus:ring-offset-0 cursor-pointer relative"
                     style={{
                       appearance: 'none',
                       WebkitAppearance: 'none',
@@ -2967,7 +2967,7 @@ export default function FormBuilder() {
                     </svg>
                   )}
                 </div>
-                <label htmlFor="required" className="text-sm font-medium text-gray-700 cursor-pointer">
+                <label htmlFor="required" className="text-sm font-medium var(--color-text-primary) cursor-pointer">
                   Required field
                 </label>
               </div>
@@ -2975,7 +2975,7 @@ export default function FormBuilder() {
               {/* Options Management for Select and Radio Fields */}
               {(fieldData.fieldType === 'select' || fieldData.fieldType === 'radio') && (
                 <div className="border-t pt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium var(--color-text-primary) mb-2">
                     Options
                   </label>
                   
@@ -3013,7 +3013,7 @@ export default function FormBuilder() {
                   </div>
                   
                   {fieldOptions.length === 0 && (
-                    <p className="text-sm text-gray-500 italic">No options added yet</p>
+                    <p className="text-sm var(--color-text-muted) italic">No options added yet</p>
                   )}
                 </div>
               )}
@@ -3021,7 +3021,7 @@ export default function FormBuilder() {
               {/* Terms Content for Terms Field */}
               {fieldData.fieldType === 'terms' && (
                 <div className="border-t pt-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium var(--color-text-primary) mb-2">
                     Terms & Conditions Content
                   </label>
                   <textarea
@@ -3029,9 +3029,9 @@ export default function FormBuilder() {
                     onChange={(e) => setTermsContent(e.target.value)}
                     placeholder="Enter the full terms and conditions text that will be displayed in the modal..."
                     rows={6}
-                    className="w-full p-3 border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full p-3 border var(--color-gray-light) rounded-md resize-none focus:ring-2 focus:ring-[var(--color-primary)] focus:border-transparent"
                   />
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm var(--color-text-muted) mt-1">
                     This content will be displayed in a modal when users click "Read Terms"
                   </p>
                 </div>

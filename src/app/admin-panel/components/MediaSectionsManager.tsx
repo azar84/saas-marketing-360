@@ -1447,7 +1447,7 @@ const MediaSectionsManager: React.FC = () => {
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Media Alt Text
                   </label>
                   <input
@@ -1588,7 +1588,7 @@ const MediaSectionsManager: React.FC = () => {
                 {formData.showCtaButton && (
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                         Select CTA from Library
                       </label>
                                             <select
@@ -1616,13 +1616,13 @@ const MediaSectionsManager: React.FC = () => {
                           </option>
                         ))}
                       </select>
-                      <p className="text-xs text-gray-500 mt-1">
+                      <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                         Choose from existing CTAs or customize below
                       </p>
                     </div>
 
                     <div className="mt-2">
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                         The selected CTA will use the styling and configuration set in the CTA Manager.
                       </p>
                     </div>
@@ -1639,7 +1639,7 @@ const MediaSectionsManager: React.FC = () => {
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       Alignment
                     </label>
                     <select
@@ -1654,7 +1654,7 @@ const MediaSectionsManager: React.FC = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       Background Style
                     </label>
                     <select
@@ -1670,7 +1670,7 @@ const MediaSectionsManager: React.FC = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       Animation Type
                     </label>
                     <select
@@ -1688,7 +1688,7 @@ const MediaSectionsManager: React.FC = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       Container Width
                     </label>
                     <select
@@ -1725,7 +1725,7 @@ const MediaSectionsManager: React.FC = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       Padding Top (px)
                     </label>
                     <input
@@ -1739,7 +1739,7 @@ const MediaSectionsManager: React.FC = () => {
                   </div>
                   
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                       Padding Bottom (px)
                     </label>
                     <input
@@ -1753,27 +1753,7 @@ const MediaSectionsManager: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={formData.enableScrollAnimations}
-                      onChange={(e) => setFormData({ ...formData, enableScrollAnimations: e.target.checked })}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm font-medium text-gray-700">Enable Scroll Animations</span>
-                  </label>
-                  
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      checked={formData.isActive}
-                      onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                    />
-                    <span className="text-sm font-medium text-gray-700">Active</span>
-                  </label>
-                </div>
+
               </div>
 
               {/* Form Actions */}

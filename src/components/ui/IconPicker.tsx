@@ -285,7 +285,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
   return (
     <div className={`relative ${className}`}>
       {showLabel && (
-        <label className="block text-sm font-medium text-gray-700 mb-2">
+        <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
           {label}
         </label>
       )}
@@ -299,44 +299,47 @@ const IconPicker: React.FC<IconPickerProps> = ({
         <div className="flex items-center space-x-2">
           {selectedIcon ? (
             <>
-              <div className={`
-                ${(() => {
+              <div style={{
+                color: (() => {
                   switch (selectedIcon.category) {
-                    case 'actions': return 'text-blue-600';
-                    case 'arrows': return 'text-gray-600';
-                    case 'media': return 'text-purple-600';
-                    case 'communication': return 'text-green-600';
-                    case 'navigation': return 'text-indigo-600';
-                    case 'business': return 'text-emerald-600';
-                    case 'technology': return 'text-cyan-600';
-                    case 'social': return 'text-pink-600';
-                    case 'status': return 'text-orange-600';
-                    case 'time': return 'text-yellow-600';
-                    case 'files': return 'text-slate-600';
-                    case 'security': return 'text-red-600';
-                    case 'tools': return 'text-amber-600';
-                    case 'special': return 'text-violet-600';
-                    case 'weather': return 'text-sky-600';
-                    case 'design': return 'text-rose-600';
-                    case 'productivity': return 'text-lime-600';
-                    case 'gaming': return 'text-fuchsia-600';
-                    case 'health': return 'text-teal-600';
-                    case 'transport': return 'text-blue-500';
-                    case 'food': return 'text-orange-500';
-                    case 'development': return 'text-gray-700';
-                    default: return 'text-gray-600';
+                    case 'actions': return 'var(--color-primary, #5243E9)';
+                    case 'arrows': return 'var(--color-text-secondary, #6B7280)';
+                    case 'media': return 'var(--color-accent, #06B6D4)';
+                    case 'communication': return 'var(--color-success, #10B981)';
+                    case 'navigation': return 'var(--color-primary, #5243E9)';
+                    case 'business': return 'var(--color-success, #10B981)';
+                    case 'technology': return 'var(--color-accent, #06B6D4)';
+                    case 'social': return 'var(--color-accent, #06B6D4)';
+                    case 'status': return 'var(--color-warning, #F59E0B)';
+                    case 'time': return 'var(--color-warning, #F59E0B)';
+                    case 'files': return 'var(--color-text-secondary, #6B7280)';
+                    case 'security': return 'var(--color-error, #EF4444)';
+                    case 'tools': return 'var(--color-warning, #F59E0B)';
+                    case 'special': return 'var(--color-accent, #06B6D4)';
+                    case 'weather': return 'var(--color-accent, #06B6D4)';
+                    case 'design': return 'var(--color-accent, #06B6D4)';
+                    case 'productivity': return 'var(--color-success, #10B981)';
+                    case 'gaming': return 'var(--color-accent, #06B6D4)';
+                    case 'health': return 'var(--color-success, #10B981)';
+                    case 'transport': return 'var(--color-primary, #5243E9)';
+                    case 'food': return 'var(--color-warning, #F59E0B)';
+                    case 'development': return 'var(--color-text-primary, #1F2937)';
+                    default: return 'var(--color-text-secondary, #6B7280)';
                   }
-                })()}
-              `}>
+                })()
+              }}>
                 <selectedIcon.component className="w-4 h-4" />
               </div>
               <span className="font-medium">{selectedIcon.name}</span>
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded-full">
+              <span className="text-xs px-2 py-1 rounded-full" style={{
+                color: 'var(--color-text-muted, #9CA3AF)',
+                backgroundColor: 'var(--color-gray-light, #E5E7EB)'
+              }}>
                 {selectedIcon.category}
               </span>
             </>
           ) : (
-            <span className="text-gray-500">{placeholder}</span>
+            <span style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>{placeholder}</span>
           )}
         </div>
         {isOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -346,7 +349,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
         <Card className="absolute top-full left-0 right-0 z-50 mt-1 p-4 max-h-96 overflow-hidden shadow-lg border min-w-96">
           <div className="space-y-3 mb-4">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/4 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/4 w-4 h-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
               <Input
                 type="text"
                 placeholder="Search icons..."
@@ -359,7 +362,8 @@ const IconPicker: React.FC<IconPickerProps> = ({
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}
             >
               {categories.map(category => (
                 <option key={category} value={category}>
@@ -388,7 +392,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
                 {/* Recently Used Section */}
                 {recentlyUsedIcons.length > 0 && searchTerm === '' && selectedCategory === 'all' && (
                   <div>
-                    <h4 className="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">Recently Used</h4>
+                    <h4 className="text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Recently Used</h4>
                     <div className="grid grid-cols-8 gap-2 mb-4">
                       {recentlyUsedIcons.map((icon) => {
                         const IconComponent = icon!.component;
@@ -396,29 +400,29 @@ const IconPicker: React.FC<IconPickerProps> = ({
                         
                         const getIconColor = (category: string) => {
                           switch (category) {
-                            case 'actions': return 'text-blue-600';
-                            case 'arrows': return 'text-gray-600';
-                            case 'media': return 'text-purple-600';
-                            case 'communication': return 'text-green-600';
-                            case 'navigation': return 'text-indigo-600';
-                            case 'business': return 'text-emerald-600';
-                            case 'technology': return 'text-cyan-600';
-                            case 'social': return 'text-pink-600';
-                            case 'status': return 'text-orange-600';
-                            case 'time': return 'text-yellow-600';
-                            case 'files': return 'text-slate-600';
-                            case 'security': return 'text-red-600';
-                            case 'tools': return 'text-amber-600';
-                            case 'special': return 'text-violet-600';
-                            case 'weather': return 'text-sky-600';
-                            case 'design': return 'text-rose-600';
-                            case 'productivity': return 'text-lime-600';
-                            case 'gaming': return 'text-fuchsia-600';
-                            case 'health': return 'text-teal-600';
-                            case 'transport': return 'text-blue-500';
-                            case 'food': return 'text-orange-500';
-                            case 'development': return 'text-gray-700';
-                            default: return 'text-gray-600';
+                            case 'actions': return 'var(--color-primary, #5243E9)';
+                            case 'arrows': return 'var(--color-text-secondary, #6B7280)';
+                            case 'media': return 'var(--color-accent, #06B6D4)';
+                            case 'communication': return 'var(--color-success, #10B981)';
+                            case 'navigation': return 'var(--color-primary, #5243E9)';
+                            case 'business': return 'var(--color-success, #10B981)';
+                            case 'technology': return 'var(--color-accent, #06B6D4)';
+                            case 'social': return 'var(--color-accent, #06B6D4)';
+                            case 'status': return 'var(--color-warning, #F59E0B)';
+                            case 'time': return 'var(--color-warning, #F59E0B)';
+                            case 'files': return 'var(--color-text-secondary, #6B7280)';
+                            case 'security': return 'var(--color-error, #EF4444)';
+                            case 'tools': return 'var(--color-warning, #F59E0B)';
+                            case 'special': return 'var(--color-accent, #06B6D4)';
+                            case 'weather': return 'var(--color-accent, #06B6D4)';
+                            case 'design': return 'var(--color-accent, #06B6D4)';
+                            case 'productivity': return 'var(--color-success, #10B981)';
+                            case 'gaming': return 'var(--color-accent, #06B6D4)';
+                            case 'health': return 'var(--color-success, #10B981)';
+                            case 'transport': return 'var(--color-primary, #5243E9)';
+                            case 'food': return 'var(--color-warning, #F59E0B)';
+                            case 'development': return 'var(--color-text-primary, #1F2937)';
+                            default: return 'var(--color-text-secondary, #6B7280)';
                           }
                         };
                         
@@ -427,24 +431,25 @@ const IconPicker: React.FC<IconPickerProps> = ({
                             key={icon!.name}
                             type="button"
                             onClick={() => handleIconSelect(icon!.name)}
-                            className={`
-                              p-2 rounded-lg border-2 transition-all duration-200 hover:scale-105
-                              flex flex-col items-center justify-center space-y-1 group relative
-                              ${isSelected 
-                                ? 'border-blue-500 bg-blue-50 shadow-md' 
-                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:shadow-sm'
-                              }
-                            `}
+                            className="p-2 rounded-lg border-2 transition-all duration-200 hover:scale-105 flex flex-col items-center justify-center space-y-1 group relative"
+                            style={{
+                              borderColor: isSelected 
+                                ? 'var(--color-primary, #5243E9)' 
+                                : 'var(--color-gray-light, #E5E7EB)',
+                              backgroundColor: isSelected 
+                                ? 'var(--color-primary-light, #EEF2FF)' 
+                                : 'var(--color-bg-primary, #FFFFFF)'
+                            }}
                             title={`${icon!.name} (${icon!.category})`}
                           >
-                            <div className={`
-                              ${isSelected ? 'text-blue-600' : getIconColor(icon!.category)}
-                              transition-colors duration-200
-                            `}>
+                            <div style={{
+                              color: isSelected ? 'var(--color-primary, #5243E9)' : getIconColor(icon!.category),
+                              transition: 'colors 0.2s'
+                            }}>
                               <IconComponent className="w-4 h-4" />
                             </div>
                             {isSelected && (
-                              <div className="absolute top-1 right-1 w-2 h-2 bg-blue-600 rounded-full"></div>
+                              <div className="absolute top-1 right-1 w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-primary, #5243E9)' }}></div>
                             )}
                           </button>
                         );
@@ -455,7 +460,7 @@ const IconPicker: React.FC<IconPickerProps> = ({
 
                 {/* All Icons Section */}
                 <div>
-                  <h4 className="text-xs font-medium text-gray-500 mb-2 uppercase tracking-wide">
+                  <h4 className="text-xs font-medium mb-2 uppercase tracking-wide" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                     {selectedCategory === 'all' ? 'All Icons' : selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}
                   </h4>
                   <div className="grid grid-cols-8 gap-2">
@@ -466,29 +471,29 @@ const IconPicker: React.FC<IconPickerProps> = ({
                       // Color scheme based on category
                       const getIconColor = (category: string) => {
                         switch (category) {
-                          case 'actions': return 'text-blue-600';
-                          case 'arrows': return 'text-gray-600';
-                          case 'media': return 'text-purple-600';
-                          case 'communication': return 'text-green-600';
-                          case 'navigation': return 'text-indigo-600';
-                          case 'business': return 'text-emerald-600';
-                          case 'technology': return 'text-cyan-600';
-                          case 'social': return 'text-pink-600';
-                          case 'status': return 'text-orange-600';
-                          case 'time': return 'text-yellow-600';
-                          case 'files': return 'text-slate-600';
-                          case 'security': return 'text-red-600';
-                          case 'tools': return 'text-amber-600';
-                          case 'special': return 'text-violet-600';
-                          case 'weather': return 'text-sky-600';
-                          case 'design': return 'text-rose-600';
-                          case 'productivity': return 'text-lime-600';
-                          case 'gaming': return 'text-fuchsia-600';
-                          case 'health': return 'text-teal-600';
-                          case 'transport': return 'text-blue-500';
-                          case 'food': return 'text-orange-500';
-                          case 'development': return 'text-gray-700';
-                          default: return 'text-gray-600';
+                          case 'actions': return 'var(--color-primary, #5243E9)';
+                          case 'arrows': return 'var(--color-text-secondary, #6B7280)';
+                          case 'media': return 'var(--color-accent, #06B6D4)';
+                          case 'communication': return 'var(--color-success, #10B981)';
+                          case 'navigation': return 'var(--color-primary, #5243E9)';
+                          case 'business': return 'var(--color-success, #10B981)';
+                          case 'technology': return 'var(--color-accent, #06B6D4)';
+                          case 'social': return 'var(--color-accent, #06B6D4)';
+                          case 'status': return 'var(--color-warning, #F59E0B)';
+                          case 'time': return 'var(--color-warning, #F59E0B)';
+                          case 'files': return 'var(--color-text-secondary, #6B7280)';
+                          case 'security': return 'var(--color-error, #EF4444)';
+                          case 'tools': return 'var(--color-warning, #F59E0B)';
+                          case 'special': return 'var(--color-accent, #06B6D4)';
+                          case 'weather': return 'var(--color-accent, #06B6D4)';
+                          case 'design': return 'var(--color-accent, #06B6D4)';
+                          case 'productivity': return 'var(--color-success, #10B981)';
+                          case 'gaming': return 'var(--color-accent, #06B6D4)';
+                          case 'health': return 'var(--color-success, #10B981)';
+                          case 'transport': return 'var(--color-primary, #5243E9)';
+                          case 'food': return 'var(--color-warning, #F59E0B)';
+                          case 'development': return 'var(--color-text-primary, #1F2937)';
+                          default: return 'var(--color-text-secondary, #6B7280)';
                         }
                       };
                       
@@ -497,28 +502,29 @@ const IconPicker: React.FC<IconPickerProps> = ({
                           key={icon.name}
                           type="button"
                           onClick={() => handleIconSelect(icon.name)}
-                          className={`
-                            p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105
-                            flex flex-col items-center justify-center space-y-2 group relative
-                            ${isSelected 
-                              ? 'border-blue-500 bg-blue-50 shadow-md' 
-                              : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50 hover:shadow-sm'
-                            }
-                          `}
+                          className="p-3 rounded-lg border-2 transition-all duration-200 hover:scale-105 flex flex-col items-center justify-center space-y-2 group relative"
+                          style={{
+                            borderColor: isSelected 
+                              ? 'var(--color-primary, #5243E9)' 
+                              : 'var(--color-gray-light, #E5E7EB)',
+                            backgroundColor: isSelected 
+                              ? 'var(--color-primary-light, #EEF2FF)' 
+                              : 'var(--color-bg-primary, #FFFFFF)'
+                          }}
                           title={`${icon.name} (${icon.category})`}
                         >
-                          <div className={`
-                            ${isSelected ? 'text-blue-600' : getIconColor(icon.category)}
-                            transition-colors duration-200
-                          `}>
+                          <div style={{
+                            color: isSelected ? 'var(--color-primary, #5243E9)' : getIconColor(icon.category),
+                            transition: 'colors 0.2s'
+                          }}>
                             <IconComponent className="w-5 h-5" />
                           </div>
-                          <span className="text-xs text-center leading-tight max-w-full truncate font-medium">
+                          <span className="text-xs text-center leading-tight max-w-full truncate font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                             {icon.name}
                           </span>
                           {isSelected && (
-                            <div className="absolute top-1 right-1 w-3 h-3 bg-blue-600 rounded-full flex items-center justify-center">
-                              <Check className="w-2 h-2 text-white" />
+                            <div className="absolute top-1 right-1 w-3 h-3 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary, #5243E9)' }}>
+                              <Check className="w-2 h-2" style={{ color: 'var(--color-bg-primary, #FFFFFF)' }} />
                             </div>
                           )}
                         </button>
@@ -528,15 +534,18 @@ const IconPicker: React.FC<IconPickerProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="text-center py-8 text-gray-500">
-                <Search className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              <div className="text-center py-8" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+                <Search className="w-8 h-8 mx-auto mb-2 opacity-50" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
                 <p>No icons found</p>
                 <p className="text-sm">Try a different search term or category</p>
               </div>
             )}
           </div>
 
-          <div className="mt-4 pt-3 border-t border-gray-200 text-xs text-gray-500 text-center">
+          <div className="mt-4 pt-3 border-t text-xs text-center" style={{
+            borderColor: 'var(--color-gray-light, #E5E7EB)',
+            color: 'var(--color-text-muted, #9CA3AF)'
+          }}>
             {filteredIcons.length} of {iconLibrary.length} icons
           </div>
         </Card>

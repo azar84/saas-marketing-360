@@ -47,7 +47,7 @@ const FeaturesManagement: React.FC = () => {
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b border-gray-200 mb-8">
+      <div className="border-b" style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
         <nav className="-mb-px flex space-x-8">
           {tabs.map((tab) => {
             const Icon = tab.icon;
@@ -57,17 +57,25 @@ const FeaturesManagement: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap transition-colors duration-200`}
+                className="group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors"
                 style={{
-                  borderColor: isActive ? 'var(--color-primary, #5243E9)' : 'transparent',
-                  color: isActive ? 'var(--color-primary, #5243E9)' : 'var(--color-text-muted, #9CA3AF)',
-                  borderBottomColor: isActive ? 'var(--color-primary, #5243E9)' : 'transparent'
+                  borderColor: isActive 
+                    ? 'var(--color-primary, #5243E9)' 
+                    : 'transparent',
+                  color: isActive 
+                    ? 'var(--color-primary, #5243E9)' 
+                    : 'var(--color-text-secondary, #6B7280)'
                 }}
               >
-                <Icon className="mr-2 h-5 w-5" style={{ 
-                  color: isActive ? 'var(--color-primary, #5243E9)' : 'var(--color-text-muted, #9CA3AF)' 
-                }} />
-                <span>{tab.name}</span>
+                <Icon
+                  className="mr-2 h-5 w-5 transition-colors"
+                  style={{
+                    color: isActive 
+                      ? 'var(--color-primary, #5243E9)' 
+                      : 'var(--color-text-secondary, #6B7280)'
+                  }}
+                />
+                {tab.name}
               </button>
             );
           })}

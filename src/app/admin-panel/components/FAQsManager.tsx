@@ -164,7 +164,7 @@ export default function FAQsManager() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-gray-600">Loading FAQs...</div>
+        <div style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Loading FAQs...</div>
       </div>
     );
   }
@@ -173,8 +173,8 @@ export default function FAQsManager() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Frequently Asked Questions</h2>
-          <p className="text-gray-600">Manage your FAQ content and organize by categories</p>
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Frequently Asked Questions</h2>
+          <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Manage your FAQ content and organize by categories</p>
         </div>
         <Button
           onClick={() => setShowCreateForm(true)}
@@ -189,7 +189,7 @@ export default function FAQsManager() {
       <Card className="p-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="relative">
-            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/4 text-gray-400" />
+            <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
             <Input
               type="text"
               placeholder="Search FAQs..."
@@ -202,7 +202,8 @@ export default function FAQsManager() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-md"
+              className="w-full p-2 border rounded-md"
+              style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}
             >
               <option value="">All Categories</option>
               <option value="uncategorized">Uncategorized</option>
@@ -235,13 +236,14 @@ export default function FAQsManager() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Category
                 </label>
                 <select
                   value={formData.categoryId}
                   onChange={(e) => handleInputChange('categoryId', e.target.value)}
-                  className="w-full p-2 border border-gray-300 rounded-md"
+                  className="w-full p-2 border rounded-md"
+                  style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}
                 >
                   <option value="">No Category</option>
                   {categories.map(category => (
@@ -253,7 +255,7 @@ export default function FAQsManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Sort Order
                 </label>
                 <Input
@@ -266,7 +268,7 @@ export default function FAQsManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Question *
               </label>
               <Input
@@ -279,7 +281,7 @@ export default function FAQsManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Answer *
               </label>
               <textarea
@@ -288,8 +290,31 @@ export default function FAQsManager() {
                 placeholder="Enter the answer to this question"
                 required
                 rows={6}
-                className="w-full p-3 border border-gray-300 rounded-md resize-vertical"
+                className="w-full p-3 border rounded-md resize-vertical"
+                style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}
               />
+              <style jsx>{`
+                textarea::placeholder {
+                  color: var(--color-text-muted, #9CA3AF) !important;
+                  opacity: 1;
+                }
+                textarea::-webkit-input-placeholder {
+                  color: var(--color-text-muted, #9CA3AF) !important;
+                  opacity: 1;
+                }
+                textarea::-moz-placeholder {
+                  color: var(--color-text-muted, #9CA3AF) !important;
+                  opacity: 1;
+                }
+                textarea:-ms-input-placeholder {
+                  color: var(--color-text-muted, #9CA3AF) !important;
+                  opacity: 1;
+                }
+                textarea:-moz-placeholder {
+                  color: var(--color-text-muted, #9CA3AF) !important;
+                  opacity: 1;
+                }
+              `}</style>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -300,7 +325,7 @@ export default function FAQsManager() {
                 onChange={(e) => handleInputChange('isActive', e.target.checked)}
                 className="rounded"
               />
-              <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
+              <label htmlFor="isActive" className="text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Active
               </label>
             </div>
@@ -337,19 +362,22 @@ export default function FAQsManager() {
                       {faq.category.name}
                     </div>
                   )}
-                  <span className="text-xs text-gray-500">Order: {faq.sortOrder}</span>
-                  <div className={`px-2 py-1 rounded-full text-xs ${
-                    faq.isActive 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
+                  <span className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Order: {faq.sortOrder}</span>
+                  <div className="px-2 py-1 rounded-full text-xs" style={{
+                    backgroundColor: faq.isActive 
+                      ? 'var(--color-success-light, #D1FAE5)' 
+                      : 'var(--color-gray-light, #E5E7EB)',
+                    color: faq.isActive 
+                      ? 'var(--color-success-dark, #065F46)' 
+                      : 'var(--color-text-secondary, #6B7280)'
+                  }}>
                     {faq.isActive ? 'Active' : 'Inactive'}
                   </div>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   {faq.question}
                 </h3>
-                <p className="text-gray-600 leading-relaxed">
+                <p className="leading-relaxed" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                   {faq.answer}
                 </p>
               </div>
@@ -365,7 +393,7 @@ export default function FAQsManager() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleDelete(faq.id)}
-                  className="text-red-600 hover:text-red-700"
+                  style={{ color: 'var(--color-error, #EF4444)' }}
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -377,11 +405,11 @@ export default function FAQsManager() {
 
       {filteredFaqs.length === 0 && (
         <div className="text-center py-12">
-          <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">
+          <MessageSquare className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
+          <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
             {searchTerm || selectedCategory ? 'No FAQs Found' : 'No FAQs Yet'}
           </h3>
-          <p className="text-gray-600 mb-4">
+          <p className="mb-4" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
             {searchTerm || selectedCategory 
               ? 'Try adjusting your search or filter criteria.'
               : 'Create your first FAQ to get started.'

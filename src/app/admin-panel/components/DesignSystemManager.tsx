@@ -106,7 +106,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, descr
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
+      <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
         {label}
       </label>
       <div className="flex items-center gap-2">
@@ -140,7 +140,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, descr
         </Button>
       </div>
       {description && (
-        <p className="text-xs text-gray-500">{description}</p>
+        <p className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>{description}</p>
       )}
     </div>
   );
@@ -334,11 +334,11 @@ const DesignSystemManager: React.FC = () => {
     return (
       <div className="p-8">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+          <div className="h-8 rounded w-1/3 mb-6" style={{ backgroundColor: 'var(--color-gray-light, #E5E7EB)' }}></div>
           <div className="space-y-4">
-            <div className="h-32 bg-gray-200 rounded"></div>
-            <div className="h-32 bg-gray-200 rounded"></div>
-            <div className="h-32 bg-gray-200 rounded"></div>
+            <div className="h-32 rounded" style={{ backgroundColor: 'var(--color-gray-light, #E5E7EB)' }}></div>
+            <div className="h-32 rounded" style={{ backgroundColor: 'var(--color-gray-light, #E5E7EB)' }}></div>
+            <div className="h-32 rounded" style={{ backgroundColor: 'var(--color-gray-light, #E5E7EB)' }}></div>
           </div>
         </div>
       </div>
@@ -349,8 +349,8 @@ const DesignSystemManager: React.FC = () => {
     return (
       <div className="p-8">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Design System Not Found</h2>
-          <p className="text-gray-600 mb-6">Unable to load the design system settings.</p>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Design System Not Found</h2>
+          <p className="mb-6" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Unable to load the design system settings.</p>
           <Button onClick={fetchDesignSystem}>
             Retry
           </Button>
@@ -373,8 +373,8 @@ const DesignSystemManager: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Design System</h1>
-          <p className="text-gray-600 mt-2">Manage your website's visual identity and design tokens</p>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Design System</h1>
+          <p className="mt-2" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Manage your website's visual identity and design tokens</p>
         </div>
         <div className="flex items-center space-x-3">
           <Button
@@ -397,7 +397,8 @@ const DesignSystemManager: React.FC = () => {
           <Button
             onClick={handleSave}
             disabled={saving}
-            className="bg-emerald-600 hover:bg-emerald-700 text-white flex items-center space-x-2"
+            className="flex items-center space-x-2"
+            style={{ backgroundColor: 'var(--color-success, #10B981)', color: 'var(--color-bg-primary, #FFFFFF)' }}
           >
             <Save className="w-4 h-4" />
             <span>{saving ? 'Saving...' : 'Save Changes'}</span>
@@ -407,32 +408,41 @@ const DesignSystemManager: React.FC = () => {
 
       {/* Status Message */}
       {message && (
-        <div className={`p-4 rounded-lg ${
-          message.type === 'success' 
-            ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' 
-            : 'bg-red-50 text-red-800 border border-red-200'
-        }`}>
+        <div className={`p-4 rounded-lg`} style={{
+          backgroundColor: message.type === 'success' ? 'var(--color-success-light, #D1FAE5)' : 'var(--color-error-light, #FEE2E2)',
+          color: message.type === 'success' ? 'var(--color-success-dark, #065F46)' : 'var(--color-error-dark, #991B1B)',
+          borderColor: message.type === 'success' ? 'var(--color-success, #10B981)' : 'var(--color-error, #EF4444)'
+        }}>
           {message.text}
         </div>
       )}
 
       {/* Tabs */}
-      <div className="border-b border-gray-200">
+      <div className="border-b" style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
         <nav className="-mb-px flex space-x-8">
           {tabs.map((tab) => {
             const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
             return (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center space-x-2 ${
-                  activeTab === tab.id
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
+                className="group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                style={{
+                  borderColor: isActive 
+                    ? 'var(--color-primary, #5243E9)' 
+                    : 'transparent',
+                  color: isActive 
+                    ? 'var(--color-primary, #5243E9)' 
+                    : 'var(--color-text-secondary, #6B7280)'
+                }}
               >
-                <Icon className="w-4 h-4" />
-                <span>{tab.name}</span>
+                <Icon className="w-4 h-4 mr-2" style={{
+                  color: isActive 
+                    ? 'var(--color-primary, #5243E9)' 
+                    : 'var(--color-text-secondary, #6B7280)'
+                }} />
+                {tab.name}
               </button>
             );
           })}
@@ -445,7 +455,7 @@ const DesignSystemManager: React.FC = () => {
           <div className="space-y-8">
             {/* Brand Colors */}
             <Card className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+              <h3 className="text-xl font-semibold mb-6 flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 <Palette className="w-5 h-5 mr-2" />
                 Brand Colors
               </h3>
@@ -485,7 +495,7 @@ const DesignSystemManager: React.FC = () => {
 
             {/* Semantic Colors */}
             <Card className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Semantic Colors
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -518,7 +528,7 @@ const DesignSystemManager: React.FC = () => {
 
             {/* Neutral Colors */}
             <Card className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Neutral & Background Colors
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -563,7 +573,7 @@ const DesignSystemManager: React.FC = () => {
 
             {/* Text Colors */}
             <Card className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Text Colors
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -594,13 +604,13 @@ const DesignSystemManager: React.FC = () => {
           <div className="space-y-8">
             {/* Font Families */}
             <Card className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+              <h3 className="text-xl font-semibold mb-6 flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 <Type className="w-5 h-5 mr-2" />
                 Font Families
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Primary Font Family
                   </label>
                   <Input
@@ -609,10 +619,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="Manrope, Inter, system-ui"
                     className="font-mono"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Used for headings and body text</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Used for headings and body text</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Monospace Font Family
                   </label>
                   <Input
@@ -621,19 +631,19 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="ui-monospace, SF Mono, Monaco"
                     className="font-mono"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Used for code and technical content</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Used for code and technical content</p>
                 </div>
               </div>
             </Card>
 
             {/* Font Sizes & Weights */}
             <Card className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Font Sizes & Weights
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Base Font Size
                   </label>
                   <Input
@@ -642,10 +652,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="16px"
                     className="font-mono"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Base font size for body text</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Base font size for body text</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Base Line Height
                   </label>
                   <Input
@@ -654,10 +664,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="1.5"
                     className="font-mono"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Line height ratio for readability</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Line height ratio for readability</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Normal Weight
                   </label>
                   <Input
@@ -666,10 +676,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="400"
                     className="font-mono"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Regular text weight</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Regular text weight</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Medium Weight
                   </label>
                   <Input
@@ -678,10 +688,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="500"
                     className="font-mono"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Semi-bold text weight</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Semi-bold text weight</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Bold Weight
                   </label>
                   <Input
@@ -690,14 +700,14 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="700"
                     className="font-mono"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Bold text weight</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Bold text weight</p>
                 </div>
               </div>
             </Card>
 
             {/* Typography Preview */}
             <Card className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Typography Preview
               </h3>
               <div className="space-y-4" style={{ fontFamily: designSystem.fontFamily }}>
@@ -738,8 +748,11 @@ const DesignSystemManager: React.FC = () => {
                 </div>
                 <div>
                   <code 
-                    className="px-2 py-1 bg-gray-100 rounded text-sm"
-                    style={{ fontFamily: designSystem.fontFamilyMono }}
+                    className="px-2 py-1 rounded text-sm"
+                    style={{ 
+                      fontFamily: designSystem.fontFamilyMono,
+                      backgroundColor: 'var(--color-bg-secondary, #F9FAFB)'
+                    }}
                   >
                     Monospace text - for code snippets
                   </code>
@@ -753,13 +766,13 @@ const DesignSystemManager: React.FC = () => {
           <div className="space-y-8">
             {/* Spacing Scale */}
             <Card className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+              <h3 className="text-xl font-semibold mb-6 flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 <Ruler className="w-5 h-5 mr-2" />
                 Spacing Scale
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Extra Small (XS)
                   </label>
                   <Input
@@ -768,10 +781,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="4px"
                     className="font-mono"
                   />
-                  <div className="mt-2 h-2 bg-blue-200 rounded" style={{ width: designSystem.spacingXs }}></div>
+                  <div className="mt-2 h-2 rounded" style={{ width: designSystem.spacingXs, backgroundColor: 'var(--color-info-light, #DBEAFE)' }}></div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Small (SM)
                   </label>
                   <Input
@@ -780,10 +793,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="8px"
                     className="font-mono"
                   />
-                  <div className="mt-2 h-2 bg-blue-200 rounded" style={{ width: designSystem.spacingSm }}></div>
+                  <div className="mt-2 h-2 rounded" style={{ width: designSystem.spacingSm, backgroundColor: 'var(--color-info-light, #DBEAFE)' }}></div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Medium (MD)
                   </label>
                   <Input
@@ -792,10 +805,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="16px"
                     className="font-mono"
                   />
-                  <div className="mt-2 h-2 bg-blue-200 rounded" style={{ width: designSystem.spacingMd }}></div>
+                  <div className="mt-2 h-2 rounded" style={{ width: designSystem.spacingMd, backgroundColor: 'var(--color-info-light, #DBEAFE)' }}></div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Large (LG)
                   </label>
                   <Input
@@ -804,10 +817,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="24px"
                     className="font-mono"
                   />
-                  <div className="mt-2 h-2 bg-blue-200 rounded" style={{ width: designSystem.spacingLg }}></div>
+                  <div className="mt-2 h-2 rounded" style={{ width: designSystem.spacingLg, backgroundColor: 'var(--color-info-light, #DBEAFE)' }}></div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Extra Large (XL)
                   </label>
                   <Input
@@ -816,10 +829,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="32px"
                     className="font-mono"
                   />
-                  <div className="mt-2 h-2 bg-blue-200 rounded" style={{ width: designSystem.spacingXl }}></div>
+                  <div className="mt-2 h-2 rounded" style={{ width: designSystem.spacingXl, backgroundColor: 'var(--color-info-light, #DBEAFE)' }}></div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     2X Large (2XL)
                   </label>
                   <Input
@@ -828,19 +841,19 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="48px"
                     className="font-mono"
                   />
-                  <div className="mt-2 h-2 bg-blue-200 rounded" style={{ width: designSystem.spacing2xl }}></div>
+                  <div className="mt-2 h-2 rounded" style={{ width: designSystem.spacing2xl, backgroundColor: 'var(--color-info-light, #DBEAFE)' }}></div>
                 </div>
               </div>
             </Card>
 
             {/* Border Radius */}
             <Card className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Border Radius
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Small Radius
                   </label>
                   <Input
@@ -850,12 +863,15 @@ const DesignSystemManager: React.FC = () => {
                     className="font-mono"
                   />
                   <div 
-                    className="mt-2 w-16 h-16 bg-blue-200" 
-                    style={{ borderRadius: designSystem.borderRadiusSm }}
+                    className="mt-2 w-16 h-16" 
+                    style={{ 
+                      borderRadius: designSystem.borderRadiusSm,
+                      backgroundColor: 'var(--color-info-light, #DBEAFE)'
+                    }}
                   ></div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Medium Radius
                   </label>
                   <Input
@@ -865,12 +881,15 @@ const DesignSystemManager: React.FC = () => {
                     className="font-mono"
                   />
                   <div 
-                    className="mt-2 w-16 h-16 bg-blue-200" 
-                    style={{ borderRadius: designSystem.borderRadiusMd }}
+                    className="mt-2 w-16 h-16" 
+                    style={{ 
+                      borderRadius: designSystem.borderRadiusMd,
+                      backgroundColor: 'var(--color-info-light, #DBEAFE)'
+                    }}
                   ></div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Large Radius
                   </label>
                   <Input
@@ -880,12 +899,15 @@ const DesignSystemManager: React.FC = () => {
                     className="font-mono"
                   />
                   <div 
-                    className="mt-2 w-16 h-16 bg-blue-200" 
-                    style={{ borderRadius: designSystem.borderRadiusLg }}
+                    className="mt-2 w-16 h-16" 
+                    style={{ 
+                      borderRadius: designSystem.borderRadiusLg,
+                      backgroundColor: 'var(--color-info-light, #DBEAFE)'
+                    }}
                   ></div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Extra Large Radius
                   </label>
                   <Input
@@ -895,12 +917,15 @@ const DesignSystemManager: React.FC = () => {
                     className="font-mono"
                   />
                   <div 
-                    className="mt-2 w-16 h-16 bg-blue-200" 
-                    style={{ borderRadius: designSystem.borderRadiusXl }}
+                    className="mt-2 w-16 h-16" 
+                    style={{ 
+                      borderRadius: designSystem.borderRadiusXl,
+                      backgroundColor: 'var(--color-info-light, #DBEAFE)'
+                    }}
                   ></div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Full Radius (Pills)
                   </label>
                   <Input
@@ -910,8 +935,11 @@ const DesignSystemManager: React.FC = () => {
                     className="font-mono"
                   />
                   <div 
-                    className="mt-2 w-24 h-16 bg-blue-200" 
-                    style={{ borderRadius: designSystem.borderRadiusFull }}
+                    className="mt-2 w-24 h-16" 
+                    style={{ 
+                      borderRadius: designSystem.borderRadiusFull,
+                      backgroundColor: 'var(--color-info-light, #DBEAFE)'
+                    }}
                   ></div>
                 </div>
               </div>
@@ -923,13 +951,13 @@ const DesignSystemManager: React.FC = () => {
           <div className="space-y-8">
             {/* Shadows */}
             <Card className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+              <h3 className="text-xl font-semibold mb-6 flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 <Zap className="w-5 h-5 mr-2" />
                 Box Shadows
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Small Shadow
                   </label>
                   <Input
@@ -939,12 +967,15 @@ const DesignSystemManager: React.FC = () => {
                     className="font-mono text-sm"
                   />
                   <div 
-                    className="mt-2 w-24 h-16 bg-white rounded-lg" 
-                    style={{ boxShadow: designSystem.shadowSm }}
+                    className="mt-2 w-24 h-16 rounded-lg" 
+                    style={{ 
+                      boxShadow: designSystem.shadowSm,
+                      backgroundColor: 'var(--color-bg-primary, #FFFFFF)'
+                    }}
                   ></div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Medium Shadow
                   </label>
                   <Input
@@ -954,12 +985,15 @@ const DesignSystemManager: React.FC = () => {
                     className="font-mono text-sm"
                   />
                   <div 
-                    className="mt-2 w-24 h-16 bg-white rounded-lg" 
-                    style={{ boxShadow: designSystem.shadowMd }}
+                    className="mt-2 w-24 h-16 rounded-lg" 
+                    style={{ 
+                      boxShadow: designSystem.shadowMd,
+                      backgroundColor: 'var(--color-bg-primary, #FFFFFF)'
+                    }}
                   ></div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Large Shadow
                   </label>
                   <Input
@@ -969,12 +1003,15 @@ const DesignSystemManager: React.FC = () => {
                     className="font-mono text-sm"
                   />
                   <div 
-                    className="mt-2 w-24 h-16 bg-white rounded-lg" 
-                    style={{ boxShadow: designSystem.shadowLg }}
+                    className="mt-2 w-24 h-16 rounded-lg" 
+                    style={{ 
+                      boxShadow: designSystem.shadowLg,
+                      backgroundColor: 'var(--color-bg-primary, #FFFFFF)'
+                    }}
                   ></div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Extra Large Shadow
                   </label>
                   <Input
@@ -984,8 +1021,11 @@ const DesignSystemManager: React.FC = () => {
                     className="font-mono text-sm"
                   />
                   <div 
-                    className="mt-2 w-24 h-16 bg-white rounded-lg" 
-                    style={{ boxShadow: designSystem.shadowXl }}
+                    className="mt-2 w-24 h-16 rounded-lg" 
+                    style={{ 
+                      boxShadow: designSystem.shadowXl,
+                      backgroundColor: 'var(--color-bg-primary, #FFFFFF)'
+                    }}
                   ></div>
                 </div>
               </div>
@@ -993,12 +1033,12 @@ const DesignSystemManager: React.FC = () => {
 
             {/* Animation Durations */}
             <Card className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6">
+              <h3 className="text-xl font-semibold mb-6" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Animation Durations
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Fast Animation
                   </label>
                   <Input
@@ -1007,10 +1047,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="150ms"
                     className="font-mono"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Quick interactions and micro-animations</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Quick interactions and micro-animations</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Normal Animation
                   </label>
                   <Input
@@ -1019,10 +1059,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="300ms"
                     className="font-mono"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Standard transitions and state changes</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Standard transitions and state changes</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Slow Animation
                   </label>
                   <Input
@@ -1031,7 +1071,7 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="500ms"
                     className="font-mono"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Complex animations and page transitions</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Complex animations and page transitions</p>
                 </div>
               </div>
             </Card>
@@ -1041,13 +1081,13 @@ const DesignSystemManager: React.FC = () => {
         {activeTab === 'breakpoints' && (
           <div className="space-y-8">
             <Card className="p-6">
-              <h3 className="text-xl font-semibold text-gray-900 mb-6 flex items-center">
+              <h3 className="text-xl font-semibold mb-6 flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 <Monitor className="w-5 h-5 mr-2" />
                 Responsive Breakpoints
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Small (SM)
                   </label>
                   <Input
@@ -1056,10 +1096,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="640px"
                     className="font-mono"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Mobile landscape and small tablets</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Mobile landscape and small tablets</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Medium (MD)
                   </label>
                   <Input
@@ -1068,10 +1108,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="768px"
                     className="font-mono"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Tablets</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Tablets</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Large (LG)
                   </label>
                   <Input
@@ -1080,10 +1120,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="1024px"
                     className="font-mono"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Small laptops</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Small laptops</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Extra Large (XL)
                   </label>
                   <Input
@@ -1092,10 +1132,10 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="1280px"
                     className="font-mono"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Laptops and desktops</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Laptops and desktops</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     2X Large (2XL)
                   </label>
                   <Input
@@ -1104,43 +1144,43 @@ const DesignSystemManager: React.FC = () => {
                     placeholder="1536px"
                     className="font-mono"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Large desktops and monitors</p>
+                  <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Large desktops and monitors</p>
                 </div>
               </div>
 
               {/* Breakpoint Visualization */}
               <div className="mt-8">
-                <h4 className="text-lg font-medium text-gray-900 mb-4">Breakpoint Visualization</h4>
+                <h4 className="text-lg font-medium mb-4" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Breakpoint Visualization</h4>
                 <div className="space-y-2">
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 text-sm text-gray-600">Mobile</div>
-                    <div className="flex-1 h-4 bg-red-200 rounded" style={{ maxWidth: '320px' }}></div>
-                    <div className="text-sm text-gray-600">0px - {designSystem.breakpointSm}</div>
+                    <div className="w-16 text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Mobile</div>
+                    <div className="flex-1 h-4 rounded" style={{ maxWidth: '320px', backgroundColor: 'var(--color-error-light, #FEE2E2)' }}></div>
+                    <div className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>0px - {designSystem.breakpointSm}</div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 text-sm text-gray-600">SM</div>
-                    <div className="flex-1 h-4 bg-orange-200 rounded" style={{ maxWidth: '400px' }}></div>
-                    <div className="text-sm text-gray-600">{designSystem.breakpointSm} - {designSystem.breakpointMd}</div>
+                    <div className="w-16 text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>SM</div>
+                    <div className="flex-1 h-4 rounded" style={{ maxWidth: '400px', backgroundColor: 'var(--color-warning-light, #FEF3C7)' }}></div>
+                    <div className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{designSystem.breakpointSm} - {designSystem.breakpointMd}</div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 text-sm text-gray-600">MD</div>
-                    <div className="flex-1 h-4 bg-yellow-200 rounded" style={{ maxWidth: '500px' }}></div>
-                    <div className="text-sm text-gray-600">{designSystem.breakpointMd} - {designSystem.breakpointLg}</div>
+                    <div className="w-16 text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>MD</div>
+                    <div className="flex-1 h-4 rounded" style={{ maxWidth: '500px', backgroundColor: 'var(--color-warning-light, #FEF3C7)' }}></div>
+                    <div className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{designSystem.breakpointMd} - {designSystem.breakpointLg}</div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 text-sm text-gray-600">LG</div>
-                    <div className="flex-1 h-4 bg-green-200 rounded" style={{ maxWidth: '600px' }}></div>
-                    <div className="text-sm text-gray-600">{designSystem.breakpointLg} - {designSystem.breakpointXl}</div>
+                    <div className="w-16 text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>LG</div>
+                    <div className="flex-1 h-4 rounded" style={{ maxWidth: '600px', backgroundColor: 'var(--color-success-light, #D1FAE5)' }}></div>
+                    <div className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{designSystem.breakpointLg} - {designSystem.breakpointXl}</div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 text-sm text-gray-600">XL</div>
-                    <div className="flex-1 h-4 bg-blue-200 rounded" style={{ maxWidth: '700px' }}></div>
-                    <div className="text-sm text-gray-600">{designSystem.breakpointXl} - {designSystem.breakpoint2xl}</div>
+                    <div className="w-16 text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>XL</div>
+                    <div className="flex-1 h-4 rounded" style={{ maxWidth: '700px', backgroundColor: 'var(--color-info-light, #DBEAFE)' }}></div>
+                    <div className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{designSystem.breakpointXl} - {designSystem.breakpoint2xl}</div>
                   </div>
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 text-sm text-gray-600">2XL</div>
-                    <div className="flex-1 h-4 bg-purple-200 rounded" style={{ maxWidth: '800px' }}></div>
-                    <div className="text-sm text-gray-600">{designSystem.breakpoint2xl}+</div>
+                    <div className="w-16 text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>2XL</div>
+                    <div className="flex-1 h-4 rounded" style={{ maxWidth: '800px', backgroundColor: 'var(--color-primary-light, #E0E7FF)' }}></div>
+                    <div className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{designSystem.breakpoint2xl}+</div>
                   </div>
                 </div>
               </div>
@@ -1152,15 +1192,19 @@ const DesignSystemManager: React.FC = () => {
           <div className="space-y-8">
             <Card className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-xl font-semibold text-gray-900 flex items-center">
+                <h3 className="text-xl font-semibold flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   <Eye className="w-5 h-5 mr-2" />
                   Live Preview
                 </h3>
                 <div className="flex items-center space-x-2">
-                  <span className="text-sm text-gray-600">Preview Mode:</span>
+                  <span className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Preview Mode:</span>
                   <button
                     onClick={() => setPreviewMode(previewMode === 'light' ? 'dark' : 'light')}
-                    className="flex items-center space-x-2 px-3 py-1 rounded-lg border border-gray-300 hover:bg-gray-50"
+                    className="flex items-center space-x-2 px-3 py-1 rounded-lg border"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light, #E5E7EB)',
+                      backgroundColor: 'var(--color-bg-primary, #FFFFFF)'
+                    }}
                   >
                     {previewMode === 'light' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                     <span className="capitalize">{previewMode}</span>

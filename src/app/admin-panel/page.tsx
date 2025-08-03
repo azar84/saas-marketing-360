@@ -176,7 +176,7 @@ export default function AdminPanel() {
   // Show loading while checking authentication or loading design system
   if (authLoading || designSystemLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+              <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}>
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -568,7 +568,7 @@ export default function AdminPanel() {
             <Card className="p-6">
               <h2 
                 className="text-xl font-semibold mb-4"
-                style={{ color: adminColors.textPrimary }}
+                style={{ color: 'var(--color-text-primary, #1F2937)' }}
               >
                 Quick Actions
               </h2>
@@ -692,13 +692,13 @@ export default function AdminPanel() {
                   <div className="flex-1">
                     <p 
                       className="text-sm font-medium"
-                      style={{ color: adminColors.textPrimary }}
+                      style={{ color: 'var(--color-text-primary, #1F2937)' }}
                     >
                       Hero section updated on homepage
                     </p>
                     <p 
                       className="text-xs"
-                      style={{ color: adminColors.textSecondary }}
+                      style={{ color: 'var(--color-text-secondary, #6B7280)' }}
                     >
                       6 hours ago
                     </p>
@@ -717,13 +717,13 @@ export default function AdminPanel() {
                   <div className="flex-1">
                     <p 
                       className="text-sm font-medium"
-                      style={{ color: adminColors.textPrimary }}
+                      style={{ color: 'var(--color-text-primary, #1F2937)' }}
                     >
                       New feature "AI Integration" added
                     </p>
                     <p 
                       className="text-xs"
-                      style={{ color: adminColors.textSecondary }}
+                      style={{ color: 'var(--color-text-secondary, #6B7280)' }}
                     >
                       1 day ago
                     </p>

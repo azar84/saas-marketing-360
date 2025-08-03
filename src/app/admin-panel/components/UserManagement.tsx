@@ -315,8 +315,8 @@ export default function UserManagement() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">User Management</h2>
-          <p className="text-gray-600">Manage admin users and their permissions</p>
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>User Management</h2>
+          <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Manage admin users and their permissions</p>
         </div>
         <div className="flex space-x-3">
           <Button
@@ -371,7 +371,7 @@ export default function UserManagement() {
             <h3 className="text-lg font-semibold">Create New User</h3>
             <button
               onClick={() => setShowCreateForm(false)}
-              className="text-gray-400 hover:text-gray-600"
+              style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
             >
               <X className="w-5 h-5" />
             </button>
@@ -379,7 +379,7 @@ export default function UserManagement() {
           <form onSubmit={handleCreateUser} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Username *
                 </label>
                 <Input
@@ -391,7 +391,7 @@ export default function UserManagement() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Email *
                 </label>
                 <Input
@@ -403,7 +403,7 @@ export default function UserManagement() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Password *
                 </label>
                 <div className="relative">
@@ -420,15 +420,15 @@ export default function UserManagement() {
                     className="absolute right-3 top-1/2 transform -translate-y-1/2"
                   >
                     {showPassword ? (
-                      <EyeOff className="w-4 h-4 text-gray-400" />
+                      <EyeOff className="w-4 h-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
                     ) : (
-                      <Eye className="w-4 h-4 text-gray-400" />
+                      <Eye className="w-4 h-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
                     )}
                   </button>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Full Name
                 </label>
                 <Input
@@ -439,13 +439,14 @@ export default function UserManagement() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Role
                 </label>
                 <select
                   value={formData.role}
                   onChange={(e) => handleInputChange('role', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2"
+                  style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}
                 >
                   <option value="admin">Admin</option>
                   <option value="editor">Editor</option>
@@ -488,7 +489,7 @@ export default function UserManagement() {
             <h3 className="text-lg font-semibold">Edit User: {editingUser.username}</h3>
             <button
               onClick={handleCancelEdit}
-              className="text-gray-400 hover:text-gray-600"
+              style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
             >
               <X className="w-5 h-5" />
             </button>
@@ -496,7 +497,7 @@ export default function UserManagement() {
           <form onSubmit={handleUpdateUser} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Username *
                 </label>
                 <Input
@@ -508,7 +509,7 @@ export default function UserManagement() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Email *
                 </label>
                 <Input
@@ -520,7 +521,7 @@ export default function UserManagement() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   New Password (leave blank to keep current)
                 </label>
                 <div className="relative">
@@ -536,15 +537,15 @@ export default function UserManagement() {
                     className="absolute right-3 top-1/2 transform -translate-y-1/2"
                   >
                     {showPassword ? (
-                      <EyeOff className="w-4 h-4 text-gray-400" />
+                      <EyeOff className="w-4 h-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
                     ) : (
-                      <Eye className="w-4 h-4 text-gray-400" />
+                      <Eye className="w-4 h-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
                     )}
                   </button>
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Full Name
                 </label>
                 <Input
@@ -555,13 +556,14 @@ export default function UserManagement() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Role
                 </label>
                 <select
                   value={formData.role}
                   onChange={(e) => handleInputChange('role', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2"
+                  style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}
                 >
                   <option value="admin">Admin</option>
                   <option value="editor">Editor</option>
@@ -604,14 +606,14 @@ export default function UserManagement() {
             <h3 className="text-lg font-semibold">Password Reset</h3>
             <button
               onClick={() => setShowPasswordReset(false)}
-              className="text-gray-400 hover:text-gray-600"
+              style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
             >
               <X className="w-5 h-5" />
             </button>
           </div>
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Email Address
               </label>
               <Input
@@ -622,7 +624,7 @@ export default function UserManagement() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Reset Token (if you have one)
               </label>
               <Input
@@ -633,7 +635,7 @@ export default function UserManagement() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 New Password
               </label>
               <div className="relative">
@@ -649,9 +651,9 @@ export default function UserManagement() {
                   className="absolute right-3 top-1/2 transform -translate-y-1/2"
                 >
                   {showPassword ? (
-                    <EyeOff className="w-4 h-4 text-gray-400" />
+                    <EyeOff className="w-4 h-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
                   ) : (
-                    <Eye className="w-4 h-4 text-gray-400" />
+                    <Eye className="w-4 h-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
                   )}
                 </button>
               </div>
@@ -706,7 +708,7 @@ export default function UserManagement() {
       <Card className="p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold">Admin Users</h3>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
             {users.length} user{users.length !== 1 ? 's' : ''}
           </div>
         </div>
@@ -714,53 +716,53 @@ export default function UserManagement() {
         {loading ? (
           <div className="flex items-center justify-center py-8">
             <Loader className="w-6 h-6 animate-spin text-blue-600" />
-            <span className="ml-2 text-gray-600">Loading users...</span>
+            <span className="ml-2" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Loading users...</span>
           </div>
         ) : users.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            <Users className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+          <div className="text-center py-8" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
+            <Users className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
             <p>No users found</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y" style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
+              <thead style={{ backgroundColor: 'var(--color-bg-secondary, #F9FAFB)' }}>
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     User
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Role
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Last Login
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Created
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-right text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     Actions
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}>
                 {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-gray-50">
+                  <tr key={user.id} style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                            <User className="w-5 h-5 text-gray-600" />
+                          <div className="h-10 w-10 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-gray-light, #E5E7EB)' }}>
+                            <User className="w-5 h-5" style={{ color: 'var(--color-text-secondary, #6B7280)' }} />
                           </div>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                             {user.name || user.username}
                           </div>
-                          <div className="text-sm text-gray-500">
+                          <div className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                             {user.email}
                           </div>
                         </div>
@@ -768,35 +770,34 @@ export default function UserManagement() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <Shield className={`w-4 h-4 mr-2 ${
-                          user.role === 'admin' ? 'text-red-500' : 
-                          user.role === 'editor' ? 'text-blue-500' : 'text-gray-500'
-                        }`} />
-                        <span className="text-sm text-gray-900 capitalize">
+                        <Shield className="w-4 h-4 mr-2" style={{ 
+                          color: user.role === 'admin' ? 'var(--color-error, #EF4444)' : 
+                          user.role === 'editor' ? 'var(--color-primary, #5243E9)' : 'var(--color-text-secondary, #6B7280)'
+                        }} />
+                        <span className="text-sm capitalize" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                           {user.role}
                         </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        user.isActive
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-red-100 text-red-800'
-                      }`}>
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full" style={{
+                        backgroundColor: user.isActive ? 'var(--color-success-light, #D1FAE5)' : 'var(--color-error-light, #FEE2E2)',
+                        color: user.isActive ? 'var(--color-success-dark, #065F46)' : 'var(--color-error-dark, #991B1B)'
+                      }}>
                         {user.isActive ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                       {user.lastLoginAt ? (
                         <div className="flex items-center">
                           <Activity className="w-4 h-4 mr-1" />
                           {formatDate(user.lastLoginAt)}
                         </div>
                       ) : (
-                        <span className="text-gray-400">Never</span>
+                        <span style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Never</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                       <div className="flex items-center">
                         <Calendar className="w-4 h-4 mr-1" />
                         {formatDate(user.createdAt)}
@@ -806,14 +807,14 @@ export default function UserManagement() {
                       <div className="flex items-center justify-end space-x-2">
                         <button
                           onClick={() => handleEditUser(user)}
-                          className="text-blue-600 hover:text-blue-900"
+                          style={{ color: 'var(--color-primary, #5243E9)' }}
                           title="Edit user"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleDeleteUser(user.id)}
-                          className="text-red-600 hover:text-red-900"
+                          style={{ color: 'var(--color-error, #EF4444)' }}
                           title="Delete user"
                         >
                           <Trash2 className="w-4 h-4" />

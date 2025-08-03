@@ -104,15 +104,15 @@ const CronExpressionEditor = ({
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 space-y-4">
+    <Card className="p-4 space-y-4" style={{ backgroundColor: 'var(--color-bg-primary)', borderColor: 'var(--color-gray-light)' }}>
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Edit Schedule</h3>
+        <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Edit Schedule</h3>
         <div className="flex gap-2">
           <Button 
             onClick={handleSave} 
             size="sm" 
             leftIcon={<Save className="w-4 h-4" />}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
+            style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-text-primary)' }}
           >
             Save
           </Button>
@@ -121,7 +121,11 @@ const CronExpressionEditor = ({
             variant="outline" 
             size="sm" 
             leftIcon={<X className="w-4 h-4" />}
-            className="text-gray-600 border-gray-200 hover:bg-gray-50"
+            style={{ 
+              color: 'var(--color-text-secondary)', 
+              borderColor: 'var(--color-gray-light)',
+              backgroundColor: 'var(--color-bg-primary)'
+            }}
           >
             Cancel
           </Button>
@@ -131,11 +135,16 @@ const CronExpressionEditor = ({
       <div className="space-y-4">
         {/* Frequency Selection */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Frequency</label>
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Frequency</label>
           <select
             value={schedule.frequency}
             onChange={(e) => setSchedule({ ...schedule, frequency: e.target.value as any })}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2"
+            style={{ 
+              borderColor: 'var(--color-gray-light)',
+              color: 'var(--color-text-primary)',
+              backgroundColor: 'var(--color-bg-primary)'
+            }}
           >
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
@@ -146,23 +155,33 @@ const CronExpressionEditor = ({
 
         {/* Time Selection */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Time (UTC)</label>
+          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Time (UTC)</label>
           <input
             type="time"
             value={schedule.time}
             onChange={(e) => setSchedule({ ...schedule, time: e.target.value })}
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2"
+            style={{ 
+              borderColor: 'var(--color-gray-light)',
+              color: 'var(--color-text-primary)',
+              backgroundColor: 'var(--color-bg-primary)'
+            }}
           />
         </div>
 
         {/* Day of Week (for weekly) */}
         {schedule.frequency === 'weekly' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Day of Week</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Day of Week</label>
             <select
               value={schedule.dayOfWeek || 0}
               onChange={(e) => setSchedule({ ...schedule, dayOfWeek: parseInt(e.target.value) })}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2"
+              style={{ 
+                borderColor: 'var(--color-gray-light)',
+                color: 'var(--color-text-primary)',
+                backgroundColor: 'var(--color-bg-primary)'
+              }}
             >
               <option value={0}>Sunday</option>
               <option value={1}>Monday</option>
@@ -178,11 +197,16 @@ const CronExpressionEditor = ({
         {/* Day of Month (for monthly) */}
         {schedule.frequency === 'monthly' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Day of Month</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Day of Month</label>
             <select
               value={schedule.dayOfMonth || 1}
               onChange={(e) => setSchedule({ ...schedule, dayOfMonth: parseInt(e.target.value) })}
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2"
+              style={{ 
+                borderColor: 'var(--color-gray-light)',
+                color: 'var(--color-text-primary)',
+                backgroundColor: 'var(--color-bg-primary)'
+              }}
             >
               {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
                 <option key={day} value={day}>{day}</option>
@@ -194,26 +218,31 @@ const CronExpressionEditor = ({
         {/* Custom Cron Expression */}
         {schedule.frequency === 'custom' && (
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Custom Cron Expression</label>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Custom Cron Expression</label>
             <input
               type="text"
               value={schedule.customExpression || ''}
               onChange={(e) => setSchedule({ ...schedule, customExpression: e.target.value })}
               placeholder="0 2 * * * (minute hour day month weekday)"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2"
+              style={{ 
+                borderColor: 'var(--color-gray-light)',
+                color: 'var(--color-text-primary)',
+                backgroundColor: 'var(--color-bg-primary)'
+              }}
             />
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
               Format: minute hour day month weekday (e.g., "0 2 * * *" for daily at 2 AM)
             </p>
           </div>
         )}
 
         {/* Preview */}
-        <div className="bg-gray-50 p-3 rounded-md">
-          <p className="text-sm text-gray-600">
-            <strong>Generated Expression:</strong> {generateCronExpression()}
+        <div className="p-3 rounded-md" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+          <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+            <strong style={{ color: 'var(--color-text-primary)' }}>Generated Expression:</strong> {generateCronExpression()}
           </p>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>
             {schedule.frequency === 'daily' && `Runs daily at ${schedule.time} UTC`}
             {schedule.frequency === 'weekly' && `Runs weekly on ${getDayName(schedule.dayOfWeek || 0)} at ${schedule.time} UTC`}
             {schedule.frequency === 'monthly' && `Runs monthly on day ${schedule.dayOfMonth || 1} at ${schedule.time} UTC`}
@@ -221,7 +250,7 @@ const CronExpressionEditor = ({
           </p>
         </div>
       </div>
-    </div>
+    </Card>
   );
 };
 
@@ -398,7 +427,7 @@ export default function SchedulerManager() {
   };
 
   if (loading) {
-    return <div className="flex justify-center p-8"><RefreshCw className="w-6 h-6 animate-spin" /></div>;
+    return <div className="flex justify-center p-8"><RefreshCw className="w-6 h-6 animate-spin" style={{ color: 'var(--color-text-secondary)' }} /></div>;
   }
 
   return (
@@ -406,8 +435,8 @@ export default function SchedulerManager() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Scheduler Management</h1>
-          <p className="text-gray-600 mt-2">Manage automated tasks and schedules</p>
+          <h1 className="text-3xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Scheduler Management</h1>
+          <p className="mt-2" style={{ color: 'var(--color-text-secondary)' }}>Manage automated tasks and schedules</p>
         </div>
         <div className="flex gap-2">
           {status?.isRunning ? (
@@ -415,7 +444,11 @@ export default function SchedulerManager() {
               onClick={() => handleSchedulerAction('stop')} 
               variant="outline" 
               leftIcon={<Pause className="w-4 h-4" />}
-              className="text-red-600 border-red-200 hover:bg-red-50"
+              style={{ 
+                color: 'var(--color-error)', 
+                borderColor: 'var(--color-error-light)',
+                backgroundColor: 'var(--color-bg-primary)'
+              }}
             >
               Stop Scheduler
             </Button>
@@ -423,7 +456,7 @@ export default function SchedulerManager() {
             <Button 
               onClick={() => handleSchedulerAction('start')} 
               leftIcon={<Play className="w-4 h-4" />}
-              className="bg-green-600 hover:bg-green-700 text-white"
+              style={{ backgroundColor: 'var(--color-success)', color: 'var(--color-text-primary)' }}
             >
               Start Scheduler
             </Button>
@@ -432,7 +465,11 @@ export default function SchedulerManager() {
             onClick={fetchData} 
             variant="outline" 
             leftIcon={<RefreshCw className="w-4 h-4" />}
-            className="text-gray-600 border-gray-200 hover:bg-gray-50"
+            style={{ 
+              color: 'var(--color-text-secondary)', 
+              borderColor: 'var(--color-gray-light)',
+              backgroundColor: 'var(--color-bg-primary)'
+            }}
           >
             Refresh
           </Button>
@@ -441,52 +478,53 @@ export default function SchedulerManager() {
 
       {/* Message */}
       {message && (
-        <div className={`p-4 rounded-lg ${
-          message.type === 'success' 
-            ? 'bg-green-50 text-green-800 border border-green-200' 
-            : 'bg-red-50 text-red-800 border border-red-200'
-        }`}>
+        <div className="p-4 rounded-lg" style={{
+          backgroundColor: message.type === 'success' ? 'var(--color-success-light)' : 'var(--color-error-light)',
+          color: message.type === 'success' ? 'var(--color-success-dark)' : 'var(--color-error-dark)',
+          borderColor: message.type === 'success' ? 'var(--color-success)' : 'var(--color-error)'
+        }}>
           {message.text}
         </div>
       )}
 
       {/* Status Overview */}
-      <Card className="p-6">
+      <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">{status?.isRunning ? 'Running' : 'Stopped'}</div>
-            <div className="text-sm text-gray-600">Status</div>
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{status?.isRunning ? 'Running' : 'Stopped'}</div>
+            <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Status</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">{status?.taskCount || 0}</div>
-            <div className="text-sm text-gray-600">Total Tasks</div>
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{status?.taskCount || 0}</div>
+            <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Total Tasks</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">{status?.enabledTaskCount || 0}</div>
-            <div className="text-sm text-gray-600">Enabled Tasks</div>
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{status?.enabledTaskCount || 0}</div>
+            <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Enabled Tasks</div>
           </div>
           <div className="text-center">
-            <div className="text-2xl font-bold text-gray-900">
+            <div className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
               {status?.nextTask ? formatDate(status.nextTask.nextRun) : 'No tasks scheduled'}
             </div>
-            <div className="text-sm text-gray-600">Next Task</div>
+            <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Next Task</div>
           </div>
         </div>
       </Card>
 
       {/* Tasks List */}
-      <div className="space-y-4">
-        <h2 className="text-xl font-semibold text-gray-900">Scheduled Tasks</h2>
+      <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+        <h2 className="text-xl font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Scheduled Tasks</h2>
         
         {tasks.length === 0 ? (
-          <Card className="p-12 text-center">
-            <Clock className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No scheduled tasks found</h3>
-            <p className="text-gray-600">Scheduled tasks will appear here.</p>
-          </Card>
+          <div className="p-12 text-center" style={{ backgroundColor: 'var(--color-bg-primary)', borderColor: 'var(--color-gray-light)', borderRadius: '0.5rem', border: '1px solid' }}>
+            <Clock className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-muted)' }} />
+            <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>No scheduled tasks found</h3>
+            <p style={{ color: 'var(--color-text-secondary)' }}>Scheduled tasks will appear here.</p>
+          </div>
         ) : (
-          tasks.map((task) => (
-            <Card key={task.id} className="p-6 hover:shadow-lg transition-shadow">
+          <div className="space-y-4">
+            {tasks.map((task) => (
+              <Card key={task.id} className="p-6 hover:shadow-lg transition-shadow" style={{ backgroundColor: 'var(--color-bg-primary)', borderColor: 'var(--color-gray-light)' }}>
               {editingTask === task.id ? (
                 <CronExpressionEditor
                   cronExpression={task.cronExpression}
@@ -494,34 +532,38 @@ export default function SchedulerManager() {
                   onCancel={() => setEditingTask(null)}
                 />
               ) : (
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-3">
-                      <h3 className="text-xl font-semibold text-gray-900">{task.name}</h3>
-                      <span className={`flex items-center gap-1 text-sm ${getStatusColor(task.enabled)}`}>
-                        {getStatusIcon(task.enabled)}
-                        {task.enabled ? 'Enabled' : 'Disabled'}
-                      </span>
-                      {task.isRunning && (
-                        <span className="flex items-center gap-1 text-sm text-blue-600">
-                          <Activity className="w-4 h-4 animate-pulse" />
-                          Running
+                                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>{task.name}</h3>
+                        <span className="flex items-center gap-1 text-sm" style={{ color: task.enabled ? 'var(--color-success)' : 'var(--color-text-muted)' }}>
+                          {getStatusIcon(task.enabled)}
+                          {task.enabled ? 'Enabled' : 'Disabled'}
                         </span>
-                      )}
+                        {task.isRunning && (
+                          <span className="flex items-center gap-1 text-sm" style={{ color: 'var(--color-info)' }}>
+                            <Activity className="w-4 h-4 animate-pulse" />
+                            Running
+                          </span>
+                        )}
+                      </div>
+                      <div className="text-sm space-y-1" style={{ color: 'var(--color-text-secondary)' }}>
+                        <div><strong style={{ color: 'var(--color-text-primary)' }}>Schedule:</strong> {task.cronExpression}</div>
+                        <div><strong style={{ color: 'var(--color-text-primary)' }}>Last Run:</strong> {task.lastRun ? formatDate(task.lastRun) : 'Never'}</div>
+                        <div><strong style={{ color: 'var(--color-text-primary)' }}>Next Run:</strong> {task.nextRun ? formatDate(task.nextRun) : 'Not scheduled'}</div>
+                      </div>
                     </div>
-                    <div className="text-sm text-gray-600 space-y-1">
-                      <div><strong>Schedule:</strong> {task.cronExpression}</div>
-                      <div><strong>Last Run:</strong> {task.lastRun ? formatDate(task.lastRun) : 'Never'}</div>
-                      <div><strong>Next Run:</strong> {task.nextRun ? formatDate(task.nextRun) : 'Not scheduled'}</div>
-                    </div>
-                  </div>
                   <div className="flex items-center gap-2 ml-4">
                     <Button
                       onClick={() => setEditingTask(task.id)}
                       variant="outline"
                       size="sm"
                       leftIcon={<Edit className="w-4 h-4" />}
-                      className="text-blue-600 border-blue-200 hover:bg-blue-50"
+                      style={{ 
+                        color: 'var(--color-info)', 
+                        borderColor: 'var(--color-info-light)',
+                        backgroundColor: 'var(--color-bg-primary)'
+                      }}
                       title="Edit schedule"
                     >
                       Edit
@@ -531,7 +573,11 @@ export default function SchedulerManager() {
                       variant="outline"
                       size="sm"
                       leftIcon={<Play className="w-4 h-4" />}
-                      className="text-green-600 border-green-200 hover:bg-green-50"
+                      style={{ 
+                        color: 'var(--color-success)', 
+                        borderColor: 'var(--color-success-light)',
+                        backgroundColor: 'var(--color-bg-primary)'
+                      }}
                       disabled={task.isRunning}
                       title="Run task now"
                     >
@@ -542,7 +588,11 @@ export default function SchedulerManager() {
                       variant="outline"
                       size="sm"
                       leftIcon={task.enabled ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
-                      className={task.enabled ? 'text-red-600 border-red-200 hover:bg-red-50' : 'text-green-600 border-green-200 hover:bg-green-50'}
+                      style={{ 
+                        color: task.enabled ? 'var(--color-error)' : 'var(--color-success)', 
+                        borderColor: task.enabled ? 'var(--color-error-light)' : 'var(--color-success-light)',
+                        backgroundColor: 'var(--color-bg-primary)'
+                      }}
                       title={task.enabled ? 'Disable task' : 'Enable task'}
                     >
                       {task.enabled ? 'Disable' : 'Enable'}
@@ -551,9 +601,10 @@ export default function SchedulerManager() {
                 </div>
               )}
             </Card>
-          ))
+            ))}
+          </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 } 

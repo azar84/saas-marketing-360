@@ -77,7 +77,6 @@ const ScriptSectionManager: React.FC = () => {
       const url = '/api/admin/script-sections';
       const method = editingScript ? 'PUT' : 'POST';
       
-      // Prepare simplified payload
       const payload = editingScript 
         ? { 
             id: editingScript.id,
@@ -99,12 +98,10 @@ const ScriptSectionManager: React.FC = () => {
         body: JSON.stringify(payload)
       });
 
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Failed to save script section');
+      if (!response.ok) throw new Error('Failed to save script section');
       
       await fetchScriptSections();
       resetForm();
-      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save script section');
     }
@@ -125,15 +122,13 @@ const ScriptSectionManager: React.FC = () => {
     if (!confirm('Are you sure you want to delete this script section?')) return;
     
     try {
-      const response = await fetch(`/api/admin/script-sections?id=${id}`, {
+      const response = await fetch(`/api/admin/script-sections/${id}`, {
         method: 'DELETE'
       });
       
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Failed to delete script section');
+      if (!response.ok) throw new Error('Failed to delete script section');
       
       await fetchScriptSections();
-      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete script section');
     }
@@ -141,20 +136,15 @@ const ScriptSectionManager: React.FC = () => {
 
   const toggleActive = async (script: ScriptSection) => {
     try {
-      const response = await fetch('/api/admin/script-sections', {
+      const response = await fetch(`/api/admin/script-sections/${script.id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: script.id,
-          isActive: !script.isActive
-        })
+        body: JSON.stringify({ ...script, isActive: !script.isActive })
       });
-
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Failed to update script section');
+      
+      if (!response.ok) throw new Error('Failed to update script section');
       
       await fetchScriptSections();
-      setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update script section');
     }
@@ -169,6 +159,7 @@ const ScriptSectionManager: React.FC = () => {
     });
     setEditingScript(null);
     setShowForm(false);
+    setError(null);
   };
 
   const copyToClipboard = (content: string) => {
@@ -176,14 +167,14 @@ const ScriptSectionManager: React.FC = () => {
   };
 
   const getScriptPreview = (content: string) => {
-    const preview = content.replace(/\s+/g, ' ').trim();
+    const preview = content.replace(/<script[^>]*>[\s\S]*?<\/script>/gi, '').trim();
     return preview.length > 100 ? preview.substring(0, 100) + '...' : preview;
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: 'var(--color-primary)' }}></div>
       </div>
     );
   }
@@ -192,14 +183,19 @@ const ScriptSectionManager: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Script Installation</h2>
-          <p className="text-gray-600 mt-1">
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Script Installation</h2>
+          <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>
             Manage JavaScript scripts that are automatically injected into the footer
           </p>
         </div>
         <button
           onClick={() => setShowForm(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+          className="px-4 py-2 rounded-lg flex items-center gap-2 font-medium hover:opacity-90 transition-opacity"
+          style={{ 
+            backgroundColor: 'var(--color-primary)', 
+            color: 'var(--color-text-primary)',
+            border: '1px solid var(--color-primary)'
+          }}
         >
           <Plus className="w-4 h-4" />
           Add Script
@@ -207,217 +203,332 @@ const ScriptSectionManager: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-center gap-2">
-          <AlertCircle className="w-5 h-5 text-red-600" />
-          <p className="text-red-600">{error}</p>
+        <div className="border rounded-lg p-4 flex items-center gap-2" style={{ backgroundColor: 'var(--color-error-light)', borderColor: 'var(--color-error)' }}>
+          <AlertCircle className="w-5 h-5" style={{ color: 'var(--color-error)' }} />
+          <span style={{ color: 'var(--color-error-dark)' }}>{error}</span>
         </div>
       )}
 
-      {/* Scripts List */}
-      <div className="space-y-4">
-        {scriptSections.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 rounded-lg">
-            <Code className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No scripts installed</h3>
-            <p className="text-gray-500 mb-4">Add your first script to get started</p>
-            <button
-              onClick={() => setShowForm(true)}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-            >
-              Add Script
-            </button>
-          </div>
-        ) : (
-          <div className="grid gap-4">
-            {scriptSections.map((script) => (
-              <div key={script.id} className="bg-white rounded-lg border border-gray-200 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                      script.isActive ? 'bg-green-100' : 'bg-gray-100'
-                    }`}>
-                      {script.isActive ? (
-                        <Activity className="w-5 h-5 text-green-600" />
-                      ) : (
-                        <Code className="w-5 h-5 text-gray-400" />
-                      )}
+      <div className="rounded-xl p-6 shadow-sm border" style={{ 
+        backgroundColor: 'var(--color-bg-secondary)', 
+        borderColor: 'var(--color-gray-light)' 
+      }}>
+        <div>
+          <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Scripts ({scriptSections.length})</h3>
+          
+          {scriptSections.length === 0 ? (
+            <div className="text-center py-12">
+              <Code className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-muted)' }} />
+              <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>No scripts installed</h3>
+              <p className="mb-4" style={{ color: 'var(--color-text-secondary)' }}>Add your first script to get started</p>
+              <button
+                onClick={() => setShowForm(true)}
+                className="px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity"
+                style={{ 
+                  backgroundColor: 'var(--color-primary)', 
+                  color: 'var(--color-text-primary)',
+                  border: '1px solid var(--color-primary)'
+                }}
+              >
+                Add Script
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {scriptSections.map((script) => (
+                <div key={script.id} className="border-2 rounded-lg p-4 transition-all duration-200" style={{ 
+                  borderColor: script.isActive ? 'var(--color-gray-light)' : 'var(--color-text-muted)',
+                  backgroundColor: script.isActive ? 'var(--color-bg-primary)' : 'var(--color-bg-secondary)',
+                  opacity: script.isActive ? 1 : 0.6
+                }}>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{
+                        backgroundColor: script.isActive ? 'var(--color-success-light)' : 'var(--color-gray-light)'
+                      }}>
+                        {script.isActive ? (
+                          <Activity className="w-5 h-5" style={{ color: 'var(--color-success)' }} />
+                        ) : (
+                          <Code className="w-5 h-5" style={{ color: 'var(--color-text-muted)' }} />
+                        )}
+                      </div>
+                      <div>
+                        <h4 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{script.name}</h4>
+                        {script.description && (
+                          <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{script.description}</p>
+                        )}
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-medium text-gray-900">{script.name}</h4>
-                      {script.description && (
-                        <p className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{script.description}</p>
-                      )}
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-1 rounded-full text-xs" style={{
+                        backgroundColor: script.isActive 
+                          ? 'var(--color-success-light)' 
+                          : 'var(--color-gray-light)',
+                        color: script.isActive 
+                          ? 'var(--color-success-dark)' 
+                          : 'var(--color-text-secondary)'
+                      }}>
+                        {script.isActive ? 'Active' : 'Inactive'}
+                      </span>
+                      <button
+                        onClick={() => toggleActive(script)}
+                        className="p-1 rounded hover:bg-gray-100 transition-colors"
+                        style={{ color: 'var(--color-text-secondary)' }}
+                        title={script.isActive ? 'Deactivate' : 'Activate'}
+                      >
+                        {script.isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                      <button
+                        onClick={() => handleEdit(script)}
+                        className="p-1 rounded hover:bg-gray-100 transition-colors"
+                        style={{ color: 'var(--color-text-secondary)' }}
+                      >
+                        <Edit className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(script.id)}
+                        className="p-1 rounded hover:bg-red-50 transition-colors"
+                        style={{ color: 'var(--color-error)' }}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      script.isActive 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-gray-100 text-gray-800'
-                    }`}>
-                      {script.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                    <button
-                      onClick={() => toggleActive(script)}
-                      className="p-2 text-gray-600 hover:text-blue-600"
-                      title={script.isActive ? 'Deactivate' : 'Activate'}
-                    >
-                      {script.isActive ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                    <button
-                      onClick={() => handleEdit(script)}
-                      className="p-2 text-gray-600 hover:text-blue-600"
-                    >
-                      <Edit className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(script.id)}
-                      className="p-2 text-gray-600 hover:text-red-600"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
 
-                {/* Script Preview */}
-                <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-gray-700">Script Content</span>
-                    <button
-                      onClick={() => copyToClipboard(script.scriptContent)}
-                      className="text-xs text-gray-600 hover:text-gray-800 flex items-center gap-1"
-                    >
-                      <Copy className="w-3 h-3" />
-                      Copy
-                    </button>
+                  <div className="rounded-lg p-4 mb-4" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Script Content</span>
+                      <button
+                        onClick={() => copyToClipboard(script.scriptContent)}
+                        className="text-xs flex items-center gap-1 px-2 py-1 rounded hover:bg-gray-50 transition-colors" style={{ color: 'var(--color-text-muted)' }}
+                      >
+                        <Copy className="w-3 h-3" />
+                        Copy
+                      </button>
+                    </div>
+                    <pre className="text-xs whitespace-pre-wrap break-all" style={{ color: 'var(--color-text-secondary)' }}>
+                      {getScriptPreview(script.scriptContent)}
+                    </pre>
                   </div>
-                  <pre className="text-xs text-gray-600 whitespace-pre-wrap break-all">
-                    {getScriptPreview(script.scriptContent)}
-                  </pre>
-                </div>
 
-                {/* Script Options */}
-                <div className="flex items-center gap-4 text-sm text-gray-600">
-                  <div className="flex items-center gap-1">
-                    <Zap className="w-4 h-4" />
-                    <span>Auto-injected in Footer</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
-                    <span>JavaScript Only</span>
+                  <div className="flex items-center gap-4 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                    <div className="flex items-center gap-1">
+                      <Zap className="w-4 h-4" />
+                      <span>Auto-injected in Footer</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <CheckCircle className="w-4 h-4" style={{ color: 'var(--color-success)' }} />
+                      <span>JavaScript Only</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Form Modal */}
       {showForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h3 className="text-xl font-semibold">
+        <div className="fixed inset-0 flex items-center justify-center z-50 p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div className="rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+            <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: 'var(--color-gray-light)' }}>
+              <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>
                 {editingScript ? 'Edit Script' : 'Add New Script'}
               </h3>
               <button
                 onClick={resetForm}
-                className="text-gray-500 hover:text-gray-700"
+                className="p-1 rounded hover:bg-gray-100 transition-colors"
+                style={{ color: 'var(--color-text-muted)' }}
               >
                 <X className="w-6 h-6" />
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Script Name *
-                </label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="e.g., Google Analytics, Facebook Pixel"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Description
-                </label>
-                <input
-                  type="text"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Brief description of what this script does"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  JavaScript Code *
-                </label>
-                <textarea
-                  value={formData.scriptContent}
-                  onChange={(e) => setFormData({ ...formData, scriptContent: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 h-40 font-mono text-sm"
-                  placeholder="Enter your JavaScript code here...
-
-Examples:
-// Google Analytics
-gtag('config', 'GA_MEASUREMENT_ID');
-
-// Facebook Pixel
-fbq('track', 'PageView');
-
-// Custom tracking
-console.log('Page loaded');"
-                  required
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Scripts are automatically injected into the footer of all pages
-                </p>
-              </div>
-
-              <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <label className="flex items-center cursor-pointer">
+            <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+              <div className="flex-1 overflow-y-auto p-6">
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                      Script Name *
+                    </label>
                     <input
-                      type="checkbox"
-                      checked={formData.isActive}
-                      onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                      className="mr-3 w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      style={{ 
+                        borderColor: 'var(--color-gray-light)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-bg-primary)'
+                      }}
+                      placeholder="e.g., Google Analytics, Facebook Pixel"
+                      required
                     />
+                    <style jsx>{`
+                      input::placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      input::-webkit-input-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      input::-moz-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      input:-ms-input-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      input:-moz-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                    `}</style>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                      Description
+                    </label>
+                    <input
+                      type="text"
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      style={{ 
+                        borderColor: 'var(--color-gray-light)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-bg-primary)'
+                      }}
+                      placeholder="Brief description of what this script does"
+                    />
+                    <style jsx>{`
+                      input::placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      input::-webkit-input-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      input::-moz-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      input:-ms-input-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      input:-moz-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                    `}</style>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                      Script Content *
+                    </label>
+                    <textarea
+                      value={formData.scriptContent}
+                      onChange={(e) => setFormData({ ...formData, scriptContent: e.target.value })}
+                      rows={8}
+                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                      style={{ 
+                        borderColor: 'var(--color-gray-light)',
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'var(--color-bg-primary)'
+                      }}
+                      placeholder="Paste your JavaScript code here..."
+                      required
+                    />
+                    <style jsx>{`
+                      textarea::placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      textarea::-webkit-input-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      textarea::-moz-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      textarea:-ms-input-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                      textarea:-moz-placeholder {
+                        color: var(--color-text-muted) !important;
+                        opacity: 1;
+                      }
+                    `}</style>
+                    <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+                      Scripts are automatically injected into the footer of all pages
+                    </p>
+                  </div>
+
+                  <div className="flex items-center justify-between p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
                     <div>
-                      <span className="text-sm font-medium text-gray-700">Enable Script</span>
-                      <p className="text-xs text-gray-500">When enabled, this script will be automatically loaded on all pages</p>
+                      <label className="flex items-center cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.isActive}
+                          onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                          className="mr-3 w-4 h-4 rounded focus:ring-2 focus:ring-blue-500"
+                          style={{ 
+                            borderColor: 'var(--color-gray-light)',
+                            backgroundColor: formData.isActive ? 'var(--color-primary)' : 'var(--color-bg-primary)'
+                          }}
+                        />
+                        <div>
+                          <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>Enable Script</span>
+                          <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>When enabled, this script will be automatically loaded on all pages</p>
+                        </div>
+                      </label>
                     </div>
-                  </label>
-                </div>
-                <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  formData.isActive 
-                    ? 'bg-green-100 text-green-800' 
-                    : 'bg-gray-100 text-gray-800'
-                }`}>
-                  {formData.isActive ? 'Active' : 'Inactive'}
+                    <div className="px-3 py-1 rounded-full text-xs font-medium" style={{
+                      backgroundColor: formData.isActive 
+                        ? 'var(--color-success-light)' 
+                        : 'var(--color-gray-light)',
+                      color: formData.isActive 
+                        ? 'var(--color-success-dark)' 
+                        : 'var(--color-text-secondary)'
+                    }}>
+                      {formData.isActive ? 'Active' : 'Inactive'}
+                    </div>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4">
+              <div className="flex justify-end gap-3 p-6 border-t flex-shrink-0" style={{ 
+                borderColor: 'var(--color-gray-light)', 
+                backgroundColor: 'var(--color-bg-primary)' 
+              }}>
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200"
+                  className="px-4 py-2 border rounded-lg font-medium hover:opacity-80 transition-opacity"
+                  style={{ 
+                    color: 'var(--color-text-primary)', 
+                    borderColor: 'var(--color-gray-light)',
+                    backgroundColor: 'var(--color-bg-primary)'
+                  }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                  className="px-4 py-2 rounded-lg flex items-center gap-2 font-medium hover:opacity-90 transition-opacity"
+                  style={{ 
+                    backgroundColor: 'var(--color-primary)', 
+                    color: 'var(--color-text-primary)',
+                    border: '1px solid var(--color-primary)'
+                  }}
                 >
                   <Save className="w-4 h-4" />
                   {editingScript ? 'Update Script' : 'Add Script'}

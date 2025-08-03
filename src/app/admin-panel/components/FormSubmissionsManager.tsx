@@ -127,17 +127,33 @@ const FormSubmissionsManager: React.FC = () => {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      sent: { color: 'bg-green-100 text-green-800', icon: CheckCircle, text: 'Email Sent' },
-      failed: { color: 'bg-red-100 text-red-800', icon: XCircle, text: 'Email Failed' },
-      pending: { color: 'bg-yellow-100 text-yellow-800', icon: Clock, text: 'Email Pending' },
-      not_configured: { color: 'bg-gray-100 text-gray-800', icon: AlertCircle, text: 'No Email' },
+      sent: { 
+        style: { backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-dark)' }, 
+        icon: CheckCircle, 
+        text: 'Email Sent' 
+      },
+      failed: { 
+        style: { backgroundColor: 'var(--color-error-light)', color: 'var(--color-error-dark)' }, 
+        icon: XCircle, 
+        text: 'Email Failed' 
+      },
+      pending: { 
+        style: { backgroundColor: 'var(--color-warning-light)', color: 'var(--color-warning-dark)' }, 
+        icon: Clock, 
+        text: 'Email Pending' 
+      },
+      not_configured: { 
+        style: { backgroundColor: 'var(--color-gray-light)', color: 'var(--color-text-secondary)' }, 
+        icon: AlertCircle, 
+        text: 'No Email' 
+      },
     };
     
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.not_configured;
     const Icon = config.icon;
     
     return (
-      <Badge className={`${config.color} flex items-center space-x-1`}>
+      <Badge className="flex items-center space-x-1" style={config.style}>
         <Icon className="w-3 h-3" />
         <span>{config.text}</span>
       </Badge>
@@ -246,9 +262,9 @@ const FormSubmissionsManager: React.FC = () => {
       <Card className="p-4">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+                            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>Search</label>
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/4 text-gray-400 w-4 h-4" />
+                              <Search className="absolute left-3 top-1/2 transform -translate-y-1/4 w-4 h-4" style={{ color: 'var(--color-text-muted)' }} />
               <Input
                 placeholder="Search submissions..."
                 value={searchTerm}
@@ -259,11 +275,12 @@ const FormSubmissionsManager: React.FC = () => {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Email Status</label>
+                            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>Email Status</label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2"
+              style={{ borderColor: 'var(--color-gray-light)' }}
             >
               <option value="all">All Statuses</option>
               <option value="sent">Email Sent</option>
@@ -274,11 +291,12 @@ const FormSubmissionsManager: React.FC = () => {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Form</label>
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>Form</label>
           <select
               value={formFilter}
               onChange={(e) => setFormFilter(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2"
+              style={{ borderColor: 'var(--color-gray-light)' }}
             >
               <option value="all">All Forms</option>
               {uniqueForms.map(form => (
@@ -290,11 +308,12 @@ const FormSubmissionsManager: React.FC = () => {
           </div>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Date Range</label>
+            <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>Date Range</label>
             <select
               value={dateFilter}
               onChange={(e) => setDateFilter(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2"
+              style={{ borderColor: 'var(--color-gray-light)' }}
             >
               <option value="all">All Time</option>
               <option value="today">Today</option>
@@ -309,24 +328,24 @@ const FormSubmissionsManager: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card className="p-4">
           <div className="flex items-center">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <User className="w-6 h-6 text-blue-600" />
+            <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-info-light)' }}>
+              <User className="w-6 h-6" style={{ color: 'var(--color-primary)' }} />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Total Submissions</p>
-              <p className="text-2xl font-bold text-gray-900">{submissions.length}</p>
+              <p className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Total Submissions</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>{submissions.length}</p>
             </div>
           </div>
         </Card>
         
         <Card className="p-4">
           <div className="flex items-center">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <CheckCircle className="w-6 h-6 text-green-600" />
+            <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-success-light)' }}>
+              <CheckCircle className="w-6 h-6" style={{ color: 'var(--color-success)' }} />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Emails Sent</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Emails Sent</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
                 {submissions.filter(s => s.emailStatus === 'sent').length}
               </p>
             </div>
@@ -335,12 +354,12 @@ const FormSubmissionsManager: React.FC = () => {
         
         <Card className="p-4">
           <div className="flex items-center">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <XCircle className="w-6 h-6 text-red-600" />
+            <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-error-light)' }}>
+              <XCircle className="w-6 h-6" style={{ color: 'var(--color-error)' }} />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Email Failures</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Email Failures</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
                 {submissions.filter(s => s.emailStatus === 'failed').length}
               </p>
             </div>
@@ -349,12 +368,12 @@ const FormSubmissionsManager: React.FC = () => {
         
         <Card className="p-4">
           <div className="flex items-center">
-            <div className="p-2 bg-yellow-100 rounded-lg">
-              <Clock className="w-6 h-6 text-yellow-600" />
+            <div className="p-2 rounded-lg" style={{ backgroundColor: 'var(--color-warning-light)' }}>
+              <Clock className="w-6 h-6" style={{ color: 'var(--color-warning)' }} />
             </div>
             <div className="ml-4">
-              <p className="text-sm font-medium text-gray-600">Pending</p>
-              <p className="text-2xl font-bold text-gray-900">
+              <p className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Pending</p>
+              <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
                 {submissions.filter(s => s.emailStatus === 'pending').length}
               </p>
             </div>
@@ -366,31 +385,31 @@ const FormSubmissionsManager: React.FC = () => {
       <Card className="overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+            <thead style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary)' }}>
                   Form & Date
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary)' }}>
                   Email Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary)' }}>
                   Form Data
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary)' }}>
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody style={{ backgroundColor: 'var(--color-bg-primary)' }}>
               {filteredSubmissions.map((submission) => (
-                <tr key={submission.id} className="hover:bg-gray-50">
+                <tr key={submission.id} style={{ borderBottom: '1px solid var(--color-gray-light)' }}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
                         {submission.form.name}
                       </div>
-                      <div className="text-sm text-gray-500 flex items-center">
+                      <div className="text-sm flex items-center" style={{ color: 'var(--color-text-secondary)' }}>
                         <Calendar className="w-4 h-4 mr-1" />
                         {new Date(submission.createdAt).toLocaleString()}
                       </div>
@@ -400,21 +419,21 @@ const FormSubmissionsManager: React.FC = () => {
                     <div className="space-y-1">
                       {getStatusBadge(submission.emailStatus)}
                       {submission.emailDetails?.messageId && (
-                        <div className="text-xs text-gray-500">
+                        <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                           ID: {submission.emailDetails.messageId.slice(1, 9)}...
                         </div>
                       )}
                     </div>
                   </td>
                   <td className="px-6 py-4">
-                    <div className="text-sm text-gray-900 max-w-xs">
+                    <div className="text-sm max-w-xs" style={{ color: 'var(--color-text-primary)' }}>
                       {Object.entries(submission.formData).slice(0, 2).map(([key, value]) => (
                         <div key={key} className="truncate">
                           <span className="font-medium">{key}:</span> {String(value)}
                         </div>
                       ))}
                       {Object.keys(submission.formData).length > 2 && (
-                        <div className="text-gray-500">
+                        <div style={{ color: 'var(--color-text-muted)' }}>
                           +{Object.keys(submission.formData).length - 2} more fields
                     </div>
                   )}
@@ -433,7 +452,7 @@ const FormSubmissionsManager: React.FC = () => {
                         onClick={() => retryEmail(submission.id)}
                     variant="outline"
                     size="sm"
-                        className="text-blue-600 hover:text-blue-800"
+                        style={{ color: 'var(--color-primary)' }}
                   >
                         <Send className="w-4 h-4" />
                   </Button>
@@ -442,7 +461,7 @@ const FormSubmissionsManager: React.FC = () => {
                       onClick={() => deleteSubmission(submission.id)}
             variant="outline"
                       size="sm"
-                      className="text-red-600 hover:text-red-800"
+                      style={{ color: 'var(--color-error)' }}
           >
                       <Trash2 className="w-4 h-4" />
           </Button>
@@ -455,9 +474,9 @@ const FormSubmissionsManager: React.FC = () => {
         
         {filteredSubmissions.length === 0 && (
           <div className="text-center py-12">
-            <AlertCircle className="mx-auto h-12 w-12 text-gray-400" />
-            <h3 className="mt-2 text-sm font-medium text-gray-900">No submissions found</h3>
-            <p className="mt-1 text-sm text-gray-500">
+            <AlertCircle className="mx-auto h-12 w-12" style={{ color: 'var(--color-text-muted)' }} />
+            <h3 className="mt-2 text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>No submissions found</h3>
+            <p className="mt-1 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
               {searchTerm || statusFilter !== 'all' || formFilter !== 'all' || dateFilter !== 'all'
                 ? 'Try adjusting your filters'
                 : 'No form submissions have been received yet'}
@@ -472,7 +491,7 @@ const FormSubmissionsManager: React.FC = () => {
           <Card className="max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
                   Submission Details - {selectedSubmission.form.name}
                 </h3>
               <Button
@@ -487,12 +506,12 @@ const FormSubmissionsManager: React.FC = () => {
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Form Data */}
               <div>
-                  <h4 className="text-md font-semibold text-gray-900 mb-3">Form Data</h4>
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                  <h4 className="text-md font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Form Data</h4>
+                  <div className="p-4 rounded-lg space-y-2" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
                     {Object.entries(selectedSubmission.formData).map(([key, value]) => (
                       <div key={key}>
-                        <span className="font-medium text-gray-700">{key}:</span>
-                        <span className="ml-2 text-gray-900">{String(value)}</span>
+                        <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{key}:</span>
+                        <span className="ml-2" style={{ color: 'var(--color-text-primary)' }}>{String(value)}</span>
                       </div>
                     ))}
                   </div>
@@ -500,26 +519,26 @@ const FormSubmissionsManager: React.FC = () => {
 
                 {/* Email Details */}
                 <div>
-                  <h4 className="text-md font-semibold text-gray-900 mb-3">Email Details</h4>
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                  <h4 className="text-md font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Email Details</h4>
+                  <div className="p-4 rounded-lg space-y-2" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
                     <div>
-                      <span className="font-medium text-gray-700">Status:</span>
+                      <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Status:</span>
                       <span className="ml-2">{getStatusBadge(selectedSubmission.emailStatus)}</span>
                     </div>
                     
                     {selectedSubmission.form.emailNotification && (
                       <>
                         <div>
-                          <span className="font-medium text-gray-700">Static Recipients:</span>
-                          <span className="ml-2 text-gray-900">
+                          <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Static Recipients:</span>
+                          <span className="ml-2" style={{ color: 'var(--color-text-primary)' }}>
                             {selectedSubmission.form.emailRecipients || 'None'}
                           </span>
               </div>
               
                         {selectedSubmission.form.dynamicEmailRecipients && (
                           <div>
-                            <span className="font-medium text-gray-700">Dynamic Recipients:</span>
-                            <span className="ml-2 text-gray-900">
+                            <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Dynamic Recipients:</span>
+                            <span className="ml-2" style={{ color: 'var(--color-text-primary)' }}>
                               {selectedSubmission.form.emailFieldRecipients || 'None configured'}
                             </span>
                           </div>
@@ -527,8 +546,8 @@ const FormSubmissionsManager: React.FC = () => {
                         
                         {selectedSubmission.form.sendToSubmitterEmail && (
                           <div>
-                            <span className="font-medium text-gray-700">Submitter Email Field:</span>
-                            <span className="ml-2 text-gray-900">
+                            <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Submitter Email Field:</span>
+                            <span className="ml-2" style={{ color: 'var(--color-text-primary)' }}>
                               {selectedSubmission.form.submitterEmailField || 'None configured'}
                             </span>
                           </div>
@@ -540,8 +559,8 @@ const FormSubmissionsManager: React.FC = () => {
                       <>
                         {selectedSubmission.emailDetails.messageId && (
                           <div>
-                            <span className="font-medium text-gray-700">Message ID:</span>
-                            <span className="ml-2 text-gray-900 text-xs">
+                            <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Message ID:</span>
+                            <span className="ml-2 text-xs" style={{ color: 'var(--color-text-primary)' }}>
                               {selectedSubmission.emailDetails.messageId}
                             </span>
                           </div>
@@ -549,8 +568,8 @@ const FormSubmissionsManager: React.FC = () => {
                         
                         {selectedSubmission.emailDetails.recipients && (
                           <div>
-                            <span className="font-medium text-gray-700">Sent To:</span>
-                            <span className="ml-2 text-gray-900">
+                            <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Sent To:</span>
+                            <span className="ml-2" style={{ color: 'var(--color-text-primary)' }}>
                               {selectedSubmission.emailDetails.recipients.join(', ')}
                             </span>
                           </div>
@@ -558,8 +577,8 @@ const FormSubmissionsManager: React.FC = () => {
                         
                         {selectedSubmission.emailDetails.subject && (
                           <div>
-                            <span className="font-medium text-gray-700">Subject:</span>
-                            <span className="ml-2 text-gray-900">
+                            <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Subject:</span>
+                            <span className="ml-2" style={{ color: 'var(--color-text-primary)' }}>
                               {selectedSubmission.emailDetails.subject}
                             </span>
                           </div>
@@ -567,8 +586,8 @@ const FormSubmissionsManager: React.FC = () => {
                         
                         {selectedSubmission.emailDetails.sentAt && (
                           <div>
-                            <span className="font-medium text-gray-700">Sent At:</span>
-                            <span className="ml-2 text-gray-900">
+                            <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Sent At:</span>
+                            <span className="ml-2" style={{ color: 'var(--color-text-primary)' }}>
                               {new Date(selectedSubmission.emailDetails.sentAt).toLocaleString()}
                             </span>
                           </div>
@@ -576,8 +595,8 @@ const FormSubmissionsManager: React.FC = () => {
                         
                         {selectedSubmission.emailDetails.error && (
               <div>
-                            <span className="font-medium text-red-700">Error:</span>
-                            <span className="ml-2 text-red-900">
+                            <span className="font-medium" style={{ color: 'var(--color-error)' }}>Error:</span>
+                            <span className="ml-2" style={{ color: 'var(--color-error)' }}>
                               {selectedSubmission.emailDetails.error}
                       </span>
                     </div>
@@ -589,9 +608,9 @@ const FormSubmissionsManager: React.FC = () => {
 
                 {/* Metadata */}
                 <div className="lg:col-span-2">
-                  <h4 className="text-md font-semibold text-gray-900 mb-3">Submission Metadata</h4>
-                  <div className="bg-gray-50 p-4 rounded-lg">
-                    <pre className="text-sm text-gray-900 whitespace-pre-wrap">
+                  <h4 className="text-md font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Submission Metadata</h4>
+                  <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+                    <pre className="text-sm whitespace-pre-wrap" style={{ color: 'var(--color-text-primary)' }}>
                       {JSON.stringify(selectedSubmission.metadata, null, 2)}
                     </pre>
                   </div>
@@ -602,7 +621,7 @@ const FormSubmissionsManager: React.FC = () => {
                 <div className="mt-6 flex justify-end">
                   <Button
                     onClick={() => retryEmail(selectedSubmission.id)}
-                    className="bg-blue-600 hover:bg-blue-700"
+                    style={{ backgroundColor: 'var(--color-primary)' }}
                   >
                     <Send className="w-4 h-4 mr-2" />
                     Retry Email

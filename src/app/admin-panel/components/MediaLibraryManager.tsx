@@ -1153,6 +1153,28 @@ const UrlImportModal: React.FC<{
               rows={3}
               placeholder="Optional description"
             />
+            <style jsx>{`
+              textarea::placeholder {
+                color: var(--color-text-muted, #9CA3AF) !important;
+                opacity: 1;
+              }
+              textarea::-webkit-input-placeholder {
+                color: var(--color-text-muted, #9CA3AF) !important;
+                opacity: 1;
+              }
+              textarea::-moz-placeholder {
+                color: var(--color-text-muted, #9CA3AF) !important;
+                opacity: 1;
+              }
+              textarea:-ms-input-placeholder {
+                color: var(--color-text-muted, #9CA3AF) !important;
+                opacity: 1;
+              }
+              textarea:-moz-placeholder {
+                color: var(--color-text-muted, #9CA3AF) !important;
+                opacity: 1;
+              }
+            `}</style>
           </div>
 
           <div className="flex gap-3 pt-4">

@@ -142,7 +142,7 @@ export default function FAQCategoriesManager() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-gray-600">Loading FAQ categories...</div>
+        <div style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Loading FAQ categories...</div>
       </div>
     );
   }
@@ -151,8 +151,8 @@ export default function FAQCategoriesManager() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">FAQ Categories</h2>
-          <p className="text-gray-600">Organize your frequently asked questions into categories</p>
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>FAQ Categories</h2>
+          <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Organize your frequently asked questions into categories</p>
         </div>
         <Button
           onClick={() => setShowCreateForm(true)}
@@ -167,7 +167,7 @@ export default function FAQCategoriesManager() {
       {showCreateForm && (
         <Card className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold">
+            <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
               {editingId ? 'Edit FAQ Category' : 'Create New FAQ Category'}
             </h3>
             <Button
@@ -182,7 +182,7 @@ export default function FAQCategoriesManager() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Category Name *
                 </label>
                 <Input
@@ -195,7 +195,7 @@ export default function FAQCategoriesManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Sort Order
                 </label>
                 <Input
@@ -208,7 +208,7 @@ export default function FAQCategoriesManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Description
               </label>
               <Input
@@ -221,7 +221,7 @@ export default function FAQCategoriesManager() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Icon
                 </label>
                 <UniversalIconPicker
@@ -232,7 +232,7 @@ export default function FAQCategoriesManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Color
                 </label>
                 <div className="flex items-center space-x-2">
@@ -261,7 +261,7 @@ export default function FAQCategoriesManager() {
                 onChange={(e) => handleInputChange('isActive', e.target.checked)}
                 className="rounded"
               />
-              <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
+              <label htmlFor="isActive" className="text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Active
               </label>
             </div>
@@ -296,8 +296,8 @@ export default function FAQCategoriesManager() {
                   {renderIcon(category.icon || 'FolderOpen')}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">{category.name}</h3>
-                  <p className="text-sm text-gray-500">Order: {category.sortOrder}</p>
+                  <h3 className="font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{category.name}</h3>
+                  <p className="text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>Order: {category.sortOrder}</p>
                 </div>
               </div>
               <div className="flex items-center space-x-1">
@@ -312,7 +312,7 @@ export default function FAQCategoriesManager() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleDelete(category.id)}
-                  className="text-red-600 hover:text-red-700"
+                  style={{ color: 'var(--color-error, #EF4444)' }}
                 >
                   <Trash2 className="w-4 h-4" />
                 </Button>
@@ -323,16 +323,15 @@ export default function FAQCategoriesManager() {
                               <p className="text-sm mb-3" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{category.description}</p>
             )}
 
-            <div className="flex items-center justify-between text-sm text-gray-500">
+            <div className="flex items-center justify-between text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
               <div className="flex items-center space-x-1">
                 <MessageSquare className="w-4 h-4" />
                 <span>{category._count?.faqs || 0} FAQs</span>
               </div>
-              <div className={`px-2 py-1 rounded-full text-xs ${
-                category.isActive 
-                  ? 'bg-green-100 text-green-800' 
-                  : 'bg-gray-100 text-gray-800'
-              }`}>
+              <div className={`px-2 py-1 rounded-full text-xs`} style={{
+                backgroundColor: category.isActive ? 'var(--color-success-light, #D1FAE5)' : 'var(--color-gray-light, #E5E7EB)',
+                color: category.isActive ? 'var(--color-success-dark, #065F46)' : 'var(--color-text-secondary, #6B7280)'
+              }}>
                 {category.isActive ? 'Active' : 'Inactive'}
               </div>
             </div>
@@ -342,9 +341,9 @@ export default function FAQCategoriesManager() {
 
       {categories.length === 0 && (
         <div className="text-center py-12">
-          <FolderOpen className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No FAQ Categories</h3>
-          <p className="text-gray-600 mb-4">Create your first FAQ category to get started.</p>
+          <FolderOpen className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
+          <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>No FAQ Categories</h3>
+          <p className="mb-4" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Create your first FAQ category to get started.</p>
           <Button onClick={() => setShowCreateForm(true)}>
             <Plus className="w-4 h-4 mr-2" />
             Add Category

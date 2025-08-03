@@ -65,10 +65,10 @@ export default function ContactManager() {
                 className="group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors"
                 style={{
                   borderColor: isActive 
-                    ? 'var(--color-success, #10B981)' 
+                    ? 'var(--color-primary, #5243E9)' 
                     : 'transparent',
                   color: isActive 
-                    ? 'var(--color-success, #10B981)' 
+                    ? 'var(--color-primary, #5243E9)' 
                     : 'var(--color-text-secondary, #6B7280)'
                 }}
               >
@@ -76,8 +76,8 @@ export default function ContactManager() {
                   className="mr-2 h-5 w-5 transition-colors"
                   style={{
                     color: isActive 
-                      ? 'var(--color-success, #10B981)' 
-                      : 'var(--color-text-muted, #9CA3AF)'
+                      ? 'var(--color-primary, #5243E9)' 
+                      : 'var(--color-text-secondary, #6B7280)'
                   }}
                 />
                 {tab.name}

@@ -183,7 +183,7 @@ export default function ContactSectionsManager() {
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="text-gray-600">Loading contact sections...</div>
+        <div style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Loading contact sections...</div>
       </div>
     );
   }
@@ -192,8 +192,8 @@ export default function ContactSectionsManager() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Contact Sections</h2>
-          <p className="text-gray-600">Manage contact forms and their configurations</p>
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Contact Sections</h2>
+          <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Manage contact forms and their configurations</p>
         </div>
         <Button
           onClick={() => setShowCreateForm(true)}
@@ -223,7 +223,7 @@ export default function ContactSectionsManager() {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Name *
                 </label>
                 <Input
@@ -236,7 +236,7 @@ export default function ContactSectionsManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                   Heading *
                 </label>
                 <Input
@@ -250,7 +250,7 @@ export default function ContactSectionsManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Subheading
               </label>
               <Input
@@ -262,7 +262,7 @@ export default function ContactSectionsManager() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Success Message *
               </label>
               <textarea
@@ -271,12 +271,35 @@ export default function ContactSectionsManager() {
                 placeholder="Message shown when form is submitted successfully"
                 required
                 rows={3}
-                className="w-full p-3 border border-gray-300 rounded-md resize-vertical"
+                className="w-full p-3 border rounded-md resize-vertical"
+                style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}
               />
+              <style jsx>{`
+                textarea::placeholder {
+                  color: var(--color-text-muted, #9CA3AF) !important;
+                  opacity: 1;
+                }
+                textarea::-webkit-input-placeholder {
+                  color: var(--color-text-muted, #9CA3AF) !important;
+                  opacity: 1;
+                }
+                textarea::-moz-placeholder {
+                  color: var(--color-text-muted, #9CA3AF) !important;
+                  opacity: 1;
+                }
+                textarea:-ms-input-placeholder {
+                  color: var(--color-text-muted, #9CA3AF) !important;
+                  opacity: 1;
+                }
+                textarea:-moz-placeholder {
+                  color: var(--color-text-muted, #9CA3AF) !important;
+                  opacity: 1;
+                }
+              `}</style>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Error Message *
               </label>
               <textarea
@@ -285,8 +308,31 @@ export default function ContactSectionsManager() {
                 placeholder="Message shown when form submission fails"
                 required
                 rows={3}
-                className="w-full p-3 border border-gray-300 rounded-md resize-vertical"
+                className="w-full p-3 border rounded-md resize-vertical"
+                style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}
               />
+              <style jsx>{`
+                textarea::placeholder {
+                  color: var(--color-text-muted, #9CA3AF) !important;
+                  opacity: 1;
+                }
+                textarea::-webkit-input-placeholder {
+                  color: var(--color-text-muted, #9CA3AF) !important;
+                  opacity: 1;
+                }
+                textarea::-moz-placeholder {
+                  color: var(--color-text-muted, #9CA3AF) !important;
+                  opacity: 1;
+                }
+                textarea:-ms-input-placeholder {
+                  color: var(--color-text-muted, #9CA3AF) !important;
+                  opacity: 1;
+                }
+                textarea:-moz-placeholder {
+                  color: var(--color-text-muted, #9CA3AF) !important;
+                  opacity: 1;
+                }
+              `}</style>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -297,7 +343,7 @@ export default function ContactSectionsManager() {
                 onChange={(e) => handleInputChange('isActive', e.target.checked)}
                 className="rounded"
               />
-              <label htmlFor="isActive" className="text-sm font-medium text-gray-700">
+              <label htmlFor="isActive" className="text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 Active
               </label>
             </div>
@@ -326,24 +372,27 @@ export default function ContactSectionsManager() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center space-x-2 mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                     {section.name}
                   </h3>
-                  <div className={`px-2 py-1 rounded-full text-xs ${
-                    section.isActive 
-                      ? 'bg-green-100 text-green-800' 
-                      : 'bg-gray-100 text-gray-800'
-                  }`}>
+                  <div className="px-2 py-1 rounded-full text-xs" style={{
+                    backgroundColor: section.isActive 
+                      ? 'var(--color-success-light, #D1FAE5)' 
+                      : 'var(--color-gray-light, #E5E7EB)',
+                    color: section.isActive 
+                      ? 'var(--color-success-dark, #065F46)' 
+                      : 'var(--color-text-secondary, #6B7280)'
+                  }}>
                     {section.isActive ? 'Active' : 'Inactive'}
                   </div>
                 </div>
                 
-                <p className="text-gray-600 mb-2">{section.heading}</p>
+                <p style={{ color: 'var(--color-text-secondary, #6B7280)' }} className="mb-2">{section.heading}</p>
                 {section.subheading && (
-                  <p className="text-sm text-gray-500 mb-3">{section.subheading}</p>
+                  <p className="text-sm mb-3" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>{section.subheading}</p>
                 )}
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
                   <div className="flex items-center space-x-1">
                     <Settings className="w-4 h-4" />
                     <span>{section.fields?.length || 0} fields</span>
@@ -379,7 +428,7 @@ export default function ContactSectionsManager() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleDelete(section.id)}
-                  className="text-red-600 hover:text-red-700"
+                  style={{ color: 'var(--color-error, #EF4444)' }}
                   disabled={Boolean(section._count?.submissions && section._count.submissions > 0)}
                 >
                   <Trash2 className="w-4 h-4" />
@@ -392,9 +441,9 @@ export default function ContactSectionsManager() {
 
       {contactSections.length === 0 && (
         <div className="text-center py-12">
-          <Mail className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Contact Sections Yet</h3>
-          <p className="text-gray-600 mb-4">
+          <Mail className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
+          <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary, #1F2937)' }}>No Contact Sections Yet</h3>
+          <p className="mb-4" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
             Create your first contact section to start collecting user inquiries.
           </p>
           <Button onClick={() => setShowCreateForm(true)}>

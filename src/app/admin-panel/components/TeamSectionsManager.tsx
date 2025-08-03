@@ -1050,13 +1050,36 @@ const TeamSectionsManager: React.FC = () => {
                   value={memberFormData.bio}
                   onChange={(e) => handleMemberInputChange('bio', e.target.value)}
                   rows={3}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full p-3 border rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Enter bio..."
                   style={{ 
                     color: designSystem?.textPrimary || '#000000',
-                    backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                    backgroundColor: designSystem?.backgroundPrimary || '#ffffff',
+                    borderColor: 'var(--color-gray-light, #E5E7EB)'
                   }}
                 />
+                <style jsx>{`
+                  textarea::placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea::-webkit-input-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea::-moz-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea:-ms-input-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea:-moz-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                `}</style>
               </div>
               <div className="md:col-span-2">
                 <label 

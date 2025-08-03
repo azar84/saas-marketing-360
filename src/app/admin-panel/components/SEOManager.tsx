@@ -493,25 +493,25 @@ Allow: /uploads/media/`;
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 60) return 'text-yellow-600';
-    return 'text-red-600';
+    if (score >= 80) return 'var(--color-success)';
+    if (score >= 60) return 'var(--color-warning)';
+    return 'var(--color-error)';
   };
 
   const getScoreBgColor = (score: number) => {
-    if (score >= 80) return 'bg-green-100';
-    if (score >= 60) return 'bg-yellow-100';
-    return 'bg-red-100';
+    if (score >= 80) return 'var(--color-success-light)';
+    if (score >= 60) return 'var(--color-warning-light)';
+    return 'var(--color-error-light)';
   };
 
   if (loading) {
     return (
       <div className="p-8">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
+                      <div className="h-8 rounded w-1/3 mb-6" style={{ backgroundColor: 'var(--color-gray-light)' }}></div>
           <div className="space-y-4">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded"></div>
+              <div key={i} className="h-24 rounded" style={{ backgroundColor: 'var(--color-gray-light)' }}></div>
             ))}
           </div>
         </div>
@@ -524,15 +524,18 @@ Allow: /uploads/media/`;
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Sitemap Management</h2>
-          <p className="text-gray-600 mt-1">Generate and manage XML sitemaps for search engines</p>
+          <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>Sitemap Management</h2>
+          <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>Generate and manage XML sitemaps for search engines</p>
         </div>
         
         <div className="flex items-center space-x-3">
           <Button
             onClick={generateSitemap}
             disabled={generating}
-            className="bg-purple-600 hover:bg-purple-700 text-white"
+            style={{ 
+              backgroundColor: 'var(--color-primary)',
+              color: 'var(--color-text-primary)'
+            }}
           >
             {generating ? (
               <>
@@ -549,7 +552,10 @@ Allow: /uploads/media/`;
           <Button
             onClick={() => window.open('/sitemap.xml', '_blank')}
             variant="outline"
-            className="border-blue-200 text-blue-600 hover:bg-blue-50"
+            style={{ 
+              borderColor: 'var(--color-gray-light)',
+              color: 'var(--color-text-primary)'
+            }}
           >
             <ExternalLink className="w-4 h-4 mr-2" />
             View Sitemap
@@ -557,7 +563,10 @@ Allow: /uploads/media/`;
           <Button
             onClick={submitSitemapToSearchEngines}
             disabled={submitting}
-            className="bg-green-600 hover:bg-green-700 text-white"
+            style={{ 
+              backgroundColor: 'var(--color-success)',
+              color: 'var(--color-text-primary)'
+            }}
           >
             {submitting ? (
               <>
@@ -581,11 +590,18 @@ Allow: /uploads/media/`;
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className={`p-4 rounded-lg flex items-center space-x-3 ${
-              message.type === 'success' ? 'bg-green-50 text-green-800 border border-green-200' :
-              message.type === 'error' ? 'bg-red-50 text-red-800 border border-red-200' :
-              'bg-blue-50 text-blue-800 border border-blue-200'
-            }`}
+            className="p-4 rounded-lg flex items-center space-x-3 border"
+            style={{
+              backgroundColor: message.type === 'success' ? 'var(--color-success-light)' :
+                message.type === 'error' ? 'var(--color-error-light)' :
+                'var(--color-info-light)',
+              color: message.type === 'success' ? 'var(--color-success-dark)' :
+                message.type === 'error' ? 'var(--color-error-dark)' :
+                'var(--color-info-dark)',
+              borderColor: message.type === 'success' ? 'var(--color-success)' :
+                message.type === 'error' ? 'var(--color-error)' :
+                'var(--color-info)'
+            }}
           >
             {message.type === 'success' && <CheckCircle className="w-5 h-5" />}
             {message.type === 'error' && <XCircle className="w-5 h-5" />}
@@ -602,24 +618,26 @@ Allow: /uploads/media/`;
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className={`p-4 rounded-lg border ${
-              submissionResults.success ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'
-            }`}
+            className="p-4 rounded-lg border"
+            style={{
+              backgroundColor: submissionResults.success ? 'var(--color-success-light)' : 'var(--color-error-light)',
+              borderColor: submissionResults.success ? 'var(--color-success)' : 'var(--color-error)'
+            }}
           >
             <div className="flex items-center space-x-3 mb-2">
               {submissionResults.success ? (
-                <CheckCircle className="w-5 h-5 text-green-600" />
+                <CheckCircle className="w-5 h-5" style={{ color: 'var(--color-success)' }} />
               ) : (
-                <XCircle className="w-5 h-5 text-red-600" />
+                <XCircle className="w-5 h-5" style={{ color: 'var(--color-error)' }} />
               )}
-              <span className={submissionResults.success ? 'text-green-800' : 'text-red-800'}>
+              <span style={{ color: submissionResults.success ? 'var(--color-success-dark)' : 'var(--color-error-dark)' }}>
                 {submissionResults.message}
               </span>
             </div>
             {submissionResults.submittedUrls && submissionResults.submittedUrls.length > 0 && (
               <div className="mt-2">
-                <p className="text-sm text-green-700 font-medium">Successfully submitted:</p>
-                <ul className="text-sm text-green-600 mt-1">
+                <p className="text-sm font-medium" style={{ color: 'var(--color-success-dark)' }}>Successfully submitted:</p>
+                <ul className="text-sm mt-1" style={{ color: 'var(--color-success-dark)' }}>
                   {submissionResults.submittedUrls.map((url, index) => (
                     <li key={index}>• {url}</li>
                   ))}
@@ -628,8 +646,8 @@ Allow: /uploads/media/`;
             )}
             {submissionResults.errors && submissionResults.errors.length > 0 && (
               <div className="mt-2">
-                <p className="text-sm text-red-700 font-medium">Errors:</p>
-                <ul className="text-sm text-red-600 mt-1">
+                <p className="text-sm font-medium" style={{ color: 'var(--color-error-dark)' }}>Errors:</p>
+                <ul className="text-sm mt-1" style={{ color: 'var(--color-error-dark)' }}>
                   {submissionResults.errors.map((error, index) => (
                     <li key={index}>• {error}</li>
                   ))}
@@ -642,50 +660,50 @@ Allow: /uploads/media/`;
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-6">
+        <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
           <div className="flex items-center">
-            <FileText className="w-8 h-8 text-blue-600 mr-3" />
+            <FileText className="w-8 h-8 mr-3" style={{ color: 'var(--color-primary)' }} />
             <div>
-              <p className="text-2xl font-semibold text-gray-900">
+              <p className="text-2xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>
                 {pages.length}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                 Total Pages
               </p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
           <div className="flex items-center">
-            <Globe className="w-8 h-8 text-green-600 mr-3" />
+            <Globe className="w-8 h-8 mr-3" style={{ color: 'var(--color-success)' }} />
             <div>
-              <p className="text-2xl font-semibold text-gray-900">XML</p>
-              <p className="text-sm text-gray-600">Sitemap Format</p>
+              <p className="text-2xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>XML</p>
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Sitemap Format</p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6">
+        <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
           <div className="flex items-center">
-            <Calendar className="w-8 h-8 text-purple-600 mr-3" />
+            <Calendar className="w-8 h-8 mr-3" style={{ color: 'var(--color-secondary)' }} />
             <div>
-              <p className="text-2xl font-semibold text-gray-900">
+              <p className="text-2xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>
                 Active
               </p>
-              <p className="text-sm text-gray-600">Sitemap Status</p>
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Sitemap Status</p>
             </div>
           </div>
         </Card>
       </div>
 
       {/* FAQ Pages Info */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Search Engine Optimization</h3>
+      <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Search Engine Optimization</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">Sitemap Benefits</h4>
-            <ul className="text-sm text-gray-600 space-y-1">
+            <h4 className="font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Sitemap Benefits</h4>
+            <ul className="text-sm space-y-1" style={{ color: 'var(--color-text-secondary)' }}>
               <li>• Helps search engines discover your pages</li>
               <li>• Improves indexing of new content</li>
               <li>• Provides metadata about page importance</li>
@@ -693,8 +711,8 @@ Allow: /uploads/media/`;
             </ul>
           </div>
           <div>
-            <h4 className="font-medium text-gray-900 mb-2">Automatic Updates</h4>
-            <ul className="text-sm text-gray-600 space-y-1">
+            <h4 className="font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Automatic Updates</h4>
+            <ul className="text-sm space-y-1" style={{ color: 'var(--color-text-secondary)' }}>
               <li>• Generated from live database content</li>
               <li>• Includes all active pages and FAQ content</li>
               <li>• Updates automatically when content changes</li>
@@ -705,31 +723,37 @@ Allow: /uploads/media/`;
       </Card>
 
       {/* Sitemap Entries List */}
-      <Card className="p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+        <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
           Pages in Sitemap
         </h3>
         <div className="space-y-4">
           {pages.map((page) => (
-            <div key={page.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div key={page.id} className="flex items-center justify-between p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
               <div className="flex-1">
                 <div className="flex items-center space-x-3">
-                  <h4 className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{page.title}</h4>
-                  <span className="text-sm text-gray-500">/{page.slug}</span>
+                  <h4 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{page.title}</h4>
+                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>/{page.slug}</span>
                 </div>
-                <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
+                <div className="flex items-center space-x-4 mt-2 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                   <span>Priority: {page.slug === 'home' ? '1.0' : '0.8'}</span>
                   <span>Change Frequency: {page.slug === 'home' ? 'daily' : 'weekly'}</span>
                   <span>Last Modified: {new Date(page.updatedAt).toLocaleDateString()}</span>
                 </div>
                 <div className="flex items-center space-x-2 mt-2">
                   {page.showInHeader && (
-                    <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded">
+                    <span className="px-2 py-1 text-xs rounded" style={{ 
+                      backgroundColor: 'var(--color-info-light)',
+                      color: 'var(--color-info-dark)'
+                    }}>
                       In Header
                     </span>
                   )}
                   {page.showInFooter && (
-                    <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">
+                    <span className="px-2 py-1 text-xs rounded" style={{ 
+                      backgroundColor: 'var(--color-success-light)',
+                      color: 'var(--color-success-dark)'
+                    }}>
                       In Footer
                     </span>
                   )}
@@ -740,6 +764,10 @@ Allow: /uploads/media/`;
                   onClick={() => window.open(`/${page.slug}`, '_blank')}
                   variant="outline"
                   size="sm"
+                  style={{ 
+                    borderColor: 'var(--color-gray-light)',
+                    color: 'var(--color-text-primary)'
+                  }}
                 >
                   <ExternalLink className="w-4 h-4" />
                 </Button>
@@ -750,17 +778,17 @@ Allow: /uploads/media/`;
 
         {pages.length === 0 && (
           <div className="text-center py-8">
-            <FileText className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No pages found</h3>
-            <p className="text-gray-500">Create some pages to see them in the sitemap.</p>
+            <FileText className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-muted)' }} />
+            <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>No pages found</h3>
+            <p style={{ color: 'var(--color-text-secondary)' }}>Create some pages to see them in the sitemap.</p>
           </div>
         )}
       </Card>
 
       {/* Submission Logs Section */}
-      <Card className="p-6">
+      <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">Google Submission Logs</h3>
+          <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Google Submission Logs</h3>
           <Button
             onClick={fetchSubmissionLogs}
             variant="outline"
@@ -784,39 +812,39 @@ Allow: /uploads/media/`;
         {/* Submission Stats */}
         {submissionStats && Object.keys(submissionStats).length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-            <div className="bg-blue-50 p-4 rounded-lg">
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-info-light)' }}>
               <div className="flex items-center">
-                <Globe className="w-5 h-5 text-blue-600 mr-2" />
+                <Globe className="w-5 h-5 mr-2" style={{ color: 'var(--color-info)' }} />
                 <div>
-                  <p className="text-sm font-medium text-blue-600">Total Submissions</p>
-                  <p className="text-lg font-bold text-blue-900">{submissionStats.total || 0}</p>
+                  <p className="text-sm font-medium" style={{ color: 'var(--color-info-dark)' }}>Total Submissions</p>
+                  <p className="text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>{submissionStats.total || 0}</p>
                 </div>
               </div>
             </div>
-            <div className="bg-green-50 p-4 rounded-lg">
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-success-light)' }}>
               <div className="flex items-center">
-                <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
+                <CheckCircle className="w-5 h-5 mr-2" style={{ color: 'var(--color-success)' }} />
                 <div>
-                  <p className="text-sm font-medium text-green-600">Successful</p>
-                  <p className="text-lg font-bold text-green-900">{submissionStats.successful || 0}</p>
+                  <p className="text-sm font-medium" style={{ color: 'var(--color-success-dark)' }}>Successful</p>
+                  <p className="text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>{submissionStats.successful || 0}</p>
                 </div>
               </div>
             </div>
-            <div className="bg-red-50 p-4 rounded-lg">
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-error-light)' }}>
               <div className="flex items-center">
-                <XCircle className="w-5 h-5 text-red-600 mr-2" />
+                <XCircle className="w-5 h-5 mr-2" style={{ color: 'var(--color-error)' }} />
                 <div>
-                  <p className="text-sm font-medium text-red-600">Failed</p>
-                  <p className="text-lg font-bold text-red-900">{submissionStats.failed || 0}</p>
+                  <p className="text-sm font-medium" style={{ color: 'var(--color-error-dark)' }}>Failed</p>
+                  <p className="text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>{submissionStats.failed || 0}</p>
                 </div>
               </div>
             </div>
-            <div className="bg-purple-50 p-4 rounded-lg">
+            <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-secondary-light)' }}>
               <div className="flex items-center">
-                <BarChart3 className="w-5 h-5 text-purple-600 mr-2" />
+                <BarChart3 className="w-5 h-5 mr-2" style={{ color: 'var(--color-secondary)' }} />
                 <div>
-                  <p className="text-sm font-medium text-purple-600">Success Rate</p>
-                  <p className="text-lg font-bold text-purple-900">{submissionStats.successRate ? `${submissionStats.successRate.toFixed(1)}%` : '0%'}</p>
+                  <p className="text-sm font-medium" style={{ color: 'var(--color-secondary-dark)' }}>Success Rate</p>
+                  <p className="text-lg font-bold" style={{ color: 'var(--color-text-primary)' }}>{submissionStats.successRate ? `${submissionStats.successRate.toFixed(1)}%` : '0%'}</p>
                 </div>
               </div>
             </div>
@@ -826,111 +854,135 @@ Allow: /uploads/media/`;
         {/* Submission Logs Table */}
         {submissionLogs.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y" style={{ borderColor: 'var(--color-gray-light)' }}>
+              <thead style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary)' }}>
                     Submitted At
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary)' }}>
                     Sitemap URL
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary)' }}>
                     Status
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary)' }}>
                     Search Engine
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary)' }}>
                     Status Code
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary)' }}>
                     Submission ID
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary)' }}>
                     Response / Error
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider" style={{ color: 'var(--color-text-primary)' }}>
                     Warnings
                   </th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="divide-y" style={{ backgroundColor: 'var(--color-bg-primary)', borderColor: 'var(--color-gray-light)' }}>
                 {submissionLogs.slice(0, 10).map((log, index) => (
-                  <tr key={log.id || index} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <tr 
+                    key={log.id || index} 
+                    className="transition-colors duration-200"
+                    style={{ 
+                      backgroundColor: 'var(--color-bg-primary)',
+                      borderBottom: '1px solid var(--color-gray-light)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.backgroundColor = 'var(--color-bg-primary)';
+                    }}
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--color-text-primary)' }}>
                       <div className="flex flex-col">
                         <span>{new Date(log.submittedAt).toLocaleDateString()}</span>
-                        <span className="text-xs text-gray-500">{new Date(log.submittedAt).toLocaleTimeString()}</span>
+                        <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>{new Date(log.submittedAt).toLocaleTimeString()}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm" style={{ color: 'var(--color-text-primary)' }}>
                       <div className="max-w-xs truncate" title={log.sitemapUrl}>
                         <a 
                           href={log.sitemapUrl} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 hover:underline"
+                          style={{ color: 'var(--color-primary)' }}
+                          className="hover:underline"
                         >
                           {log.sitemapUrl}
                         </a>
                       </div>
                       {log.siteUrl && (
-                        <div className="text-xs text-gray-500 mt-1" title={log.siteUrl}>
+                        <div className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }} title={log.siteUrl}>
                           Site: {log.siteUrl.replace('sc-domain:', '')}
                         </div>
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                        log.status === 'success' 
-                          ? 'bg-green-100 text-green-800' 
+                      <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full" style={{
+                        backgroundColor: log.status === 'success' 
+                          ? 'var(--color-success-light)'
                           : log.status === 'error'
-                          ? 'bg-red-100 text-red-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
+                          ? 'var(--color-error-light)'
+                          : 'var(--color-warning-light)',
+                        color: log.status === 'success' 
+                          ? 'var(--color-success-dark)'
+                          : log.status === 'error'
+                          ? 'var(--color-error-dark)'
+                          : 'var(--color-warning-dark)'
+                      }}>
                         {log.status}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--color-text-primary)' }}>
                       <div className="flex items-center">
                         {log.searchEngine === 'Google' ? (
-                          <span className="text-blue-600 font-medium">Google</span>
+                          <span className="font-medium" style={{ color: 'var(--color-primary)' }}>Google</span>
                         ) : (
-                          <span className="text-orange-600 font-medium">{log.searchEngine}</span>
+                          <span className="font-medium" style={{ color: 'var(--color-warning)' }}>{log.searchEngine}</span>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--color-text-primary)' }}>
                       {log.statusCode ? (
-                        <span className={`inline-flex px-2 py-1 text-xs font-medium rounded ${
-                          log.statusCode >= 200 && log.statusCode < 300
-                            ? 'bg-green-100 text-green-800'
+                        <span className="inline-flex px-2 py-1 text-xs font-medium rounded" style={{
+                          backgroundColor: log.statusCode >= 200 && log.statusCode < 300
+                            ? 'var(--color-success-light)'
                             : log.statusCode >= 400
-                            ? 'bg-red-100 text-red-800'
-                            : 'bg-yellow-100 text-yellow-800'
-                        }`}>
+                            ? 'var(--color-error-light)'
+                            : 'var(--color-warning-light)',
+                          color: log.statusCode >= 200 && log.statusCode < 300
+                            ? 'var(--color-success-dark)'
+                            : log.statusCode >= 400
+                            ? 'var(--color-error-dark)'
+                            : 'var(--color-warning-dark)'
+                        }}>
                           {log.statusCode}
                         </span>
                       ) : (
-                        <span className="text-gray-400">-</span>
+                        <span style={{ color: 'var(--color-text-muted)' }}>-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm" style={{ color: 'var(--color-text-primary)' }}>
                       {log.submissionId ? (
                         <div className="max-w-xs truncate font-mono text-xs" title={log.submissionId}>
                           {log.submissionId}
                         </div>
                       ) : (
-                        <span className="text-gray-400">-</span>
+                        <span style={{ color: 'var(--color-text-muted)' }}>-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm" style={{ color: 'var(--color-text-primary)' }}>
                       {log.status === 'success' ? (
                         <div className="space-y-1">
-                          <span className="text-green-600 font-medium">✅ Submitted Successfully</span>
+                          <span className="font-medium" style={{ color: 'var(--color-success)' }}>✅ Submitted Successfully</span>
                           {log.googleResponse && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
                               {typeof log.googleResponse === 'object' && log.googleResponse.kind ? (
                                 <span>Kind: {log.googleResponse.kind}</span>
                               ) : (
@@ -941,35 +993,35 @@ Allow: /uploads/media/`;
                         </div>
                       ) : log.errorMessage ? (
                         <div className="space-y-1">
-                          <div className="max-w-xs text-red-600 font-medium" title={log.errorMessage}>
+                          <div className="max-w-xs font-medium" style={{ color: 'var(--color-error)' }} title={log.errorMessage}>
                             ❌ {log.errorMessage.length > 50 ? `${log.errorMessage.substring(0, 50)}...` : log.errorMessage}
                           </div>
                           {log.errorMessage.length > 50 && (
-                            <div className="text-xs text-gray-500 cursor-help" title={log.errorMessage}>
+                            <div className="text-xs cursor-help" style={{ color: 'var(--color-text-secondary)' }} title={log.errorMessage}>
                               Hover for full error
                             </div>
                           )}
                         </div>
                       ) : (
-                        <span className="text-gray-500">-</span>
+                        <span style={{ color: 'var(--color-text-secondary)' }}>-</span>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-900">
+                    <td className="px-6 py-4 text-sm" style={{ color: 'var(--color-text-primary)' }}>
                       {log.warnings && log.warnings.length > 0 ? (
                         <div className="space-y-1">
-                                                     {log.warnings.slice(0, 2).map((warning: string, wIndex: number) => (
-                             <div key={wIndex} className="text-yellow-600 text-xs" title={warning}>
-                               ⚠️ {warning.length > 30 ? `${warning.substring(0, 30)}...` : warning}
-                             </div>
-                           ))}
+                          {log.warnings.slice(0, 2).map((warning: string, wIndex: number) => (
+                            <div key={wIndex} className="text-xs" style={{ color: 'var(--color-warning)' }} title={warning}>
+                              ⚠️ {warning.length > 30 ? `${warning.substring(0, 30)}...` : warning}
+                            </div>
+                          ))}
                           {log.warnings.length > 2 && (
-                            <div className="text-xs text-gray-500">
+                            <div className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
                               +{log.warnings.length - 2} more warnings
                             </div>
                           )}
                         </div>
                       ) : (
-                        <span className="text-gray-400">None</span>
+                        <span style={{ color: 'var(--color-text-muted)' }}>None</span>
                       )}
                     </td>
                   </tr>
@@ -979,9 +1031,9 @@ Allow: /uploads/media/`;
           </div>
         ) : (
           <div className="text-center py-8">
-            <Globe className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No submission logs</h3>
-            <p className="text-gray-500">
+            <Globe className="w-12 h-12 mx-auto mb-4" style={{ color: 'var(--color-text-muted)' }} />
+            <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>No submission logs</h3>
+            <p style={{ color: 'var(--color-text-secondary)' }}>
               {logsLoading ? 'Loading submission logs...' : 'Submit your sitemap to see logs here.'}
             </p>
           </div>
@@ -993,33 +1045,46 @@ Allow: /uploads/media/`;
   return (
     <div className="max-w-7xl mx-auto">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">SEO Manager</h1>
-        <p className="text-gray-600">
+        <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>SEO Manager</h1>
+        <p style={{ color: 'var(--color-text-secondary)' }}>
           Manage your website's SEO settings, generate sitemaps, and audit page performance.
         </p>
       </div>
 
       {/* Tabs */}
-      <div className="flex space-x-1 mb-8 bg-gray-100 p-1 rounded-lg">
-        {[
-          { id: 'sitemap', label: 'Sitemap', icon: FileText },
-          { id: 'robots', label: 'Robots.txt', icon: Settings },
-          { id: 'audit', label: 'SEO Audit', icon: BarChart3 },
-          { id: 'settings', label: 'SEO Settings', icon: Globe },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as any)}
-            className={`flex items-center px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-              activeTab === tab.id
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-600 hover:text-gray-900'
-            }`}
-          >
-            <tab.icon className="w-4 h-4 mr-2" />
-            {tab.label}
-          </button>
-        ))}
+      <div className="border-b" style={{ borderColor: 'var(--color-gray-light)' }}>
+        <nav className="-mb-px flex space-x-8">
+          {[
+            { id: 'sitemap', label: 'Sitemap', icon: FileText },
+            { id: 'robots', label: 'Robots.txt', icon: Settings },
+            { id: 'audit', label: 'SEO Audit', icon: BarChart3 },
+            { id: 'settings', label: 'SEO Settings', icon: Globe },
+          ].map((tab) => {
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className="group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+                style={{
+                  borderColor: isActive 
+                    ? 'var(--color-primary)' 
+                    : 'transparent',
+                  color: isActive 
+                    ? 'var(--color-primary)' 
+                    : 'var(--color-text-secondary)'
+                }}
+              >
+                <tab.icon className="w-4 h-4 mr-2" style={{
+                  color: isActive 
+                    ? 'var(--color-primary)' 
+                    : 'var(--color-text-secondary)'
+                }} />
+                {tab.label}
+              </button>
+            );
+          })}
+        </nav>
       </div>
 
       {/* Sitemap Tab */}
@@ -1030,13 +1095,16 @@ Allow: /uploads/media/`;
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900">Robots.txt</h2>
-              <p className="text-gray-600 mt-1">Control how search engines crawl your website.</p>
+              <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Robots.txt</h2>
+              <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>Control how search engines crawl your website.</p>
             </div>
             <Button
               onClick={saveRobotsTxt}
               disabled={generating}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              style={{ 
+                backgroundColor: 'var(--color-primary)',
+                color: 'var(--color-bg-primary)'
+              }}
             >
               {generating ? (
                 <>
@@ -1052,28 +1120,37 @@ Allow: /uploads/media/`;
             </Button>
           </div>
 
-          <Card className="p-6">
+          <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                 Robots.txt Content
               </label>
               <textarea
                 value={robotsContent}
                 onChange={(e) => setRobotsContent(e.target.value)}
                 rows={15}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono text-sm"
+                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                style={{ 
+                  color: 'var(--color-text-primary)',
+                  backgroundColor: 'var(--color-bg-primary)',
+                  borderColor: 'var(--color-gray-light)'
+                }}
                 placeholder="Enter robots.txt content..."
               />
             </div>
             
             <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-600">
-                This will be served at <code className="bg-gray-200 px-2 py-1 rounded">/robots.txt</code>
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                This will be served at <code className="px-2 py-1 rounded" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>/robots.txt</code>
               </p>
               <Button
                 onClick={() => setRobotsContent(generateDefaultRobots())}
                 variant="outline"
                 size="sm"
+                style={{ 
+                  borderColor: 'var(--color-gray-light)',
+                  color: 'var(--color-text-primary)'
+                }}
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Reset to Default
@@ -1082,14 +1159,18 @@ Allow: /uploads/media/`;
           </Card>
 
           {/* Live Robots.txt View */}
-          <Card className="p-6">
+          <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Live Robots.txt</h3>
+              <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Live Robots.txt</h3>
               <div className="flex items-center space-x-2">
                 <Button
                   onClick={() => window.open(`${siteSettings.baseUrl || 'http://localhost:3000'}/robots.txt`, '_blank')}
                   variant="outline"
                   size="sm"
+                  style={{ 
+                    borderColor: 'var(--color-gray-light)',
+                    color: 'var(--color-text-primary)'
+                  }}
                 >
                   <ExternalLink className="w-4 h-4 mr-2" />
                   View Live
@@ -1098,6 +1179,10 @@ Allow: /uploads/media/`;
                   onClick={() => copyToClipboard(robotsContent, 'Robots.txt')}
                   variant="outline"
                   size="sm"
+                  style={{ 
+                    borderColor: 'var(--color-gray-light)',
+                    color: 'var(--color-text-primary)'
+                  }}
                 >
                   <Copy className="w-4 h-4 mr-2" />
                   Copy
@@ -1106,19 +1191,23 @@ Allow: /uploads/media/`;
             </div>
             
             <div className="space-y-4">
-              <div className="bg-green-50 p-4 rounded-lg">
+              <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-success-light)' }}>
                 <div className="flex items-center">
-                  <CheckCircle className="w-5 h-5 text-green-600 mr-2" />
-                  <span className="text-green-800 font-medium">Robots.txt is live and accessible</span>
+                  <CheckCircle className="w-5 h-5 mr-2" style={{ color: 'var(--color-success)' }} />
+                  <span className="font-medium" style={{ color: 'var(--color-success-dark)' }}>Robots.txt is live and accessible</span>
                 </div>
-                <p className="text-green-700 text-sm mt-1">
-                  Your robots.txt is available at: <code className="bg-green-100 px-2 py-1 rounded">{siteSettings.baseUrl || 'http://localhost:3000'}/robots.txt</code>
+                <p className="text-sm mt-1" style={{ color: 'var(--color-success-dark)' }}>
+                  Your robots.txt is available at: <code className="px-2 py-1 rounded" style={{ backgroundColor: 'var(--color-success-light)' }}>{siteSettings.baseUrl || 'http://localhost:3000'}/robots.txt</code>
                 </p>
               </div>
               
-              <div className="bg-gray-50 p-4 rounded-lg">
-                <h4 className="font-medium text-gray-900 mb-2">Current Robots.txt Content:</h4>
-                <pre className="bg-white p-4 rounded-lg overflow-x-auto text-sm border font-mono">
+              <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+                <h4 className="font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Current Robots.txt Content:</h4>
+                <pre className="p-4 rounded-lg overflow-x-auto text-sm border font-mono" style={{ 
+                  backgroundColor: 'var(--color-bg-primary)',
+                  borderColor: 'var(--color-gray-light)',
+                  color: 'var(--color-text-primary)'
+                }}>
                   <code>{robotsContent}</code>
                 </pre>
               </div>
@@ -1132,13 +1221,16 @@ Allow: /uploads/media/`;
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900">SEO Audit</h2>
-              <p className="text-gray-600 mt-1">Analyze your pages for SEO best practices.</p>
+              <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>SEO Audit</h2>
+              <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>Analyze your pages for SEO best practices.</p>
             </div>
             <Button
               onClick={runSEOAudit}
               disabled={auditLoading}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+              style={{ 
+                backgroundColor: 'var(--color-primary)',
+                color: 'var(--color-text-primary)'
+              }}
             >
               {auditLoading ? (
                 <>
@@ -1155,27 +1247,33 @@ Allow: /uploads/media/`;
           </div>
 
           {/* Live Check Option */}
-          <Card className="p-4 mb-6">
+          <Card className="p-4 mb-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-medium text-gray-900">Audit Options</h3>
-                <p className="text-sm text-gray-600">Configure how the SEO audit should run</p>
+                <h3 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Audit Options</h3>
+                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Configure how the SEO audit should run</p>
               </div>
               <label className="flex items-center">
                 <input
                   type="checkbox"
                   checked={checkLivePages}
                   onChange={(e) => setCheckLivePages(e.target.checked)}
-                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="rounded focus:ring-2 focus:ring-blue-500"
+                  style={{
+                    borderColor: 'var(--color-gray-light)',
+                    backgroundColor: checkLivePages ? 'var(--color-primary)' : 'var(--color-bg-primary)'
+                  }}
                 />
-                <span className="ml-2 text-sm text-gray-700">Check live pages for meta tags</span>
+                <span className="ml-2 text-sm" style={{ color: 'var(--color-text-primary)' }}>Check live pages for meta tags</span>
               </label>
             </div>
           </Card>
 
           {auditResults.length > 0 && (
-            <div className="space-y-4">
-              {auditResults.filter(result => result.metaTagsStatus).map((result, index) => {
+            <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+              <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Audit Results</h3>
+              <div className="space-y-4">
+                {auditResults.filter(result => result.metaTagsStatus).map((result, index) => {
                 const pageTitle = result.page?.title || result.faqPage?.title || 'Unknown Page';
                 const pageUrl = result.page?.slug 
                   ? `/${result.page?.slug === 'home' ? '' : result.page?.slug}`
@@ -1183,18 +1281,21 @@ Allow: /uploads/media/`;
                 const pageType = result.page ? 'Page' : result.faqPage?.type === 'faq-category' ? 'FAQ Category' : 'FAQ Question';
                 
                 return (
-                  <Card key={result.page?.id || `faq-${index}`} className="p-6">
+                  <Card key={result.page?.id || `faq-${index}`} className="p-6" style={{ backgroundColor: 'var(--color-bg-primary)', borderColor: 'var(--color-gray-light)' }}>
                     <div className="flex items-center justify-between mb-4">
                       <div>
                         <div className="flex items-center gap-2">
-                          <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{pageTitle}</h3>
-                          <span className="px-2 py-1 text-xs bg-gray-100 text-gray-600 rounded-full">
+                          <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>{pageTitle}</h3>
+                          <span className="px-2 py-1 text-xs rounded-full" style={{ 
+                            backgroundColor: 'var(--color-bg-secondary)',
+                            color: 'var(--color-text-secondary)'
+                          }}>
                             {pageType}
                           </span>
                         </div>
-                        <p className="text-sm text-gray-600">{pageUrl}</p>
+                        <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{pageUrl}</p>
                         {result.liveSEOCheck && (
-                          <p className="text-xs text-gray-500 mt-1">
+                          <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
                             Live check: {result.liveSEOCheck.isValid ? '✅ Valid' : '❌ Issues found'}
                           </p>
                         )}
@@ -1208,7 +1309,8 @@ Allow: /uploads/media/`;
                           {Object.entries(result.metaTagsStatus).map(([tag, status]) => (
                             <span 
                               key={tag}
-                              className={`w-2 h-2 rounded-full ${status ? 'bg-green-500' : 'bg-red-500'}`}
+                              className="w-2 h-2 rounded-full"
+                              style={{ backgroundColor: status ? 'var(--color-success)' : 'var(--color-error)' }}
                               title={`${tag}: ${status ? 'Present' : 'Missing'}`}
                             />
                           ))}
@@ -1219,11 +1321,11 @@ Allow: /uploads/media/`;
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {result.issues.length > 0 && (
                       <div>
-                        <h4 className="font-medium text-red-600 mb-2 flex items-center">
+                        <h4 className="font-medium mb-2 flex items-center" style={{ color: 'var(--color-error)' }}>
                           <XCircle className="w-4 h-4 mr-1" />
                           Issues ({result.issues.length})
                         </h4>
-                        <ul className="text-sm text-red-700 space-y-1">
+                        <ul className="text-sm space-y-1" style={{ color: 'var(--color-error-dark)' }}>
                           {result.issues.map((issue, idx) => (
                             <li key={idx}>• {issue}</li>
                           ))}
@@ -1233,11 +1335,11 @@ Allow: /uploads/media/`;
 
                     {result.warnings.length > 0 && (
                       <div>
-                        <h4 className="font-medium text-yellow-600 mb-2 flex items-center">
+                        <h4 className="font-medium mb-2 flex items-center" style={{ color: 'var(--color-warning)' }}>
                           <AlertTriangle className="w-4 h-4 mr-1" />
                           Warnings ({result.warnings.length})
                         </h4>
-                        <ul className="text-sm text-yellow-700 space-y-1">
+                        <ul className="text-sm space-y-1" style={{ color: 'var(--color-warning-dark)' }}>
                           {result.warnings.map((warning, idx) => (
                             <li key={idx}>• {warning}</li>
                           ))}
@@ -1247,11 +1349,11 @@ Allow: /uploads/media/`;
 
                     {result.suggestions.length > 0 && (
                       <div>
-                        <h4 className="font-medium text-blue-600 mb-2 flex items-center">
+                        <h4 className="font-medium mb-2 flex items-center" style={{ color: 'var(--color-info)' }}>
                           <CheckCircle className="w-4 h-4 mr-1" />
                           Suggestions ({result.suggestions.length})
                         </h4>
-                        <ul className="text-sm text-blue-700 space-y-1">
+                        <ul className="text-sm space-y-1" style={{ color: 'var(--color-info-dark)' }}>
                           {result.suggestions.map((suggestion, idx) => (
                             <li key={idx}>• {suggestion}</li>
                           ))}
@@ -1262,7 +1364,8 @@ Allow: /uploads/media/`;
                 </Card>
                 );
               })}
-            </div>
+              </div>
+            </Card>
           )}
         </div>
       )}
@@ -1271,16 +1374,16 @@ Allow: /uploads/media/`;
       {activeTab === 'settings' && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900">SEO Settings</h2>
-            <p className="text-gray-600 mt-1">Configure global SEO settings for your website.</p>
+            <h2 className="text-2xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>SEO Settings</h2>
+            <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>Configure global SEO settings for your website.</p>
           </div>
 
           {/* Google Analytics Settings */}
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Google Analytics 4</h3>
+          <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Google Analytics 4</h3>
             <div className="space-y-6">
               <div>
-                <label htmlFor="gaMeasurementId" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="gaMeasurementId" className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                   Google Analytics Measurement ID
                 </label>
                 <Input
@@ -1290,8 +1393,13 @@ Allow: /uploads/media/`;
                   value={siteSettings.gaMeasurementId || ''}
                   onChange={(e) => setSiteSettings(prev => ({ ...prev, gaMeasurementId: e.target.value }))}
                   className="max-w-md"
+                  style={{ 
+                    color: 'var(--color-text-primary)',
+                    backgroundColor: 'var(--color-bg-primary)',
+                    borderColor: 'var(--color-gray-light)'
+                  }}
                 />
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                   You can find this in your Google Analytics property under Data Streams. Format: G-XXXXXXXXXX
                 </p>
               </div>
@@ -1300,7 +1408,10 @@ Allow: /uploads/media/`;
                 <Button
                   onClick={saveGASettings}
                   disabled={submitting}
-                  className="bg-blue-600 hover:bg-blue-700 text-white"
+                  style={{ 
+                    backgroundColor: 'var(--color-primary)',
+                    color: 'var(--color-text-primary)'
+                  }}
                 >
                   {submitting ? (
                     <>
@@ -1316,14 +1427,20 @@ Allow: /uploads/media/`;
                 </Button>
                 
                 {siteSettings.gaMeasurementId && (
-                  <div className="flex items-center text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                  <div className="flex items-center text-sm px-3 py-1 rounded-full" style={{ 
+                    color: 'var(--color-success-dark)',
+                    backgroundColor: 'var(--color-success-light)'
+                  }}>
                     <CheckCircle className="w-4 h-4 mr-1" />
                     GA4 is configured
                   </div>
                 )}
                 
                 {!siteSettings.gaMeasurementId && (
-                  <div className="flex items-center text-sm text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
+                  <div className="flex items-center text-sm px-3 py-1 rounded-full" style={{ 
+                    color: 'var(--color-text-muted)',
+                    backgroundColor: 'var(--color-bg-secondary)'
+                  }}>
                     <XCircle className="w-4 h-4 mr-1" />
                     Not configured
                   </div>
@@ -1333,11 +1450,11 @@ Allow: /uploads/media/`;
           </Card>
 
           {/* Google Tag Manager Settings */}
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Google Tag Manager</h3>
+          <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Google Tag Manager</h3>
             <div className="space-y-6">
               <div>
-                <label htmlFor="gtmContainerId" className="block text-sm font-medium text-gray-700 mb-2">
+                <label htmlFor="gtmContainerId" className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                   GTM Container ID
                 </label>
                 <Input
@@ -1347,13 +1464,18 @@ Allow: /uploads/media/`;
                   value={siteSettings.gtmContainerId || ''}
                   onChange={(e) => setSiteSettings(prev => ({ ...prev, gtmContainerId: e.target.value }))}
                   className="max-w-md"
+                  style={{ 
+                    color: 'var(--color-text-primary)',
+                    backgroundColor: 'var(--color-bg-primary)',
+                    borderColor: 'var(--color-gray-light)'
+                  }}
                 />
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                   You can find this in your Google Tag Manager account. Format: GTM-XXXXX to GTM-XXXXXXXX
                 </p>
               </div>
               
-              <div className="border-t pt-4">
+              <div className="border-t pt-4" style={{ borderColor: 'var(--color-gray-light)' }}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -1363,8 +1485,11 @@ Allow: /uploads/media/`;
                         onChange={(e) => setSiteSettings(prev => ({ ...prev, gtmEnabled: e.target.checked }))}
                         className="sr-only peer"
                       />
-                      <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
-                      <span className="ml-3 text-sm font-medium text-gray-900">
+                      <div className="relative w-11 h-6 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all" style={{
+                        backgroundColor: siteSettings.gtmEnabled ? 'var(--color-primary)' : 'var(--color-gray-light)',
+                        borderColor: 'var(--color-gray-light)'
+                      }}></div>
+                      <span className="ml-3 text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
                         {siteSettings.gtmEnabled ? 'GTM Enabled' : 'GTM Disabled'}
                       </span>
                     </label>
@@ -1372,12 +1497,18 @@ Allow: /uploads/media/`;
                   
                   <div className="flex items-center">
                     {siteSettings.gtmEnabled ? (
-                      <div className="flex items-center text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                      <div className="flex items-center text-sm px-3 py-1 rounded-full" style={{ 
+                        color: 'var(--color-success-dark)',
+                        backgroundColor: 'var(--color-success-light)'
+                      }}>
                         <CheckCircle className="w-4 h-4 mr-1" />
                         Active
                       </div>
                     ) : (
-                      <div className="flex items-center text-sm text-gray-500 bg-gray-50 px-3 py-1 rounded-full">
+                      <div className="flex items-center text-sm px-3 py-1 rounded-full" style={{ 
+                        color: 'var(--color-text-muted)',
+                        backgroundColor: 'var(--color-bg-secondary)'
+                      }}>
                         <XCircle className="w-4 h-4 mr-1" />
                         Inactive
                       </div>
@@ -1385,7 +1516,7 @@ Allow: /uploads/media/`;
                   </div>
                 </div>
                 
-                <p className="text-sm text-gray-600 mt-2">
+                <p className="text-sm mt-2" style={{ color: 'var(--color-text-secondary)' }}>
                   {siteSettings.gtmEnabled 
                     ? 'GTM scripts will be loaded on your website when enabled.'
                     : 'GTM scripts will not be loaded when disabled.'
@@ -1397,7 +1528,10 @@ Allow: /uploads/media/`;
                 <Button
                   onClick={saveGTMSettings}
                   disabled={submitting}
-                  className="bg-green-600 hover:bg-green-700 text-white"
+                  style={{ 
+                    backgroundColor: 'var(--color-success)',
+                    color: 'var(--color-bg-primary)'
+                  }}
                 >
                   {submitting ? (
                     <>
@@ -1413,14 +1547,20 @@ Allow: /uploads/media/`;
                 </Button>
                 
                 {siteSettings.gtmContainerId && siteSettings.gtmEnabled && (
-                  <div className="flex items-center text-sm text-green-600 bg-green-50 px-3 py-1 rounded-full">
+                  <div className="flex items-center text-sm px-3 py-1 rounded-full" style={{ 
+                    color: 'var(--color-success-dark)',
+                    backgroundColor: 'var(--color-success-light)'
+                  }}>
                     <CheckCircle className="w-4 h-4 mr-1" />
                     GTM is configured and enabled
                   </div>
                 )}
                 
                 {siteSettings.gtmContainerId && !siteSettings.gtmEnabled && (
-                  <div className="flex items-center text-sm text-orange-600 bg-orange-50 px-3 py-1 rounded-full">
+                  <div className="flex items-center text-sm px-3 py-1 rounded-full" style={{ 
+                    color: 'var(--color-warning-dark)',
+                    backgroundColor: 'var(--color-warning-light)'
+                  }}>
                     <AlertTriangle className="w-4 h-4 mr-1" />
                     GTM configured but disabled
                   </div>
@@ -1430,27 +1570,35 @@ Allow: /uploads/media/`;
           </Card>
 
           {/* Google Search Console Service Account */}
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Google Search Console Service Account</h3>
+          <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Google Search Console Service Account</h3>
             <form onSubmit={handleServiceAccountUpload} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                   Upload Google Service Account JSON
                 </label>
                 <input
                   type="file"
                   name="file"
                   accept="application/json"
-                  className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  className="block w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold"
+                  style={{ 
+                    color: 'var(--color-text-secondary)',
+                    backgroundColor: 'var(--color-bg-primary)',
+                    borderColor: 'var(--color-gray-light)'
+                  }}
                   required
                 />
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
                   Download your service account JSON from Google Cloud Console and upload it here.
                 </p>
               </div>
               <Button
                 type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
+                style={{ 
+                  backgroundColor: 'var(--color-primary)',
+                  color: 'var(--color-bg-primary)'
+                }}
                 disabled={serviceAccountStatus === 'uploading'}
               >
                 {serviceAccountStatus === 'uploading' ? (
@@ -1468,9 +1616,9 @@ Allow: /uploads/media/`;
             </form>
             <div className="mt-6">
               {serviceAccountStatus === 'valid' && serviceAccountInfo && (
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <h4 className="font-medium text-green-900 mb-2">✅ Service Account Uploaded</h4>
-                  <div className="text-sm text-green-800 space-y-1">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-success-light)' }}>
+                  <h4 className="font-medium mb-2" style={{ color: 'var(--color-success-dark)' }}>✅ Service Account Uploaded</h4>
+                  <div className="text-sm space-y-1" style={{ color: 'var(--color-success-dark)' }}>
                     <p><strong>Project ID:</strong> {serviceAccountInfo.projectId}</p>
                     <p><strong>Client Email:</strong> {serviceAccountInfo.clientEmail}</p>
                     <p><strong>Status:</strong> Ready for sitemap submission</p>
@@ -1478,34 +1626,38 @@ Allow: /uploads/media/`;
                 </div>
               )}
               {serviceAccountStatus === 'error' && (
-                <div className="bg-red-50 p-4 rounded-lg text-red-800">
-                  <h4 className="font-medium mb-2">❌ Error</h4>
-                  <p>{serviceAccountError}</p>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-error-light)' }}>
+                  <h4 className="font-medium mb-2" style={{ color: 'var(--color-error-dark)' }}>❌ Error</h4>
+                  <p style={{ color: 'var(--color-error-dark)' }}>{serviceAccountError}</p>
                 </div>
               )}
               {serviceAccountStatus === 'none' && (
-                <div className="bg-yellow-50 p-4 rounded-lg text-yellow-800">
-                  <h4 className="font-medium mb-2">No Service Account Uploaded</h4>
-                  <p>Upload your Google service account JSON to enable programmatic sitemap submission.</p>
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--color-warning-light)' }}>
+                  <h4 className="font-medium mb-2" style={{ color: 'var(--color-warning-dark)' }}>No Service Account Uploaded</h4>
+                  <p style={{ color: 'var(--color-warning-dark)' }}>Upload your Google service account JSON to enable programmatic sitemap submission.</p>
                 </div>
               )}
             </div>
           </Card>
 
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+          <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Quick Actions</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Button
                 onClick={() => window.open('/sitemap.xml', '_blank')}
                 variant="outline"
                 className="justify-start h-auto p-4"
+                style={{ 
+                  borderColor: 'var(--color-gray-light)',
+                  color: 'var(--color-text-primary)'
+                }}
               >
                 <div className="text-left">
                   <div className="flex items-center">
-                    <FileText className="w-5 h-5 mr-2 text-blue-600" />
+                    <FileText className="w-5 h-5 mr-2" style={{ color: 'var(--color-primary)' }} />
                     <span className="font-medium">View Live Sitemap</span>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">Check your current sitemap.xml</p>
+                  <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>Check your current sitemap.xml</p>
                 </div>
               </Button>
 
@@ -1513,46 +1665,50 @@ Allow: /uploads/media/`;
                 onClick={() => window.open('/robots.txt', '_blank')}
                 variant="outline"
                 className="justify-start h-auto p-4"
+                style={{ 
+                  borderColor: 'var(--color-gray-light)',
+                  color: 'var(--color-text-primary)'
+                }}
               >
                 <div className="text-left">
                   <div className="flex items-center">
-                    <Settings className="w-5 h-5 mr-2 text-green-600" />
+                    <Settings className="w-5 h-5 mr-2" style={{ color: 'var(--color-success)' }} />
                     <span className="font-medium">View Live Robots.txt</span>
                   </div>
-                  <p className="text-sm text-gray-600 mt-1">Check your current robots.txt</p>
+                  <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>Check your current robots.txt</p>
                 </div>
               </Button>
             </div>
           </Card>
 
-          <Card className="p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">SEO Tips</h3>
-            <div className="space-y-4 text-sm text-gray-600">
+          <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>SEO Tips</h3>
+            <div className="space-y-4 text-sm" style={{ color: 'var(--color-text-secondary)' }}>
               <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <CheckCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-success)' }} />
                 <div>
-                  <p className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Optimize Page Titles</p>
+                  <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Optimize Page Titles</p>
                   <p>Keep titles under 60 characters and include your target keywords.</p>
                 </div>
               </div>
               <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <CheckCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-success)' }} />
                 <div>
-                  <p className="font-medium text-gray-900">Write Compelling Meta Descriptions</p>
+                  <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Write Compelling Meta Descriptions</p>
                   <p>Keep descriptions between 150-160 characters and make them actionable.</p>
                 </div>
               </div>
               <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <CheckCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-success)' }} />
                 <div>
-                  <p className="font-medium text-gray-900">Update Your Sitemap Regularly</p>
+                  <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Update Your Sitemap Regularly</p>
                   <p>Regenerate your sitemap when you add or modify pages.</p>
                 </div>
               </div>
               <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-green-500 mr-2 mt-0.5 flex-shrink-0" />
+                <CheckCircle className="w-5 h-5 mr-2 mt-0.5 flex-shrink-0" style={{ color: 'var(--color-success)' }} />
                 <div>
-                  <p className="font-medium text-gray-900">Monitor SEO Performance</p>
+                  <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Monitor SEO Performance</p>
                   <p>Run regular SEO audits to identify and fix issues.</p>
                 </div>
               </div>

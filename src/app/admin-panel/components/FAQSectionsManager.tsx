@@ -136,58 +136,68 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, descr
 
   return (
     <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
         {label}
       </label>
       {description && (
-        <p className="text-xs text-gray-500">{description}</p>
+        <p className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>{description}</p>
       )}
       
       <div className="relative">
         <button
           type="button"
           onClick={() => setShowPicker(!showPicker)}
-          className="flex items-center gap-3 w-full p-3 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition-colors"
+          className="flex items-center gap-3 w-full p-3 border rounded-lg transition-colors"
+        style={{ 
+          borderColor: 'var(--color-gray-light, #E5E7EB)', 
+          backgroundColor: 'var(--color-bg-primary, #FFFFFF)' 
+        }}
         >
           <div 
-            className="w-8 h-8 rounded-md border border-gray-200"
-            style={{ backgroundColor: value }}
+            className="w-8 h-8 rounded-md border"
+            style={{ 
+              borderColor: 'var(--color-gray-light)',
+              backgroundColor: value 
+            }}
           />
           <div className="flex-1 text-left">
-            <div className="font-medium text-gray-900">
+            <div className="font-medium" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
               {isThemeColor 
                 ? themeColors.find(c => (c.actualValue || c.value) === value)?.name || 'Theme Color'
                 : 'Custom Color'
               }
             </div>
-            <div className="text-sm text-gray-500">{value}</div>
+            <div className="text-sm" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>{value}</div>
           </div>
-          <Palette className="w-4 h-4 text-gray-400" />
+                      <Palette className="w-4 h-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />
         </button>
 
         {showPicker && (
-          <div className="absolute top-full left-0 right-0 mt-2 p-4 bg-white border border-gray-200 rounded-lg shadow-lg z-10">
+          <div className="absolute top-full left-0 right-0 mt-2 p-4 border rounded-lg shadow-lg z-10" style={{ backgroundColor: 'var(--color-bg-primary)', borderColor: 'var(--color-gray-light)' }}>
             <div className="space-y-4">
               {/* Theme Colors */}
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Theme Colors</h4>
+                <h4 className="text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Theme Colors</h4>
                 <div className="grid grid-cols-3 gap-2">
                   {themeColors.map((color) => (
                     <button
                       key={color.key}
                       type="button"
                       onClick={() => handleThemeColorClick(color)}
-                      className={`flex items-center gap-2 p-2 rounded-md border transition-colors ${
-                        (color.actualValue || color.value) === value
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-gray-300'
-                      }`}
+                      className={`flex items-center gap-2 p-2 rounded-md border transition-colors`}
+                      style={{
+                        borderColor: (color.actualValue || color.value) === value ? 'var(--color-primary, #5243E9)' : 'var(--color-gray-light, #E5E7EB)',
+                        backgroundColor: (color.actualValue || color.value) === value ? 'var(--color-bg-secondary, #F9FAFB)' : 'var(--color-bg-primary, #FFFFFF)'
+                      }}
                     >
                       <div 
-                        className="w-6 h-6 rounded border border-gray-200"
-                        style={{ backgroundColor: color.actualValue || color.value }}
+                        className="w-6 h-6 rounded border"
+                        style={{ 
+                          borderColor: 'var(--color-gray-light)',
+                          backgroundColor: color.actualValue || color.value 
+                        }}
                       />
-                      <span className="text-xs text-gray-700">{color.name}</span>
+                      <span className="text-xs" style={{ color: 'var(--color-text-primary, #1F2937)' }}>{color.name}</span>
                     </button>
                   ))}
                 </div>
@@ -195,13 +205,14 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ label, value, onChange, descr
 
               {/* Custom Color */}
               <div>
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Custom Color</h4>
+                <h4 className="text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Custom Color</h4>
                 <div className="flex gap-2">
                   <input
                     type="color"
                     value={customColor}
                     onChange={handleCustomColorChange}
-                    className="w-12 h-10 rounded border border-gray-300"
+                    className="w-12 h-10 rounded border"
+            style={{ borderColor: 'var(--color-gray-light)' }}
                   />
                   <Input
                     value={customColor}
@@ -431,7 +442,7 @@ export default function FAQSectionsManager() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2" style={{ borderColor: 'var(--color-primary)' }}></div>
       </div>
     );
   }
@@ -440,8 +451,8 @@ export default function FAQSectionsManager() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">FAQ Sections</h2>
-          <p className="text-gray-600 mt-1">
+                  <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>FAQ Sections</h2>
+        <p className="mt-1" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
             Manage FAQ section configurations and display settings
           </p>
         </div>
@@ -452,8 +463,8 @@ export default function FAQSectionsManager() {
       </div>
 
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-600">{error}</p>
+        <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--color-error-light, #FEE2E2)', borderColor: 'var(--color-error, #EF4444)' }}>
+          <p style={{ color: 'var(--color-error-dark, #991B1B)' }}>{error}</p>
         </div>
       )}
 
@@ -471,7 +482,7 @@ export default function FAQSectionsManager() {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                   Section Name *
                 </label>
                 <Input
@@ -483,7 +494,7 @@ export default function FAQSectionsManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                   Main Heading *
                 </label>
                 <Input
@@ -495,7 +506,7 @@ export default function FAQSectionsManager() {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                   Subheading
                 </label>
                 <Input
@@ -506,7 +517,7 @@ export default function FAQSectionsManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                   Hero Title *
                 </label>
                 <Input
@@ -518,7 +529,7 @@ export default function FAQSectionsManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                   Hero Subtitle
                 </label>
                 <Input
@@ -529,7 +540,7 @@ export default function FAQSectionsManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                   Search Placeholder
                 </label>
                 <Input
@@ -558,7 +569,7 @@ export default function FAQSectionsManager() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
                   Hero Height
                 </label>
                 <select
@@ -576,7 +587,7 @@ export default function FAQSectionsManager() {
             </div>
 
             <div className="space-y-4">
-              <h4 className="text-md font-medium text-gray-900">Display Options</h4>
+                              <h4 className="text-md font-medium" style={{ color: 'var(--color-text-primary)' }}>Display Options</h4>
               
               <div className="flex items-center gap-4">
                 <label className="flex items-center gap-2">
@@ -584,9 +595,10 @@ export default function FAQSectionsManager() {
                     type="checkbox"
                     checked={formData.showHero}
                     onChange={(e) => setFormData({ ...formData, showHero: e.target.checked })}
-                    className="rounded border-gray-300"
+                    className="rounded"
+                    style={{ borderColor: 'var(--color-gray-light)' }}
                   />
-                  <span className="text-sm text-gray-700">Show Hero Section</span>
+                  <span className="text-sm" style={{ color: 'var(--color-text-primary)' }}>Show Hero Section</span>
                 </label>
 
                 <label className="flex items-center gap-2">
@@ -594,9 +606,10 @@ export default function FAQSectionsManager() {
                     type="checkbox"
                     checked={formData.showCategories}
                     onChange={(e) => setFormData({ ...formData, showCategories: e.target.checked })}
-                    className="rounded border-gray-300"
+                    className="rounded"
+                    style={{ borderColor: 'var(--color-gray-light)' }}
                   />
-                  <span className="text-sm text-gray-700">Show Categories Sidebar</span>
+                  <span className="text-sm" style={{ color: 'var(--color-text-primary)' }}>Show Categories Sidebar</span>
                 </label>
 
                 <label className="flex items-center gap-2">
@@ -604,9 +617,10 @@ export default function FAQSectionsManager() {
                     type="checkbox"
                     checked={formData.isActive}
                     onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                    className="rounded border-gray-300"
+                    className="rounded"
+                    style={{ borderColor: 'var(--color-gray-light)' }}
                   />
-                  <span className="text-sm text-gray-700">Active</span>
+                  <span className="text-sm" style={{ color: 'var(--color-text-primary)' }}>Active</span>
                 </label>
               </div>
             </div>
@@ -614,17 +628,17 @@ export default function FAQSectionsManager() {
             {/* Category Selection */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h4 className="text-md font-medium text-gray-900">FAQ Categories</h4>
-                <span className="text-sm text-gray-500">
+                <h4 className="text-md font-medium" style={{ color: 'var(--color-text-primary)' }}>FAQ Categories</h4>
+                <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                   {selectedCategories.length} of {categories.length} selected
                 </span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                 Select which FAQ categories to include in this section. If none are selected, all active categories will be displayed.
               </p>
               
               {categories.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto border border-gray-200 rounded-lg p-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto border rounded-lg p-4" style={{ borderColor: 'var(--color-gray-light)' }}>
                   {categories.map((category) => (
                     <label
                       key={category.id}
@@ -633,23 +647,32 @@ export default function FAQSectionsManager() {
                           ? 'border-blue-500 bg-blue-50'
                           : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                       }`}
+                      style={{
+                        borderColor: selectedCategories.includes(category.id) 
+                          ? 'var(--color-primary)' 
+                          : 'var(--color-gray-light)',
+                        backgroundColor: selectedCategories.includes(category.id) 
+                          ? 'var(--color-primary-light)' 
+                          : 'transparent'
+                      }}
                     >
                       <input
                         type="checkbox"
                         checked={selectedCategories.includes(category.id)}
                         onChange={() => handleCategoryToggle(category.id)}
-                        className="rounded border-gray-300"
+                        className="rounded"
+                        style={{ borderColor: 'var(--color-gray-light)' }}
                       />
                       <div className="flex items-center gap-2 flex-1 min-w-0">
                         <div
-                          className="w-4 h-4 rounded-full border border-gray-200"
-                          style={{ backgroundColor: category.color }}
+                          className="w-4 h-4 rounded-full border"
+                          style={{ backgroundColor: category.color, borderColor: 'var(--color-gray-light)' }}
                         />
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium text-gray-900 truncate">
+                          <div className="font-medium truncate" style={{ color: 'var(--color-text-primary)' }}>
                             {category.name}
                           </div>
-                          <div className="text-xs text-gray-500">
+                          <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                             {category._count.faqs} FAQ{category._count.faqs !== 1 ? 's' : ''}
                           </div>
                         </div>
@@ -658,7 +681,7 @@ export default function FAQSectionsManager() {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8" style={{ color: 'var(--color-text-muted)' }}>
                   <p>No FAQ categories available.</p>
                   <p className="text-sm mt-1">Create some FAQ categories first to select them for this section.</p>
                 </div>
@@ -705,17 +728,17 @@ export default function FAQSectionsManager() {
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {section.name}
-                  </h3>
+                              <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+              {section.name}
+            </h3>
                   <div className="flex items-center gap-2">
                     {section.isActive ? (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-dark)' }}>
                         <Eye className="w-3 h-3" />
                         Active
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium" style={{ backgroundColor: 'var(--color-gray-light)', color: 'var(--color-text-secondary)' }}>
                         <EyeOff className="w-3 h-3" />
                         Inactive
                       </span>
@@ -725,31 +748,31 @@ export default function FAQSectionsManager() {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="font-medium text-gray-700">Heading:</span>
-                    <p className="text-gray-600 mt-1">{section.heading}</p>
+                    <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Heading:</span>
+                    <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>{section.heading}</p>
                   </div>
                   
                   {section.subheading && (
                     <div>
-                      <span className="font-medium text-gray-700">Subheading:</span>
-                      <p className="mt-1" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>{section.subheading}</p>
+                      <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Subheading:</span>
+                      <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>{section.subheading}</p>
                     </div>
                   )}
 
                   <div>
-                    <span className="font-medium text-gray-700">Hero Title:</span>
-                    <p className="text-gray-600 mt-1">{section.heroTitle}</p>
+                    <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Hero Title:</span>
+                    <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>{section.heroTitle}</p>
                   </div>
 
                   {section.heroSubtitle && (
                     <div>
-                      <span className="font-medium text-gray-700">Hero Subtitle:</span>
-                      <p className="text-gray-600 mt-1">{section.heroSubtitle}</p>
+                      <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Hero Subtitle:</span>
+                      <p className="mt-1" style={{ color: 'var(--color-text-secondary)' }}>{section.heroSubtitle}</p>
                     </div>
                   )}
                 </div>
 
-                <div className="flex items-center gap-4 mt-4 text-xs text-gray-500">
+                <div className="flex items-center gap-4 mt-4 text-xs" style={{ color: 'var(--color-text-muted)' }}>
                   <span>Show Hero: {section.showHero ? 'Yes' : 'No'}</span>
                   <span>Show Categories: {section.showCategories ? 'Yes' : 'No'}</span>
                   <span>Created: {new Date(section.createdAt).toLocaleDateString()}</span>
@@ -781,7 +804,7 @@ export default function FAQSectionsManager() {
                   variant="outline"
                   size="sm"
                   onClick={() => handleDelete(section.id)}
-                  className="flex items-center gap-1 text-red-600 hover:text-red-700 hover:bg-red-50"
+                  style={{ color: 'var(--color-error)' }}
                 >
                   <Trash2 className="w-4 h-4" />
                   Delete
@@ -793,11 +816,11 @@ export default function FAQSectionsManager() {
 
         {sections.length === 0 && !loading && (
           <Card className="p-12 text-center">
-            <div className="text-gray-400 mb-4">
+            <div className="mb-4" style={{ color: 'var(--color-text-muted)' }}>
               <Plus className="w-12 h-12 mx-auto" />
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No FAQ Sections</h3>
-            <p className="text-gray-600 mb-4">
+            <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>No FAQ Sections</h3>
+            <p className="mb-4" style={{ color: 'var(--color-text-secondary)' }}>
               Create your first FAQ section configuration to get started.
             </p>
             <Button onClick={handleCreate}>Create FAQ Section</Button>

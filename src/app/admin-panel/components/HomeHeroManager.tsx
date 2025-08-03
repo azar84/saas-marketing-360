@@ -418,11 +418,20 @@ const HomeHeroManager: React.FC = () => {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              className={`flex items-center gap-2 p-4 rounded-lg ${
-                message.type === 'success' 
-                  ? 'bg-green-50 text-green-800 border border-green-200' 
-                  : 'bg-red-50 text-red-800 border border-red-200'
-              }`}
+              className="flex items-center gap-2 p-4 rounded-lg"
+              style={{
+                backgroundColor: message.type === 'success' 
+                  ? 'var(--color-success-light, #D1FAE5)' 
+                  : 'var(--color-error-light, #FEE2E2)',
+                color: message.type === 'success' 
+                  ? 'var(--color-success-dark, #065F46)' 
+                  : 'var(--color-error-dark, #991B1B)',
+                borderColor: message.type === 'success' 
+                  ? 'var(--color-success, #10B981)' 
+                  : 'var(--color-error, #EF4444)',
+                borderWidth: '1px',
+                borderStyle: 'solid'
+              }}
             >
               {message.type === 'success' ? (
                 <CheckCircle className="w-5 h-5" />
@@ -472,7 +481,7 @@ const HomeHeroManager: React.FC = () => {
                   const IconComponent = getIconComponent(indicator.iconName);
                   return (
                     <div key={index} className="flex items-center gap-2" style={{ color: designSystem?.textSecondary || '#666666' }}>
-                      <IconComponent className="w-4 h-4 text-green-600" />
+                      <IconComponent className="w-4 h-4" style={{ color: 'var(--color-success, #10B981)' }} />
                       <span className="text-sm font-medium">{indicator.text}</span>
                     </div>
                   );
@@ -486,8 +495,11 @@ const HomeHeroManager: React.FC = () => {
             {/* Main Content */}
             <div className="space-y-6">
               <div 
-                className="rounded-xl p-6 shadow-sm border border-gray-200"
-                style={{ backgroundColor: designSystem?.backgroundSecondary || '#F9FAFB' }}
+                className="rounded-xl p-6 shadow-sm border"
+                style={{ 
+                  borderColor: 'var(--color-gray-light, #E5E7EB)',
+                  backgroundColor: designSystem?.backgroundSecondary || '#F9FAFB' 
+                }}
               >
                 <h3 className="text-lg font-semibold mb-4" style={{ color: designSystem?.textPrimary || '#1F2937' }}>Main Content</h3>
                 
@@ -518,12 +530,35 @@ const HomeHeroManager: React.FC = () => {
                       onChange={(e) => setHeroData({ ...heroData, subheading: e.target.value })}
                       placeholder="Enter your hero subheading"
                       rows={3}
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                      className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
                       style={{ 
                         color: designSystem?.textPrimary || '#1F2937',
-                        backgroundColor: designSystem?.backgroundSecondary || '#F9FAFB'
+                        backgroundColor: designSystem?.backgroundSecondary || '#F9FAFB',
+                        borderColor: 'var(--color-gray-light, #E5E7EB)'
                       }}
                     />
+                    <style jsx>{`
+                      textarea::placeholder {
+                        color: var(--color-text-muted, #9CA3AF) !important;
+                        opacity: 1;
+                      }
+                      textarea::-webkit-input-placeholder {
+                        color: var(--color-text-muted, #9CA3AF) !important;
+                        opacity: 1;
+                      }
+                      textarea::-moz-placeholder {
+                        color: var(--color-text-muted, #9CA3AF) !important;
+                        opacity: 1;
+                      }
+                      textarea:-ms-input-placeholder {
+                        color: var(--color-text-muted, #9CA3AF) !important;
+                        opacity: 1;
+                      }
+                      textarea:-moz-placeholder {
+                        color: var(--color-text-muted, #9CA3AF) !important;
+                        opacity: 1;
+                      }
+                    `}</style>
                   </div>
                   
                   <div className="flex items-center">
@@ -532,7 +567,11 @@ const HomeHeroManager: React.FC = () => {
                       id="heroActive"
                       checked={heroData.isActive}
                       onChange={(e) => setHeroData({ ...heroData, isActive: e.target.checked })}
-                      className="w-4 h-4 text-[#5243E9] border-gray-300 rounded focus:ring-[#5243E9]"
+                      className="w-4 h-4 border rounded"
+                      style={{
+                        color: 'var(--color-primary, #5243E9)',
+                        borderColor: 'var(--color-gray-light, #E5E7EB)'
+                      }}
                     />
                     <label htmlFor="heroActive" className="text-sm font-medium ml-2" style={{ color: designSystem?.textPrimary || '#000000' }}>
                       Enable Hero Section
@@ -543,8 +582,11 @@ const HomeHeroManager: React.FC = () => {
 
               {/* Styling */}
               <div 
-                className="rounded-xl p-6 shadow-sm border border-gray-200"
-                style={{ backgroundColor: designSystem?.backgroundSecondary || '#F9FAFB' }}
+                className="rounded-xl p-6 shadow-sm border"
+                style={{ 
+                  borderColor: 'var(--color-gray-light, #E5E7EB)',
+                  backgroundColor: designSystem?.backgroundSecondary || '#F9FAFB' 
+                }}
               >
                 <div className="flex items-center space-x-3 mb-6">
                   <div className="p-2 bg-indigo-100 rounded-lg">
@@ -579,12 +621,18 @@ const HomeHeroManager: React.FC = () => {
                           onClick={() => setHeroData(prev => ({ ...prev, backgroundColor: colorOption.value }))}
                         >
                           <div
-                            className="w-12 h-12 rounded-lg shadow-sm border border-gray-200 mb-1 relative"
-                            style={{ backgroundColor: colorOption.value }}
+                            className="w-12 h-12 rounded-lg shadow-sm border mb-1 relative"
+                            style={{ 
+                              backgroundColor: colorOption.value,
+                              borderColor: 'var(--color-gray-light, #E5E7EB)'
+                            }}
                           >
                             {heroData.backgroundColor === colorOption.value && (
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="w-3 h-3 bg-white rounded-full border-2 border-blue-500" />
+                                <div className="w-3 h-3 rounded-full border-2" style={{ 
+                                  backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                                  borderColor: 'var(--color-primary, #5243E9)'
+                                }} />
                               </div>
                             )}
                           </div>
@@ -598,8 +646,11 @@ const HomeHeroManager: React.FC = () => {
                     {/* Custom Color Input */}
                     <div className="flex items-center gap-3">
                       <div
-                        className="w-12 h-12 border-2 border-gray-300 rounded-lg cursor-pointer relative overflow-hidden"
-                        style={{ backgroundColor: heroData.backgroundColor }}
+                        className="w-12 h-12 border-2 rounded-lg cursor-pointer relative overflow-hidden"
+                        style={{ 
+                          backgroundColor: heroData.backgroundColor,
+                          borderColor: 'var(--color-gray-light, #E5E7EB)'
+                        }}
                       >
                         <input
                           type="color"

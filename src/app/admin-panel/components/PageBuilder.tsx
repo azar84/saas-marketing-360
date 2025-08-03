@@ -1795,6 +1795,28 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
                     color: 'var(--color-text-primary, #1F2937)'
                   }}
                 />
+                <style jsx>{`
+                  textarea::placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea::-webkit-input-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea::-moz-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea:-ms-input-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                  textarea:-moz-placeholder {
+                    color: var(--color-text-muted, #9CA3AF) !important;
+                    opacity: 1;
+                  }
+                `}</style>
                 <p className="text-xs mt-1"
                    style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>
                   Advanced: JSON configuration for section-specific settings
@@ -1821,7 +1843,7 @@ const PageBuilder: React.FC<PageBuilderProps> = ({ selectedPageId }) => {
               </div>
 
               {/* Actions */}
-              <div className="flex space-x-4 pt-4 border-t border-gray-200">
+              <div className="flex space-x-4 pt-4 border-t" style={{ borderColor: 'var(--color-gray-light, #E5E7EB)' }}>
                 {/* Validation Status */}
                 {(formData.sectionType === 'hero' || formData.sectionType === 'features' || formData.sectionType === 'media' || formData.sectionType === 'pricing' || formData.sectionType === 'faq' || formData.sectionType === 'form' || formData.sectionType === 'html' || formData.sectionType === 'team') && (
                   <div className="flex-1 text-sm">
