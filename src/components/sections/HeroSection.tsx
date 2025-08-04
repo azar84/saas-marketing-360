@@ -389,31 +389,31 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
     
     switch (heroHeight) {
       case 'auto':
-        return 'min-h-[500px]';
+        return 'min-h-[400px] sm:min-h-[500px]';
       case '50vh':
-        return 'h-[50vh]';
+        return 'min-h-[400px] sm:h-[50vh]';
       case '60vh':
-        return 'h-[60vh]';
+        return 'min-h-[400px] sm:h-[60vh]';
       case '70vh':
-        return 'h-[70vh]';
+        return 'min-h-[400px] sm:h-[70vh]';
       case '80vh':
-        return 'h-[80vh]';
+        return 'min-h-[400px] sm:h-[80vh]';
       case '90vh':
-        return 'h-[90vh]';
+        return 'min-h-[400px] sm:h-[90vh]';
       case '100vh':
-        return 'h-screen';
+        return 'min-h-[400px] sm:h-screen';
       case '400px':
-        return 'h-[400px]';
+        return 'min-h-[400px]';
       case '500px':
-        return 'h-[500px]';
+        return 'min-h-[400px] sm:h-[500px]';
       case '600px':
-        return 'h-[600px]';
+        return 'min-h-[400px] sm:h-[600px]';
       case '700px':
-        return 'h-[700px]';
+        return 'min-h-[400px] sm:h-[700px]';
       case '800px':
-        return 'h-[800px]';
+        return 'min-h-[400px] sm:h-[800px]';
       default:
-        return 'min-h-[500px]';
+        return 'min-h-[400px] sm:min-h-[500px]';
     }
   };
 
@@ -973,7 +973,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
         <div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-r from-[var(--color-primary-light)]/6 to-[var(--color-accent)]/4 rounded-full blur-3xl" />
       </div>
 
-      <div className="relative z-10 w-full pb-8 lg:pb-0">
+      <div className="relative z-10 w-full pb-8 lg:pb-0 px-4 sm:px-6 lg:px-8">
         <div className={`${getLayoutClasses()} max-w-7xl mx-auto`}>
           
           {/* Text Content */}
@@ -981,7 +981,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
             initial={{ opacity: 0, x: getTextAnimationDirection() }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
-            className={`${getTextContentClasses()} ${getLineSpacingClasses()}`}
+            className={`${getTextContentClasses()} ${getLineSpacingClasses()} px-4 sm:px-0`}
           >
             {/* Tighter Main Headline with Refined Typography */}
             <div>
@@ -989,7 +989,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className={`text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.05] ${getTextColor()}`}
+                className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight sm:leading-[1.05] ${getTextColor()}`}
               >
                 {heroData?.heading || 'Automate Conversations, Capture Leads, Serve Customers — All Without Code'}
               </motion.h1>
@@ -1001,7 +1001,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.6 }}
-                className={`text-lg ${getSecondaryTextColor()} leading-relaxed max-w-lg font-medium mx-auto`}
+                className={`text-base sm:text-lg ${getSecondaryTextColor()} leading-relaxed max-w-lg font-medium mx-auto`}
               >
                 {heroData.subheading}
               </motion.p>
@@ -1012,7 +1012,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.8 }}
-              className="flex flex-col sm:flex-row gap-4 pt-2"
+              className="flex flex-col sm:flex-row gap-3 sm:gap-4 pt-4 sm:pt-2"
             >
               {heroData?.primaryCtaId && heroData?.primaryCta && (() => {
                 console.log('HeroSection - Primary CTA data:', heroData.primaryCta);
