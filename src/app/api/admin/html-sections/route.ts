@@ -52,7 +52,14 @@ export async function GET() {
       }
     });
 
-    return NextResponse.json(htmlSections);
+    // Filter out null pages from the response
+    const filteredHtmlSections = htmlSections.map(section => ({
+      ...section,
+      pageHtmlSections: section.pageHtmlSections.filter(phs => phs.page !== null),
+      pageSections: section.pageSections.filter(ps => ps.page !== null)
+    }));
+
+    return NextResponse.json(filteredHtmlSections);
   } catch (error) {
     console.error('Error fetching HTML sections:', error);
     return NextResponse.json(
@@ -102,7 +109,14 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    return NextResponse.json(htmlSection, { status: 201 });
+    // Filter out null pages from the response
+    const filteredHtmlSection = {
+      ...htmlSection,
+      pageHtmlSections: htmlSection.pageHtmlSections.filter(phs => phs.page !== null),
+      pageSections: htmlSection.pageSections.filter(ps => ps.page !== null)
+    };
+
+    return NextResponse.json(filteredHtmlSection, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -169,7 +183,14 @@ export async function PUT(request: NextRequest) {
       }
     });
 
-    return NextResponse.json(htmlSection);
+    // Filter out null pages from the response
+    const filteredHtmlSection = {
+      ...htmlSection,
+      pageHtmlSections: htmlSection.pageHtmlSections.filter(phs => phs.page !== null),
+      pageSections: htmlSection.pageSections.filter(ps => ps.page !== null)
+    };
+
+    return NextResponse.json(filteredHtmlSection);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
