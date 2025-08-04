@@ -244,24 +244,40 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
 
   // Smart color calculation based on background color
   const getTextColor = () => {
-    // According to frontend design system: Headline Text should use Primary Text
-    return 'text-[var(--color-text-primary)]';
+    // Use custom heading color if available, otherwise use default
+    if (heroData?.headingColor) {
+      return { color: heroData.headingColor };
+    }
+    // Default heading color (same as API default)
+    return { color: '#1F2937' };
   };
 
   // Get secondary text color based on design system
   const getSecondaryTextColor = () => {
-    // According to frontend design system: Body Text should use Secondary Text
-    return 'text-[var(--color-text-secondary)]';
+    // Use custom subheading color if available, otherwise use default
+    if (heroData?.subheadingColor) {
+      return { color: heroData.subheadingColor };
+    }
+    // Default subheading color (same as API default)
+    return { color: '#6B7280' };
   };
 
   // Get trust indicator colors based on design system
   const getTrustIndicatorColors = () => {
-    // According to frontend design system: Use consistent colors for trust indicators
+    // Use custom trust indicator colors if available, otherwise use defaults
+    const textColor = heroData?.trustIndicatorTextColor ? 
+      { color: heroData.trustIndicatorTextColor } : 
+      { color: '#6B7280' }; // Default text color (same as API default)
+    
+    const backgroundColor = heroData?.trustIndicatorBackgroundColor ? 
+      { backgroundColor: heroData.trustIndicatorBackgroundColor } : 
+      { backgroundColor: '#F9FAFB' }; // Default background color (same as API default)
+    
     return {
-      text: 'text-[var(--color-text-secondary)]',
-      background: 'bg-[var(--color-bg-secondary)]',
-      border: 'border-[var(--color-gray-light)]',
-      icon: 'text-[var(--color-primary)]'
+      text: textColor,
+      background: backgroundColor,
+      border: { borderColor: 'var(--color-gray-light)' },
+      icon: { color: 'var(--color-primary)' }
     };
   };
 
@@ -989,7 +1005,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
-                className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight sm:leading-[1.05] ${getTextColor()}`}
+                className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight sm:leading-[1.05]"
+                style={getTextColor()}
               >
                 {heroData?.heading || 'Automate Conversations, Capture Leads, Serve Customers — All Without Code'}
               </motion.h1>
@@ -1001,7 +1018,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.6 }}
-                className={`text-base sm:text-lg ${getSecondaryTextColor()} leading-relaxed max-w-lg font-medium mx-auto`}
+                className="text-base sm:text-lg leading-relaxed max-w-lg font-medium mx-auto"
+                style={getSecondaryTextColor()}
               >
                 {heroData.subheading}
               </motion.p>
@@ -1339,9 +1357,14 @@ const HeroSection: React.FC<HeroSectionProps> = ({ heroData: propHeroData }) => 
                       initial={{ opacity: 0, scale: 0.9 }}
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ duration: 0.5, delay: 1.2 + index * 0.1 }}
-                      className={`flex items-center gap-2 ${trustColors.text} ${trustColors.background} backdrop-blur-sm px-3 py-2 rounded-lg border ${trustColors.border}`}
+                      className="flex items-center gap-2 backdrop-blur-sm px-3 py-2 rounded-lg border"
+                      style={{
+                        ...trustColors.text,
+                        ...trustColors.background,
+                        ...trustColors.border
+                      }}
                     >
-                      <IconComponent className={`w-4 h-4 ${trustColors.icon}`} />
+                      <IconComponent className="w-4 h-4" style={trustColors.icon} />
                       <span className="text-sm font-medium">{indicator.text}</span>
                     </motion.div>
                   );

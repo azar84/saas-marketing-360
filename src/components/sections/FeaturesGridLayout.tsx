@@ -21,13 +21,23 @@ interface FeaturesGridLayoutProps {
   heading: string;
   subheading?: string;
   backgroundColor?: string;
+  headingColor?: string;
+  subheadingColor?: string;
+  cardBackgroundColor?: string;
+  titleColor?: string;
+  subtitleColor?: string;
 }
 
 const FeaturesGridLayout: React.FC<FeaturesGridLayoutProps> = ({ 
   features, 
   heading, 
   subheading,
-  backgroundColor = 'var(--color-bg-secondary)'
+  backgroundColor = 'var(--color-bg-secondary)',
+  headingColor,
+  subheadingColor,
+  cardBackgroundColor,
+  titleColor,
+  subtitleColor
 }) => {
 
   const getIconComponent = (iconName: string) => {
@@ -60,7 +70,7 @@ const FeaturesGridLayout: React.FC<FeaturesGridLayoutProps> = ({
                   viewport={{ once: true }}
                   transition={{ duration: 0.6 }}
                   className="elementor-heading-title text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight"
-                  style={{ color: 'var(--color-text-primary)' }}
+                  style={{ color: headingColor || 'var(--color-text-primary, #1F2937)' }}
                 >
                   {heading}
                 </motion.h2>
@@ -77,7 +87,7 @@ const FeaturesGridLayout: React.FC<FeaturesGridLayoutProps> = ({
                     viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: 0.1 }}
                     className="text-lg leading-relaxed"
-                    style={{ color: 'var(--color-text-secondary)' }}
+                    style={{ color: subheadingColor || 'var(--color-text-secondary, #6B7280)' }}
                   >
                     <span>{subheading}</span>
                   </motion.p>
@@ -99,8 +109,8 @@ const FeaturesGridLayout: React.FC<FeaturesGridLayoutProps> = ({
                           transition={{ duration: 0.6, delay: index * 0.1 }}
                           className="group rounded-xl px-16 py-8 shadow-sm border hover:shadow-md transition-all duration-300"
                           style={{ 
-                            backgroundColor: 'var(--color-bg-secondary)',
-                            borderColor: 'var(--color-gray-light)'
+                            backgroundColor: cardBackgroundColor || 'var(--color-bg-secondary, #F9FAFB)',
+                            borderColor: 'var(--color-gray-light, #E5E7EB)'
                           }}
                         >
                           <div className="elementor-icon-box-wrapper">
@@ -118,14 +128,14 @@ const FeaturesGridLayout: React.FC<FeaturesGridLayoutProps> = ({
                             {/* Content */}
                             <div className="elementor-icon-box-content">
                               <h3 className="elementor-icon-box-title text-xl font-bold mb-3 group-hover:text-[var(--color-primary)] transition-colors duration-300"
-                                style={{ color: 'var(--color-text-primary)' }}>
+                                style={{ color: titleColor || 'var(--color-text-primary, #1F2937)' }}>
                                 <span>
                                   {feature.title}
                                 </span>
                               </h3>
                               
                               <p className="elementor-icon-box-description leading-relaxed"
-                                style={{ color: 'var(--color-text-secondary)' }}>
+                                style={{ color: subtitleColor || 'var(--color-text-secondary, #6B7280)' }}>
                                 {feature.description}
                               </p>
                             </div>
@@ -153,8 +163,8 @@ const FeaturesGridLayout: React.FC<FeaturesGridLayoutProps> = ({
                             transition={{ duration: 0.6, delay: (index + 3) * 0.1 }}
                             className="group rounded-xl px-16 py-8 shadow-sm border hover:shadow-md transition-all duration-300"
                             style={{ 
-                              backgroundColor: 'var(--color-bg-secondary)',
-                              borderColor: 'var(--color-gray-light)'
+                              backgroundColor: cardBackgroundColor || 'var(--color-bg-secondary, #F9FAFB)',
+                              borderColor: 'var(--color-gray-light, #E5E7EB)'
                             }}
                           >
                             <div className="elementor-icon-box-wrapper">
@@ -172,14 +182,14 @@ const FeaturesGridLayout: React.FC<FeaturesGridLayoutProps> = ({
                               {/* Content */}
                               <div className="elementor-icon-box-content">
                                 <h3 className="elementor-icon-box-title text-xl font-bold mb-3 group-hover:text-[var(--color-primary)] transition-colors duration-300"
-                                  style={{ color: 'var(--color-text-primary)' }}>
+                                  style={{ color: titleColor || 'var(--color-text-primary, #1F2937)' }}>
                                   <span>
                                     {feature.title}
                                   </span>
                                 </h3>
                                 
                                 <p className="elementor-icon-box-description leading-relaxed"
-                                  style={{ color: 'var(--color-text-secondary)' }}>
+                                  style={{ color: subtitleColor || 'var(--color-text-secondary, #6B7280)' }}>
                                   {feature.description}
                                 </p>
                               </div>
@@ -208,8 +218,8 @@ const FeaturesGridLayout: React.FC<FeaturesGridLayoutProps> = ({
                             transition={{ duration: 0.6, delay: (index + 6) * 0.1 }}
                             className="group rounded-xl px-16 py-8 shadow-sm border hover:shadow-md transition-all duration-300"
                             style={{ 
-                              backgroundColor: 'var(--color-bg-secondary)',
-                              borderColor: 'var(--color-gray-light)'
+                              backgroundColor: cardBackgroundColor || 'var(--color-bg-secondary, #F9FAFB)',
+                              borderColor: 'var(--color-gray-light, #E5E7EB)'
                             }}
                           >
                             <div className="elementor-icon-box-wrapper">
@@ -227,14 +237,14 @@ const FeaturesGridLayout: React.FC<FeaturesGridLayoutProps> = ({
                               {/* Content */}
                               <div className="elementor-icon-box-content">
                                 <h3 className="elementor-icon-box-title text-xl font-bold mb-3 group-hover:text-[var(--color-primary)] transition-colors duration-300"
-                                  style={{ color: 'var(--color-text-primary)' }}>
+                                  style={{ color: titleColor || 'var(--color-text-primary, #1F2937)' }}>
                                   <span>
                                     {feature.title}
                                   </span>
                                 </h3>
                                 
                                 <p className="elementor-icon-box-description leading-relaxed"
-                                  style={{ color: 'var(--color-text-secondary)' }}>
+                                  style={{ color: subtitleColor || 'var(--color-text-secondary, #6B7280)' }}>
                                   {feature.description}
                                 </p>
                               </div>

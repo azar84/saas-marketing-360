@@ -98,6 +98,11 @@ interface PageSection {
     description?: string;
     layoutType?: 'grid' | 'list';
     backgroundColor?: string;
+    headingColor?: string;
+    subheadingColor?: string;
+    cardBackgroundColor?: string;
+    titleColor?: string;
+    subtitleColor?: string;
     isActive: boolean;
     items: Array<{
       id: number;
@@ -530,11 +535,16 @@ async function fetchHomeHeroData() {
             }
           ]
         },
-        trustIndicators: [
-          { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
-          { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
-          { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
-        ]
+              trustIndicators: [
+        { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
+        { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
+        { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
+      ],
+      // Color controls with defaults
+      headingColor: '#1F2937',
+      subheadingColor: '#6B7280',
+      trustIndicatorTextColor: '#6B7280',
+      trustIndicatorBackgroundColor: '#F9FAFB'
       };
     }
 
@@ -558,7 +568,7 @@ async function fetchHomeHeroData() {
       secondaryCta: homeHero.ctaSecondary || null,
 
       isActive: homeHero.isActive,
-              animationType: homeHero.animationType || 'conversation',
+      animationType: homeHero.animationType || 'conversation',
       animationData: homeHero.animationData ? JSON.parse(homeHero.animationData) : {
         conversationFlow: [
           {
@@ -595,7 +605,12 @@ async function fetchHomeHeroData() {
         { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
         { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
         { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
-      ]
+      ],
+      // Color controls with defaults
+      headingColor: homeHero.headingColor || '#1F2937',
+      subheadingColor: homeHero.subheadingColor || '#6B7280',
+      trustIndicatorTextColor: homeHero.trustIndicatorTextColor || '#6B7280',
+      trustIndicatorBackgroundColor: homeHero.trustIndicatorBackgroundColor || '#F9FAFB'
     };
     
     console.log('fetchHomeHeroData - Transformed data:', transformedData);
@@ -650,7 +665,12 @@ async function fetchHomeHeroData() {
         { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
         { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
         { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
-      ]
+      ],
+      // Color controls with defaults (same as API defaults)
+      headingColor: '#1F2937',
+      subheadingColor: '#6B7280',
+      trustIndicatorTextColor: '#6B7280',
+      trustIndicatorBackgroundColor: '#F9FAFB'
     };
   }
 }
@@ -945,6 +965,11 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
               subheading={section.featureGroup.description}
               layoutType={section.featureGroup.layoutType}
               backgroundColor={section.featureGroup.backgroundColor}
+              headingColor={section.featureGroup.headingColor}
+              subheadingColor={section.featureGroup.subheadingColor}
+              cardBackgroundColor={section.featureGroup.cardBackgroundColor}
+              titleColor={section.featureGroup.titleColor}
+              subtitleColor={section.featureGroup.subtitleColor}
             />
           );
         }

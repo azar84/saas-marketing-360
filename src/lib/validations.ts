@@ -269,6 +269,11 @@ export const CreateFeatureGroupSchema = z.object({
   subheading: z.string().max(500).optional(),
   layoutType: FeatureGroupLayoutEnum.default('grid'),
   backgroundColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#ffffff'),
+  headingColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#1F2937'),
+  subheadingColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#6B7280'),
+  cardBackgroundColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#FFFFFF'),
+  titleColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#1F2937'),
+  subtitleColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#6B7280'),
   isActive: z.boolean().default(true),
 });
 

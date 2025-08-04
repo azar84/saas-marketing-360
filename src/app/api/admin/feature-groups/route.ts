@@ -14,6 +14,11 @@ export async function GET() {
         description: true,
         layoutType: true,
         backgroundColor: true,
+        headingColor: true,
+        subheadingColor: true,
+        cardBackgroundColor: true,
+        titleColor: true,
+        subtitleColor: true,
         isActive: true,
         createdAt: true,
         updatedAt: true,
@@ -64,6 +69,11 @@ export async function GET() {
       description: group.description, // Keep description for backward compatibility
       layoutType: group.layoutType,
       backgroundColor: group.backgroundColor,
+      headingColor: group.headingColor,
+      subheadingColor: group.subheadingColor,
+      cardBackgroundColor: group.cardBackgroundColor,
+      titleColor: group.titleColor,
+      subtitleColor: group.subtitleColor,
       isActive: group.isActive,
       createdAt: group.createdAt,
       updatedAt: group.updatedAt,
@@ -119,6 +129,11 @@ export async function POST(request: NextRequest) {
         description: validatedData.subheading || null,  // Map subheading -> description
         layoutType: validatedData.layoutType,
         backgroundColor: validatedData.backgroundColor,
+        headingColor: validatedData.headingColor,
+        subheadingColor: validatedData.subheadingColor,
+        cardBackgroundColor: validatedData.cardBackgroundColor,
+        titleColor: validatedData.titleColor,
+        subtitleColor: validatedData.subtitleColor,
         isActive: validatedData.isActive
       } as any,
       include: {
@@ -159,6 +174,11 @@ export async function POST(request: NextRequest) {
       description: featureGroup.description, // Keep description for backward compatibility
       layoutType: featureGroup.layoutType,
       backgroundColor: featureGroup.backgroundColor,
+      headingColor: featureGroup.headingColor,
+      subheadingColor: featureGroup.subheadingColor,
+      cardBackgroundColor: featureGroup.cardBackgroundColor,
+      titleColor: featureGroup.titleColor,
+      subtitleColor: featureGroup.subtitleColor,
       isActive: featureGroup.isActive,
       createdAt: featureGroup.createdAt,
       updatedAt: featureGroup.updatedAt,
@@ -220,6 +240,11 @@ export async function PUT(request: NextRequest) {
         ...(validatedData.subheading !== undefined && { description: validatedData.subheading }),  // Map subheading -> description
         ...(validatedData.layoutType !== undefined && { layoutType: validatedData.layoutType }),
         ...(validatedData.backgroundColor !== undefined && { backgroundColor: validatedData.backgroundColor }),
+        ...(validatedData.headingColor !== undefined && { headingColor: validatedData.headingColor }),
+        ...(validatedData.subheadingColor !== undefined && { subheadingColor: validatedData.subheadingColor }),
+        ...(validatedData.cardBackgroundColor !== undefined && { cardBackgroundColor: validatedData.cardBackgroundColor }),
+        ...(validatedData.titleColor !== undefined && { titleColor: validatedData.titleColor }),
+        ...(validatedData.subtitleColor !== undefined && { subtitleColor: validatedData.subtitleColor }),
         ...(validatedData.isActive !== undefined && { isActive: validatedData.isActive }),
         updatedAt: new Date()
       } as any,
@@ -261,6 +286,11 @@ export async function PUT(request: NextRequest) {
       description: featureGroup.description, // Keep description for backward compatibility
       layoutType: featureGroup.layoutType,
       backgroundColor: featureGroup.backgroundColor,
+      headingColor: featureGroup.headingColor,
+      subheadingColor: featureGroup.subheadingColor,
+      cardBackgroundColor: featureGroup.cardBackgroundColor,
+      titleColor: featureGroup.titleColor,
+      subtitleColor: featureGroup.subtitleColor,
       isActive: featureGroup.isActive,
       createdAt: featureGroup.createdAt,
       updatedAt: featureGroup.updatedAt,

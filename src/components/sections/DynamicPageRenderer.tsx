@@ -81,6 +81,11 @@ interface PageSection {
     description?: string;
     layoutType?: 'grid' | 'list';
     backgroundColor?: string;
+    headingColor?: string;
+    subheadingColor?: string;
+    cardBackgroundColor?: string;
+    titleColor?: string;
+    subtitleColor?: string;
     isActive: boolean;
     items: Array<{
       id: number;
@@ -357,7 +362,12 @@ const DynamicPageRenderer: React.FC<DynamicPageRendererProps> = ({
             heading: section.title || section.featureGroup.name, // API returns 'name', not 'heading'
             subheading: section.subtitle || section.featureGroup.description, // API returns 'description', not 'subheading'
             layoutType: section.featureGroup.layoutType || 'grid',
-            backgroundColor: section.featureGroup.backgroundColor
+            backgroundColor: section.featureGroup.backgroundColor,
+            headingColor: section.featureGroup.headingColor,
+            subheadingColor: section.featureGroup.subheadingColor,
+            cardBackgroundColor: section.featureGroup.cardBackgroundColor,
+            titleColor: section.featureGroup.titleColor,
+            subtitleColor: section.featureGroup.subtitleColor
           };
 
           console.log('🎯 DynamicPageRenderer - Feature Group layoutType:', section.featureGroup.layoutType);

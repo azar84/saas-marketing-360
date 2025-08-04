@@ -86,6 +86,11 @@ interface HomeHeroData {
   primaryCta?: CTAButton | null;
   secondaryCta?: CTAButton | null;
   trustIndicators: TrustIndicator[];
+  // Color controls
+  headingColor?: string;
+  subheadingColor?: string;
+  trustIndicatorTextColor?: string;
+  trustIndicatorBackgroundColor?: string;
   // Creatives configuration
   animationType?: string; // video, html, script, image
   animationData?: any; // JSON object for creatives configuration
@@ -109,6 +114,11 @@ const HomeHeroManager: React.FC = () => {
     secondaryCtaId: null,
     isActive: true,
     trustIndicators: [],
+    // Color controls with defaults
+    headingColor: '#1F2937',
+    subheadingColor: '#6B7280',
+    trustIndicatorTextColor: '#6B7280',
+    trustIndicatorBackgroundColor: '#F9FAFB',
     animationType: 'conversation',
     animationData: {
       conversationFlow: [
@@ -212,7 +222,12 @@ const HomeHeroManager: React.FC = () => {
             mediaSize: result.data.mediaSize || 'full',
             heroHeight: result.data.heroHeight || 'auto',
             lineSpacing: result.data.lineSpacing || '4',
-            trustIndicators: result.data.trustIndicators || []
+            trustIndicators: result.data.trustIndicators || [],
+            // Color controls with defaults
+            headingColor: result.data.headingColor || '#1F2937',
+            subheadingColor: result.data.subheadingColor || '#6B7280',
+            trustIndicatorTextColor: result.data.trustIndicatorTextColor || '#6B7280',
+            trustIndicatorBackgroundColor: result.data.trustIndicatorBackgroundColor || '#F9FAFB'
           };
           setHeroData(heroData);
         } else {
@@ -255,7 +270,12 @@ const HomeHeroManager: React.FC = () => {
             mediaSize: result.data.mediaSize || 'full',
             heroHeight: result.data.heroHeight || 'auto',
             lineSpacing: result.data.lineSpacing || '4',
-            trustIndicators: result.data.trustIndicators || []
+            trustIndicators: result.data.trustIndicators || [],
+            // Color controls with defaults
+            headingColor: result.data.headingColor || '#1F2937',
+            subheadingColor: result.data.subheadingColor || '#6B7280',
+            trustIndicatorTextColor: result.data.trustIndicatorTextColor || '#6B7280',
+            trustIndicatorBackgroundColor: result.data.trustIndicatorBackgroundColor || '#F9FAFB'
           };
           console.log('Processed hero data:', heroData);
           setHeroData(heroData);
@@ -451,10 +471,10 @@ const HomeHeroManager: React.FC = () => {
             style={{ backgroundColor: heroData.backgroundColor }}
           >
             <div className="max-w-4xl mx-auto">
-              <h1 className="text-4xl font-bold mb-4 leading-tight" style={{ color: designSystem?.textPrimary || '#000000' }}>
+              <h1 className="text-4xl font-bold mb-4 leading-tight" style={{ color: heroData.headingColor || designSystem?.textPrimary || '#000000' }}>
                 {heroData.heading || 'Your Hero Heading'}
               </h1>
-              <p className="text-lg mb-8 leading-relaxed" style={{ color: designSystem?.textSecondary || '#666666' }}>
+              <p className="text-lg mb-8 leading-relaxed" style={{ color: heroData.subheadingColor || designSystem?.textSecondary || '#666666' }}>
                 {heroData.subheading || 'Your compelling subheading that explains your value proposition and encourages visitors to take action.'}
               </p>
               <div className="flex flex-wrap gap-4 mb-8">
@@ -481,7 +501,15 @@ const HomeHeroManager: React.FC = () => {
                 {(heroData.trustIndicators || []).filter(indicator => indicator.isVisible).map((indicator, index) => {
                   const IconComponent = getIconComponent(indicator.iconName);
                   return (
-                    <div key={index} className="flex items-center gap-2" style={{ color: designSystem?.textSecondary || '#666666' }}>
+                    <div 
+                      key={index} 
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg border" 
+                      style={{ 
+                        color: heroData.trustIndicatorTextColor || designSystem?.textSecondary || '#666666',
+                        backgroundColor: heroData.trustIndicatorBackgroundColor || designSystem?.backgroundSecondary || '#F9FAFB',
+                        borderColor: 'var(--color-gray-light, #E5E7EB)'
+                      }}
+                    >
                       <IconComponent className="w-4 h-4" style={{ color: 'var(--color-success, #10B981)' }} />
                       <span className="text-sm font-medium">{indicator.text}</span>
                     </div>
@@ -581,7 +609,7 @@ const HomeHeroManager: React.FC = () => {
                 </div>
               </div>
 
-              {/* Styling */}
+              {/* Color Controls */}
               <div 
                 className="rounded-xl p-6 shadow-sm border"
                 style={{ 
@@ -594,8 +622,8 @@ const HomeHeroManager: React.FC = () => {
                     <Palette className="w-5 h-5 text-indigo-600" />
                   </div>
                   <div>
-                                      <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Styling</h3>
-                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Customize the hero section appearance</p>
+                    <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Color Controls</h3>
+                    <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Customize all colors including background, text, and trust indicators</p>
                   </div>
                 </div>
 
@@ -677,8 +705,6 @@ const HomeHeroManager: React.FC = () => {
                     </div>
                   </div>
 
-
-
                   {/* Background Overlay */}
                   <div>
                     <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
@@ -710,7 +736,7 @@ const HomeHeroManager: React.FC = () => {
                               </div>
                             )}
                           </div>
-                          <span className="text-xs block truncate" style={{ color: designSystem?.textSecondary || '#666666' }}>
+                          <span className="text-xs block truncate" style={{ color: 'var(--color-text-secondary)' }}>
                             {colorOption.name}
                           </span>
                         </div>
@@ -738,8 +764,9 @@ const HomeHeroManager: React.FC = () => {
                           className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent font-mono text-sm"
                           placeholder="rgba(0,0,0,0.5) or transparent"
                           style={{ 
-                            color: designSystem?.textPrimary || '#000000',
-                            backgroundColor: designSystem?.backgroundPrimary || '#ffffff'
+                            color: 'var(--color-text-primary)',
+                            backgroundColor: 'var(--color-bg-primary)',
+                            borderColor: 'var(--color-gray-light)'
                           }}
                         />
                       </div>
@@ -747,12 +774,345 @@ const HomeHeroManager: React.FC = () => {
                         type="button"
                         onClick={() => setHeroData(prev => ({ ...prev, backgroundOverlay: '' }))}
                         className="px-3 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-lg hover:bg-gray-50"
+                        style={{ 
+                          color: 'var(--color-text-secondary)',
+                          borderColor: 'var(--color-gray-light)'
+                        }}
                       >
                         Clear
                       </button>
                     </div>
                   </div>
 
+                  {/* Heading Color */}
+                  <div>
+                    <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
+                      Heading Color
+                    </label>
+                    <p className="text-xs mb-4" style={{ color: 'var(--color-text-muted)' }}>
+                      Choose the color for the main heading text.
+                    </p>
+                    
+                    {/* Design System Color Palette */}
+                    <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 mb-4">
+                      {getDesignSystemColors().map((colorOption) => (
+                        <div
+                          key={colorOption.name}
+                          className={`cursor-pointer text-center ${
+                            heroData.headingColor === colorOption.value
+                              ? 'ring-2 ring-blue-500 ring-offset-2 rounded-lg'
+                              : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 rounded-lg'
+                          }`}
+                          onClick={() => setHeroData(prev => ({ ...prev, headingColor: colorOption.value }))}
+                        >
+                          <div
+                            className="w-12 h-12 rounded-lg shadow-sm border mb-1 relative"
+                            style={{ 
+                              backgroundColor: colorOption.value,
+                              borderColor: 'var(--color-gray-light, #E5E7EB)'
+                            }}
+                          >
+                            {heroData.headingColor === colorOption.value && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-3 h-3 rounded-full border-2" style={{ 
+                                  backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                                  borderColor: 'var(--color-primary, #5243E9)'
+                                }} />
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-xs block truncate" style={{ color: 'var(--color-text-secondary)' }}>
+                            {colorOption.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Custom Color Input */}
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-12 h-12 border-2 rounded-lg cursor-pointer relative overflow-hidden"
+                        style={{ 
+                          backgroundColor: heroData.headingColor || '#1F2937',
+                          borderColor: 'var(--color-gray-light, #E5E7EB)'
+                        }}
+                      >
+                        <input
+                          type="color"
+                          value={heroData.headingColor || '#1F2937'}
+                          onChange={(e) => setHeroData(prev => ({ ...prev, headingColor: e.target.value }))}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={heroData.headingColor || '#1F2937'}
+                          onChange={(e) => setHeroData(prev => ({ ...prev, headingColor: e.target.value }))}
+                          className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent font-mono text-sm"
+                          placeholder="#1F2937"
+                          style={{ 
+                            color: 'var(--color-text-primary)',
+                            backgroundColor: 'var(--color-bg-primary)',
+                            borderColor: 'var(--color-gray-light)'
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Subheading Color */}
+                  <div>
+                    <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
+                      Subheading Color
+                    </label>
+                    <p className="text-xs mb-4" style={{ color: 'var(--color-text-muted)' }}>
+                      Choose the color for the subheading text.
+                    </p>
+                    
+                    {/* Design System Color Palette */}
+                    <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 mb-4">
+                      {getDesignSystemColors().map((colorOption) => (
+                        <div
+                          key={colorOption.name}
+                          className={`cursor-pointer text-center ${
+                            heroData.subheadingColor === colorOption.value
+                              ? 'ring-2 ring-blue-500 ring-offset-2 rounded-lg'
+                              : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 rounded-lg'
+                          }`}
+                          onClick={() => setHeroData(prev => ({ ...prev, subheadingColor: colorOption.value }))}
+                        >
+                          <div
+                            className="w-12 h-12 rounded-lg shadow-sm border mb-1 relative"
+                            style={{ 
+                              backgroundColor: colorOption.value,
+                              borderColor: 'var(--color-gray-light, #E5E7EB)'
+                            }}
+                          >
+                            {heroData.subheadingColor === colorOption.value && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-3 h-3 rounded-full border-2" style={{ 
+                                  backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                                  borderColor: 'var(--color-primary, #5243E9)'
+                                }} />
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-xs block truncate" style={{ color: 'var(--color-text-secondary)' }}>
+                            {colorOption.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Custom Color Input */}
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-12 h-12 border-2 rounded-lg cursor-pointer relative overflow-hidden"
+                        style={{ 
+                          backgroundColor: heroData.subheadingColor || '#6B7280',
+                          borderColor: 'var(--color-gray-light, #E5E7EB)'
+                        }}
+                      >
+                        <input
+                          type="color"
+                          value={heroData.subheadingColor || '#6B7280'}
+                          onChange={(e) => setHeroData(prev => ({ ...prev, subheadingColor: e.target.value }))}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={heroData.subheadingColor || '#6B7280'}
+                          onChange={(e) => setHeroData(prev => ({ ...prev, subheadingColor: e.target.value }))}
+                          className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent font-mono text-sm"
+                          placeholder="#6B7280"
+                          style={{ 
+                            color: 'var(--color-text-primary)',
+                            backgroundColor: 'var(--color-bg-primary)',
+                            borderColor: 'var(--color-gray-light)'
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Trust Indicator Text Color */}
+                  <div>
+                    <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
+                      Trust Indicator Text Color
+                    </label>
+                    <p className="text-xs mb-4" style={{ color: 'var(--color-text-muted)' }}>
+                      Choose the color for trust indicator text.
+                    </p>
+                    
+                    {/* Design System Color Palette */}
+                    <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 mb-4">
+                      {getDesignSystemColors().map((colorOption) => (
+                        <div
+                          key={colorOption.name}
+                          className={`cursor-pointer text-center ${
+                            heroData.trustIndicatorTextColor === colorOption.value
+                              ? 'ring-2 ring-blue-500 ring-offset-2 rounded-lg'
+                              : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 rounded-lg'
+                          }`}
+                          onClick={() => setHeroData(prev => ({ ...prev, trustIndicatorTextColor: colorOption.value }))}
+                        >
+                          <div
+                            className="w-12 h-12 rounded-lg shadow-sm border mb-1 relative"
+                            style={{ 
+                              backgroundColor: colorOption.value,
+                              borderColor: 'var(--color-gray-light, #E5E7EB)'
+                            }}
+                          >
+                            {heroData.trustIndicatorTextColor === colorOption.value && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-3 h-3 rounded-full border-2" style={{ 
+                                  backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                                  borderColor: 'var(--color-primary, #5243E9)'
+                                }} />
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-xs block truncate" style={{ color: 'var(--color-text-secondary)' }}>
+                            {colorOption.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Custom Color Input */}
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-12 h-12 border-2 rounded-lg cursor-pointer relative overflow-hidden"
+                        style={{ 
+                          backgroundColor: heroData.trustIndicatorTextColor || '#6B7280',
+                          borderColor: 'var(--color-gray-light, #E5E7EB)'
+                        }}
+                      >
+                        <input
+                          type="color"
+                          value={heroData.trustIndicatorTextColor || '#6B7280'}
+                          onChange={(e) => setHeroData(prev => ({ ...prev, trustIndicatorTextColor: e.target.value }))}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={heroData.trustIndicatorTextColor || '#6B7280'}
+                          onChange={(e) => setHeroData(prev => ({ ...prev, trustIndicatorTextColor: e.target.value }))}
+                          className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent font-mono text-sm"
+                          placeholder="#6B7280"
+                          style={{ 
+                            color: 'var(--color-text-primary)',
+                            backgroundColor: 'var(--color-bg-primary)',
+                            borderColor: 'var(--color-gray-light)'
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Trust Indicator Background Color */}
+                  <div>
+                    <label className="block text-sm font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
+                      Trust Indicator Background Color
+                    </label>
+                    <p className="text-xs mb-4" style={{ color: 'var(--color-text-muted)' }}>
+                      Choose the background color for trust indicators.
+                    </p>
+                    
+                    {/* Design System Color Palette */}
+                    <div className="grid grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-3 mb-4">
+                      {getDesignSystemColors().map((colorOption) => (
+                        <div
+                          key={colorOption.name}
+                          className={`cursor-pointer text-center ${
+                            heroData.trustIndicatorBackgroundColor === colorOption.value
+                              ? 'ring-2 ring-blue-500 ring-offset-2 rounded-lg'
+                              : 'hover:ring-2 hover:ring-gray-300 hover:ring-offset-2 rounded-lg'
+                          }`}
+                          onClick={() => setHeroData(prev => ({ ...prev, trustIndicatorBackgroundColor: colorOption.value }))}
+                        >
+                          <div
+                            className="w-12 h-12 rounded-lg shadow-sm border mb-1 relative"
+                            style={{ 
+                              backgroundColor: colorOption.value,
+                              borderColor: 'var(--color-gray-light, #E5E7EB)'
+                            }}
+                          >
+                            {heroData.trustIndicatorBackgroundColor === colorOption.value && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="w-3 h-3 rounded-full border-2" style={{ 
+                                  backgroundColor: 'var(--color-bg-primary, #FFFFFF)',
+                                  borderColor: 'var(--color-primary, #5243E9)'
+                                }} />
+                              </div>
+                            )}
+                          </div>
+                          <span className="text-xs block truncate" style={{ color: 'var(--color-text-secondary)' }}>
+                            {colorOption.name}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                    
+                    {/* Custom Color Input */}
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-12 h-12 border-2 rounded-lg cursor-pointer relative overflow-hidden"
+                        style={{ 
+                          backgroundColor: heroData.trustIndicatorBackgroundColor || '#F9FAFB',
+                          borderColor: 'var(--color-gray-light, #E5E7EB)'
+                        }}
+                      >
+                        <input
+                          type="color"
+                          value={heroData.trustIndicatorBackgroundColor || '#F9FAFB'}
+                          onChange={(e) => setHeroData(prev => ({ ...prev, trustIndicatorBackgroundColor: e.target.value }))}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={heroData.trustIndicatorBackgroundColor || '#F9FAFB'}
+                          onChange={(e) => setHeroData(prev => ({ ...prev, trustIndicatorBackgroundColor: e.target.value }))}
+                          className="w-full p-2 border rounded-lg focus:ring-2 focus:ring-[#5243E9] focus:border-transparent font-mono text-sm"
+                          placeholder="#F9FAFB"
+                          style={{ 
+                            color: 'var(--color-text-primary)',
+                            backgroundColor: 'var(--color-bg-primary)',
+                            borderColor: 'var(--color-gray-light)'
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Styling */}
+              <div 
+                className="rounded-xl p-6 shadow-sm border"
+                style={{ 
+                  borderColor: 'var(--color-gray-light)',
+                  backgroundColor: 'var(--color-bg-secondary)' 
+                }}
+              >
+                <div className="flex items-center space-x-3 mb-6">
+                  <div className="p-2 bg-indigo-100 rounded-lg">
+                    <Palette className="w-5 h-5 text-indigo-600" />
+                  </div>
+                  <div>
+                                      <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>Styling</h3>
+                  <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Customize the hero section appearance</p>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
                   {/* Hero Height */}
                   <div>
                     <label className="block text-sm font-medium mb-3" style={{ color: designSystem?.textPrimary || '#000000' }}>

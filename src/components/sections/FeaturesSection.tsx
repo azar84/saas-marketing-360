@@ -24,6 +24,11 @@ interface FeaturesSectionProps {
   subheading?: string;
   layoutType?: 'grid' | 'list';
   backgroundColor?: string;
+  headingColor?: string;
+  subheadingColor?: string;
+  cardBackgroundColor?: string;
+  titleColor?: string;
+  subtitleColor?: string;
 }
 
 // Default features fallback
@@ -70,7 +75,12 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
   heading: propHeading,
   subheading: propSubheading,
   layoutType: propLayoutType,
-  backgroundColor
+  backgroundColor,
+  headingColor,
+  subheadingColor,
+  cardBackgroundColor,
+  titleColor,
+  subtitleColor
 }) => {
   const [features, setFeatures] = useState<GlobalFeature[]>(propFeatures);
   const [loading, setLoading] = useState(propFeatures.length === 0);
@@ -78,6 +88,11 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
   const [groupSubheading, setGroupSubheading] = useState<string>('');
   const [layoutType, setLayoutType] = useState<'grid' | 'list'>(propLayoutType || 'grid');
   const [finalBackgroundColor, setFinalBackgroundColor] = useState<string>(backgroundColor || 'var(--color-bg-secondary)');
+  const [finalHeadingColor, setFinalHeadingColor] = useState<string>(headingColor || '');
+  const [finalSubheadingColor, setFinalSubheadingColor] = useState<string>(subheadingColor || '');
+  const [finalCardBackgroundColor, setFinalCardBackgroundColor] = useState<string>(cardBackgroundColor || '');
+  const [finalTitleColor, setFinalTitleColor] = useState<string>(titleColor || '');
+  const [finalSubtitleColor, setFinalSubtitleColor] = useState<string>(subtitleColor || '');
 
   // Fetch features from API if not provided via props
   useEffect(() => {
@@ -130,6 +145,14 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
                 subheading = group.subheading || '';
                 layout = group.layoutType || 'grid';
                 bgColor = group.backgroundColor || backgroundColor || 'var(--color-bg-secondary)';
+                
+                // Set color fields from the feature group
+                setFinalHeadingColor(group.headingColor);
+                setFinalSubheadingColor(group.subheadingColor);
+                setFinalCardBackgroundColor(group.cardBackgroundColor);
+                setFinalTitleColor(group.titleColor);
+                setFinalSubtitleColor(group.subtitleColor);
+                
                 console.log('🎯 Setting layout to:', layout);
                 console.log('🎯 Features data count:', featuresData.length);
               }
@@ -160,6 +183,13 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
                       subheading = pageGroup.featureGroup.subheading || '';
                       layout = pageGroup.featureGroup.layoutType || 'grid';
                       bgColor = pageGroup.featureGroup.backgroundColor || backgroundColor || 'var(--color-bg-secondary)';
+                      
+                      // Set color fields from the feature group
+                      setFinalHeadingColor(pageGroup.featureGroup.headingColor);
+                      setFinalSubheadingColor(pageGroup.featureGroup.subheadingColor);
+                      setFinalCardBackgroundColor(pageGroup.featureGroup.cardBackgroundColor);
+                      setFinalTitleColor(pageGroup.featureGroup.titleColor);
+                      setFinalSubtitleColor(pageGroup.featureGroup.subtitleColor);
                     }
                   }
                 }
@@ -206,6 +236,13 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
         // Use propLayoutType if available, otherwise use the fetched layout
         setLayoutType(propLayoutType || layout);
         setFinalBackgroundColor(bgColor);
+        
+        // Set default color values if not already set
+        if (!finalHeadingColor) setFinalHeadingColor(headingColor || '');
+        if (!finalSubheadingColor) setFinalSubheadingColor(subheadingColor || '');
+        if (!finalCardBackgroundColor) setFinalCardBackgroundColor(cardBackgroundColor || '');
+        if (!finalTitleColor) setFinalTitleColor(titleColor || '');
+        if (!finalSubtitleColor) setFinalSubtitleColor(subtitleColor || '');
 
       } catch (error) {
         // Fall back to default features if everything fails
@@ -214,6 +251,11 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
         setGroupSubheading(propSubheading || 'Simple. Smart. Built for growing businesses');
         setLayoutType('grid');
         setFinalBackgroundColor(backgroundColor || 'var(--color-bg-secondary)');
+        setFinalHeadingColor(headingColor || '');
+        setFinalSubheadingColor(subheadingColor || '');
+        setFinalCardBackgroundColor(cardBackgroundColor || '');
+        setFinalTitleColor(titleColor || '');
+        setFinalSubtitleColor(subtitleColor || '');
       } finally {
         setLoading(false);
       }
@@ -252,6 +294,11 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
         heading={groupHeading || 'Why Choose Us?'}
         subheading={groupSubheading}
         backgroundColor={finalBackgroundColor}
+        headingColor={finalHeadingColor}
+        subheadingColor={finalSubheadingColor}
+        cardBackgroundColor={finalCardBackgroundColor}
+        titleColor={finalTitleColor}
+        subtitleColor={finalSubtitleColor}
       />
     );
   }
@@ -264,6 +311,11 @@ const FeaturesSection: React.FC<FeaturesSectionProps> = ({
       heading={groupHeading || 'Why Choose Us?'}
       subheading={groupSubheading}
       backgroundColor={finalBackgroundColor}
+      headingColor={finalHeadingColor}
+      subheadingColor={finalSubheadingColor}
+      cardBackgroundColor={finalCardBackgroundColor}
+      titleColor={finalTitleColor}
+      subtitleColor={finalSubtitleColor}
     />
   );
 };

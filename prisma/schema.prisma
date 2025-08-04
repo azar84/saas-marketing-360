@@ -410,33 +410,37 @@ model HeaderCTA {
 }
 
 model HomePageHero {
-  id                Int      @id @default(autoincrement())
-  tagline           String?
-  headline          String
-  subheading        String?
-  ctaPrimaryId      Int?
-  ctaSecondaryId    Int?
-  ctaPrimaryText    String?
-  ctaPrimaryUrl     String?
-  ctaSecondaryText  String?
-  ctaSecondaryUrl   String?
-  mediaUrl          String?
-  backgroundColor   String?  @default("#FFFFFF")
-  layoutType        String   @default("split")
-  mediaPosition     String   @default("right")
-  mediaSize         String   @default("full")
-  heroHeight        String?  @default("auto")
-  lineSpacing       String?  @default("normal")
-  isActive          Boolean  @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  animationData     String?
-  animationType     String?  @default("conversation")
-  trustIndicators   String?
-  backgroundOverlay String?
-  backgroundSize    String   @default("cover")
-  ctaPrimary        CTA?     @relation("HomeHeroPrimaryCTA", fields: [ctaPrimaryId], references: [id])
-  ctaSecondary      CTA?     @relation("HomeHeroSecondaryCTA", fields: [ctaSecondaryId], references: [id])
+  id                            Int      @id @default(autoincrement())
+  tagline                       String?
+  headline                      String
+  subheading                    String?
+  ctaPrimaryId                  Int?
+  ctaSecondaryId                Int?
+  ctaPrimaryText                String?
+  ctaPrimaryUrl                 String?
+  ctaSecondaryText              String?
+  ctaSecondaryUrl               String?
+  mediaUrl                      String?
+  backgroundColor               String?  @default("#FFFFFF")
+  layoutType                    String   @default("split")
+  mediaPosition                 String   @default("right")
+  mediaSize                     String   @default("full")
+  heroHeight                    String?  @default("auto")
+  lineSpacing                   String?  @default("normal")
+  isActive                      Boolean  @default(true)
+  createdAt                     DateTime @default(now())
+  updatedAt                     DateTime @updatedAt
+  animationData                 String?
+  animationType                 String?  @default("conversation")
+  trustIndicators               String?
+  backgroundOverlay             String?
+  backgroundSize                String   @default("cover")
+  headingColor                  String?  @default("#1F2937")
+  subheadingColor               String?  @default("#6B7280")
+  trustIndicatorBackgroundColor String?  @default("#F9FAFB")
+  trustIndicatorTextColor       String?  @default("#6B7280")
+  ctaPrimary                    CTA?     @relation("HomeHeroPrimaryCTA", fields: [ctaPrimaryId], references: [id])
+  ctaSecondary                  CTA?     @relation("HomeHeroSecondaryCTA", fields: [ctaSecondaryId], references: [id])
 
   @@map("home_page_hero")
 }
@@ -470,18 +474,23 @@ model GlobalFeature {
 }
 
 model FeatureGroup {
-  id              Int                @id @default(autoincrement())
-  name            String
-  description     String?
-  layoutType      String             @default("grid")
-  backgroundColor String?            @default("#FFFFFF")
-  sortOrder       Int                @default(0)
-  isActive        Boolean            @default(true)
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  items           FeatureGroupItem[]
-  pageGroups      PageFeatureGroup[]
-  pageSections    PageSection[]
+  id                  Int                @id @default(autoincrement())
+  name                String
+  description         String?
+  layoutType          String             @default("grid")
+  backgroundColor     String?            @default("#FFFFFF")
+  sortOrder           Int                @default(0)
+  isActive            Boolean            @default(true)
+  createdAt           DateTime           @default(now())
+  updatedAt           DateTime           @updatedAt
+  headingColor        String?            @default("#1F2937")
+  subheadingColor     String?            @default("#6B7280")
+  cardBackgroundColor String?            @default("#FFFFFF")
+  subtitleColor       String?            @default("#6B7280")
+  titleColor          String?            @default("#1F2937")
+  items               FeatureGroupItem[]
+  pageGroups          PageFeatureGroup[]
+  pageSections        PageSection[]
 
   @@map("feature_groups")
 }
@@ -745,7 +754,6 @@ model Plan {
   position      Int                  @default(0)
   isActive      Boolean              @default(true)
   isPopular     Boolean              @default(false)
-  // JavaScript Events
   events        Json?                @default("[]")
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
@@ -777,7 +785,7 @@ model PlanPricing {
   priceCents     Int
   stripePriceId  String?
   ctaUrl         String?
-  events         Json?        // Events for this specific billing cycle
+  events         Json?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
   billingCycle   BillingCycle @relation(fields: [billingCycleId], references: [id], onDelete: Cascade)

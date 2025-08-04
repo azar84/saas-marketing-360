@@ -120,6 +120,11 @@ interface FeatureGroup {
   subheading?: string;
   layoutType?: string;
   backgroundColor?: string;
+  headingColor?: string;
+  subheadingColor?: string;
+  cardBackgroundColor?: string;
+  titleColor?: string;
+  subtitleColor?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -149,6 +154,11 @@ const FeatureGroupsManager: React.FC = () => {
     subheading: string;
     layoutType: 'grid' | 'list';
     backgroundColor: string;
+    headingColor: string;
+    subheadingColor: string;
+    cardBackgroundColor: string;
+    titleColor: string;
+    subtitleColor: string;
     isActive: boolean;
   }>({
     name: '',
@@ -156,6 +166,11 @@ const FeatureGroupsManager: React.FC = () => {
     subheading: '',
     layoutType: 'grid',
     backgroundColor: '#ffffff',
+    headingColor: '#1F2937',
+    subheadingColor: '#6B7280',
+    cardBackgroundColor: '#FFFFFF',
+    titleColor: '#1F2937',
+    subtitleColor: '#6B7280',
     isActive: true
   });
 
@@ -412,6 +427,11 @@ const FeatureGroupsManager: React.FC = () => {
       subheading: '',
       layoutType: 'grid',
       backgroundColor: '#ffffff',
+      headingColor: '#1F2937',
+      subheadingColor: '#6B7280',
+      cardBackgroundColor: '#FFFFFF',
+      titleColor: '#1F2937',
+      subtitleColor: '#6B7280',
       isActive: true
     });
     setEditingGroup(null);
@@ -425,6 +445,11 @@ const FeatureGroupsManager: React.FC = () => {
       subheading: group.subheading || '',
       layoutType: (group as any).layoutType || 'grid',
       backgroundColor: group.backgroundColor || '#ffffff',
+      headingColor: group.headingColor || '#1F2937',
+      subheadingColor: group.subheadingColor || '#6B7280',
+      cardBackgroundColor: group.cardBackgroundColor || '#FFFFFF',
+      titleColor: group.titleColor || '#1F2937',
+      subtitleColor: group.subtitleColor || '#6B7280',
       isActive: group.isActive
     });
     setEditingGroup(group);
@@ -442,7 +467,10 @@ const FeatureGroupsManager: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#5243E9]"></div>
+        <div 
+          className="animate-spin rounded-full h-8 w-8 border-b-2"
+          style={{ borderColor: 'var(--color-primary, #5243E9)' }}
+        ></div>
       </div>
     );
   }
@@ -587,6 +615,49 @@ const FeatureGroupsManager: React.FC = () => {
                   designSystemColors={getDesignSystemColors()}
                 />
               </div>
+
+              {/* Color Controls */}
+              <div className="space-y-4">
+                <h4 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary, #1F2937)' }}>Color Controls</h4>
+                <p className="text-sm" style={{ color: 'var(--color-text-secondary, #6B7280)' }}>Customize all colors for the feature group</p>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <ColorPicker
+                    label="Heading Color"
+                    value={formData.headingColor || '#1F2937'}
+                    onChange={(color) => setFormData({ ...formData, headingColor: color })}
+                    designSystemColors={getDesignSystemColors()}
+                  />
+                  
+                  <ColorPicker
+                    label="Subheading Color"
+                    value={formData.subheadingColor || '#6B7280'}
+                    onChange={(color) => setFormData({ ...formData, subheadingColor: color })}
+                    designSystemColors={getDesignSystemColors()}
+                  />
+                  
+                  <ColorPicker
+                    label="Card Background Color"
+                    value={formData.cardBackgroundColor || '#FFFFFF'}
+                    onChange={(color) => setFormData({ ...formData, cardBackgroundColor: color })}
+                    designSystemColors={getDesignSystemColors()}
+                  />
+                  
+                  <ColorPicker
+                    label="Title Color"
+                    value={formData.titleColor || '#1F2937'}
+                    onChange={(color) => setFormData({ ...formData, titleColor: color })}
+                    designSystemColors={getDesignSystemColors()}
+                  />
+                  
+                  <ColorPicker
+                    label="Subtitle Color"
+                    value={formData.subtitleColor || '#6B7280'}
+                    onChange={(color) => setFormData({ ...formData, subtitleColor: color })}
+                    designSystemColors={getDesignSystemColors()}
+                  />
+                </div>
+              </div>
             </div>
 
             <div className="flex items-center space-x-3">
@@ -616,7 +687,12 @@ const FeatureGroupsManager: React.FC = () => {
                 }}
               >
                 {saving ? (
-                  <div className="w-4 h-4 animate-spin rounded-full border-2 border-white border-t-transparent mr-2" />
+                  <div className="w-4 h-4 animate-spin rounded-full border-2 mr-2" 
+                  style={{ 
+                    borderColor: 'var(--color-bg-primary, #FFFFFF)',
+                    borderTopColor: 'transparent'
+                  }} 
+                />
                 ) : (
                   <Save className="w-4 h-4 mr-2" />
                 )}
@@ -753,7 +829,11 @@ const FeatureGroupsManager: React.FC = () => {
                             return (
                               <div
                                 key={item.id}
-                                className="flex items-center justify-between p-4 bg-white rounded-lg border border-gray-200"
+                                className="flex items-center justify-between p-4 rounded-lg border"
+                                style={{ 
+                                  backgroundColor: 'var(--color-bg-primary, #FFFFFF)', 
+                                  borderColor: 'var(--color-gray-light, #E5E7EB)' 
+                                }}
                               >
                                 <div className="flex items-center gap-3">
                                                                       <GripVertical className="w-4 h-4" style={{ color: 'var(--color-text-muted, #9CA3AF)' }} />

@@ -43,7 +43,12 @@ export async function GET() {
           { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
           { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
           { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
-        ]
+        ],
+        // Color controls with defaults
+        headingColor: '#1F2937',
+        subheadingColor: '#6B7280',
+        trustIndicatorTextColor: '#6B7280',
+        trustIndicatorBackgroundColor: '#F9FAFB'
       };
 
       return NextResponse.json({
@@ -80,7 +85,12 @@ export async function GET() {
         { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
         { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
         { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
-      ]
+      ],
+      // Color controls with defaults
+      headingColor: homeHero.headingColor || '#1F2937',
+      subheadingColor: homeHero.subheadingColor || '#6B7280',
+      trustIndicatorTextColor: homeHero.trustIndicatorTextColor || '#6B7280',
+      trustIndicatorBackgroundColor: homeHero.trustIndicatorBackgroundColor || '#F9FAFB'
     };
 
     return NextResponse.json({
@@ -129,7 +139,12 @@ export async function POST(request: NextRequest) {
           { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
           { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
           { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
-        ])
+        ]),
+        // Color controls
+        headingColor: body.headingColor || '#1F2937',
+        subheadingColor: body.subheadingColor || '#6B7280',
+        trustIndicatorTextColor: body.trustIndicatorTextColor || '#6B7280',
+        trustIndicatorBackgroundColor: body.trustIndicatorBackgroundColor || '#F9FAFB'
       }
     });
 
@@ -204,7 +219,12 @@ export async function PUT(request: NextRequest) {
             { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
             { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
             { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
-          ])
+          ]),
+          // Color controls
+          headingColor: updateData.headingColor || '#1F2937',
+          subheadingColor: updateData.subheadingColor || '#6B7280',
+          trustIndicatorTextColor: updateData.trustIndicatorTextColor || '#6B7280',
+          trustIndicatorBackgroundColor: updateData.trustIndicatorBackgroundColor || '#F9FAFB'
         }
       });
 
@@ -237,6 +257,12 @@ export async function PUT(request: NextRequest) {
     }
 
     // Update existing hero - map component data to database format
+    // First, deactivate all other heroes to ensure only one is active
+    await prisma.homePageHero.updateMany({
+      where: { id: { not: parseInt(id) } },
+      data: { isActive: false }
+    });
+
     const homeHero = await prisma.homePageHero.update({
       where: { id: parseInt(id) },
       data: {
@@ -257,6 +283,10 @@ export async function PUT(request: NextRequest) {
         ...(updateData.animationData !== undefined && { animationData: JSON.stringify(updateData.animationData) }),
         ...(updateData.isActive !== undefined && { isActive: updateData.isActive }),
         ...(updateData.trustIndicators !== undefined && { trustIndicators: JSON.stringify(updateData.trustIndicators) }),
+        ...(updateData.headingColor !== undefined && { headingColor: updateData.headingColor }),
+        ...(updateData.subheadingColor !== undefined && { subheadingColor: updateData.subheadingColor }),
+        ...(updateData.trustIndicatorTextColor !== undefined && { trustIndicatorTextColor: updateData.trustIndicatorTextColor }),
+        ...(updateData.trustIndicatorBackgroundColor !== undefined && { trustIndicatorBackgroundColor: updateData.trustIndicatorBackgroundColor }),
         updatedAt: new Date()
       }
     });
@@ -284,7 +314,12 @@ export async function PUT(request: NextRequest) {
         { iconName: 'Shield', text: '99.9% Uptime', sortOrder: 0, isVisible: true },
         { iconName: 'Clock', text: '24/7 Support', sortOrder: 1, isVisible: true },
         { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
-      ])
+      ]),
+      // Color controls
+      headingColor: homeHero.headingColor || '#1F2937',
+      subheadingColor: homeHero.subheadingColor || '#6B7280',
+      trustIndicatorTextColor: homeHero.trustIndicatorTextColor || '#6B7280',
+      trustIndicatorBackgroundColor: homeHero.trustIndicatorBackgroundColor || '#F9FAFB'
     };
 
     return NextResponse.json({

@@ -21,13 +21,23 @@ interface FeaturesListLayoutProps {
   heading: string;
   subheading?: string;
   backgroundColor?: string;
+  headingColor?: string;
+  subheadingColor?: string;
+  cardBackgroundColor?: string;
+  titleColor?: string;
+  subtitleColor?: string;
 }
 
 const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({ 
   features, 
   heading, 
   subheading,
-  backgroundColor = 'var(--color-bg-secondary)'
+  backgroundColor = 'var(--color-bg-secondary)',
+  headingColor,
+  subheadingColor,
+  cardBackgroundColor,
+  titleColor,
+  subtitleColor
 }) => {
 
   const { designSystem } = useDesignSystem();
@@ -288,14 +298,14 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
         <div className="text-center mb-16">
           <h1 
             className="text-4xl md:text-6xl font-bold mb-8"
-            style={{ color: 'var(--color-text-primary)' }}
+            style={{ color: headingColor || 'var(--color-text-primary, #1F2937)' }}
           >
             {heading}
           </h1>
           {subheading && (
             <p 
               className="text-xl md:text-2xl max-w-4xl mx-auto"
-              style={{ color: 'var(--color-text-secondary)' }}
+              style={{ color: subheadingColor || 'var(--color-text-secondary, #6B7280)' }}
             >
               {subheading}
             </p>
@@ -375,8 +385,8 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
                 key={feature.id}
                 className="feature-card relative rounded-xl p-8 cursor-pointer overflow-hidden"
                 style={{
-                  background: 'var(--color-bg-secondary)',
-                  border: '1px solid var(--color-gray-light)',
+                  background: cardBackgroundColor || 'var(--color-bg-secondary, #F9FAFB)',
+                  border: '1px solid var(--color-gray-light, #E5E7EB)',
                   transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                   animation: `fadeInUp 0.8s ease-out forwards ${index * 0.1}s, pulse 2s ease-in-out infinite`,
                   opacity: 0
@@ -420,7 +430,7 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
                       {/* Title */}
                       <h3 
                         className="text-xl font-bold mb-2"
-                        style={{ color: 'var(--color-text-primary)' }}
+                        style={{ color: titleColor || 'var(--color-text-primary)' }}
                       >
                         {feature.title}
                       </h3>
@@ -428,7 +438,7 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
                       {/* Description */}
                       <p 
                         className="text-base leading-relaxed"
-                        style={{ color: 'var(--color-text-secondary)' }}
+                        style={{ color: subtitleColor || 'var(--color-text-secondary)' }}
                       >
                         {feature.description}
                       </p>

@@ -786,7 +786,7 @@ export default function AdminPanel() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs transition-colors"
-                style={{ color: 'var(--color-primary, #5243E9)' }}
+                style={{ color: 'var(--color-text-secondary, #6B7280)' }}
                 title="Open website in new tab"
               >
                 View Website →
@@ -830,7 +830,7 @@ export default function AdminPanel() {
                       : 'transparent',
                     color: activeSection === item.id 
                       ? 'var(--color-text-primary, #1F2937)'
-                      : 'var(--color-text-secondary, #6B7280)'
+                      : 'var(--color-text-primary, #1F2937)'
                   }}
                 >
                   <Icon 
@@ -838,7 +838,7 @@ export default function AdminPanel() {
                     style={{ 
                       color: activeSection === item.id 
                         ? 'var(--color-text-primary, #1F2937)'
-                        : 'var(--color-text-secondary, #6B7280)'
+                        : 'var(--color-text-primary, #1F2937)'
                     }} 
                   />
                   {item.name}
