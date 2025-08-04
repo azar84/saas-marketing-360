@@ -830,7 +830,7 @@ export default function AdminPanel() {
                       : 'transparent',
                     color: activeSection === item.id 
                       ? 'var(--color-text-primary, #1F2937)'
-                      : '#FFFFFF'
+                      : 'var(--color-text-secondary, #6B7280)'
                   }}
                 >
                   <Icon 
@@ -838,7 +838,7 @@ export default function AdminPanel() {
                     style={{ 
                       color: activeSection === item.id 
                         ? 'var(--color-text-primary, #1F2937)'
-                        : '#FFFFFF'
+                        : 'var(--color-text-secondary, #6B7280)'
                     }} 
                   />
                   {item.name}
