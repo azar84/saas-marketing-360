@@ -385,7 +385,7 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
                 key={feature.id}
                 className="feature-card relative rounded-xl p-8 cursor-pointer overflow-hidden"
                 style={{
-                  background: cardBackgroundColor || 'var(--color-bg-secondary, #F9FAFB)',
+                  background: 'transparent',
                   border: '1px solid var(--color-gray-light, #E5E7EB)',
                   transition: 'all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                   animation: `fadeInUp 0.8s ease-out forwards ${index * 0.1}s, pulse 2s ease-in-out infinite`,
@@ -404,7 +404,7 @@ const FeaturesListLayout: React.FC<FeaturesListLayoutProps> = ({
                 {/* Card Background */}
                 <div 
                   className="absolute inset-0.5 rounded-3xl z-5"
-                  style={{ backgroundColor: backgroundPrimary }}
+                  style={{ backgroundColor: cardBackgroundColor || 'var(--color-bg-secondary, #F9FAFB)' }}
                 />
 
                 {/* Content */}
