@@ -15,51 +15,39 @@ const HtmlSectionSchema = z.object({
 // GET - Fetch all HTML sections
 export async function GET() {
   try {
+    // First, get all HTML sections without the problematic includes
     const htmlSections = await prisma.htmlSection.findMany({
       orderBy: [
         { sortOrder: 'asc' },
         { name: 'asc' }
-      ],
-      include: {
-        pageHtmlSections: {
-          include: {
-            page: {
-              select: {
-                id: true,
-                title: true,
-                slug: true
-              }
-            }
-          }
-        },
-        pageSections: {
-          include: {
-            page: {
-              select: {
-                id: true,
-                title: true,
-                slug: true
-              }
-            }
-          }
-        },
-        _count: {
-          select: {
-            pageHtmlSections: true,
-            pageSections: true
-          }
-        }
-      }
+      ]
     });
 
-    // Filter out null pages from the response
-    const filteredHtmlSections = htmlSections.map(section => ({
-      ...section,
-      pageHtmlSections: section.pageHtmlSections.filter(phs => phs.page !== null),
-      pageSections: section.pageSections.filter(ps => ps.page !== null)
-    }));
+    // Get the counts separately to avoid null page issues
+    const sectionsWithCounts = await Promise.all(
+      htmlSections.map(async (section) => {
+        const [pageHtmlSectionsCount, pageSectionsCount] = await Promise.all([
+          prisma.pageHtmlSection.count({
+            where: { htmlSectionId: section.id }
+          }),
+          prisma.pageSection.count({
+            where: { htmlSectionId: section.id }
+          })
+        ]);
 
-    return NextResponse.json(filteredHtmlSections);
+        return {
+          ...section,
+          _count: {
+            pageHtmlSections: pageHtmlSectionsCount,
+            pageSections: pageSectionsCount
+          },
+          pageHtmlSections: [],
+          pageSections: []
+        };
+      })
+    );
+
+    return NextResponse.json(sectionsWithCounts);
   } catch (error) {
     console.error('Error fetching HTML sections:', error);
     return NextResponse.json(
@@ -76,47 +64,30 @@ export async function POST(request: NextRequest) {
     const validatedData = HtmlSectionSchema.parse(body);
 
     const htmlSection = await prisma.htmlSection.create({
-      data: validatedData,
-      include: {
-        pageHtmlSections: {
-          include: {
-            page: {
-              select: {
-                id: true,
-                title: true,
-                slug: true
-              }
-            }
-          }
-        },
-        pageSections: {
-          include: {
-            page: {
-              select: {
-                id: true,
-                title: true,
-                slug: true
-              }
-            }
-          }
-        },
-        _count: {
-          select: {
-            pageHtmlSections: true,
-            pageSections: true
-          }
-        }
-      }
+      data: validatedData
     });
 
-    // Filter out null pages from the response
-    const filteredHtmlSection = {
+    // Get counts for the new section
+    const [pageHtmlSectionsCount, pageSectionsCount] = await Promise.all([
+      prisma.pageHtmlSection.count({
+        where: { htmlSectionId: htmlSection.id }
+      }),
+      prisma.pageSection.count({
+        where: { htmlSectionId: htmlSection.id }
+      })
+    ]);
+
+    const responseSection = {
       ...htmlSection,
-      pageHtmlSections: htmlSection.pageHtmlSections.filter(phs => phs.page !== null),
-      pageSections: htmlSection.pageSections.filter(ps => ps.page !== null)
+      _count: {
+        pageHtmlSections: pageHtmlSectionsCount,
+        pageSections: pageSectionsCount
+      },
+      pageHtmlSections: [],
+      pageSections: []
     };
 
-    return NextResponse.json(filteredHtmlSection, { status: 201 });
+    return NextResponse.json(responseSection, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -150,47 +121,30 @@ export async function PUT(request: NextRequest) {
 
     const htmlSection = await prisma.htmlSection.update({
       where: { id: parseInt(id) },
-      data: validatedData,
-      include: {
-        pageHtmlSections: {
-          include: {
-            page: {
-              select: {
-                id: true,
-                title: true,
-                slug: true
-              }
-            }
-          }
-        },
-        pageSections: {
-          include: {
-            page: {
-              select: {
-                id: true,
-                title: true,
-                slug: true
-              }
-            }
-          }
-        },
-        _count: {
-          select: {
-            pageHtmlSections: true,
-            pageSections: true
-          }
-        }
-      }
+      data: validatedData
     });
 
-    // Filter out null pages from the response
-    const filteredHtmlSection = {
+    // Get counts for the updated section
+    const [pageHtmlSectionsCount, pageSectionsCount] = await Promise.all([
+      prisma.pageHtmlSection.count({
+        where: { htmlSectionId: htmlSection.id }
+      }),
+      prisma.pageSection.count({
+        where: { htmlSectionId: htmlSection.id }
+      })
+    ]);
+
+    const responseSection = {
       ...htmlSection,
-      pageHtmlSections: htmlSection.pageHtmlSections.filter(phs => phs.page !== null),
-      pageSections: htmlSection.pageSections.filter(ps => ps.page !== null)
+      _count: {
+        pageHtmlSections: pageHtmlSectionsCount,
+        pageSections: pageSectionsCount
+      },
+      pageHtmlSections: [],
+      pageSections: []
     };
 
-    return NextResponse.json(filteredHtmlSection);
+    return NextResponse.json(responseSection);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
