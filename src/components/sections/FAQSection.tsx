@@ -238,10 +238,10 @@ export default function FAQSection({
           }}
         >
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6" style={{ color: 'var(--color-bg-primary)' }}>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6" style={{ color: 'var(--color-text-primary)' }}>
               {heroTitle}
             </h1>
-            <p className="text-xl mb-8 max-w-2xl mx-auto" style={{ color: 'var(--color-bg-primary)', opacity: 0.9 }}>
+            <p className="text-xl mb-8 max-w-2xl mx-auto" style={{ color: 'var(--color-text-secondary)' }}>
               {heroSubtitle}
             </p>
             
