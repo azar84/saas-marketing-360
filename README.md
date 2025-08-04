@@ -19,6 +19,7 @@ A comprehensive content management system for SaaS businesses, built with Next.j
 - Customizable heading, subheading, card background, title, and subtitle colors
 - Design system compliant with proper fallbacks
 - Admin panel integration for easy color management
+- **List Layout Fix**: Card background color now applies to inner content area for better visual effect
 
 ## Getting Started
 
