@@ -35,6 +35,11 @@ export async function PUT(
       heroSubtitleColor,
       headingColor,
       subheadingColor,
+      categoriesBackgroundColor,
+      categoriesTextColor,
+      questionsBackgroundColor,
+      questionsTextColor,
+      answersTextColor,
       isActive
     } = data;
 
@@ -85,6 +90,11 @@ export async function PUT(
     if (heroSubtitleColor !== undefined) updateData.heroSubtitleColor = heroSubtitleColor || '#FFFFFF';
     if (headingColor !== undefined) updateData.headingColor = headingColor || '#1F2937';
     if (subheadingColor !== undefined) updateData.subheadingColor = subheadingColor || '#6B7280';
+    if (categoriesBackgroundColor !== undefined) updateData.categoriesBackgroundColor = categoriesBackgroundColor || '#F9FAFB';
+    if (categoriesTextColor !== undefined) updateData.categoriesTextColor = categoriesTextColor || '#6B7280';
+    if (questionsBackgroundColor !== undefined) updateData.questionsBackgroundColor = questionsBackgroundColor || '#FFFFFF';
+    if (questionsTextColor !== undefined) updateData.questionsTextColor = questionsTextColor || '#1F2937';
+    if (answersTextColor !== undefined) updateData.answersTextColor = answersTextColor || '#6B7280';
     if (isActive !== undefined) updateData.isActive = Boolean(isActive);
 
     const section = await prisma.fAQSection.update({

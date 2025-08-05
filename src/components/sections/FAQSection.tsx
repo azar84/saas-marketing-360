@@ -43,6 +43,11 @@ interface FAQSectionProps {
   heroSubtitleColor?: string;
   headingColor?: string;
   subheadingColor?: string;
+  categoriesBackgroundColor?: string;
+  categoriesTextColor?: string;
+  questionsBackgroundColor?: string;
+  questionsTextColor?: string;
+  answersTextColor?: string;
   // Page builder specific props
   faqCategoryId?: number; // If specified, only show FAQs from this category
   showHero?: boolean;
@@ -67,6 +72,11 @@ export default function FAQSection({
   heroSubtitleColor,
   headingColor,
   subheadingColor,
+  categoriesBackgroundColor,
+  categoriesTextColor,
+  questionsBackgroundColor,
+  questionsTextColor,
+  answersTextColor,
   faqCategoryId,
   showHero = true
 }: FAQSectionProps) {
@@ -303,10 +313,10 @@ export default function FAQSection({
           {showCategories && !faqCategoryId && sortedCategories.length > 0 && (
             <div className="lg:col-span-1">
               <div className="rounded-lg shadow-sm border p-6 sticky top-8" style={{ 
-              backgroundColor: 'var(--color-bg-secondary)', 
+              backgroundColor: categoriesBackgroundColor || 'var(--color-bg-secondary, #F9FAFB)', 
               borderColor: 'var(--color-gray-light)' 
             }}>
-                <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
+                <h3 className="text-lg font-semibold mb-4" style={{ color: categoriesTextColor || 'var(--color-text-primary, #6B7280)' }}>
                   Quick Navigation
                 </h3>
                 
@@ -320,7 +330,7 @@ export default function FAQSection({
                     }
                     style={{
                       backgroundColor: selectedCategory === null ? 'var(--color-primary-light)' : 'transparent',
-                      color: selectedCategory === null ? 'var(--color-primary)' : 'var(--color-text-secondary)',
+                      color: selectedCategory === null ? 'var(--color-primary)' : (categoriesTextColor || 'var(--color-text-secondary, #6B7280)'),
                       borderLeftColor: selectedCategory === null ? 'var(--color-primary)' : 'transparent'
                     }}
                   >
@@ -338,7 +348,7 @@ export default function FAQSection({
                       }
                       style={{
                         backgroundColor: selectedCategory === category.id ? category.color : 'transparent',
-                        color: selectedCategory === category.id ? 'var(--color-bg-primary)' : 'var(--color-text-secondary)',
+                        color: selectedCategory === category.id ? 'var(--color-bg-primary)' : (categoriesTextColor || 'var(--color-text-secondary, #6B7280)'),
                         borderLeftColor: selectedCategory === category.id ? category.color : 'transparent'
                       }}
                     >
@@ -388,7 +398,7 @@ export default function FAQSection({
                   key={faq.id}
                   className="border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
                   style={{ 
-                    backgroundColor: 'var(--color-bg-primary)', 
+                    backgroundColor: questionsBackgroundColor || 'var(--color-bg-primary, #FFFFFF)', 
                     borderColor: 'var(--color-gray-light)' 
                   }}
                 >
@@ -397,7 +407,7 @@ export default function FAQSection({
                     className="w-full px-6 py-5 text-left flex items-start justify-between transition-colors hover:bg-[var(--color-bg-secondary)]"
                   >
                     <div className="flex-1 pr-4">
-                      <h3 className="text-lg font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>
+                      <h3 className="text-lg font-medium mb-1" style={{ color: questionsTextColor || 'var(--color-text-primary, #1F2937)' }}>
                         {faq.question}
                       </h3>
                     </div>
@@ -412,7 +422,7 @@ export default function FAQSection({
                   
                   {openFAQ === faq.id && (
                     <div className="px-6 pb-5 border-t" style={{ borderColor: 'var(--color-gray-light)' }}>
-                      <div className="pt-4 leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--color-text-secondary)' }}>
+                      <div className="pt-4 leading-relaxed whitespace-pre-wrap" style={{ color: answersTextColor || 'var(--color-text-secondary, #6B7280)' }}>
                         {faq.answer}
                       </div>
                     </div>

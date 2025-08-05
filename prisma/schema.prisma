@@ -645,6 +645,11 @@ model FAQSection {
   heroSubtitleColor   String?              @default("#FFFFFF")
   headingColor        String?              @default("#1F2937")
   subheadingColor     String?              @default("#6B7280")
+  categoriesBackgroundColor String?         @default("#F9FAFB")
+  categoriesTextColor String?              @default("#6B7280")
+  questionsBackgroundColor String?         @default("#FFFFFF")
+  questionsTextColor  String?              @default("#1F2937")
+  answersTextColor    String?              @default("#6B7280")
   isActive            Boolean              @default(true)
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt

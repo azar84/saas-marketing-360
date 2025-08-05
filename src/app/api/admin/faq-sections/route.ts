@@ -66,6 +66,11 @@ export async function POST(request: NextRequest) {
       heroSubtitleColor,
       headingColor,
       subheadingColor,
+      categoriesBackgroundColor,
+      categoriesTextColor,
+      questionsBackgroundColor,
+      questionsTextColor,
+      answersTextColor,
       isActive
     } = data;
 
@@ -120,6 +125,11 @@ export async function POST(request: NextRequest) {
         heroSubtitleColor: heroSubtitleColor || '#FFFFFF',
         headingColor: headingColor || '#1F2937',
         subheadingColor: subheadingColor || '#6B7280',
+        categoriesBackgroundColor: categoriesBackgroundColor || '#F9FAFB',
+        categoriesTextColor: categoriesTextColor || '#6B7280',
+        questionsBackgroundColor: questionsBackgroundColor || '#FFFFFF',
+        questionsTextColor: questionsTextColor || '#1F2937',
+        answersTextColor: answersTextColor || '#6B7280',
         isActive: Boolean(isActive)
       }
     });

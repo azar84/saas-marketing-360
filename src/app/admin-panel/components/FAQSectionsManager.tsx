@@ -12,18 +12,23 @@ interface FAQSection {
   name: string;
   heading: string;
   subheading?: string;
-  heroTitle: string;
+  heroTitle?: string;
   heroSubtitle?: string;
-  searchPlaceholder: string;
+  searchPlaceholder?: string;
   showHero: boolean;
   showCategories: boolean;
-  backgroundColor: string;
-  heroBackgroundColor: string;
-  heroHeight: string;
+  backgroundColor?: string;
+  heroBackgroundColor?: string;
+  heroHeight?: string;
   heroTitleColor?: string;
   heroSubtitleColor?: string;
   headingColor?: string;
   subheadingColor?: string;
+  categoriesBackgroundColor?: string;
+  categoriesTextColor?: string;
+  questionsBackgroundColor?: string;
+  questionsTextColor?: string;
+  answersTextColor?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -274,6 +279,11 @@ export default function FAQSectionsManager() {
     heroSubtitleColor: '#FFFFFF',
     headingColor: '#1F2937',
     subheadingColor: '#6B7280',
+    categoriesBackgroundColor: '#F9FAFB',
+    categoriesTextColor: '#6B7280',
+    questionsBackgroundColor: '#FFFFFF',
+    questionsTextColor: '#1F2937',
+    answersTextColor: '#6B7280',
     isActive: true
   });
 
@@ -338,6 +348,11 @@ export default function FAQSectionsManager() {
       heroSubtitleColor: '#FFFFFF',
       headingColor: '#1F2937',
       subheadingColor: '#6B7280',
+      categoriesBackgroundColor: '#F9FAFB',
+      categoriesTextColor: '#6B7280',
+      questionsBackgroundColor: '#FFFFFF',
+      questionsTextColor: '#1F2937',
+      answersTextColor: '#6B7280',
       isActive: true
     });
     setSelectedCategories([]);
@@ -357,18 +372,23 @@ export default function FAQSectionsManager() {
       name: section.name,
       heading: section.heading,
       subheading: section.subheading || '',
-      heroTitle: section.heroTitle,
+      heroTitle: section.heroTitle || '',
       heroSubtitle: section.heroSubtitle || '',
-      searchPlaceholder: section.searchPlaceholder,
+      searchPlaceholder: section.searchPlaceholder || 'Enter your keyword here',
       showHero: section.showHero,
       showCategories: section.showCategories,
-      backgroundColor: section.backgroundColor,
-      heroBackgroundColor: section.heroBackgroundColor,
+      backgroundColor: section.backgroundColor || '#f8fafc',
+      heroBackgroundColor: section.heroBackgroundColor || '#6366f1',
       heroHeight: section.heroHeight || '80vh',
       heroTitleColor: section.heroTitleColor || '#FFFFFF',
       heroSubtitleColor: section.heroSubtitleColor || '#FFFFFF',
       headingColor: section.headingColor || '#1F2937',
       subheadingColor: section.subheadingColor || '#6B7280',
+      categoriesBackgroundColor: section.categoriesBackgroundColor || '#F9FAFB',
+      categoriesTextColor: section.categoriesTextColor || '#6B7280',
+      questionsBackgroundColor: section.questionsBackgroundColor || '#FFFFFF',
+      questionsTextColor: section.questionsTextColor || '#1F2937',
+      answersTextColor: section.answersTextColor || '#6B7280',
       isActive: section.isActive
     });
     fetchSectionCategories(section.id);
@@ -634,6 +654,51 @@ export default function FAQSectionsManager() {
                   value={formData.subheadingColor}
                   onChange={(color) => setFormData({ ...formData, subheadingColor: color })}
                   description="Color for the main section subheading"
+                />
+              </div>
+
+              <div>
+                <ColorPicker
+                  label="Categories Background Color"
+                  value={formData.categoriesBackgroundColor}
+                  onChange={(color) => setFormData({ ...formData, categoriesBackgroundColor: color })}
+                  description="Background color for the categories sidebar"
+                />
+              </div>
+
+              <div>
+                <ColorPicker
+                  label="Categories Text Color"
+                  value={formData.categoriesTextColor}
+                  onChange={(color) => setFormData({ ...formData, categoriesTextColor: color })}
+                  description="Text color for category names in the sidebar"
+                />
+              </div>
+
+              <div>
+                <ColorPicker
+                  label="Questions Background Color"
+                  value={formData.questionsBackgroundColor}
+                  onChange={(color) => setFormData({ ...formData, questionsBackgroundColor: color })}
+                  description="Background color for question cards"
+                />
+              </div>
+
+              <div>
+                <ColorPicker
+                  label="Questions Text Color"
+                  value={formData.questionsTextColor}
+                  onChange={(color) => setFormData({ ...formData, questionsTextColor: color })}
+                  description="Text color for question titles"
+                />
+              </div>
+
+              <div>
+                <ColorPicker
+                  label="Answers Text Color"
+                  value={formData.answersTextColor}
+                  onChange={(color) => setFormData({ ...formData, answersTextColor: color })}
+                  description="Text color for answer content"
                 />
               </div>
             </div>

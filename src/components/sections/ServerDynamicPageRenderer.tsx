@@ -186,6 +186,11 @@ interface PageSection {
     heroSubtitleColor?: string;
     headingColor?: string;
     subheadingColor?: string;
+    categoriesBackgroundColor?: string;
+    categoriesTextColor?: string;
+    questionsBackgroundColor?: string;
+    questionsTextColor?: string;
+    answersTextColor?: string;
     isActive: boolean;
     sectionCategories?: Array<{
       id: number;
@@ -1054,6 +1059,11 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
               heroSubtitleColor={section.faqSection.heroSubtitleColor}
               headingColor={section.faqSection.headingColor}
               subheadingColor={section.faqSection.subheadingColor}
+              categoriesBackgroundColor={section.faqSection.categoriesBackgroundColor}
+              categoriesTextColor={section.faqSection.categoriesTextColor}
+              questionsBackgroundColor={section.faqSection.questionsBackgroundColor}
+              questionsTextColor={section.faqSection.questionsTextColor}
+              answersTextColor={section.faqSection.answersTextColor}
               sectionCategories={sectionCategories}
               faqCategoryId={section.faqCategoryId}
               faqDataPromise={faqDataPromise}
@@ -1245,6 +1255,11 @@ async function FAQSectionWrapper({
   heroSubtitleColor,
   headingColor,
   subheadingColor,
+  categoriesBackgroundColor,
+  categoriesTextColor,
+  questionsBackgroundColor,
+  questionsTextColor,
+  answersTextColor,
   sectionCategories,
   faqCategoryId,
   faqDataPromise 
@@ -1263,6 +1278,11 @@ async function FAQSectionWrapper({
   heroSubtitleColor?: string;
   headingColor?: string;
   subheadingColor?: string;
+  categoriesBackgroundColor?: string;
+  categoriesTextColor?: string;
+  questionsBackgroundColor?: string;
+  questionsTextColor?: string;
+  answersTextColor?: string;
   sectionCategories: number[];
   faqCategoryId?: number;
   faqDataPromise: Promise<any>; 
@@ -1285,6 +1305,11 @@ async function FAQSectionWrapper({
       heroSubtitleColor={heroSubtitleColor}
       headingColor={headingColor}
       subheadingColor={subheadingColor}
+      categoriesBackgroundColor={categoriesBackgroundColor}
+      categoriesTextColor={categoriesTextColor}
+      questionsBackgroundColor={questionsBackgroundColor}
+      questionsTextColor={questionsTextColor}
+      answersTextColor={answersTextColor}
       sectionCategories={sectionCategories}
       faqCategoryId={faqCategoryId}
       faqs={faqData.faqs}
