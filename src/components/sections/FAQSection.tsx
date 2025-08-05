@@ -147,6 +147,14 @@ export default function FAQSection({
     return availableCategories.sort((a, b) => a.sortOrder - b.sortOrder);
   }, [categories, sectionCategories]);
 
+  // Auto-select first category when there are multiple categories and no category is selected
+  useEffect(() => {
+    if (!faqCategoryId && !defaultCategory && sortedCategories.length > 1 && selectedCategory === null) {
+      // Auto-select the first category when there are multiple categories
+      setSelectedCategory(sortedCategories[0]?.id || null);
+    }
+  }, [sortedCategories, faqCategoryId, defaultCategory, selectedCategory]);
+
   const toggleFAQ = (faqId: number) => {
     setOpenFAQ(openFAQ === faqId ? null : faqId);
   };
@@ -159,7 +167,14 @@ export default function FAQSection({
   const clearSearch = () => {
     setSearchTerm('');
     if (!faqCategoryId) {
-      setSelectedCategory(null);
+      // Only reset to null if there's only one category or no categories
+      // Otherwise, keep the current selection or default to first category
+      if (sortedCategories.length <= 1) {
+        setSelectedCategory(null);
+      } else if (selectedCategory === null) {
+        // If no category is selected and there are multiple categories, select the first one
+        setSelectedCategory(sortedCategories[0]?.id || null);
+      }
     }
     setOpenFAQ(null);
   };
