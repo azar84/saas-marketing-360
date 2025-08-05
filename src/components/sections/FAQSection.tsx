@@ -276,7 +276,7 @@ export default function FAQSection({
                   placeholder={searchPlaceholder}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-12 pr-4 py-4 text-lg border-0 rounded-lg shadow-lg focus:ring-2 focus:outline-none"
+                  className="w-full pl-12 pr-4 py-4 text-lg border-0 rounded-lg shadow-lg focus:ring-2 focus:outline-none text-center"
                   style={{ 
                     backgroundColor: 'var(--color-bg-primary)',
                     color: 'var(--color-text-primary)'
