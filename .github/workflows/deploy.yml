@@ -25,14 +25,16 @@ jobs:
     - name: Generate Prisma client
       run: npx prisma generate
 
-    - name: Deploy to platform (example for Railway/Render/etc)
+    - name: Install Vercel CLI
+      run: npm install --global vercel@latest
+
+    - name: Deploy to Vercel
       run: |
-        # This step will vary based on your deployment platform
-        # For Railway: railway up
-        # For Render: render deploy
-        # For DigitalOcean: doctl apps create
-        echo "Deploying to your platform..."
-        # Add your deployment command here
+        vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_ORG_ID }}
+      env:
+        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
     - name: Wait for deployment
       run: sleep 30
