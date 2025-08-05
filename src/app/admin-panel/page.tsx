@@ -776,7 +776,7 @@ export default function AdminPanel() {
             <div className="flex flex-col">
               <span 
                 className="text-sm font-bold truncate max-w-[120px]"
-                style={{ color: '#FFFFFF' }}
+                style={{ color: 'var(--color-text-primary, #FFFFFF)' }}
                 title={siteSettings?.footerCompanyName || 'Your Company'}
               >
                 {siteSettings?.footerCompanyName || 'Your Company'}
