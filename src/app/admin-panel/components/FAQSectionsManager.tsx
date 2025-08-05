@@ -586,120 +586,135 @@ export default function FAQSectionsManager() {
                 />
               </div>
 
-              <div>
-                <ColorPicker
-                  label="Background Color"
-                  value={formData.backgroundColor}
-                  onChange={(color) => setFormData({ ...formData, backgroundColor: color })}
-                  description="Main section background color"
-                />
+              {/* Hero & Section Colors */}
+              <div className="space-y-4">
+                <h4 className="text-md font-medium" style={{ color: 'var(--color-text-primary)' }}>Hero & Section Colors</h4>
+                
+                <div>
+                  <ColorPicker
+                    label="Background Color"
+                    value={formData.backgroundColor}
+                    onChange={(color) => setFormData({ ...formData, backgroundColor: color })}
+                    description="Main section background color"
+                  />
+                </div>
+
+                <div>
+                  <ColorPicker
+                    label="Hero Background Color"
+                    value={formData.heroBackgroundColor}
+                    onChange={(color) => setFormData({ ...formData, heroBackgroundColor: color })}
+                    description="Hero section background color (supports theme colors)"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                    Hero Height
+                  </label>
+                  <select
+                    value={formData.heroHeight}
+                    onChange={(e) => setFormData({ ...formData, heroHeight: e.target.value })}
+                    className="w-full rounded border border-gray-300"
+                  >
+                    {HERO_HEIGHT_OPTIONS.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <ColorPicker
+                    label="Hero Title Color"
+                    value={formData.heroTitleColor}
+                    onChange={(color) => setFormData({ ...formData, heroTitleColor: color })}
+                    description="Color for the hero section title"
+                  />
+                </div>
+
+                <div>
+                  <ColorPicker
+                    label="Hero Subtitle Color"
+                    value={formData.heroSubtitleColor}
+                    onChange={(color) => setFormData({ ...formData, heroSubtitleColor: color })}
+                    description="Color for the hero section subtitle"
+                  />
+                </div>
+
+                <div>
+                  <ColorPicker
+                    label="Heading Color"
+                    value={formData.headingColor}
+                    onChange={(color) => setFormData({ ...formData, headingColor: color })}
+                    description="Color for the main section heading"
+                  />
+                </div>
+
+                <div>
+                  <ColorPicker
+                    label="Subheading Color"
+                    value={formData.subheadingColor}
+                    onChange={(color) => setFormData({ ...formData, subheadingColor: color })}
+                    description="Color for the main section subheading"
+                  />
+                </div>
               </div>
 
-              <div>
-                <ColorPicker
-                  label="Hero Background Color"
-                  value={formData.heroBackgroundColor}
-                  onChange={(color) => setFormData({ ...formData, heroBackgroundColor: color })}
-                  description="Hero section background color (supports theme colors)"
-                />
+              {/* Categories Colors */}
+              <div className="space-y-4">
+                <h4 className="text-md font-medium" style={{ color: 'var(--color-text-primary)' }}>Categories Colors</h4>
+                
+                <div>
+                  <ColorPicker
+                    label="Categories Background Color"
+                    value={formData.categoriesBackgroundColor}
+                    onChange={(color) => setFormData({ ...formData, categoriesBackgroundColor: color })}
+                    description="Background color for the categories sidebar"
+                  />
+                </div>
+
+                <div>
+                  <ColorPicker
+                    label="Categories Text Color"
+                    value={formData.categoriesTextColor}
+                    onChange={(color) => setFormData({ ...formData, categoriesTextColor: color })}
+                    description="Text color for category names in the sidebar"
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
-                  Hero Height
-                </label>
-                <select
-                  value={formData.heroHeight}
-                  onChange={(e) => setFormData({ ...formData, heroHeight: e.target.value })}
-                  className="w-full rounded border border-gray-300"
-                >
-                  {HERO_HEIGHT_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              {/* Q&A Colors */}
+              <div className="space-y-4">
+                <h4 className="text-md font-medium" style={{ color: 'var(--color-text-primary)' }}>Q&A Colors</h4>
+                
+                <div>
+                  <ColorPicker
+                    label="Questions Background Color"
+                    value={formData.questionsBackgroundColor}
+                    onChange={(color) => setFormData({ ...formData, questionsBackgroundColor: color })}
+                    description="Background color for question cards"
+                  />
+                </div>
 
-              <div>
-                <ColorPicker
-                  label="Hero Title Color"
-                  value={formData.heroTitleColor}
-                  onChange={(color) => setFormData({ ...formData, heroTitleColor: color })}
-                  description="Color for the hero section title"
-                />
-              </div>
+                <div>
+                  <ColorPicker
+                    label="Questions Text Color"
+                    value={formData.questionsTextColor}
+                    onChange={(color) => setFormData({ ...formData, questionsTextColor: color })}
+                    description="Text color for question titles"
+                  />
+                </div>
 
-              <div>
-                <ColorPicker
-                  label="Hero Subtitle Color"
-                  value={formData.heroSubtitleColor}
-                  onChange={(color) => setFormData({ ...formData, heroSubtitleColor: color })}
-                  description="Color for the hero section subtitle"
-                />
-              </div>
-
-              <div>
-                <ColorPicker
-                  label="Heading Color"
-                  value={formData.headingColor}
-                  onChange={(color) => setFormData({ ...formData, headingColor: color })}
-                  description="Color for the main section heading"
-                />
-              </div>
-
-              <div>
-                <ColorPicker
-                  label="Subheading Color"
-                  value={formData.subheadingColor}
-                  onChange={(color) => setFormData({ ...formData, subheadingColor: color })}
-                  description="Color for the main section subheading"
-                />
-              </div>
-
-              <div>
-                <ColorPicker
-                  label="Categories Background Color"
-                  value={formData.categoriesBackgroundColor}
-                  onChange={(color) => setFormData({ ...formData, categoriesBackgroundColor: color })}
-                  description="Background color for the categories sidebar"
-                />
-              </div>
-
-              <div>
-                <ColorPicker
-                  label="Categories Text Color"
-                  value={formData.categoriesTextColor}
-                  onChange={(color) => setFormData({ ...formData, categoriesTextColor: color })}
-                  description="Text color for category names in the sidebar"
-                />
-              </div>
-
-              <div>
-                <ColorPicker
-                  label="Questions Background Color"
-                  value={formData.questionsBackgroundColor}
-                  onChange={(color) => setFormData({ ...formData, questionsBackgroundColor: color })}
-                  description="Background color for question cards"
-                />
-              </div>
-
-              <div>
-                <ColorPicker
-                  label="Questions Text Color"
-                  value={formData.questionsTextColor}
-                  onChange={(color) => setFormData({ ...formData, questionsTextColor: color })}
-                  description="Text color for question titles"
-                />
-              </div>
-
-              <div>
-                <ColorPicker
-                  label="Answers Text Color"
-                  value={formData.answersTextColor}
-                  onChange={(color) => setFormData({ ...formData, answersTextColor: color })}
-                  description="Text color for answer content"
-                />
+                <div>
+                  <ColorPicker
+                    label="Answers Text Color"
+                    value={formData.answersTextColor}
+                    onChange={(color) => setFormData({ ...formData, answersTextColor: color })}
+                    description="Text color for answer content"
+                  />
+                </div>
               </div>
             </div>
 
