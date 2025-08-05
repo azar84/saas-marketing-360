@@ -587,8 +587,11 @@ export default function FAQSectionsManager() {
               </div>
 
               {/* Hero & Section Colors */}
-              <div className="space-y-4">
-                <h4 className="text-md font-medium" style={{ color: 'var(--color-text-primary)' }}>Hero & Section Colors</h4>
+              <div className="space-y-4 p-4 rounded-lg border" style={{ 
+                borderColor: 'var(--color-gray-light, #E5E7EB)',
+                backgroundColor: 'var(--color-bg-secondary, #F9FAFB)'
+              }}>
+                <h4 className="text-md font-medium mb-4" style={{ color: 'var(--color-text-primary)' }}>Hero & Section Colors</h4>
                 
                 <div>
                   <ColorPicker
@@ -663,8 +666,11 @@ export default function FAQSectionsManager() {
               </div>
 
               {/* Categories Colors */}
-              <div className="space-y-4">
-                <h4 className="text-md font-medium" style={{ color: 'var(--color-text-primary)' }}>Categories Colors</h4>
+              <div className="space-y-4 p-4 rounded-lg border" style={{ 
+                borderColor: 'var(--color-gray-light, #E5E7EB)',
+                backgroundColor: 'var(--color-bg-secondary, #F9FAFB)'
+              }}>
+                <h4 className="text-md font-medium mb-4" style={{ color: 'var(--color-text-primary)' }}>Categories Colors</h4>
                 
                 <div>
                   <ColorPicker
@@ -686,8 +692,11 @@ export default function FAQSectionsManager() {
               </div>
 
               {/* Q&A Colors */}
-              <div className="space-y-4">
-                <h4 className="text-md font-medium" style={{ color: 'var(--color-text-primary)' }}>Q&A Colors</h4>
+              <div className="space-y-4 p-4 rounded-lg border" style={{ 
+                borderColor: 'var(--color-gray-light, #E5E7EB)',
+                backgroundColor: 'var(--color-bg-secondary, #F9FAFB)'
+              }}>
+                <h4 className="text-md font-medium mb-4" style={{ color: 'var(--color-text-primary)' }}>Q&A Colors</h4>
                 
                 <div>
                   <ColorPicker
