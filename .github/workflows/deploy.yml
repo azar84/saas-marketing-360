@@ -2,7 +2,7 @@ name: Deploy and Seed Database
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, version-1.2 ]
   workflow_dispatch:
 
 jobs:
@@ -38,8 +38,15 @@ jobs:
       run: sleep 30
 
     - name: Seed database
+      if: ${{ secrets.DEPLOY_URL != '' }}
       run: |
         # Call the seed API endpoint
         curl -X POST ${{ secrets.DEPLOY_URL }}/api/admin/seed-database
       env:
-        DEPLOY_URL: ${{ secrets.DEPLOY_URL }} 
+        DEPLOY_URL: ${{ secrets.DEPLOY_URL }}
+
+    - name: Skip seeding (no DEPLOY_URL)
+      if: ${{ secrets.DEPLOY_URL == '' }}
+      run: |
+        echo "DEPLOY_URL secret not configured. Skipping database seeding."
+        echo "Please configure the DEPLOY_URL secret in your GitHub repository settings." 
