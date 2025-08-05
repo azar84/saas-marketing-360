@@ -1,4 +1,4 @@
-name: Deploy and Seed Database
+name: Database Setup and Seed
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-and-seed:
+  setup-database:
     runs-on: ubuntu-latest
     
     steps:
@@ -25,24 +25,8 @@ jobs:
     - name: Generate Prisma client
       run: npx prisma generate
 
-    - name: Install Vercel CLI
-      run: npm install --global vercel@latest
-
-    - name: Deploy to Vercel
+    - name: Database setup complete
       run: |
-        vercel --prod --token ${{ secrets.VERCEL_TOKEN }} --scope ${{ secrets.VERCEL_ORG_ID }}
-      env:
-        VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
-        VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-        VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
-    - name: Wait for deployment
-      run: sleep 30
-
-    # Commented out seeding step since DEPLOY_URL secret is not configured
-    # - name: Seed database
-    #   run: |
-    #     # Call the seed API endpoint
-    #     curl -X POST ${{ secrets.DEPLOY_URL }}/api/admin/seed-database
-    #   env:
-    #     DEPLOY_URL: ${{ secrets.DEPLOY_URL }} 
+        echo "✅ Database setup completed"
+        echo "🚀 Vercel will handle deployment automatically"
+        echo "📊 Check Vercel dashboard for deployment status" 
