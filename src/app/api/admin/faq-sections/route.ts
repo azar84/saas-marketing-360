@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import { handleApiError } from '@/lib/errorHandling';
+import { validateAndTransform, CreateFAQSectionSchema, UpdateFAQSectionSchema } from '@/lib/validations';
 
 // GET /api/admin/faq-sections - Get all FAQ sections
 export async function GET() {
@@ -61,6 +62,10 @@ export async function POST(request: NextRequest) {
       backgroundColor,
       heroBackgroundColor,
       heroHeight,
+      heroTitleColor,
+      heroSubtitleColor,
+      headingColor,
+      subheadingColor,
       isActive
     } = data;
 
@@ -111,6 +116,10 @@ export async function POST(request: NextRequest) {
         backgroundColor: backgroundColor || '#f8fafc',
         heroBackgroundColor: heroBackgroundColor || '#6366f1',
         heroHeight: heroHeight || '80vh',
+        heroTitleColor: heroTitleColor || '#FFFFFF',
+        heroSubtitleColor: heroSubtitleColor || '#FFFFFF',
+        headingColor: headingColor || '#1F2937',
+        subheadingColor: subheadingColor || '#6B7280',
         isActive: Boolean(isActive)
       }
     });

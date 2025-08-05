@@ -20,6 +20,10 @@ interface FAQSection {
   backgroundColor: string;
   heroBackgroundColor: string;
   heroHeight: string;
+  heroTitleColor?: string;
+  heroSubtitleColor?: string;
+  headingColor?: string;
+  subheadingColor?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -266,6 +270,10 @@ export default function FAQSectionsManager() {
     backgroundColor: '#f8fafc',
     heroBackgroundColor: '#6366f1',
     heroHeight: '80vh',
+    heroTitleColor: '#FFFFFF',
+    heroSubtitleColor: '#FFFFFF',
+    headingColor: '#1F2937',
+    subheadingColor: '#6B7280',
     isActive: true
   });
 
@@ -326,6 +334,10 @@ export default function FAQSectionsManager() {
       backgroundColor: '#f8fafc',
       heroBackgroundColor: '#6366f1',
       heroHeight: '80vh',
+      heroTitleColor: '#FFFFFF',
+      heroSubtitleColor: '#FFFFFF',
+      headingColor: '#1F2937',
+      subheadingColor: '#6B7280',
       isActive: true
     });
     setSelectedCategories([]);
@@ -353,6 +365,10 @@ export default function FAQSectionsManager() {
       backgroundColor: section.backgroundColor,
       heroBackgroundColor: section.heroBackgroundColor,
       heroHeight: section.heroHeight || '80vh',
+      heroTitleColor: section.heroTitleColor || '#FFFFFF',
+      heroSubtitleColor: section.heroSubtitleColor || '#FFFFFF',
+      headingColor: section.headingColor || '#1F2937',
+      subheadingColor: section.subheadingColor || '#6B7280',
       isActive: section.isActive
     });
     fetchSectionCategories(section.id);
@@ -583,6 +599,42 @@ export default function FAQSectionsManager() {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              <div>
+                <ColorPicker
+                  label="Hero Title Color"
+                  value={formData.heroTitleColor}
+                  onChange={(color) => setFormData({ ...formData, heroTitleColor: color })}
+                  description="Color for the hero section title"
+                />
+              </div>
+
+              <div>
+                <ColorPicker
+                  label="Hero Subtitle Color"
+                  value={formData.heroSubtitleColor}
+                  onChange={(color) => setFormData({ ...formData, heroSubtitleColor: color })}
+                  description="Color for the hero section subtitle"
+                />
+              </div>
+
+              <div>
+                <ColorPicker
+                  label="Heading Color"
+                  value={formData.headingColor}
+                  onChange={(color) => setFormData({ ...formData, headingColor: color })}
+                  description="Color for the main section heading"
+                />
+              </div>
+
+              <div>
+                <ColorPicker
+                  label="Subheading Color"
+                  value={formData.subheadingColor}
+                  onChange={(color) => setFormData({ ...formData, subheadingColor: color })}
+                  description="Color for the main section subheading"
+                />
               </div>
             </div>
 

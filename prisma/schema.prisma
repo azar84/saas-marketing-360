@@ -641,6 +641,10 @@ model FAQSection {
   backgroundColor     String               @default("#f8fafc")
   heroBackgroundColor String               @default("#6366f1")
   heroHeight          String               @default("80vh")
+  heroTitleColor      String?              @default("#FFFFFF")
+  heroSubtitleColor   String?              @default("#FFFFFF")
+  headingColor        String?              @default("#1F2937")
+  subheadingColor     String?              @default("#6B7280")
   isActive            Boolean              @default(true)
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt

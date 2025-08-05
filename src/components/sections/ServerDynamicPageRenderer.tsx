@@ -182,6 +182,10 @@ interface PageSection {
     backgroundColor?: string;
     heroBackgroundColor?: string;
     heroHeight?: string;
+    heroTitleColor?: string;
+    heroSubtitleColor?: string;
+    headingColor?: string;
+    subheadingColor?: string;
     isActive: boolean;
     sectionCategories?: Array<{
       id: number;
@@ -607,10 +611,10 @@ async function fetchHomeHeroData() {
         { iconName: 'Code', text: 'No Code Required', sortOrder: 2, isVisible: true }
       ],
       // Color controls with defaults
-      headingColor: homeHero.headingColor || '#1F2937',
-      subheadingColor: homeHero.subheadingColor || '#6B7280',
-      trustIndicatorTextColor: homeHero.trustIndicatorTextColor || '#6B7280',
-      trustIndicatorBackgroundColor: homeHero.trustIndicatorBackgroundColor || '#F9FAFB'
+      headingColor: homeHero?.headingColor || '#1F2937',
+      subheadingColor: homeHero?.subheadingColor || '#6B7280',
+      trustIndicatorTextColor: homeHero?.trustIndicatorTextColor || '#6B7280',
+      trustIndicatorBackgroundColor: homeHero?.trustIndicatorBackgroundColor || '#F9FAFB'
     };
     
     console.log('fetchHomeHeroData - Transformed data:', transformedData);
@@ -1046,6 +1050,10 @@ const ServerDynamicPageRenderer: React.FC<ServerDynamicPageRendererProps> = asyn
               backgroundColor={section.faqSection.backgroundColor}
               heroBackgroundColor={section.faqSection.heroBackgroundColor}
               heroHeight={section.faqSection.heroHeight}
+              heroTitleColor={section.faqSection.heroTitleColor}
+              heroSubtitleColor={section.faqSection.heroSubtitleColor}
+              headingColor={section.faqSection.headingColor}
+              subheadingColor={section.faqSection.subheadingColor}
               sectionCategories={sectionCategories}
               faqCategoryId={section.faqCategoryId}
               faqDataPromise={faqDataPromise}
@@ -1233,6 +1241,10 @@ async function FAQSectionWrapper({
   backgroundColor,
   heroBackgroundColor,
   heroHeight,
+  heroTitleColor,
+  heroSubtitleColor,
+  headingColor,
+  subheadingColor,
   sectionCategories,
   faqCategoryId,
   faqDataPromise 
@@ -1247,6 +1259,10 @@ async function FAQSectionWrapper({
   backgroundColor?: string;
   heroBackgroundColor?: string;
   heroHeight?: string;
+  heroTitleColor?: string;
+  heroSubtitleColor?: string;
+  headingColor?: string;
+  subheadingColor?: string;
   sectionCategories: number[];
   faqCategoryId?: number;
   faqDataPromise: Promise<any>; 
@@ -1265,6 +1281,10 @@ async function FAQSectionWrapper({
       backgroundColor={backgroundColor}
       heroBackgroundColor={heroBackgroundColor}
       heroHeight={heroHeight}
+      heroTitleColor={heroTitleColor}
+      heroSubtitleColor={heroSubtitleColor}
+      headingColor={headingColor}
+      subheadingColor={subheadingColor}
       sectionCategories={sectionCategories}
       faqCategoryId={faqCategoryId}
       faqs={faqData.faqs}

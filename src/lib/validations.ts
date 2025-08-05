@@ -592,6 +592,30 @@ export const UpdateFAQSchema = CreateFAQSchema.extend({
   id: IdSchema,
 }).partial().required({ id: true });
 
+// FAQ Section Validation Schemas
+export const CreateFAQSectionSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
+  heading: z.string().min(1, 'Heading is required').max(200),
+  subheading: z.string().max(500).optional(),
+  heroTitle: z.string().min(1, 'Hero title is required').max(200),
+  heroSubtitle: z.string().max(500).optional(),
+  searchPlaceholder: z.string().max(100).default('Enter your keyword here'),
+  showHero: z.boolean().default(true),
+  showCategories: z.boolean().default(true),
+  backgroundColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#f8fafc'),
+  heroBackgroundColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#6366f1'),
+  heroHeight: z.string().max(50).default('80vh'),
+  heroTitleColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#FFFFFF'),
+  heroSubtitleColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#FFFFFF'),
+  headingColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#1F2937'),
+  subheadingColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid hex color').default('#6B7280'),
+  isActive: z.boolean().default(true),
+});
+
+export const UpdateFAQSectionSchema = CreateFAQSectionSchema.extend({
+  id: IdSchema,
+}).partial().required({ id: true });
+
 // Pricing Plans Validation Schemas
 export const PricingIntervalEnum = z.enum(['month', 'year', 'one-time']);
 

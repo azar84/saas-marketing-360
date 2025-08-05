@@ -39,6 +39,10 @@ interface FAQSectionProps {
   backgroundColor?: string;
   heroBackgroundColor?: string;
   heroHeight?: string;
+  heroTitleColor?: string;
+  heroSubtitleColor?: string;
+  headingColor?: string;
+  subheadingColor?: string;
   // Page builder specific props
   faqCategoryId?: number; // If specified, only show FAQs from this category
   showHero?: boolean;
@@ -59,6 +63,10 @@ export default function FAQSection({
   backgroundColor = "var(--color-bg-secondary)",
   heroBackgroundColor = "var(--color-bg-primary)",
   heroHeight = "80vh",
+  heroTitleColor,
+  heroSubtitleColor,
+  headingColor,
+  subheadingColor,
   faqCategoryId,
   showHero = true
 }: FAQSectionProps) {
@@ -253,10 +261,10 @@ export default function FAQSection({
           }}
         >
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6" style={{ color: 'var(--color-text-primary)' }}>
+            <h1 className="text-4xl md:text-5xl font-bold mb-6" style={{ color: heroTitleColor || 'var(--color-text-primary, #FFFFFF)' }}>
               {heroTitle}
             </h1>
-            <p className="text-xl mb-8 max-w-2xl mx-auto" style={{ color: 'var(--color-text-secondary)' }}>
+            <p className="text-xl mb-8 max-w-2xl mx-auto" style={{ color: heroSubtitleColor || 'var(--color-text-secondary, #FFFFFF)' }}>
               {heroSubtitle}
             </p>
             
@@ -346,16 +354,16 @@ export default function FAQSection({
             
             {!searchTerm && (
               <div className="mb-8">
-                <h2 className="text-2xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                <h2 className="text-2xl font-bold mb-2" style={{ color: headingColor || 'var(--color-text-primary, #1F2937)' }}>
                   {currentCategoryName || heading}
                 </h2>
                 {subheading && !currentCategoryName && (
-                  <p style={{ color: 'var(--color-text-secondary)' }}>
+                  <p style={{ color: subheadingColor || 'var(--color-text-secondary, #6B7280)' }}>
                     {subheading}
                   </p>
                 )}
                 {currentCategoryName && (
-                  <p style={{ color: 'var(--color-text-secondary)' }}>
+                  <p style={{ color: subheadingColor || 'var(--color-text-secondary, #6B7280)' }}>
                     {sortedCategories.find(cat => cat.id === (faqCategoryId || selectedCategory))?.description || 
                      'Questions related to ' + currentCategoryName}
                   </p>
