@@ -95,6 +95,12 @@ export const SiteSettingsSchema = z.object({
   cloudinaryCloudName: optionalString,
   cloudinaryApiKey: optionalString,
   cloudinaryApiSecret: optionalString,
+  
+  // Sidebar Configuration
+  sidebarBackgroundColor: z.string().optional().nullable(),
+  sidebarTextColor: z.string().optional().nullable(),
+  sidebarSelectedColor: z.string().optional().nullable(),
+  sidebarHoverColor: z.string().optional().nullable(),
 });
 
 // Partial schema for updates - all fields are optional

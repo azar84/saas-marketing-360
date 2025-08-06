@@ -58,6 +58,10 @@ model SiteSettings {
   cloudinaryCloudName      String?
   cloudinaryEnabled        Boolean  @default(false)
   cloudinaryUploadPreset   String?
+  sidebarBackgroundColor   String?  @default("#1F2937")
+  sidebarTextColor         String?  @default("#E5E7EB")
+  sidebarSelectedColor     String?  @default("#FFFFFF")
+  sidebarHoverColor        String?  @default("#D1D5DB")
 
   @@map("site_settings")
 }

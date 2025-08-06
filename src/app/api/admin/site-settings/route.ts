@@ -58,7 +58,11 @@ export async function POST(request: NextRequest) {
       cloudinaryEnabled,
       cloudinaryCloudName,
       cloudinaryApiKey,
-      cloudinaryApiSecret
+      cloudinaryApiSecret,
+      sidebarBackgroundColor,
+      sidebarTextColor,
+      sidebarSelectedColor,
+      sidebarHoverColor
     } = body;
 
     // Check if settings already exist
@@ -79,6 +83,10 @@ export async function POST(request: NextRequest) {
           cloudinaryCloudName: cloudinaryCloudName !== undefined ? cloudinaryCloudName : existingSettings.cloudinaryCloudName,
           cloudinaryApiKey: cloudinaryApiKey !== undefined ? cloudinaryApiKey : existingSettings.cloudinaryApiKey,
           cloudinaryApiSecret: cloudinaryApiSecret !== undefined ? cloudinaryApiSecret : existingSettings.cloudinaryApiSecret,
+          sidebarBackgroundColor: sidebarBackgroundColor !== undefined ? sidebarBackgroundColor : existingSettings.sidebarBackgroundColor,
+          sidebarTextColor: sidebarTextColor !== undefined ? sidebarTextColor : existingSettings.sidebarTextColor,
+          sidebarSelectedColor: sidebarSelectedColor !== undefined ? sidebarSelectedColor : existingSettings.sidebarSelectedColor,
+          sidebarHoverColor: sidebarHoverColor !== undefined ? sidebarHoverColor : existingSettings.sidebarHoverColor,
         }
       });
     } else {
@@ -94,6 +102,10 @@ export async function POST(request: NextRequest) {
           cloudinaryCloudName: cloudinaryCloudName || null,
           cloudinaryApiKey: cloudinaryApiKey || null,
           cloudinaryApiSecret: cloudinaryApiSecret || null,
+          sidebarBackgroundColor: sidebarBackgroundColor || '#1F2937',
+          sidebarTextColor: sidebarTextColor || '#E5E7EB',
+          sidebarSelectedColor: sidebarSelectedColor || '#FFFFFF',
+          sidebarHoverColor: sidebarHoverColor || '#D1D5DB',
           smtpEnabled: false,
           smtpPort: 587,
           smtpSecure: true,

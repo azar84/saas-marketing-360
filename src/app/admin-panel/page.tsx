@@ -134,6 +134,7 @@ export default function AdminPanel() {
     pricingPlansGrowth: 0
   });
   const [loadingStats, setLoadingStats] = useState(true);
+  const [lastUpdateTime, setLastUpdateTime] = useState<number | null>(null);
 
   // Check authentication
   useEffect(() => {
@@ -172,6 +173,46 @@ export default function AdminPanel() {
       fetchData();
     }
   }, [get, isAuthenticated]);
+
+  // Update CSS custom properties when site settings change
+  useEffect(() => {
+    if (siteSettings) {
+      document.documentElement.style.setProperty('--sidebar-bg-color', siteSettings.sidebarBackgroundColor || '#1F2937');
+      document.documentElement.style.setProperty('--sidebar-text-color', siteSettings.sidebarTextColor || '#E5E7EB');
+      document.documentElement.style.setProperty('--sidebar-selected-color', siteSettings.sidebarSelectedColor || '#FFFFFF');
+      document.documentElement.style.setProperty('--sidebar-hover-color', siteSettings.sidebarHoverColor || '#D1D5DB');
+    }
+  }, [siteSettings]);
+
+  // Listen for site settings updates from SiteSettingsManager
+  useEffect(() => {
+    const checkForUpdates = () => {
+      const lastUpdate = localStorage.getItem('siteSettingsUpdated');
+      if (lastUpdate && (!lastUpdateTime || parseInt(lastUpdate) > lastUpdateTime)) {
+        setLastUpdateTime(parseInt(lastUpdate));
+        // Refresh site settings
+        const refreshSettings = async () => {
+          try {
+            const settingsResponse = await get<{ success: boolean; data: SiteSettings }>('/api/admin/site-settings');
+            if (settingsResponse.success) {
+              setSiteSettings(settingsResponse.data);
+            }
+          } catch (error) {
+            console.error('Error refreshing site settings:', error);
+          }
+        };
+        refreshSettings();
+      }
+    };
+
+    // Check immediately
+    checkForUpdates();
+    
+    // Set up interval to check for updates
+    const interval = setInterval(checkForUpdates, 1000);
+    
+    return () => clearInterval(interval);
+  }, [get]);
 
   // Show loading while checking authentication or loading design system
   if (authLoading || designSystemLoading) {
@@ -747,13 +788,13 @@ export default function AdminPanel() {
       {/* Sidebar */}
       <div 
         className={`${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} fixed inset-y-0 left-0 z-50 w-64 shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}
-        style={{ backgroundColor: 'var(--color-bg-dark, #1F2937)' }}
+        style={{ backgroundColor: siteSettings?.sidebarBackgroundColor || '#1F2937' }}
       >
         <div 
           className="flex items-center justify-between h-16 px-6 border-b"
           style={{ 
-            borderColor: 'var(--color-gray-light, #E5E7EB)',
-            backgroundColor: 'var(--color-bg-dark, #1F2937)'
+            borderColor: siteSettings?.sidebarTextColor || '#E5E7EB',
+            backgroundColor: siteSettings?.sidebarBackgroundColor || '#1F2937'
           }}
         >
           <div className="flex items-center space-x-2">
@@ -776,7 +817,7 @@ export default function AdminPanel() {
             <div className="flex flex-col">
               <span 
                 className="text-sm font-bold truncate max-w-[120px]"
-                style={{ color: 'var(--color-text-primary, #FFFFFF)' }}
+                style={{ color: siteSettings?.sidebarTextColor || '#E5E7EB' }}
                 title={siteSettings?.footerCompanyName || 'Your Company'}
               >
                 {siteSettings?.footerCompanyName || 'Your Company'}
@@ -786,7 +827,7 @@ export default function AdminPanel() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs transition-colors"
-                style={{ color: 'var(--color-text-secondary, #6B7280)' }}
+                style={{ color: siteSettings?.sidebarTextColor || '#E5E7EB' }}
                 title="Open website in new tab"
               >
                 View Website →
@@ -796,16 +837,16 @@ export default function AdminPanel() {
           <div className="flex items-center space-x-2">
             <button
               onClick={logout}
-              className="p-1 rounded-md transition-colors"
-              style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
+              className="p-1 rounded-md transition-colors hover:bg-gray-700"
+              style={{ color: siteSettings?.sidebarTextColor || '#E5E7EB' }}
               title="Logout"
             >
               <LogOut className="w-4 h-4" />
             </button>
             <button
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden p-1 rounded-md transition-colors"
-              style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
+              className="lg:hidden p-1 rounded-md transition-colors hover:bg-gray-700"
+              style={{ color: siteSettings?.sidebarTextColor || '#E5E7EB' }}
             >
               <X className="w-5 h-5" />
             </button>
@@ -816,6 +857,10 @@ export default function AdminPanel() {
           <div className="space-y-1">
             {getNavigationItems(designSystem).map((item) => {
               const Icon = item.icon;
+              // Use site settings for sidebar colors
+              const textColor = activeSection === item.id 
+                ? siteSettings?.sidebarSelectedColor || '#FFFFFF'
+                : siteSettings?.sidebarTextColor || '#E5E7EB';
               return (
                 <button
                   key={item.id}
@@ -826,19 +871,27 @@ export default function AdminPanel() {
                   className={`w-full flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors`}
                   style={{
                     backgroundColor: activeSection === item.id 
-                      ? 'var(--color-bg-secondary, #F9FAFB)'
+                      ? 'rgba(255, 255, 255, 0.1)'
                       : 'transparent',
-                    color: activeSection === item.id 
-                      ? 'var(--color-text-primary, #1F2937)'
-                      : 'var(--color-text-primary, #1F2937)'
+                    color: textColor
+                  }}
+                  onMouseEnter={(e) => {
+                    if (activeSection !== item.id) {
+                      e.currentTarget.style.color = siteSettings?.sidebarHoverColor || '#D1D5DB';
+                      e.currentTarget.querySelector('svg')?.setAttribute('style', `color: ${siteSettings?.sidebarHoverColor || '#D1D5DB'}`);
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (activeSection !== item.id) {
+                      e.currentTarget.style.color = siteSettings?.sidebarTextColor || '#E5E7EB';
+                      e.currentTarget.querySelector('svg')?.setAttribute('style', `color: ${siteSettings?.sidebarTextColor || '#E5E7EB'}`);
+                    }
                   }}
                 >
                   <Icon 
                     className="mr-3 w-5 h-5" 
                     style={{ 
-                      color: activeSection === item.id 
-                        ? 'var(--color-text-primary, #1F2937)'
-                        : 'var(--color-text-primary, #1F2937)'
+                      color: textColor
                     }} 
                   />
                   {item.name}
@@ -858,15 +911,15 @@ export default function AdminPanel() {
         <div 
           className="shadow-sm border-b px-6 py-4 lg:hidden"
                       style={{ 
-              backgroundColor: 'var(--color-bg-dark, #1F2937)',
-              borderColor: 'var(--color-gray-light, #E5E7EB)'
+              backgroundColor: siteSettings?.sidebarBackgroundColor || '#1F2937',
+              borderColor: siteSettings?.sidebarTextColor || '#E5E7EB'
             }}
         >
           <div className="flex items-center justify-between">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-md transition-colors"
-              style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
+              className="p-2 rounded-md transition-colors hover:bg-gray-700"
+              style={{ color: siteSettings?.sidebarTextColor || '#E5E7EB' }}
             >
               <Menu className="w-5 h-5" />
             </button>
@@ -889,7 +942,7 @@ export default function AdminPanel() {
               )}
               <span 
                 className="text-sm font-bold truncate max-w-[120px]"
-                style={{ color: '#FFFFFF' }}
+                style={{ color: siteSettings?.sidebarTextColor || '#E5E7EB' }}
                 title={siteSettings?.footerCompanyName || 'Your Company'}
               >
                 {siteSettings?.footerCompanyName || 'Your Company'}

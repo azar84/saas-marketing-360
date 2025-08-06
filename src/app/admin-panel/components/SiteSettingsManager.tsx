@@ -106,6 +106,12 @@ interface SiteSettings {
   cloudinaryApiKey?: string | null;
   cloudinaryApiSecret?: string | null;
   
+  // Sidebar Configuration
+  sidebarBackgroundColor?: string | null;
+  sidebarTextColor?: string | null;
+  sidebarSelectedColor?: string | null;
+  sidebarHoverColor?: string | null;
+  
   createdAt?: string;
   updatedAt?: string;
 }
@@ -140,7 +146,7 @@ export default function SiteSettingsManager() {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [activeTab, setActiveTab] = useState<'general' | 'company' | 'email' | 'cloudinary'>('general');
+  const [activeTab, setActiveTab] = useState<'general' | 'company' | 'email' | 'cloudinary' | 'sidebar'>('general');
   
   // File upload states
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -340,6 +346,8 @@ export default function SiteSettingsManager() {
       if (result.success) {
         setMessage({ type: 'success', text: 'Settings saved successfully!' });
         setSettings(result.data);
+        // Trigger a refresh in the admin panel by setting a timestamp
+        localStorage.setItem('siteSettingsUpdated', Date.now().toString());
       } else {
         setMessage({ type: 'error', text: result.error || 'Failed to save settings' });
       }
@@ -545,6 +553,28 @@ export default function SiteSettingsManager() {
                   : 'var(--color-text-secondary)'
               }} />
               <span>Cloudinary</span>
+            </div>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('sidebar')}
+            className="group inline-flex items-center py-4 px-1 border-b-2 font-medium text-sm transition-colors"
+            style={{
+              borderColor: activeTab === 'sidebar' 
+                ? 'var(--color-primary)' 
+                : 'transparent',
+              color: activeTab === 'sidebar' 
+                ? 'var(--color-primary)' 
+                : 'var(--color-text-secondary)'
+            }}
+          >
+            <div className="flex items-center space-x-2">
+              <Palette className="w-4 h-4" style={{
+                color: activeTab === 'sidebar' 
+                  ? 'var(--color-primary)' 
+                  : 'var(--color-text-secondary)'
+              }} />
+              <span>Sidebar Colors</span>
             </div>
           </button>
         </nav>
@@ -1535,6 +1565,169 @@ export default function SiteSettingsManager() {
                   </p>
                 </div>
               )}
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Sidebar Settings Tab */}
+      {activeTab === 'sidebar' && (
+        <div className="space-y-6">
+          <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+            <div className="flex items-center space-x-3 mb-6">
+              <Palette className="w-5 h-5" style={{ color: 'var(--color-text-secondary)' }} />
+              <div>
+                <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Sidebar Color Configuration</h3>
+                <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Customize the admin panel sidebar colors</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Background Color */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                  Background Color
+                </label>
+                <div className="flex items-center space-x-3">
+                  <Input
+                    type="color"
+                    value={settings.sidebarBackgroundColor || '#1F2937'}
+                    onChange={(e) => handleInputChange('sidebarBackgroundColor', e.target.value)}
+                    className="w-16 h-10 p-1 rounded border"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light)',
+                      backgroundColor: 'var(--color-bg-primary)'
+                    }}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="#1F2937"
+                    value={settings.sidebarBackgroundColor || '#1F2937'}
+                    onChange={(e) => handleInputChange('sidebarBackgroundColor', e.target.value)}
+                    className="flex-1"
+                    style={{ 
+                      color: 'var(--color-text-primary)',
+                      backgroundColor: 'var(--color-bg-primary)',
+                      borderColor: 'var(--color-gray-light)'
+                    }}
+                  />
+                </div>
+                <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
+                  Main sidebar background color
+                </p>
+              </div>
+
+              {/* Text Color */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                  Text Color
+                </label>
+                <div className="flex items-center space-x-3">
+                  <Input
+                    type="color"
+                    value={settings.sidebarTextColor || '#E5E7EB'}
+                    onChange={(e) => handleInputChange('sidebarTextColor', e.target.value)}
+                    className="w-16 h-10 p-1 rounded border"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light)',
+                      backgroundColor: 'var(--color-bg-primary)'
+                    }}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="#E5E7EB"
+                    value={settings.sidebarTextColor || '#E5E7EB'}
+                    onChange={(e) => handleInputChange('sidebarTextColor', e.target.value)}
+                    className="flex-1"
+                    style={{ 
+                      color: 'var(--color-text-primary)',
+                      backgroundColor: 'var(--color-bg-primary)',
+                      borderColor: 'var(--color-gray-light)'
+                    }}
+                  />
+                </div>
+                <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
+                  Default text color for sidebar items
+                </p>
+              </div>
+
+              {/* Selected Color */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                  Selected Item Color
+                </label>
+                <div className="flex items-center space-x-3">
+                  <Input
+                    type="color"
+                    value={settings.sidebarSelectedColor || '#FFFFFF'}
+                    onChange={(e) => handleInputChange('sidebarSelectedColor', e.target.value)}
+                    className="w-16 h-10 p-1 rounded border"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light)',
+                      backgroundColor: 'var(--color-bg-primary)'
+                    }}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="#FFFFFF"
+                    value={settings.sidebarSelectedColor || '#FFFFFF'}
+                    onChange={(e) => handleInputChange('sidebarSelectedColor', e.target.value)}
+                    className="flex-1"
+                    style={{ 
+                      color: 'var(--color-text-primary)',
+                      backgroundColor: 'var(--color-bg-primary)',
+                      borderColor: 'var(--color-gray-light)'
+                    }}
+                  />
+                </div>
+                <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
+                  Color for active/selected sidebar items
+                </p>
+              </div>
+
+              {/* Hover Color */}
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                  Hover Color
+                </label>
+                <div className="flex items-center space-x-3">
+                  <Input
+                    type="color"
+                    value={settings.sidebarHoverColor || '#D1D5DB'}
+                    onChange={(e) => handleInputChange('sidebarHoverColor', e.target.value)}
+                    className="w-16 h-10 p-1 rounded border"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light)',
+                      backgroundColor: 'var(--color-bg-primary)'
+                    }}
+                  />
+                  <Input
+                    type="text"
+                    placeholder="#D1D5DB"
+                    value={settings.sidebarHoverColor || '#D1D5DB'}
+                    onChange={(e) => handleInputChange('sidebarHoverColor', e.target.value)}
+                    className="flex-1"
+                    style={{ 
+                      color: 'var(--color-text-primary)',
+                      backgroundColor: 'var(--color-bg-primary)',
+                      borderColor: 'var(--color-gray-light)'
+                    }}
+                  />
+                </div>
+                <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
+                  Color for sidebar items on hover
+                </p>
+              </div>
+            </div>
+
+            <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: 'var(--color-info-light)', borderColor: 'var(--color-info)' }}>
+              <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-info-dark)' }}>💡 Color Tips</h4>
+              <ul className="text-sm space-y-1" style={{ color: 'var(--color-info-dark)' }}>
+                <li>• Use dark backgrounds with light text for better contrast</li>
+                <li>• Ensure selected items have sufficient contrast with the background</li>
+                <li>• Test hover states to make sure they're visible</li>
+                <li>• Colors will be applied immediately to the admin panel sidebar</li>
+              </ul>
             </div>
           </Card>
         </div>
