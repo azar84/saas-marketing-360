@@ -105,6 +105,13 @@ interface SiteSettings {
   faviconDarkUrl: string | null;
   footerCompanyName: string | null;
   footerCompanyDescription: string | null;
+  
+  // Sidebar Configuration
+  sidebarBackgroundColor?: string | null;
+  sidebarTextColor?: string | null;
+  sidebarSelectedColor?: string | null;
+  sidebarHoverColor?: string | null;
+  
   // ... other fields
 }
 
