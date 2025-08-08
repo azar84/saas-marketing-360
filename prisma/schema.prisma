@@ -50,9 +50,6 @@ model SiteSettings {
   baseUrl                  String?  @default("")
   createdAt                DateTime @default(now())
   updatedAt                DateTime @updatedAt
-  gaMeasurementId          String?  @default("NULL")
-  gtmContainerId           String?  @default("NULL")
-  gtmEnabled               Boolean  @default(false)
   cloudinaryApiKey         String?
   cloudinaryApiSecret      String?
   cloudinaryCloudName      String?
@@ -173,8 +170,6 @@ model Page {
   showInFooter    Boolean              @default(false)
   createdAt       DateTime             @default(now())
   updatedAt       DateTime             @updatedAt
-  menuItems       MenuItem[]
-  features        Feature[]
   headerNavItems  HeaderNavItem[]
   featureGroups   PageFeatureGroup[]
   htmlSections    PageHtmlSection[]
@@ -222,21 +217,6 @@ model HeroSection {
   pageSections              PageSection[]
 
   @@map("hero_sections")
-}
-
-model Feature {
-  id         Int      @id @default(autoincrement())
-  pageId     Int
-  iconUrl    String?
-  heading    String
-  subheading String?
-  position   Int      @default(0)
-  visible    Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  page       Page     @relation(fields: [pageId], references: [id], onDelete: Cascade)
-
-  @@map("features")
 }
 
 model MediaSection {
@@ -288,51 +268,6 @@ model MediaSectionFeature {
   @@map("media_section_features")
 }
 
-model Menu {
-  id            Int                @id @default(autoincrement())
-  name          String
-  description   String?
-  isActive      Boolean            @default(true)
-  sortOrder     Int                @default(0)
-  createdAt     DateTime           @default(now())
-  updatedAt     DateTime           @updatedAt
-  headerConfigs HeaderConfigMenu[]
-  items         MenuItem[]
-}
-
-model MenuItem {
-  id        Int        @id @default(autoincrement())
-  menuId    Int
-  label     String
-  url       String?
-  icon      String?
-  target    String     @default("_self")
-  isActive  Boolean    @default(true)
-  sortOrder Int        @default(0)
-  parentId  Int?
-  pageId    Int?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  menu      Menu       @relation(fields: [menuId], references: [id], onDelete: Cascade)
-  page      Page?      @relation(fields: [pageId], references: [id])
-  parent    MenuItem?  @relation("MenuItemHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
-  children  MenuItem[] @relation("MenuItemHierarchy")
-}
-
-model HeaderConfigMenu {
-  id             Int          @id @default(autoincrement())
-  headerConfigId Int
-  menuId         Int
-  sortOrder      Int          @default(0)
-  isVisible      Boolean      @default(true)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
-  headerConfig   HeaderConfig @relation(fields: [headerConfigId], references: [id], onDelete: Cascade)
-  menu           Menu         @relation(fields: [menuId], references: [id], onDelete: Cascade)
-
-  @@unique([headerConfigId, menuId])
-}
-
 model HeaderNavItem {
   id             Int          @id @default(autoincrement())
   headerConfigId Int
@@ -361,7 +296,6 @@ model HeaderConfig {
   menuActiveColor String?            @default("#5243E9")
   menuHoverColor  String?            @default("#5243E9")
   menuTextColor   String?            @default("#374151")
-  menus           HeaderConfigMenu[]
   headerCTAs      HeaderCTA[]
   navItems        HeaderNavItem[]
 

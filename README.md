@@ -6,17 +6,13 @@ A clean, modern SaaS admin panel template built with Next.js, React, TypeScript,
 
 ### Core Admin Features
 - **Dashboard** - Overview with stats and quick actions
-- **Features Management** - Manage website features and capabilities
 - **Media Library** - File upload and management system
 - **Pricing Plans** - Configure and manage pricing tiers
 - **FAQ Management** - Create and manage FAQ content
 - **Forms Management** - Contact form configuration
 - **Newsletter Subscribers** - Email list management
-- **Script Installation** - Code injection for analytics and tracking
-- **Menu Management** - Navigation menu configuration
-- **SEO Manager** - Search engine optimization tools
+- **Script Installation** - Code injection for tracking
 - **User Management** - Admin user management
-- **Analytics** - Dashboard for metrics (placeholder)
 - **Scheduler** - Task scheduling and automation
 - **Design System** - Color and styling management
 - **Site Settings** - General configuration
@@ -118,7 +114,6 @@ The project uses Prisma with PostgreSQL. Key models include:
 - **AdminUser** - Admin authentication
 - **SiteSettings** - Global configuration
 - **DesignSystem** - Color and theme settings
-- **Features** - Feature management
 - **PricingPlans** - Pricing configuration
 - **FAQ** - FAQ content management
 

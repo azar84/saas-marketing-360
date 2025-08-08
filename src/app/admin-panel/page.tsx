@@ -30,15 +30,12 @@ import {
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import FeaturesManagement from './components/FeaturesManagement';
 import SiteSettingsManager from './components/SiteSettingsManager';
 import DesignSystemManager from './components/DesignSystemManager';
 import MediaLibraryManager from './components/MediaLibraryManager';
 import PricingManager from './components/PricingManager';
 import FAQManager from './components/FAQManager';
 import ContactManager from './components/ContactManager';
-import MenuManager from './components/MenuManager';
-import SEOManager from './components/SEOManager';
 import ScriptSectionManager from './components/ScriptSectionManager';
 import NewsletterManager from './components/NewsletterManager';
 import UserManagement from './components/UserManagement';
@@ -47,7 +44,7 @@ import SchedulerManager from './components/SchedulerManager';
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-type Section = 'dashboard' | 'features-management' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'menu-management' | 'seo-manager' | 'users' | 'analytics' | 'site-settings' | 'design-system' | 'scheduler';
+type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler';
 
 // Navigation items with design system colors
 const getNavigationItems = (designSystem: any) => {
@@ -55,17 +52,13 @@ const getNavigationItems = (designSystem: any) => {
   
   return [
     { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard, color: colors.primary },
-    { id: 'features-management', name: 'Features Management', icon: Star, color: colors.warning },
     { id: 'media-library', name: 'Media Library', icon: FolderOpen, color: colors.primary },
     { id: 'pricing', name: 'Pricing Plans', icon: DollarSign, color: colors.success },
     { id: 'faq-management', name: 'FAQ Management', icon: MessageSquare, color: colors.accent },
     { id: 'contact-management', name: 'Forms Management', icon: Mail, color: colors.primary },
     { id: 'newsletter-management', name: 'Newsletter Subscribers', icon: Users, color: colors.success },
     { id: 'script-installation', name: 'Script Installation', icon: Zap, color: colors.warning },
-    { id: 'menu-management', name: 'Menu Management', icon: Menu, color: colors.info },
-    { id: 'seo-manager', name: 'SEO Manager', icon: Globe, color: colors.success },
     { id: 'users', name: 'Users', icon: Users, color: colors.error },
-    { id: 'analytics', name: 'Analytics', icon: BarChart3, color: colors.success },
     { id: 'scheduler', name: 'Scheduler', icon: Clock, color: colors.warning },
     { id: 'design-system', name: 'Design System', icon: Layers, color: colors.primary },
     { id: 'site-settings', name: 'Site Settings', icon: Settings, color: colors.textSecondary },
@@ -208,15 +201,6 @@ export default function AdminPanel() {
 
   const renderContent = () => {
     switch (activeSection) {
-      case 'features-management':
-        return (
-          <div 
-            className="p-8 space-y-8"
-            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
-          >
-            <FeaturesManagement />
-          </div>
-        );
       case 'media-library':
         return (
           <div 
@@ -271,24 +255,6 @@ export default function AdminPanel() {
             <ScriptSectionManager />
           </div>
         );
-      case 'menu-management':
-        return (
-          <div 
-            className="p-8 space-y-8"
-            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
-          >
-            <MenuManager />
-          </div>
-        );
-      case 'seo-manager':
-        return (
-          <div 
-            className="p-8 space-y-8"
-            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
-          >
-            <SEOManager />
-          </div>
-        );
       case 'users':
         return (
           <div 
@@ -296,29 +262,6 @@ export default function AdminPanel() {
             style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
           >
             <UserManagement />
-          </div>
-        );
-      case 'analytics':
-        return (
-          <div 
-            className="p-8"
-            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
-          >
-            <div className="text-center py-12">
-              <BarChart3 
-                className="w-16 h-16 mx-auto mb-4" 
-                style={{ color: 'var(--color-text-muted, #9CA3AF)' }}
-              />
-              <h2 
-                className="text-2xl font-bold mb-2"
-                style={{ color: 'var(--color-text-primary, #1F2937)' }}
-              >
-                Analytics
-              </h2>
-              <p style={{ color: 'var(--color-text-secondary, #6B7280)' }}>
-                Analytics dashboard coming soon...
-              </p>
-            </div>
           </div>
         );
       case 'scheduler':
@@ -517,24 +460,6 @@ export default function AdminPanel() {
                   <div>
                     <h3 style={{ color: 'var(--color-text-primary, #1F2937)' }} className="font-semibold">Design System</h3>
                     <p style={{ color: 'var(--color-text-secondary, #6B7280)' }} className="text-sm">Manage colors and styling</p>
-                  </div>
-                </div>
-              </Card>
-
-              <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setActiveSection('seo-manager')}>
-                <div className="flex items-center space-x-4">
-                  <div 
-                    className="p-3 rounded-lg"
-                    style={{ backgroundColor: `${designSystem?.successColor || '#10B981'}1A` }}
-                  >
-                    <Globe 
-                      className="w-6 h-6" 
-                      style={{ color: designSystem?.successColor || '#10B981' }}
-                    />
-                  </div>
-                  <div>
-                    <h3 style={{ color: 'var(--color-text-primary, #1F2937)' }} className="font-semibold">SEO Manager</h3>
-                    <p style={{ color: 'var(--color-text-secondary, #6B7280)' }} className="text-sm">Optimize for search engines</p>
                   </div>
                 </div>
               </Card>
