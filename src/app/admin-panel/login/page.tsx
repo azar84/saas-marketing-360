@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, ArrowLeft, Shield, Eye, EyeOff, User } from 'lucide-react';
 import Image from 'next/image';
+import { useAuth } from '@/hooks/useAuth';
 
 interface SiteSettings {
   footerCompanyName?: string;
@@ -29,6 +30,7 @@ export default function AdminLogin() {
   const [siteSettings, setSiteSettings] = useState<SiteSettings>({});
   const [loadingSettings, setLoadingSettings] = useState(true);
   const router = useRouter();
+  const { login } = useAuth();
 
   // Fetch site settings for branding
   useEffect(() => {
@@ -56,22 +58,12 @@ export default function AdminLogin() {
     setSuccess('');
 
     try {
-      const response = await fetch('/api/admin/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(credentials),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('adminToken', data.token);
-        localStorage.setItem('adminUser', JSON.stringify(data.user));
+      const success = await login(credentials.username, credentials.password);
+      
+      if (success) {
         router.push('/admin-panel');
       } else {
-        setError(data.error || 'Login failed. Please check your credentials.');
+        setError('Login failed. Please check your credentials.');
       }
     } catch (err) {
       setError('Network error. Please try again.');

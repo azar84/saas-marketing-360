@@ -1,330 +1,259 @@
-'use client';
-
 import React from 'react';
+import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
-import { 
-  Type, 
-  Mail, 
-  Phone, 
-  FileText, 
-  ToggleRight, 
-  ToggleLeft, 
-  Calendar,
-  MapPin,
-  Hash,
-  Globe,
-  User,
-  Building,
-  FileCheck
-} from 'lucide-react';
+import * as Icons from 'lucide-react';
 
 export interface FormFieldType {
   type: string;
   label: string;
-  icon: React.ComponentType<any>;
   description: string;
-  defaultPlaceholder: string;
-  defaultLabel: string;
+  icon: string;
+  hasOptions: boolean;
+  hasPlaceholder: boolean;
+  hasHelpText: boolean;
+  hasValidation: boolean;
   defaultFieldName: string;
-  supportsOptions: boolean;
-  supportsValidation: boolean;
+  defaultLabel: string;
+  defaultPlaceholder: string;
   defaultWidth: string;
+  supportsOptions: boolean;
 }
 
-export const PREDEFINED_FIELD_TYPES: FormFieldType[] = [
+const fieldTypes: FormFieldType[] = [
   {
     type: 'text',
     label: 'Text Input',
-    icon: Type,
     description: 'Single line text input',
-    defaultPlaceholder: 'Enter text...',
-    defaultLabel: 'Text Field',
+    icon: 'Type',
+    hasOptions: false,
+    hasPlaceholder: true,
+    hasHelpText: true,
+    hasValidation: true,
     defaultFieldName: 'text_field',
+    defaultLabel: 'Text Input',
+    defaultPlaceholder: 'Enter text...',
+    defaultWidth: 'full',
     supportsOptions: false,
-    supportsValidation: true,
-    defaultWidth: 'full'
-  },
-  {
-    type: 'email',
-    label: 'Email',
-    icon: Mail,
-    description: 'Email address input with validation',
-    defaultPlaceholder: 'Enter your email...',
-    defaultLabel: 'Email Address',
-    defaultFieldName: 'email',
-    supportsOptions: false,
-    supportsValidation: true,
-    defaultWidth: 'full'
-  },
-  {
-    type: 'tel',
-    label: 'Phone Number',
-    icon: Phone,
-    description: 'Phone number input',
-    defaultPlaceholder: 'Enter your phone number...',
-    defaultLabel: 'Phone Number',
-    defaultFieldName: 'phone',
-    supportsOptions: false,
-    supportsValidation: true,
-    defaultWidth: 'full'
   },
   {
     type: 'textarea',
     label: 'Text Area',
-    icon: FileText,
     description: 'Multi-line text input',
+    icon: 'AlignLeft',
+    hasOptions: false,
+    hasPlaceholder: true,
+    hasHelpText: true,
+    hasValidation: true,
+    defaultFieldName: 'textarea_field',
+    defaultLabel: 'Text Area',
     defaultPlaceholder: 'Enter your message...',
-    defaultLabel: 'Message',
-    defaultFieldName: 'message',
+    defaultWidth: 'full',
     supportsOptions: false,
-    supportsValidation: true,
-    defaultWidth: 'full'
+  },
+  {
+    type: 'email',
+    label: 'Email',
+    description: 'Email address input',
+    icon: 'Mail',
+    hasOptions: false,
+    hasPlaceholder: true,
+    hasHelpText: true,
+    hasValidation: true,
+    defaultFieldName: 'email_field',
+    defaultLabel: 'Email Address',
+    defaultPlaceholder: 'Enter your email...',
+    defaultWidth: 'full',
+    supportsOptions: false,
+  },
+  {
+    type: 'phone',
+    label: 'Phone',
+    description: 'Phone number input',
+    icon: 'Phone',
+    hasOptions: false,
+    hasPlaceholder: true,
+    hasHelpText: true,
+    hasValidation: true,
+    defaultFieldName: 'phone_field',
+    defaultLabel: 'Phone Number',
+    defaultPlaceholder: 'Enter your phone number...',
+    defaultWidth: 'full',
+    supportsOptions: false,
+  },
+  {
+    type: 'number',
+    label: 'Number',
+    description: 'Numeric input',
+    icon: 'Hash',
+    hasOptions: false,
+    hasPlaceholder: true,
+    hasHelpText: true,
+    hasValidation: true,
+    defaultFieldName: 'number_field',
+    defaultLabel: 'Number',
+    defaultPlaceholder: 'Enter a number...',
+    defaultWidth: 'half',
+    supportsOptions: false,
+  },
+  {
+    type: 'url',
+    label: 'URL',
+    description: 'Website URL input',
+    icon: 'Link',
+    hasOptions: false,
+    hasPlaceholder: true,
+    hasHelpText: true,
+    hasValidation: true,
+    defaultFieldName: 'url_field',
+    defaultLabel: 'Website URL',
+    defaultPlaceholder: 'Enter your website URL...',
+    defaultWidth: 'full',
+    supportsOptions: false,
   },
   {
     type: 'select',
-    label: 'Select Dropdown',
-    icon: ToggleRight,
-    description: 'Dropdown selection with options',
-    defaultPlaceholder: 'Select an option...',
-    defaultLabel: 'Select Option',
+    label: 'Dropdown',
+    description: 'Select from options',
+    icon: 'ChevronDown',
+    hasOptions: true,
+    hasPlaceholder: true,
+    hasHelpText: true,
+    hasValidation: true,
     defaultFieldName: 'select_field',
+    defaultLabel: 'Select Option',
+    defaultPlaceholder: 'Choose an option...',
+    defaultWidth: 'full',
     supportsOptions: true,
-    supportsValidation: true,
-    defaultWidth: 'full'
-  },
-  {
-    type: 'checkbox',
-    label: 'Checkbox',
-    icon: ToggleLeft,
-    description: 'Single checkbox input',
-    defaultPlaceholder: '',
-    defaultLabel: 'I agree to the terms',
-    defaultFieldName: 'checkbox_field',
-    supportsOptions: false,
-    supportsValidation: false,
-    defaultWidth: 'full'
   },
   {
     type: 'radio',
     label: 'Radio Buttons',
-    icon: ToggleLeft,
-    description: 'Radio button group with options',
-    defaultPlaceholder: '',
-    defaultLabel: 'Select Option',
+    description: 'Single choice from options',
+    icon: 'Circle',
+    hasOptions: true,
+    hasPlaceholder: false,
+    hasHelpText: true,
+    hasValidation: true,
     defaultFieldName: 'radio_field',
+    defaultLabel: 'Select One',
+    defaultPlaceholder: '',
+    defaultWidth: 'full',
     supportsOptions: true,
-    supportsValidation: true,
-    defaultWidth: 'full'
+  },
+  {
+    type: 'checkbox',
+    label: 'Checkbox',
+    description: 'Multiple choice from options',
+    icon: 'CheckSquare',
+    hasOptions: true,
+    hasPlaceholder: false,
+    hasHelpText: true,
+    hasValidation: true,
+    defaultFieldName: 'checkbox_field',
+    defaultLabel: 'Select All That Apply',
+    defaultPlaceholder: '',
+    defaultWidth: 'full',
+    supportsOptions: true,
   },
   {
     type: 'date',
-    label: 'Date Picker',
-    icon: Calendar,
-    description: 'Date selection input',
-    defaultPlaceholder: 'Select a date...',
-    defaultLabel: 'Date',
+    label: 'Date',
+    description: 'Date picker',
+    icon: 'Calendar',
+    hasOptions: false,
+    hasPlaceholder: true,
+    hasHelpText: true,
+    hasValidation: true,
     defaultFieldName: 'date_field',
+    defaultLabel: 'Date',
+    defaultPlaceholder: 'Select a date...',
+    defaultWidth: 'half',
     supportsOptions: false,
-    supportsValidation: true,
-    defaultWidth: 'full'
   },
   {
-    type: 'number',
-    label: 'Number Input',
-    icon: Hash,
-    description: 'Numeric input field',
-    defaultPlaceholder: 'Enter a number...',
-    defaultLabel: 'Number',
-    defaultFieldName: 'number_field',
+    type: 'time',
+    label: 'Time',
+    description: 'Time picker',
+    icon: 'Clock',
+    hasOptions: false,
+    hasPlaceholder: true,
+    hasHelpText: true,
+    hasValidation: true,
+    defaultFieldName: 'time_field',
+    defaultLabel: 'Time',
+    defaultPlaceholder: 'Select a time...',
+    defaultWidth: 'half',
     supportsOptions: false,
-    supportsValidation: true,
-    defaultWidth: 'full'
   },
   {
-    type: 'url',
-    label: 'Website URL',
-    icon: Globe,
-    description: 'Website URL input with validation',
-    defaultPlaceholder: 'https://example.com',
-    defaultLabel: 'Website',
-    defaultFieldName: 'website',
-    supportsOptions: false,
-    supportsValidation: true,
-    defaultWidth: 'full'
-  },
-  {
-    type: 'first_name',
-    label: 'First Name',
-    icon: User,
-    description: 'First name input field',
-    defaultPlaceholder: 'Enter your first name...',
-    defaultLabel: 'First Name',
-    defaultFieldName: 'first_name',
-    supportsOptions: false,
-    supportsValidation: true,
-    defaultWidth: 'half'
-  },
-  {
-    type: 'last_name',
-    label: 'Last Name',
-    icon: User,
-    description: 'Last name input field',
-    defaultPlaceholder: 'Enter your last name...',
-    defaultLabel: 'Last Name',
-    defaultFieldName: 'last_name',
-    supportsOptions: false,
-    supportsValidation: true,
-    defaultWidth: 'half'
-  },
-  {
-    type: 'company',
-    label: 'Company',
-    icon: Building,
-    description: 'Company name input field',
-    defaultPlaceholder: 'Enter your company name...',
-    defaultLabel: 'Company',
-    defaultFieldName: 'company',
-    supportsOptions: false,
-    supportsValidation: false,
-    defaultWidth: 'full'
-  },
-  {
-    type: 'street_address',
-    label: 'Street Address',
-    icon: MapPin,
-    description: 'Street address line 1',
-    defaultPlaceholder: '123 Main Street',
-    defaultLabel: 'Street Address',
-    defaultFieldName: 'street_address',
-    supportsOptions: false,
-    supportsValidation: true,
-    defaultWidth: 'full'
-  },
-  {
-    type: 'address_line_2',
-    label: 'Address Line 2',
-    icon: MapPin,
-    description: 'Apartment, suite, unit, etc.',
-    defaultPlaceholder: 'Apt 4B, Suite 200, Unit 5 (optional)',
-    defaultLabel: 'Address Line 2',
-    defaultFieldName: 'address_line_2',
-    supportsOptions: false,
-    supportsValidation: false,
-    defaultWidth: 'full'
-  },
-  {
-    type: 'city',
-    label: 'City',
-    icon: MapPin,
-    description: 'City name',
-    defaultPlaceholder: 'Toronto',
-    defaultLabel: 'City',
-    defaultFieldName: 'city',
-    supportsOptions: false,
-    supportsValidation: true,
-    defaultWidth: 'half'
-  },
-  {
-    type: 'province_state',
-    label: 'Province/State',
-    icon: MapPin,
-    description: 'Province or State',
-    defaultPlaceholder: 'ON',
-    defaultLabel: 'Province/State',
-    defaultFieldName: 'province_state',
-    supportsOptions: false,
-    supportsValidation: true,
-    defaultWidth: 'half'
-  },
-  {
-    type: 'postal_code',
-    label: 'Postal/Zip Code',
-    icon: MapPin,
-    description: 'Postal or ZIP code',
-    defaultPlaceholder: 'M5V 3A8',
-    defaultLabel: 'Postal/Zip Code',
-    defaultFieldName: 'postal_code',
-    supportsOptions: false,
-    supportsValidation: true,
-    defaultWidth: 'half'
-  },
-  {
-    type: 'country',
-    label: 'Country',
-    icon: Globe,
-    description: 'Country selection',
-    defaultPlaceholder: 'Select country',
-    defaultLabel: 'Country',
-    defaultFieldName: 'country',
-    supportsOptions: true,
-    supportsValidation: true,
-    defaultWidth: 'half'
-  },
-  {
-    type: 'terms',
-    label: 'Terms & Conditions',
-    icon: FileCheck,
-    description: 'Terms and conditions checkbox with modal',
+    type: 'file',
+    label: 'File Upload',
+    description: 'File upload input',
+    icon: 'Upload',
+    hasOptions: false,
+    hasPlaceholder: false,
+    hasHelpText: true,
+    hasValidation: true,
+    defaultFieldName: 'file_field',
+    defaultLabel: 'File Upload',
     defaultPlaceholder: '',
-    defaultLabel: 'I agree to the terms and conditions',
-    defaultFieldName: 'terms_agreement',
-    supportsOptions: true,
-    supportsValidation: true,
-    defaultWidth: 'full'
-  }
+    defaultWidth: 'full',
+    supportsOptions: false,
+  },
+  {
+    type: 'hidden',
+    label: 'Hidden Field',
+    description: 'Hidden form field',
+    icon: 'EyeOff',
+    hasOptions: false,
+    hasPlaceholder: false,
+    hasHelpText: false,
+    hasValidation: false,
+    defaultFieldName: 'hidden_field',
+    defaultLabel: 'Hidden Field',
+    defaultPlaceholder: '',
+    defaultWidth: 'full',
+    supportsOptions: false,
+  },
 ];
 
 interface FormFieldTypesProps {
   onFieldSelect: (fieldType: FormFieldType) => void;
-  primaryColor?: string;
+  primaryColor: string;
 }
 
-export default function FormFieldTypes({ onFieldSelect, primaryColor = '#5243E9' }: FormFieldTypesProps) {
+const FormFieldTypes: React.FC<FormFieldTypesProps> = ({ onFieldSelect, primaryColor }) => {
+  const getIconComponent = (iconName: string) => {
+    const IconComponent = (Icons as any)[iconName];
+    return IconComponent ? <IconComponent className="h-4 w-4" /> : <Icons.Type className="h-4 w-4" />;
+  };
+
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {PREDEFINED_FIELD_TYPES.map((fieldType) => {
-          const Icon = fieldType.icon;
-          
-          return (
-            <Card
-              key={fieldType.type}
-              className="p-4 cursor-pointer hover:shadow-md transition-shadow border-2 border-dashed"
-              style={{
-                borderColor: 'var(--color-gray-light, #E5E7EB)',
-                transition: 'all 0.2s ease-in-out'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = `${primaryColor}80`;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = 'var(--color-gray-light, #E5E7EB)';
-              }}
-              onClick={() => onFieldSelect(fieldType)}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      {fieldTypes.map((fieldType) => (
+        <Card
+          key={fieldType.type}
+          className="p-4 cursor-pointer hover:shadow-md transition-shadow border-2 hover:border-blue-500"
+          onClick={() => onFieldSelect(fieldType)}
+        >
+          <div className="flex items-center space-x-3">
+            <div 
+              className="p-2 rounded-lg"
+              style={{ backgroundColor: `${primaryColor}20` }}
             >
-              <div className="flex items-center space-x-3">
-                <div className="flex-shrink-0">
-                  <Icon className="h-6 w-6" style={{ color: primaryColor }} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 
-                    className="text-sm font-medium truncate"
-                    style={{ color: 'var(--color-text-primary, #1F2937)' }}
-                  >
-                    {fieldType.label}
-                  </h3>
-                  <p 
-                    className="text-xs truncate"
-                    style={{ color: 'var(--color-text-secondary, #6B7280)' }}
-                  >
-                    {fieldType.description}
-                  </p>
-                </div>
+              <div style={{ color: primaryColor }}>
+                {getIconComponent(fieldType.icon)}
               </div>
-            </Card>
-          );
-        })}
-      </div>
+            </div>
+            <div className="flex-1">
+              <h4 className="font-medium text-sm">{fieldType.label}</h4>
+              <p className="text-xs text-gray-500">{fieldType.description}</p>
+            </div>
+          </div>
+        </Card>
+      ))}
     </div>
   );
-} 
+};
+
+export default FormFieldTypes;

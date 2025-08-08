@@ -30,14 +30,14 @@ export async function generateMetadata(): Promise<Metadata> {
     console.warn('Failed to fetch site settings for metadata:', error);
   }
 
-  const companyName = siteSettings?.footerCompanyName || 'Your Company';
-  const companyDescription = siteSettings?.footerCompanyDescription || 'Your company description and value proposition.';
+  const companyName = siteSettings?.footerCompanyName || 'SaaS Admin Panel';
+  const companyDescription = siteSettings?.footerCompanyDescription || 'Admin panel for SaaS platform management.';
   const baseUrl = siteSettings?.baseUrl || 'https://yourcompany.com';
 
   return {
-    title: `${companyName} - ${companyDescription}`,
+    title: `${companyName} - Admin Panel`,
     description: companyDescription,
-    keywords: "your, company, keywords",
+    keywords: "admin, panel, saas, management",
     authors: [{ name: companyName }],
     creator: companyName,
     publisher: companyName,
@@ -51,7 +51,7 @@ export async function generateMetadata(): Promise<Metadata> {
       canonical: "/",
     },
     openGraph: {
-      title: `${companyName} - ${companyDescription}`,
+      title: `${companyName} - Admin Panel`,
       description: companyDescription,
       url: baseUrl,
       siteName: companyName,
@@ -60,7 +60,7 @@ export async function generateMetadata(): Promise<Metadata> {
           url: "/og-image.jpg",
           width: 1200,
           height: 630,
-          alt: `${companyName} - ${companyDescription}`,
+          alt: `${companyName} - Admin Panel`,
         },
       ],
       locale: "en_US",
@@ -68,17 +68,17 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     twitter: {
       card: "summary_large_image",
-      title: `${companyName} - ${companyDescription}`,
+      title: `${companyName} - Admin Panel`,
       description: companyDescription,
       images: ["/og-image.jpg"],
       creator: "@yourcompany",
     },
     robots: {
-      index: true,
-      follow: true,
+      index: false, // Don't index admin panel
+      follow: false,
       googleBot: {
-        index: true,
-        follow: true,
+        index: false,
+        follow: false,
         "max-video-preview": -1,
         "max-image-preview": "large",
         "max-snippet": -1,

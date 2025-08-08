@@ -59,9 +59,9 @@ model SiteSettings {
   cloudinaryEnabled        Boolean  @default(false)
   cloudinaryUploadPreset   String?
   sidebarBackgroundColor   String?  @default("#1F2937")
-  sidebarTextColor         String?  @default("#E5E7EB")
-  sidebarSelectedColor     String?  @default("#FFFFFF")
   sidebarHoverColor        String?  @default("#D1D5DB")
+  sidebarSelectedColor     String?  @default("#FFFFFF")
+  sidebarTextColor         String?  @default("#E5E7EB")
 
   @@map("site_settings")
 }
@@ -633,32 +633,32 @@ model FAQ {
 }
 
 model FAQSection {
-  id                  Int                  @id @default(autoincrement())
-  name                String               @unique
-  heading             String
-  subheading          String?
-  heroTitle           String
-  heroSubtitle        String?
-  searchPlaceholder   String               @default("Enter your keyword here")
-  showHero            Boolean              @default(true)
-  showCategories      Boolean              @default(true)
-  backgroundColor     String               @default("#f8fafc")
-  heroBackgroundColor String               @default("#6366f1")
-  heroHeight          String               @default("80vh")
-  heroTitleColor      String?              @default("#FFFFFF")
-  heroSubtitleColor   String?              @default("#FFFFFF")
-  headingColor        String?              @default("#1F2937")
-  subheadingColor     String?              @default("#6B7280")
-  categoriesBackgroundColor String?         @default("#F9FAFB")
-  categoriesTextColor String?              @default("#6B7280")
-  questionsBackgroundColor String?         @default("#FFFFFF")
-  questionsTextColor  String?              @default("#1F2937")
-  answersTextColor    String?              @default("#6B7280")
-  isActive            Boolean              @default(true)
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  sectionCategories   FAQSectionCategory[]
-  pageSections        PageSection[]
+  id                        Int                  @id @default(autoincrement())
+  name                      String               @unique
+  heading                   String
+  subheading                String?
+  heroTitle                 String
+  heroSubtitle              String?
+  searchPlaceholder         String               @default("Enter your keyword here")
+  showHero                  Boolean              @default(true)
+  showCategories            Boolean              @default(true)
+  backgroundColor           String               @default("#f8fafc")
+  heroBackgroundColor       String               @default("#6366f1")
+  heroHeight                String               @default("80vh")
+  heroTitleColor            String?              @default("#FFFFFF")
+  heroSubtitleColor         String?              @default("#FFFFFF")
+  headingColor              String?              @default("#1F2937")
+  subheadingColor           String?              @default("#6B7280")
+  categoriesBackgroundColor String?              @default("#F9FAFB")
+  categoriesTextColor       String?              @default("#6B7280")
+  questionsBackgroundColor  String?              @default("#FFFFFF")
+  questionsTextColor        String?              @default("#1F2937")
+  answersTextColor          String?              @default("#6B7280")
+  isActive                  Boolean              @default(true)
+  createdAt                 DateTime             @default(now())
+  updatedAt                 DateTime             @updatedAt
+  sectionCategories         FAQSectionCategory[]
+  pageSections              PageSection[]
 
   @@map("faq_sections")
 }

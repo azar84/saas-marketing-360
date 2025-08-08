@@ -4,5 +4,5 @@ import { permanentRedirect } from 'next/navigation';
 export const dynamic = 'force-dynamic';
 
 export default function RootPage() {
-  permanentRedirect('/home');
+  permanentRedirect('/admin-panel');
 }
