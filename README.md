@@ -1,21 +1,29 @@
-# SaaS Admin Panel Template
+# SaaS Marketing 360
 
-A clean, modern SaaS admin panel template built with Next.js, React, TypeScript, and Tailwind CSS. This template provides a solid foundation for building SaaS platforms with comprehensive admin functionality.
+A comprehensive SaaS marketing platform built with Next.js, React, TypeScript, and Tailwind CSS. This platform provides a complete solution for SaaS businesses to manage their marketing operations, customer relationships, and business growth.
 
 ## 🚀 Features
 
-### Core Admin Features
-- **Dashboard** - Overview with stats and quick actions
-- **Media Library** - File upload and management system
+### Core Marketing Features
+- **Dashboard** - Marketing analytics and performance overview
+- **Media Library** - Asset management for marketing materials
 - **Pricing Plans** - Configure and manage pricing tiers
 - **FAQ Management** - Create and manage FAQ content
-- **Forms Management** - Contact form configuration
-- **Newsletter Subscribers** - Email list management
-- **Script Installation** - Code injection for tracking
-- **User Management** - Admin user management
-- **Scheduler** - Task scheduling and automation
-- **Design System** - Color and styling management
-- **Site Settings** - General configuration
+- **Forms Management** - Lead capture and contact forms
+- **Newsletter Subscribers** - Email marketing and list management
+- **Script Installation** - Marketing tracking and analytics
+- **User Management** - Team and customer management
+- **Scheduler** - Marketing campaign automation
+- **Design System** - Brand consistency and styling
+- **Site Settings** - Platform configuration
+
+### Marketing-Specific Capabilities
+- **Lead Management** - Capture and nurture leads
+- **Campaign Tracking** - Monitor marketing campaign performance
+- **Customer Segmentation** - Organize and target customers
+- **Content Management** - Manage marketing content and assets
+- **Analytics Integration** - Track marketing metrics
+- **Automation Tools** - Marketing workflow automation
 
 ### Technical Features
 - **Authentication** - JWT-based login system
@@ -38,8 +46,8 @@ A clean, modern SaaS admin panel template built with Next.js, React, TypeScript,
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/azar84/saas-admin-new.git
-   cd saas-admin-new
+   git clone https://github.com/azar84/saas-marketing-360.git
+   cd saas-marketing-360
    ```
 
 2. **Install dependencies**
@@ -54,7 +62,7 @@ A clean, modern SaaS admin panel template built with Next.js, React, TypeScript,
    
    Configure your `.env` file:
    ```env
-   DATABASE_URL="postgresql://username:password@localhost:5432/saas_admin"
+   DATABASE_URL="postgresql://username:password@localhost:5432/saas_marketing"
    JWT_SECRET="your-secret-key"
    ```
 
@@ -77,7 +85,7 @@ A clean, modern SaaS admin panel template built with Next.js, React, TypeScript,
 ## 🏗️ Project Structure
 
 ```
-saas-admin-new/
+saas-marketing-360/
 ├── src/
 │   ├── app/
 │   │   ├── admin-panel/          # Admin panel pages
@@ -100,7 +108,7 @@ saas-admin-new/
 ## 🔧 Configuration
 
 ### Design System
-The admin panel uses a dynamic design system that can be customized through the Design System manager:
+The platform uses a dynamic design system that can be customized through the Design System manager:
 
 - **Primary Colors** - Main brand colors
 - **Secondary Colors** - Supporting colors
@@ -130,7 +138,7 @@ The project uses Prisma with PostgreSQL. Key models include:
 
 ## 📝 Usage
 
-### Adding New Features
+### Adding New Marketing Features
 1. Create components in `src/app/admin-panel/components/`
 2. Add API routes in `src/app/api/admin/`
 3. Update navigation in `src/app/admin-panel/page.tsx`
@@ -141,6 +149,28 @@ The project uses Prisma with PostgreSQL. Key models include:
 - **Layout**: Modify `src/app/admin-panel/page.tsx`
 - **Authentication**: Update `src/hooks/useAuth.ts`
 - **Database**: Modify `prisma/schema.prisma`
+
+## 🎯 Marketing Use Cases
+
+### Lead Generation
+- Capture leads through contact forms
+- Manage lead lists and segmentation
+- Track lead sources and conversion rates
+
+### Content Marketing
+- Manage marketing content and assets
+- Organize media library for campaigns
+- Create and manage FAQ content
+
+### Customer Management
+- Manage customer subscriptions
+- Track customer interactions
+- Handle customer support requests
+
+### Campaign Management
+- Schedule marketing campaigns
+- Track campaign performance
+- Automate marketing workflows
 
 ## 🤝 Contributing
 
@@ -163,7 +193,7 @@ For support and questions:
 
 ## 🔄 Recent Changes
 
-This template was created by cleaning up a full CMS system to focus only on admin panel functionality. See `ADMIN_PANEL_CLEANUP_SUMMARY.md` for detailed information about what was removed and what remains.
+This platform was created by adapting a comprehensive CMS system into a focused SaaS marketing solution. See `ADMIN_PANEL_CLEANUP_SUMMARY.md` for detailed information about the evolution.
 
 ---
 

@@ -1,6 +1,6 @@
 {
-  "name": "saas-cms",
-  "version": "0.1.0",
+  "name": "saas-marketing-360",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
@@ -87,9 +87,10 @@
     "typescript",
     "tailwindcss",
     "saas",
-    "cms",
-    "website-builder"
+    "marketing",
+    "crm",
+    "lead-management"
   ],
   "author": "Your Name",
-  "description": "SaaS CMS with Next.js and PostgreSQL"
+  "description": "Comprehensive SaaS marketing platform with Next.js and PostgreSQL"
 }
