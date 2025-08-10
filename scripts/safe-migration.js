@@ -78,14 +78,10 @@ async function safeMigration() {
     for (const table of criticalTables) {
       try {
         const result = await prisma.$queryRaw`
-          SELECT EXISTS (
-            SELECT FROM information_schema.tables 
-            WHERE table_schema = 'public' 
-            AND table_name = ${table}
-          ) as exists
+          SELECT name FROM sqlite_master WHERE type='table' AND name=${table}
         `;
         
-        const exists = result[0].exists;
+        const exists = result.length > 0;
         console.log(`   ${exists ? '✅' : '❌'} ${table}`);
         
         if (!exists) {

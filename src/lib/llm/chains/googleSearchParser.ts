@@ -23,6 +23,12 @@ export const GoogleSearchOutputSchema = z.object({
     isCompanyWebsite: z.boolean(), // True if it's a company website, false if directory/form
     confidence: z.number().min(0).max(1), // Confidence score 0-1
     extractedFrom: z.string(), // Which field the company name was extracted from
+    // Geographic information
+    city: z.string().optional(),
+    stateProvince: z.string().optional(),
+    country: z.string().optional(),
+    // Industry information
+    industry: z.string().optional(),
     rawData: z.object({
       title: z.string(),
       link: z.string(),
@@ -51,7 +57,9 @@ function buildPrompt(searchResults: any[], industry?: string, location?: string)
 Your task is to analyze the provided Google search results and determine:
 1. Which URLs are actual company websites (vs directories, forms, or aggregators)
 2. Extract the business name from each company website
-3. Return the base URL (domain) for each company website
+3. Extract geographic information (city, state/province, country) when available
+4. Identify the industry or business type
+5. Return the base URL (domain) for each company website
 
 Industry Context: ${industry || 'Not specified'}
 Location Context: ${location || 'Not specified'}
@@ -64,6 +72,8 @@ Analysis Rules:
 - Directories/aggregators often have multiple company listings, generic titles like "Best [Service] in [Location]"
 - Forms/lead generation pages usually have URLs with "contact", "quote", "request" or similar patterns
 - Extract company names from titles, avoiding generic words like "Best", "Top", "Leading"
+- Extract geographic information from titles, snippets, or URLs when available
+- Identify industry/business type from service descriptions, company names, or context
 - Return base URLs without protocols (e.g., "example.com" not "https://example.com")
 - Assign confidence scores based on clarity of business identification
 
@@ -76,6 +86,10 @@ Return ONLY valid JSON with this exact structure:
       "isCompanyWebsite": true,
       "confidence": 0.9,
       "extractedFrom": "title",
+      "city": "City Name",
+      "stateProvince": "State/Province Name",
+      "country": "Country Name",
+      "industry": "Industry Type",
       "rawData": {
         "title": "Original Title",
         "link": "Original URL",

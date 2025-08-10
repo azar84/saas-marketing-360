@@ -16,6 +16,9 @@ export async function POST(request: NextRequest) {
       searchResults, 
       industry, 
       location, 
+      city,
+      stateProvince,
+      country,
       minConfidence = 0.7,
       dryRun = false 
     } = body;
@@ -35,6 +38,9 @@ export async function POST(request: NextRequest) {
     const result = await processAndSaveSearchResults(searchResults, {
       industry,
       location,
+      city,
+      stateProvince,
+      country,
       minConfidence,
       dryRun
     });
@@ -47,7 +53,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Get the actual business classification data from the chain
-    let chainBusinesses = [];
+    let chainBusinesses: any[] = [];
     if (result.chainProcessing) {
       try {
         // Import the chain to get the raw classification data

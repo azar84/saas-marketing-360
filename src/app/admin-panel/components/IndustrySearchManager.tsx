@@ -160,6 +160,10 @@ export default function IndustrySearchManager() {
   const [extractionInProgress, setExtractionInProgress] = useState(false);
   const [extractionResults, setExtractionResults] = useState<Record<string, BusinessExtractionResult>>({});
   const [savedBusinesses, setSavedBusinesses] = useState<Set<string>>(new Set());
+  const [saveToDirectory, setSaveToDirectory] = useState(true); // Default to saving to directory
+  const [processingAllPages, setProcessingAllPages] = useState(false); // Track if processing all pages
+  const [allPagesProgress, setAllPagesProgress] = useState({ current: 0, total: 0, processed: 0 }); // Progress tracking
+  const [successMessage, setSuccessMessage] = useState<string | null>(null); // Success message display
   
   // Configuration state
   const [config, setConfig] = useState<SearchEngineConfig>({
@@ -405,6 +409,7 @@ export default function IndustrySearchManager() {
 
     setIsLoading(true);
     setError(null);
+    setSuccessMessage(null); // Clear any previous success messages
     setSearchResults([]);
     setCurrentPage(page);
     
@@ -467,6 +472,7 @@ export default function IndustrySearchManager() {
         setPagination(data.pagination);
         const results = parseInt(data.totalResults.toString()) || data.results.length || 0;
         setTotalResults(results);
+        return data; // Return the full response for processing
       } else {
         throw new Error(data.message || 'Search failed');
       }
@@ -479,6 +485,7 @@ export default function IndustrySearchManager() {
         setError(err.message || 'An error occurred during search');
       }
       setPagination(null);
+      return null; // Return null on error
     } finally {
       setIsLoading(false);
       setAbortController(null);
@@ -512,6 +519,8 @@ export default function IndustrySearchManager() {
     setSearchResults(prev => prev.map(r => 
       r === result ? { ...r, isProcessing: true, extractionError: undefined } : r
     ));
+    setError(null);
+    setSuccessMessage(null); // Clear any previous success messages
 
     try {
       const response = await fetch('/api/admin/llm/run', {
@@ -591,8 +600,11 @@ export default function IndustrySearchManager() {
           searchResults: [transformedResult],
           industry: selectedIndustry?.title,
           location: selectedCity?.name,
+          city: selectedCity?.name,
+          stateProvince: selectedCity?.state?.name,
+          country: selectedCity?.country?.name,
           minConfidence: 0.7,
-          dryRun: false
+          dryRun: !saveToDirectory // Use the saveToDirectory state
         })
       });
 
@@ -601,9 +613,16 @@ export default function IndustrySearchManager() {
       if (data.success) {
         setSavedBusinesses(prev => new Set([...prev, result.url]));
         console.log('✅ Business saved to directory successfully');
-        // Show success message or update UI
+        
+        // Show success message
+        if (saveToDirectory) {
+          setSuccessMessage(`Business "${result.businessExtraction?.businessName || result.title}" saved to business directory successfully!`);
+        } else {
+          setSuccessMessage(`Business "${result.businessExtraction?.businessName || result.title}" processed (dry run mode - no data saved)`);
+        }
       } else {
         console.error('❌ Failed to save business:', data.error);
+        setError(`Failed to save business: ${data.error}`);
       }
     } catch (error) {
       console.error('❌ Failed to save business:', error);
@@ -630,6 +649,7 @@ export default function IndustrySearchManager() {
 
     setExtractionInProgress(true);
     setError(null); // Clear any previous errors
+    setSuccessMessage(null); // Clear any previous success messages
     
     try {
       // Transform search results to match our API format
@@ -650,8 +670,11 @@ export default function IndustrySearchManager() {
           searchResults: transformedResults,
           industry: selectedIndustry?.title,
           location: selectedCity?.name,
+          city: selectedCity?.name,
+          stateProvince: selectedCity?.state?.name,
+          country: selectedCity?.country?.name,
           minConfidence: 0.7,
-          dryRun: true
+          dryRun: !saveToDirectory // Use the saveToDirectory state
         })
       });
 
@@ -722,6 +745,14 @@ export default function IndustrySearchManager() {
           console.log('📊 No extraction results to display');
           setExtractionResults({});
         }
+
+        // Show success message based on mode
+        if (saveToDirectory) {
+          setError(null);
+          setSuccessMessage(`Successfully processed and saved ${data.data.businesses.length} businesses to the business directory!`);
+        } else {
+          setSuccessMessage(`Successfully processed ${data.data.businesses.length} businesses (dry run mode - no data saved)`);
+        }
       } else {
         console.error('❌ Extraction failed:', data);
         setError(data.error || 'Failed to extract business information');
@@ -731,6 +762,159 @@ export default function IndustrySearchManager() {
       setError(`Failed to extract business information: ${error instanceof Error ? error.message : 'Unknown error'}`);
     } finally {
       setExtractionInProgress(false);
+    }
+  };
+
+  /**
+   * Process all pages of search results and extract businesses
+   * This will fetch all available pages and process them sequentially
+   */
+  const processAllPages = async () => {
+    if (processingAllPages || !pagination) {
+      console.log('⚠️ Already processing all pages or no pagination info');
+      return;
+    }
+
+    if (pagination.totalPages <= 1) {
+      console.log('ℹ️ Only one page, using regular extraction');
+      await extractAllBusinesses();
+      return;
+    }
+
+    setProcessingAllPages(true);
+    setAllPagesProgress({ current: 1, total: pagination.totalPages, processed: 0 });
+    setError(null);
+    setSuccessMessage(null); // Clear any previous success messages
+
+    try {
+      console.log(`🚀 Starting to process all ${pagination.totalPages} pages`);
+      
+      const allResults: EnhancedSearchResult[] = [];
+      let totalProcessed = 0;
+      let totalBusinesses = 0;
+
+      // Process each page
+      for (let page = 1; page <= pagination.totalPages; page++) {
+        setAllPagesProgress(prev => ({ ...prev, current: page }));
+        
+        console.log(`📄 Processing page ${page}/${pagination.totalPages}`);
+        
+        // Fetch the page
+        const pageResults = await performSearch(page);
+        if (pageResults && pageResults.success) {
+          allResults.push(...pageResults.results);
+          totalProcessed += pageResults.results.length;
+          
+          console.log(`✅ Page ${page}: ${pageResults.results.length} results`);
+        } else {
+          console.warn(`⚠️ Page ${page} failed or returned no results`);
+        }
+      }
+
+      console.log(`📊 Total results collected: ${totalProcessed}`);
+
+      // Now process all collected results through the business extraction
+      if (allResults.length > 0) {
+        setSearchResults(allResults);
+        
+        // Transform all results for API processing
+        const transformedResults = allResults.map(result => ({
+          title: result.title,
+          link: result.url,
+          snippet: result.description,
+          displayLink: result.displayUrl
+        }));
+
+        console.log(`🔍 Processing ${transformedResults.length} total results through business extraction`);
+
+        const response = await fetch('/api/admin/industry-search/process-results', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            searchResults: transformedResults,
+            industry: selectedIndustry?.title,
+            location: selectedCity?.name,
+            city: selectedCity?.name,
+            stateProvince: selectedCity?.state?.name,
+            country: selectedCity?.country?.name,
+            minConfidence: 0.7,
+            dryRun: !saveToDirectory
+          })
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        if (data.success && data.data) {
+          // Transform and display results similar to extractAllBusinesses
+          if (data.data.businesses && Array.isArray(data.data.businesses)) {
+            const transformedExtractions = data.data.businesses.map((business: any) => ({
+              isCompany: business.isCompanyWebsite,
+              businessName: business.companyName,
+              baseUrl: business.website,
+              confidence: business.confidence,
+              reasoning: `Extracted from ${business.extractedFrom}`,
+              extractedData: {
+                companyName: business.companyName,
+                website: business.website,
+                description: business.rawData?.snippet,
+                industry: selectedIndustry?.title,
+                location: selectedCity?.name
+              }
+            }));
+
+            // Update results with extraction data
+            setSearchResults(prev => prev.map(result => {
+              const extraction = transformedExtractions.find((e: any) => e.baseUrl === result.url);
+              return {
+                ...result,
+                businessExtraction: extraction || {
+                  isCompany: false,
+                  confidence: 0,
+                  baseUrl: result.url,
+                  businessName: undefined,
+                  reasoning: 'No extraction data available',
+                  extractedData: undefined
+                },
+                isExpanded: false
+              };
+            }));
+
+            // Set extraction results
+            const extractionResultsMap = transformedExtractions.reduce((acc: any, extraction: any) => {
+              if (extraction.baseUrl) {
+                acc[extraction.baseUrl] = extraction;
+              }
+              return acc;
+            }, {});
+
+            setExtractionResults(extractionResultsMap);
+            totalBusinesses = transformedExtractions.length;
+            
+            console.log(`🎉 Successfully processed all pages: ${totalBusinesses} businesses extracted`);
+            
+            // Show success message
+            if (saveToDirectory) {
+              setSuccessMessage(`Successfully processed all ${pagination.totalPages} pages and saved ${totalBusinesses} businesses to the business directory!`);
+            } else {
+              setSuccessMessage(`Successfully processed all ${pagination.totalPages} pages and extracted ${totalBusinesses} businesses (dry run mode - no data saved)`);
+            }
+          }
+        } else {
+          throw new Error(data.error || 'Business extraction failed');
+        }
+      }
+
+      setAllPagesProgress({ current: pagination.totalPages, total: pagination.totalPages, processed: totalProcessed });
+
+    } catch (error) {
+      console.error('❌ Failed to process all pages:', error);
+      setError(`Failed to process all pages: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setProcessingAllPages(false);
     }
   };
 
@@ -1193,6 +1377,28 @@ export default function IndustrySearchManager() {
         </div>
       </div>
 
+      {/* Success Message */}
+      {successMessage && (
+        <div className="mb-4 p-4 rounded-lg border-2" style={{
+          backgroundColor: 'var(--color-success-light)',
+          borderColor: 'var(--color-success)',
+          color: 'var(--color-success-dark)'
+        }}>
+          <div className="flex items-center gap-2">
+            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-success)' }}>
+              <span className="text-white text-sm font-bold">✓</span>
+            </div>
+            <span className="font-medium">{successMessage}</span>
+            <button
+              onClick={() => setSuccessMessage(null)}
+              className="ml-auto text-sm opacity-75 hover:opacity-100"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Error Display */}
       {error && (
         <div className="p-4 rounded-lg border" style={{ 
@@ -1272,6 +1478,47 @@ export default function IndustrySearchManager() {
               </div>
               
               <div className="flex gap-2">
+                {/* Business Directory Save Toggle */}
+                <div className="flex items-center gap-3 mr-4">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      id="saveToDirectory"
+                      checked={saveToDirectory}
+                      onChange={(e) => setSaveToDirectory(e.target.checked)}
+                      className="w-4 h-4"
+                    />
+                    <label htmlFor="saveToDirectory" className="text-sm font-medium">
+                      Save to Business Directory
+                    </label>
+                    <span className="text-xs px-2 py-1 rounded-full" style={{
+                      backgroundColor: saveToDirectory ? 'var(--color-success-light)' : 'var(--color-warning-light)',
+                      color: saveToDirectory ? 'var(--color-success-dark)' : 'var(--color-warning-dark)'
+                    }}>
+                      {saveToDirectory ? 'Live Save' : 'Dry Run'}
+                    </span>
+                  </div>
+                </div>
+                
+                <Button
+                  variant="outline"
+                  onClick={processAllPages}
+                  disabled={processingAllPages || searchResults.length === 0 || !pagination}
+                  className="flex items-center gap-2"
+                >
+                  {processingAllPages ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                      Processing All Pages...
+                    </>
+                  ) : (
+                    <>
+                      <Info className="h-4 w-4" />
+                      Process All Pages
+                    </>
+                  )}
+                </Button>
+
                 <Button
                   variant="outline"
                   onClick={extractAllBusinesses}
@@ -1291,6 +1538,67 @@ export default function IndustrySearchManager() {
                   )}
                 </Button>
               </div>
+              
+              {/* Processing Mode Information */}
+              <div className="mt-3 p-3 rounded-lg text-sm" style={{
+                backgroundColor: 'var(--color-bg-secondary)',
+                border: '1px solid var(--color-gray-light)'
+              }}>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0">
+                    <Info className="h-4 w-4 mt-0.5" style={{ color: 'var(--color-primary)' }} />
+                  </div>
+                  <div>
+                    <p className="font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>
+                      Processing Mode: {saveToDirectory ? 'Live Save' : 'Dry Run'}
+                    </p>
+                    <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                      <strong>Live Save (Default):</strong> Process, classify, and save valid businesses to the business directory. 
+                      <strong>Dry Run:</strong> Process and classify businesses without saving to database (for testing).
+                    </p>
+                    <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+                      <strong>Note:</strong> Currently processing {searchResults.length} results from page {pagination?.currentPage || 1}. 
+                      To process all {totalResults} results, use the "Process All Pages" button above.
+                    </p>
+                  </div>
+                </div>
+              </div>
+              
+              {/* All Pages Progress Indicator */}
+              {processingAllPages && (
+                <div className="mt-3 p-3 rounded-lg" style={{
+                  backgroundColor: 'var(--color-bg-secondary)',
+                  border: '1px solid var(--color-primary)'
+                }}>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-shrink-0">
+                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" style={{ color: 'var(--color-primary)' }}></div>
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center mb-2">
+                        <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                          Processing All Pages
+                        </span>
+                        <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                          {allPagesProgress.current} / {allPagesProgress.total}
+                        </span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2" style={{ backgroundColor: 'var(--color-gray-light)' }}>
+                        <div 
+                          className="h-2 rounded-full transition-all duration-300" 
+                          style={{ 
+                            backgroundColor: 'var(--color-primary)',
+                            width: `${(allPagesProgress.current / allPagesProgress.total) * 100}%`
+                          }}
+                        ></div>
+                      </div>
+                      <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+                        Page {allPagesProgress.current} of {allPagesProgress.total} • {allPagesProgress.processed} results collected
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
           

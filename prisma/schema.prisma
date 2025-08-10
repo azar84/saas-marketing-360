@@ -1454,6 +1454,7 @@ model Industry {
 
   // Relations
   keywords  Keyword[]
+  businesses BusinessIndustry[] // Many-to-many relationship with businesses
 
   @@map("industries")
 }
@@ -1492,6 +1493,7 @@ model BusinessDirectory {
   companyName     String?
   city            String?
   stateProvince   String?
+  country         String?  // Added country field
   phoneNumber     String?
   email           String?
   employeesCount  Int?
@@ -1502,12 +1504,35 @@ model BusinessDirectory {
   
   // Relations
   contactPerson   ContactPerson? @relation(fields: [contactPersonId], references: [id])
+  industries      BusinessIndustry[] // Many-to-many relationship with industries
 
   @@unique([website]) // Prevent duplicate websites
   @@index([city])
   @@index([stateProvince])
+  @@index([country])
   @@index([isActive])
   @@map("business_directory")
+}
+
+// ===================================
+// BUSINESS-INDUSTRY JUNCTION TABLE
+// ===================================
+
+model BusinessIndustry {
+  id              Int      @id @default(autoincrement())
+  businessId      Int
+  industryId      Int
+  isPrimary       Boolean  @default(false) // Mark primary industry
+  createdAt       DateTime @default(now())
+  
+  // Relations
+  business        BusinessDirectory @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  industry        Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  
+  @@unique([businessId, industryId]) // Prevent duplicate relationships
+  @@index([businessId])
+  @@index([industryId])
+  @@map("business_industries")
 }
 
 model ContactPerson {

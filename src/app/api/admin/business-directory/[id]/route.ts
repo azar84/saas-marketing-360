@@ -29,6 +29,16 @@ export async function GET(
             email: true,
             phone: true
           }
+        },
+        industries: {
+          include: {
+            industry: {
+              select: {
+                id: true,
+                label: true
+              }
+            }
+          }
         }
       }
     });
@@ -71,7 +81,7 @@ export async function PUT(
     }
 
     const body = await request.json();
-    const { website, companyName, city, stateProvince, phoneNumber, email, employeesCount, contactPersonId, isActive } = body;
+    const { website, companyName, city, stateProvince, country, phoneNumber, email, employeesCount, contactPersonId, isActive } = body;
 
     // Check if business exists
     const existingBusiness = await prisma.businessDirectory.findUnique({
@@ -107,6 +117,7 @@ export async function PUT(
         companyName,
         city,
         stateProvince,
+        country,
         phoneNumber,
         email,
         employeesCount: employeesCount ? parseInt(employeesCount) : null,

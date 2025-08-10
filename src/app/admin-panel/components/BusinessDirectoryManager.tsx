@@ -34,6 +34,7 @@ interface BusinessDirectory {
   companyName?: string;
   city?: string;
   stateProvince?: string;
+  country?: string;
   phoneNumber?: string;
   email?: string;
   employeesCount?: number;
@@ -42,6 +43,19 @@ interface BusinessDirectory {
   createdAt: string;
   updatedAt: string;
   contactPerson?: ContactPerson;
+  industries?: BusinessIndustry[];
+}
+
+interface BusinessIndustry {
+  id: number;
+  businessId: number;
+  industryId: number;
+  isPrimary: boolean;
+  createdAt: string;
+  industry: {
+    id: number;
+    label: string;
+  };
 }
 
 interface ContactPerson {
@@ -108,6 +122,7 @@ export default function BusinessDirectoryManager() {
     companyName: '',
     city: '',
     stateProvince: '',
+    country: '',
     phoneNumber: '',
     email: '',
     employeesCount: '',
@@ -209,6 +224,7 @@ export default function BusinessDirectoryManager() {
       companyName: business.companyName || '',
       city: business.city || '',
       stateProvince: business.stateProvince || '',
+      country: business.country || '',
       phoneNumber: business.phoneNumber || '',
       email: business.email || '',
       employeesCount: business.employeesCount?.toString() || '',
@@ -271,6 +287,7 @@ export default function BusinessDirectoryManager() {
       companyName: '',
       city: '',
       stateProvince: '',
+      country: '',
       phoneNumber: '',
       email: '',
       employeesCount: '',
@@ -314,15 +331,17 @@ export default function BusinessDirectoryManager() {
   };
 
   const generateCSV = (data: BusinessDirectory[]) => {
-    const headers = ['Company Name', 'Website', 'City', 'State/Province', 'Phone', 'Email', 'Employees', 'Status', 'Created At'];
+    const headers = ['Company Name', 'Website', 'City', 'State/Province', 'Country', 'Phone', 'Email', 'Employees', 'Industries', 'Status', 'Created At'];
     const rows = data.map(business => [
       business.companyName || '',
       business.website || '',
       business.city || '',
       business.stateProvince || '',
+      business.country || '',
       business.phoneNumber || '',
       business.email || '',
       business.employeesCount || '',
+      business.industries?.map(bi => bi.industry.label).join('; ') || '',
       business.isActive ? 'Active' : 'Inactive',
       new Date(business.createdAt).toLocaleDateString()
     ]);
@@ -353,7 +372,8 @@ export default function BusinessDirectoryManager() {
       business.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       business.website.toLowerCase().includes(searchTerm.toLowerCase()) ||
       business.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      business.stateProvince?.toLowerCase().includes(searchTerm.toLowerCase());
+      business.stateProvince?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      business.country?.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesFilter = filterActive ? business.isActive : true;
     
@@ -563,7 +583,7 @@ export default function BusinessDirectoryManager() {
                               <div className="flex items-center gap-2">
                                 <Globe className="h-4 w-4 text-gray-400" />
                                 <a 
-                                  href={business.website} 
+                                  href={business.website.startsWith('http') ? business.website : `https://${business.website}`} 
                                   target="_blank" 
                                   rel="noopener noreferrer"
                                   className="text-blue-600 hover:underline"
@@ -571,10 +591,12 @@ export default function BusinessDirectoryManager() {
                                   {business.website}
                                 </a>
                               </div>
-                              {business.city && business.stateProvince && (
+                              {(business.city || business.stateProvince || business.country) && (
                                 <div className="flex items-center gap-2">
                                   <MapPin className="h-4 w-4 text-gray-400" />
-                                  <span>{business.city}, {business.stateProvince}</span>
+                                  <span>
+                                    {[business.city, business.stateProvince, business.country].filter(Boolean).join(', ')}
+                                  </span>
                                 </div>
                               )}
                             </div>
@@ -607,6 +629,26 @@ export default function BusinessDirectoryManager() {
                                 <strong>Contact:</strong> {business.contactPerson.firstName} {business.contactPerson.lastName}
                                 {business.contactPerson.title && ` - ${business.contactPerson.title}`}
                               </p>
+                            </div>
+                          )}
+                          
+                          {business.industries && business.industries.length > 0 && (
+                            <div className="mt-3 p-2 rounded bg-blue-50">
+                              <p className="text-sm text-blue-800 mb-2">
+                                <strong>Industries:</strong>
+                              </p>
+                              <div className="flex flex-wrap gap-2">
+                                {business.industries.map((businessIndustry) => (
+                                  <Badge 
+                                    key={businessIndustry.id} 
+                                    variant={businessIndustry.isPrimary ? 'default' : 'secondary'}
+                                    className="text-xs"
+                                  >
+                                    {businessIndustry.industry.label}
+                                    {businessIndustry.isPrimary && ' (Primary)'}
+                                  </Badge>
+                                ))}
+                              </div>
                             </div>
                           )}
                         </div>
@@ -870,6 +912,15 @@ export default function BusinessDirectoryManager() {
                     value={businessForm.stateProvince}
                     onChange={(e) => setBusinessForm(prev => ({ ...prev, stateProvince: e.target.value }))}
                     placeholder="State/Province"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Country</label>
+                  <Input
+                    type="text"
+                    value={businessForm.country}
+                    onChange={(e) => setBusinessForm(prev => ({ ...prev, country: e.target.value }))}
+                    placeholder="Country"
                   />
                 </div>
                 <div>

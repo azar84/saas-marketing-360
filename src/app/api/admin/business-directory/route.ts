@@ -55,6 +55,16 @@ export async function GET(request: NextRequest) {
             email: true,
             phone: true
           }
+        },
+        industries: {
+          include: {
+            industry: {
+              select: {
+                id: true,
+                label: true
+              }
+            }
+          }
         }
       },
       orderBy: { createdAt: 'desc' },
@@ -89,7 +99,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { website, companyName, city, stateProvince, phoneNumber, email, employeesCount, contactPersonId } = body;
+    const { website, companyName, city, stateProvince, country, phoneNumber, email, employeesCount, contactPersonId } = body;
 
     // Validate required field
     if (!website) {
@@ -118,6 +128,7 @@ export async function POST(request: NextRequest) {
         companyName,
         city,
         stateProvince,
+        country,
         phoneNumber,
         email,
         employeesCount: employeesCount ? parseInt(employeesCount) : null,
