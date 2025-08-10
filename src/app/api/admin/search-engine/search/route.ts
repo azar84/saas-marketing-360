@@ -12,7 +12,10 @@ export async function POST(request: Request) {
       searchEngineId, 
       resultsLimit = '10',
       filters = {},
-      page = '1'
+      page = '1',
+      // Add date filtering options
+      maxAgeDays = 365, // Maximum age in days (default: 1 year)
+      requireDateFiltering = true // Whether to enforce date filtering
     } = body;
 
     // Support both single query and multiple queries
@@ -42,7 +45,9 @@ export async function POST(request: Request) {
       apiKey: apiKey ? '***' : 'missing',
       searchEngineId,
       resultsLimit: limit,
-      page: pageNumber
+      page: pageNumber,
+      maxAgeDays,
+      requireDateFiltering
     });
 
     // Process multiple queries in parallel for better performance
@@ -87,6 +92,15 @@ export async function POST(request: Request) {
         requestUrl.searchParams.append('key', apiKey);
         requestUrl.searchParams.append('cx', searchEngineId);
         requestUrl.searchParams.append('num', limit.toString());
+        
+        // Add date filtering if enabled
+        if (requireDateFiltering && maxAgeDays > 0) {
+          // Google CSE dateRestrict parameter supports various formats
+          // For maxAgeDays, we use the "d" suffix for days
+          const dateRestrict = `${maxAgeDays}d`;
+          requestUrl.searchParams.append('dateRestrict', dateRestrict);
+          console.log(`📅 Adding date restriction: ${dateRestrict} (max ${maxAgeDays} days old)`);
+        }
         
         if (pageNumber > 1) {
           const startIndex = ((pageNumber - 1) * limit) + 1;
@@ -239,7 +253,12 @@ export async function POST(request: Request) {
               fullUrl: result.link || '',
               description: result.snippet || 'No description available',
               cacheId: result.cacheId || undefined,
-              query: currentQuery // Add the query that generated this result
+              query: currentQuery, // Add the query that generated this result
+              // Add date information if available from Google CSE
+              date: result.pagemap?.metatags?.[0]?.['article:published_time'] || 
+                    result.pagemap?.metatags?.[0]?.['date'] ||
+                    result.pagemap?.metatags?.[0]?.['og:updated_time'] ||
+                    undefined
             };
           });
 
@@ -320,7 +339,16 @@ export async function POST(request: Request) {
       filtersApplied: filters,
       pagination: combinedPagination,
       queriesProcessed: searchQueries.length,
-      successfulQueries: Object.values(queryResults).filter((q: any) => q.success).length
+      successfulQueries: Object.values(queryResults).filter((q: any) => q.success).length,
+      // Add date filtering information
+      dateFiltering: {
+        enabled: requireDateFiltering,
+        maxAgeDays: maxAgeDays,
+        dateRestrict: requireDateFiltering && maxAgeDays > 0 ? `${maxAgeDays}d` : undefined,
+        description: requireDateFiltering && maxAgeDays > 0 
+          ? `Results limited to content published within the last ${maxAgeDays} days`
+          : 'No date filtering applied'
+      }
     });
 
   } catch (error: any) {

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import ClientDesignSystemProvider from "./components/ClientDesignSystemProvider";
+import { NotificationProvider } from "@/components/providers/NotificationProvider";
 import "@/lib/llm/register";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -31,7 +32,9 @@ export default function AdminPanelLayout({
 }) {
   return (
     <ClientDesignSystemProvider>
-      {children}
+      <NotificationProvider>
+        {children}
+      </NotificationProvider>
     </ClientDesignSystemProvider>
   );
 } 

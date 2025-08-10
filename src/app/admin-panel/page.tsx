@@ -49,11 +49,14 @@ import KeywordsResult from './components/KeywordsResult';
 import SearchEngineManager from './components/SearchEngineManager';
 import IndustrySearchManager from './components/IndustrySearchManager';
 import BusinessDirectoryManager from './components/BusinessDirectoryManager';
+import { EnrichmentManager } from './components/EnrichmentManager';
+import { NotificationCenter } from '@/components/ui/NotificationCenter';
+import { useNotificationContext } from '@/components/providers/NotificationProvider';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'tech-discovery' | 'geographic-manager' | 'naics-manager' | 'search-engine' | 'industry-search' | 'business-directory';
+type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'tech-discovery' | 'geographic-manager' | 'naics-manager' | 'search-engine' | 'industry-search' | 'business-directory' | 'enrichment';
 
 // Navigation items with design system colors
 const getNavigationItems = (designSystem: any) => {
@@ -63,6 +66,7 @@ const getNavigationItems = (designSystem: any) => {
     { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard, color: colors.primary },
     { id: 'industry-search', name: 'Industry Search', icon: Building, color: colors.success },
     { id: 'business-directory', name: 'Business Directory', icon: Building, color: colors.warning },
+    { id: 'enrichment', name: 'Data Enrichment', icon: Zap, color: colors.info },
     { id: 'naics-manager', name: 'NAICS Industries', icon: BarChart3, color: colors.accent },
     { id: 'search-engine', name: 'Search Engine', icon: Search, color: colors.info },
     { id: 'tech-discovery', name: 'Tech Discovery', icon: Search, color: colors.accent },
@@ -105,6 +109,7 @@ export default function AdminPanel() {
   const router = useRouter();
   const { designSystem } = useDesignSystem();
   const { get } = useAdminApi();
+  const { notifications, dismissNotification, clearAllNotifications } = useNotificationContext();
   
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [showKeywordsResult, setShowKeywordsResult] = useState(false);
@@ -413,6 +418,15 @@ export default function AdminPanel() {
             style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
           >
             <BusinessDirectoryManager />
+          </div>
+        );
+      case 'enrichment':
+        return (
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
+            <EnrichmentManager />
           </div>
         );
       case 'dashboard':
@@ -783,6 +797,11 @@ export default function AdminPanel() {
           </div>
           
           <div className="flex items-center space-x-3">
+            <NotificationCenter 
+              notifications={notifications}
+              onDismiss={dismissNotification}
+              onClearAll={clearAllNotifications}
+            />
             <div className="flex items-center space-x-2">
               <div 
                 className="w-8 h-8 rounded-full flex items-center justify-center"
