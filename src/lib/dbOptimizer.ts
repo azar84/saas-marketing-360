@@ -139,19 +139,6 @@ export async function getHeaderConfig() {
       headerCTAs: {
         include: { cta: true },
         orderBy: { sortOrder: 'asc' }
-      },
-      menus: {
-        include: {
-          menu: {
-            include: {
-              items: {
-                include: { page: true, parent: true },
-                orderBy: { sortOrder: 'asc' }
-              }
-            }
-          }
-        },
-        orderBy: { sortOrder: 'asc' }
       }
     }
   });

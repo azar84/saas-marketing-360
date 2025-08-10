@@ -345,26 +345,32 @@ const MediaLibraryManager: React.FC<MediaLibraryManagerProps> = ({
                     : selectedItems[0]?.title || selectedItems[0]?.filename || 'item'}
                 </button>
               )}
-              {onClose && (
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="p-2.5 rounded-lg transition-colors"
-                  style={{ 
-                    color: '#ffffff',
-                    backgroundColor: 'transparent'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = 'transparent';
-                  }}
-                  title="Close"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={onClose || (() => {
+                  // If no onClose provided, try to go back or show a message
+                  if (window.history.length > 1) {
+                    window.history.back();
+                  } else {
+                    // Fallback: show an alert or console message
+                    console.log('Media Library close requested');
+                  }
+                })}
+                className="p-2.5 rounded-lg transition-colors border border-white/20"
+                style={{ 
+                  color: '#ffffff',
+                  backgroundColor: 'rgba(255, 255, 255, 0.05)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.05)';
+                }}
+                title="Close Media Library"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
           </div>
         </div>

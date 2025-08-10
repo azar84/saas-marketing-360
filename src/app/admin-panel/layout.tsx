@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { prisma } from "@/lib/db";
 import ClientDesignSystemProvider from "./components/ClientDesignSystemProvider";
+import "@/lib/llm/register";
 
 export async function generateMetadata(): Promise<Metadata> {
   // Fetch site settings for dynamic metadata

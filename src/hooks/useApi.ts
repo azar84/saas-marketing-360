@@ -13,8 +13,11 @@ export function useAdminApi() {
     url: string,
     options: RequestInit = {}
   ): Promise<T> => {
+    console.log('🔗 useApi: Starting API call to:', url);
     setLoading(true);
     try {
+      console.log('🔗 useApi: Making fetch request...');
+      
       const response = await fetch(url, {
         headers: {
           'Content-Type': 'application/json',
@@ -22,17 +25,23 @@ export function useAdminApi() {
         },
         ...options,
       });
+      
+      console.log('🔗 useApi: Fetch request completed');
+
+      console.log('🔗 useApi: Response status:', response.status);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const data = await response.json();
+      console.log('🔗 useApi: Response data received');
       return data;
     } catch (error) {
-      console.error('API call failed:', error);
+      console.error('🔗 useApi: API call failed:', error);
       throw error;
     } finally {
+      console.log('🔗 useApi: Setting loading to false');
       setLoading(false);
     }
   }, []);

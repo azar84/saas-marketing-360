@@ -24,26 +24,6 @@ export async function GET() {
             orderBy: {
               sortOrder: 'asc'
             }
-          },
-          menus: {
-            include: {
-              menu: {
-                include: {
-                  items: {
-                    include: {
-                      page: true,
-                      parent: true
-                    },
-                    orderBy: {
-                      sortOrder: 'asc'
-                    }
-                  }
-                }
-              }
-            },
-            orderBy: {
-              sortOrder: 'asc'
-            }
           }
         }
     });
@@ -100,13 +80,7 @@ export async function POST(request: NextRequest) {
             })) || []
           )
         },
-        menus: menuId ? {
-          create: [{
-            menuId: menuId,
-            sortOrder: 0,
-            isVisible: true
-          }]
-        } : undefined
+
       },
       include: {
         navItems: {
@@ -120,26 +94,6 @@ export async function POST(request: NextRequest) {
         headerCTAs: {
           include: {
             cta: true
-          },
-          orderBy: {
-            sortOrder: 'asc'
-          }
-        },
-        menus: {
-          include: {
-            menu: {
-              include: {
-                items: {
-                  include: {
-                    page: true,
-                    parent: true
-                  },
-                  orderBy: {
-                    sortOrder: 'asc'
-                  }
-                }
-              }
-            }
           },
           orderBy: {
             sortOrder: 'asc'
@@ -200,9 +154,7 @@ export async function PUT(request: NextRequest) {
       where: { headerConfigId: id }
     });
 
-    await prisma.headerConfigMenu.deleteMany({
-      where: { headerConfigId: id }
-    });
+
 
     // Update header config with new items
     const headerConfig = await prisma.headerConfig.update({
@@ -235,14 +187,7 @@ export async function PUT(request: NextRequest) {
               isVisible: true
             })) || []
           )
-        },
-        menus: menuId ? {
-          create: [{
-            menuId: menuId,
-            sortOrder: 0,
-            isVisible: true
-          }]
-        } : undefined
+        }
       },
       include: {
         navItems: {
@@ -256,26 +201,6 @@ export async function PUT(request: NextRequest) {
         headerCTAs: {
           include: {
             cta: true
-          },
-          orderBy: {
-            sortOrder: 'asc'
-          }
-        },
-        menus: {
-          include: {
-            menu: {
-              include: {
-                items: {
-                  include: {
-                    page: true,
-                    parent: true
-                  },
-                  orderBy: {
-                    sortOrder: 'asc'
-                  }
-                }
-              }
-            }
           },
           orderBy: {
             sortOrder: 'asc'

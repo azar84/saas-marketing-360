@@ -283,7 +283,7 @@ export default function NewsletterManager() {
             </select>
           </div>
           
-          <Button onClick={handleSearch} style={{ backgroundColor: getPrimaryColor() }}>
+          <Button onClick={handleSearch} variant="primary">
             Search
           </Button>
         </div>
