@@ -20,15 +20,15 @@ export const GoogleSearchOutputSchema = z.object({
   businesses: z.array(z.object({
     website: z.string(), // Base URL (e.g., "example.com")
     companyName: z.string().optional(),
-    isCompanyWebsite: z.boolean(), // True if it's a company website, false if directory/form
+    isCompanyWebsite: z.boolean(), // True if it's a company website, false if directory/forum
     confidence: z.number().min(0).max(1), // Confidence score 0-1
     extractedFrom: z.string(), // Which field the company name was extracted from
     // Geographic information
     city: z.string().optional(),
     stateProvince: z.string().optional(),
     country: z.string().optional(),
-    // Industry information
-    industry: z.string().optional(),
+    // Business categories - array of descriptive categories
+    categories: z.array(z.string()).optional(), // e.g., ["Fiberglass Installation", "Spray Foam Insulation", "Drywall Services"]
     rawData: z.object({
       title: z.string(),
       link: z.string(),
@@ -55,10 +55,10 @@ function buildPrompt(searchResults: any[], industry?: string, location?: string)
   return `You are a business intelligence analyst specializing in analyzing Google search results to identify company websites and extract business information.
 
 Your task is to analyze the provided Google search results and determine:
-1. Which URLs are actual company websites (vs directories, forms, or aggregators)
+1. Which URLs are actual company websites (vs directories, forums, or aggregators)
 2. Extract the business name from each company website
 3. Extract geographic information (city, state/province, country) when available
-4. Identify the industry or business type
+4. Identify and categorize the business services/industries in detail
 5. Return the base URL (domain) for each company website
 
 Industry Context: ${industry || 'Not specified'}
@@ -73,7 +73,12 @@ Analysis Rules:
 - Forms/lead generation pages usually have URLs with "contact", "quote", "request" or similar patterns
 - Extract company names from titles, avoiding generic words like "Best", "Top", "Leading"
 - Extract geographic information from titles, snippets, or URLs when available
-- Identify industry/business type from service descriptions, company names, or context
+- For business categories, be specific and descriptive:
+  * Instead of "Fiberglass", use "Fiberglass Installation" or "Fiberglass Supply"
+  * Instead of "Drywall", use "Drywall Installation" or "Drywall Contracting"
+  * Instead of "Spray Foam", use "Spray Foam Insulation" or "Spray Foam Application"
+  * Include service type (Installation, Supply, Contracting, Repair, etc.)
+  * Separate multiple categories as individual items in the array
 - Return base URLs without protocols (e.g., "example.com" not "https://example.com")
 - Assign confidence scores based on clarity of business identification
 
@@ -89,7 +94,7 @@ Return ONLY valid JSON with this exact structure:
       "city": "City Name",
       "stateProvince": "State/Province Name",
       "country": "Country Name",
-      "industry": "Industry Type",
+      "categories": ["Specific Service Type 1", "Specific Service Type 2"],
       "rawData": {
         "title": "Original Title",
         "link": "Original URL",

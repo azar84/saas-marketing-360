@@ -14,7 +14,7 @@ export interface BusinessDirectoryEntry {
   email?: string;
   employeesCount?: number;
   contactPersonId?: number;
-  industry?: string; // Added industry field for relationship creation
+  categories?: string[]; // Changed from industry to categories array
 }
 
 export interface SaveResult {
@@ -41,7 +41,7 @@ export interface SaveResult {
 /**
  * Create a business-industry relationship
  */
-async function createBusinessIndustryRelationship(businessId: number, industryLabel: string) {
+async function createBusinessIndustryRelationship(businessId: number, industryLabel: string, isPrimary: boolean = false) {
   try {
     // Find or create the industry
     let industry = await prisma.industry.findUnique({
@@ -59,11 +59,11 @@ async function createBusinessIndustryRelationship(businessId: number, industryLa
       data: {
         businessId,
         industryId: industry.id,
-        isPrimary: true // Mark as primary industry
+        isPrimary
       }
     });
 
-    console.log(`✅ Created industry relationship: Business ${businessId} -> Industry ${industryLabel}`);
+    console.log(`✅ Created industry relationship: Business ${businessId} -> Industry ${industryLabel} (${isPrimary ? 'Primary' : 'Secondary'})`);
   } catch (error) {
     console.error(`❌ Failed to create industry relationship:`, error);
   }
@@ -124,7 +124,7 @@ export async function saveExtractedBusinesses(
     city?: string;
     stateProvince?: string;
     country?: string;
-    industry?: string;
+    categories?: string[]; // Changed from industry to categories
     dryRun?: boolean;
   } = {}
 ): Promise<SaveResult> {
@@ -186,7 +186,7 @@ export async function saveExtractedBusinesses(
         email: undefined, // Will be populated later if available
         employeesCount: undefined,
         contactPersonId: undefined,
-        industry: business.industry || undefined
+        categories: business.categories || undefined
       };
 
       // Check if business already exists
@@ -208,8 +208,21 @@ export async function saveExtractedBusinesses(
         });
 
         // Handle industry relationship updates
-        if (businessData.industry) {
-          await updateBusinessIndustryRelationship(existingBusiness.id, businessData.industry);
+        if (businessData.categories && businessData.categories.length > 0) {
+          // Clear existing relationships and create new ones
+          await prisma.businessIndustry.deleteMany({
+            where: { businessId: existingBusiness.id }
+          });
+          
+          // Create relationships for each category
+          for (let i = 0; i < businessData.categories.length; i++) {
+            const category = businessData.categories[i];
+            await createBusinessIndustryRelationship(
+              existingBusiness.id, 
+              category, 
+              i === 0 // First category is primary
+            );
+          }
         }
 
         result.details.updated.push(business.website);
@@ -231,9 +244,16 @@ export async function saveExtractedBusinesses(
           }
         });
 
-        // Create industry relationship if industry is specified
-        if (businessData.industry) {
-          await createBusinessIndustryRelationship(newBusiness.id, businessData.industry);
+        // Create industry relationships for each category
+        if (businessData.categories && businessData.categories.length > 0) {
+          for (let i = 0; i < businessData.categories.length; i++) {
+            const category = businessData.categories[i];
+            await createBusinessIndustryRelationship(
+              newBusiness.id, 
+              category, 
+              i === 0 // First category is primary
+            );
+          }
         }
 
         result.details.created.push(business.website);
@@ -279,17 +299,16 @@ export async function saveExtractedBusinesses(
 export async function processAndSaveSearchResults(
   searchResults: any[],
   options: {
-    industry?: string;
     location?: string;
     city?: string;
     stateProvince?: string;
     country?: string;
+    categories?: string[]; // Changed from industry to categories
     minConfidence?: number;
     dryRun?: boolean;
   } = {}
 ): Promise<SaveResult> {
   const { 
-    industry, 
     location, 
     city, 
     stateProvince, 
@@ -298,7 +317,7 @@ export async function processAndSaveSearchResults(
     dryRun = false 
   } = options;
 
-  console.log(`🔍 Processing ${searchResults.length} search results for industry: ${industry || 'Not specified'}`);
+  console.log(`🔍 Processing ${searchResults.length} search results for categories: ${options.categories?.join(', ') || 'Not specified'}`);
   console.log(`📍 Location: ${location || 'Not specified'}`);
 
   try {
@@ -308,7 +327,6 @@ export async function processAndSaveSearchResults(
     // Process search results through the chain
     const parsedResults = await googleSearchParser.run({
       searchResults,
-      industry,
       location
     });
 
@@ -316,13 +334,13 @@ export async function processAndSaveSearchResults(
     console.log(`📊 Summary: ${parsedResults.summary.companyWebsites} company websites, ${parsedResults.summary.directories} directories`);
 
     // Save the extracted businesses
+    // Note: Each business in parsedResults.businesses already has its categories extracted by the LLM
     const saveResult = await saveExtractedBusinesses(parsedResults.businesses, {
       minConfidence,
       location,
       city,
       stateProvince,
       country,
-      industry,
       dryRun
     });
 

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import { RefreshCw, Eye, EyeOff } from 'lucide-react';
+import { RefreshCw, Eye, EyeOff, Trash2, Edit2, Save, X, Plus } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 
@@ -79,8 +79,19 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
   const [selectedIndustry, setSelectedIndustry] = useState<FlatItem | null>(null);
   const [industryKeywords, setIndustryKeywords] = useState<IndustryKeywords | null>(null);
   const [loadingKeywords, setLoadingKeywords] = useState(false);
-  const [sortBy, setSortBy] = useState<'label' | 'keywordsCount'>('label');
+  const [sortBy, setSortBy] = useState<'id' | 'label' | 'keywordsCount'>('id');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  
+  // Delete confirmation state
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState<number | null>(null);
+  
+  // Keyword editing state
+  const [editingKeywordId, setEditingKeywordId] = useState<number | null>(null);
+  const [editingKeywordText, setEditingKeywordText] = useState('');
+  const [addingNewKeyword, setAddingNewKeyword] = useState(false);
+  const [newKeywordText, setNewKeywordText] = useState('');
+  
   const resultRef = useRef<HTMLDivElement | null>(null);
 
   const fetchList = async (q: string, p: number) => {
@@ -107,6 +118,38 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
       console.error('Failed to fetch industries:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const deleteIndustry = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this industry? This action cannot be undone.')) {
+      return;
+    }
+    
+    setDeletingId(id);
+    try {
+      const response = await fetch(`/api/admin/industries/${id}`, {
+        method: 'DELETE',
+      });
+      
+      if (response.ok) {
+        // Remove from local state
+        setItems(prev => prev.filter(item => item.id !== id));
+        setTotal(prev => prev - 1);
+        // Refresh the current page if it's now empty
+        if (items.length === 1 && page > 1) {
+          setPage(prev => prev - 1);
+        }
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to delete industry: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Failed to delete industry:', error);
+      alert('Failed to delete industry. Please try again.');
+    } finally {
+      setDeletingId(null);
+      setShowDeleteConfirm(null);
     }
   };
 
@@ -198,6 +241,118 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
   const openGenerateView = (industry: FlatItem) => {
     setSelectedIndustry(industry);
     setCurrentView('generate');
+  };
+
+  // Keyword editing functions
+  const startEditingKeyword = (keyword: Keyword) => {
+    setEditingKeywordId(keyword.id);
+    setEditingKeywordText(keyword.searchTerm);
+  };
+
+  const cancelEditingKeyword = () => {
+    setEditingKeywordId(null);
+    setEditingKeywordText('');
+  };
+
+  const saveEditedKeyword = async (keywordId: number) => {
+    try {
+      const response = await fetch(`/api/admin/industries/keywords/${keywordId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ searchTerm: editingKeywordText })
+      });
+
+      if (response.ok) {
+        // Update local state
+        setIndustryKeywords(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            keywords: prev.keywords.map(k => 
+              k.id === keywordId 
+                ? { ...k, searchTerm: editingKeywordText, updatedAt: new Date().toISOString() }
+                : k
+            )
+          };
+        });
+        setEditingKeywordId(null);
+        setEditingKeywordText('');
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to update keyword: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Failed to update keyword:', error);
+      alert('Failed to update keyword. Please try again.');
+    }
+  };
+
+  const deleteKeyword = async (keywordId: number) => {
+    if (!confirm('Are you sure you want to delete this keyword?')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/industries/keywords/${keywordId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // Remove from local state
+        setIndustryKeywords(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            keywords: prev.keywords.filter(k => k.id !== keywordId),
+            totalKeywords: prev.totalKeywords - 1
+          };
+        });
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to delete keyword: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Failed to delete keyword:', error);
+      alert('Failed to delete keyword. Please try again.');
+    }
+  };
+
+  const addNewKeyword = async () => {
+    if (!newKeywordText.trim() || !selectedIndustry) return;
+
+    try {
+      const response = await fetch('/api/admin/industries/keywords', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          industry: selectedIndustry.title,
+          searchTerm: newKeywordText.trim()
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success && data.keyword) {
+          // Add to local state
+          setIndustryKeywords(prev => {
+            if (!prev) return prev;
+            return {
+              ...prev,
+              keywords: [...prev.keywords, data.keyword],
+              totalKeywords: prev.totalKeywords + 1
+            };
+          });
+          setNewKeywordText('');
+          setAddingNewKeyword(false);
+        }
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to add keyword: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Failed to add keyword:', error);
+      alert('Failed to add keyword. Please try again.');
+    }
   };
 
   // Auto scroll to the results card when we have output or an error
@@ -294,7 +449,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
           <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
             <span>Sorted by:</span>
             <span className="font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-              {sortBy === 'label' ? 'Industry Name' : 'Keywords Count'}
+              {sortBy === 'id' ? 'ID' : sortBy === 'label' ? 'Industry Name' : 'Keywords Count'}
             </span>
             <span className="px-1.5 py-0.5 rounded text-xs font-medium" style={{ 
               backgroundColor: 'var(--color-primary-light)', 
@@ -332,7 +487,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                 <select
                   value={sortBy}
                   onChange={(e) => {
-                    setSortBy(e.target.value as 'label' | 'keywordsCount');
+                    setSortBy(e.target.value as 'id' | 'label' | 'keywordsCount');
                     setPage(1); // Reset to first page when sorting changes
                   }}
                   className="text-xs px-2 py-1 rounded border transition-colors focus:outline-none focus:ring-1 focus:ring-opacity-50"
@@ -343,6 +498,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                     '--tw-ring-color': 'var(--color-primary)'
                   } as any}
                 >
+                  <option value="id">ID</option>
                   <option value="label">Industry Name</option>
                   <option value="keywordsCount">Keywords Count</option>
                 </select>
@@ -394,7 +550,28 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
             <table className="min-w-full">
               <thead>
                 <tr style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-                  <th className="text-left px-6 py-4 text-xs font-semibold tracking-wider uppercase" style={{ color: 'var(--color-text-secondary)' }}>ID</th>
+                  <th 
+                    className="text-left px-6 py-4 text-xs font-semibold tracking-wider uppercase cursor-pointer hover:bg-opacity-80 transition-colors"
+                    style={{ color: 'var(--color-text-secondary)' }}
+                    onClick={() => {
+                      if (sortBy === 'id') {
+                        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                      } else {
+                        setSortBy('id');
+                        setSortOrder('asc');
+                      }
+                      setPage(1);
+                    }}
+                  >
+                    <div className="flex items-center gap-1">
+                      ID
+                      {sortBy === 'id' && (
+                        <span className="text-xs" style={{ color: 'var(--color-primary)' }}>
+                          {sortOrder === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
+                  </th>
                   <th 
                     className="text-left px-6 py-4 text-xs font-semibold tracking-wider uppercase cursor-pointer hover:bg-opacity-80 transition-colors"
                     style={{ color: 'var(--color-text-secondary)' }}
@@ -481,7 +658,52 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                           <Eye className="h-4 w-4 mr-1" />
                           View Keywords
                         </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => setShowDeleteConfirm(item.id)}
+                          disabled={deletingId === item.id}
+                          size="sm"
+                          style={{ color: 'var(--color-error)' }}
+                        >
+                          {deletingId === item.id ? (
+                            <RefreshCw className="h-4 w-4 animate-spin" />
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                        </Button>
                       </div>
+                      
+                      {/* Delete Confirmation */}
+                      {showDeleteConfirm === item.id && (
+                        <div className="mt-2 p-2 rounded-lg border" style={{
+                          backgroundColor: 'var(--color-error-light)',
+                          borderColor: 'var(--color-error)'
+                        }}>
+                          <p className="text-sm mb-2" style={{ color: 'var(--color-error-dark)' }}>
+                            Are you sure you want to delete "{item.title}"?
+                          </p>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              onClick={() => deleteIndustry(item.id)}
+                              disabled={deletingId === item.id}
+                              style={{
+                                backgroundColor: 'var(--color-error)',
+                                color: 'white'
+                              }}
+                            >
+                              {deletingId === item.id ? 'Deleting...' : 'Delete'}
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setShowDeleteConfirm(null)}
+                            >
+                              Cancel
+                            </Button>
+                          </div>
+                        </div>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -592,6 +814,59 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                 {industryKeywords.totalKeywords} keywords
               </span>
             </div>
+
+            {/* Add New Keyword */}
+            <div className="border rounded-lg p-4" style={{ borderColor: 'var(--color-gray-light)' }}>
+              <div className="flex items-center gap-2 mb-3">
+                <Plus className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
+                <h4 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>Add New Keyword</h4>
+              </div>
+              
+              {addingNewKeyword ? (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newKeywordText}
+                    onChange={(e) => setNewKeywordText(e.target.value)}
+                    placeholder="Enter new keyword..."
+                    className="flex-1 px-3 py-2 rounded border transition-colors focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                    style={{ 
+                      backgroundColor: 'var(--color-bg-primary)', 
+                      borderColor: 'var(--color-gray-light)',
+                      color: 'var(--color-text-primary)',
+                      '--tw-ring-color': 'var(--color-primary)'
+                    } as any}
+                    onKeyPress={(e) => e.key === 'Enter' && addNewKeyword()}
+                  />
+                  <Button
+                    size="sm"
+                    onClick={addNewKeyword}
+                    disabled={!newKeywordText.trim()}
+                  >
+                    Add
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setAddingNewKeyword(false);
+                      setNewKeywordText('');
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setAddingNewKeyword(true)}
+                >
+                  <Plus className="h-4 w-4 mr-1" />
+                  Add Keyword
+                </Button>
+              )}
+            </div>
             
             <div className="space-y-4">
               {industryKeywords.keywords.map((keyword) => (
@@ -599,15 +874,64 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                   backgroundColor: 'var(--color-bg-secondary)',
                   borderColor: 'var(--color-gray-light)'
                 }}>
-                  <span style={{ color: 'var(--color-text-primary)' }}>{keyword.searchTerm}</span>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-xs px-2 py-1 rounded-full ${keyword.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
-                      {keyword.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                    <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-                      {new Date(keyword.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
+                  {editingKeywordId === keyword.id ? (
+                    <div className="flex items-center gap-2 flex-1">
+                      <input
+                        type="text"
+                        value={editingKeywordText}
+                        onChange={(e) => setEditingKeywordText(e.target.value)}
+                        className="flex-1 px-3 py-2 rounded border transition-colors focus:outline-none focus:ring-2 focus:ring-opacity-50"
+                        style={{ 
+                          backgroundColor: 'var(--color-bg-primary)', 
+                          borderColor: 'var(--color-gray-light)',
+                          color: 'var(--color-text-primary)',
+                          '--tw-ring-color': 'var(--color-primary)'
+                        } as any}
+                        onKeyPress={(e) => e.key === 'Enter' && saveEditedKeyword(keyword.id)}
+                      />
+                      <Button
+                        size="sm"
+                        onClick={() => saveEditedKeyword(keyword.id)}
+                        disabled={!editingKeywordText.trim()}
+                      >
+                        <Save className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={cancelEditingKeyword}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <>
+                      <span style={{ color: 'var(--color-text-primary)' }}>{keyword.searchTerm}</span>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs px-2 py-1 rounded-full ${keyword.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                          {keyword.isActive ? 'Active' : 'Inactive'}
+                        </span>
+                        <span className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                          {new Date(keyword.createdAt).toLocaleDateString()}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => startEditingKeyword(keyword)}
+                        >
+                          <Edit2 className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deleteKeyword(keyword.id)}
+                          style={{ color: 'var(--color-error)' }}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ))}
             </div>

@@ -35,8 +35,8 @@ export async function POST(request: NextRequest) {
     console.log(`📍 Location: ${location || 'Not specified'}`);
 
     // Process search results through the chain and save businesses
+    // Note: We don't pass categories here - let the LLM extract them from search results
     const result = await processAndSaveSearchResults(searchResults, {
-      industry,
       location,
       city,
       stateProvince,
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
         const { googleSearchParser } = await import('@/lib/llm/chains/googleSearchParser');
         const chainResult = await googleSearchParser.run({
           searchResults,
-          industry,
+          industry, // Keep this for backward compatibility with the chain
           location
         });
         chainBusinesses = chainResult.businesses;
