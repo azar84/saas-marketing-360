@@ -9,7 +9,7 @@ export interface LangChainModelOptions {
 
 export function getChatModel(opts: LangChainModelOptions = {}) {
   const temperature = opts.temperature ?? 0.2;
-  const model = opts.model || "deepseek-chat";
+  const modelName = opts.model || "deepseek-chat";
 
   // Use DeepSeek API key
   const deepseekApiKey = opts.apiKey || process.env.DEEPSEEK_API_KEY;
@@ -34,7 +34,7 @@ export function getChatModel(opts: LangChainModelOptions = {}) {
     "deepseek-llm-67b-chat"
   ];
 
-  return {
+  const chatModel = {
     async invoke(messages: Array<{ role: string; content: string }>) {
       console.log('Sending prompt to DeepSeek:', messages[messages.length - 1]?.content?.substring(0, 200) + '...');
 
@@ -72,7 +72,25 @@ export function getChatModel(opts: LangChainModelOptions = {}) {
       
       throw lastError || new Error('No DeepSeek models available');
     },
-  } as any;
+
+    // Add support for the .call() method that the chain expects
+    async call(content: string) {
+      console.log('Sending prompt to DeepSeek via call method:', content.substring(0, 200) + '...');
+      
+      // Convert single content string to messages format
+      const messages = [{ role: 'user', content }];
+      
+      const response = await this.invoke(messages);
+      return response;
+    },
+  };
+
+  // Debug: log the model object to ensure methods are attached
+  console.log('Created chatModel with methods:', Object.getOwnPropertyNames(chatModel));
+  console.log('chatModel call method type:', typeof chatModel.call);
+  console.log('chatModel invoke method type:', typeof chatModel.invoke);
+
+  return chatModel;
 }
 
 

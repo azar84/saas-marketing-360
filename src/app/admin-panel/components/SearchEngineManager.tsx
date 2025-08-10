@@ -14,6 +14,7 @@ interface SearchResult {
   fullUrl: string;
   description: string;
   cacheId?: string;
+  query?: string; // Added for multiple query results
 }
 
 interface SearchEngineConfig {
@@ -41,8 +42,12 @@ interface SearchFilters {
 
 export default function SearchEngineManager() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchQueries, setSearchQueries] = useState<string[]>([]);
+  const [isMultipleSearch, setIsMultipleSearch] = useState(false);
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentQueryIndex, setCurrentQueryIndex] = useState<number>(0);
+  const [totalQueries, setTotalQueries] = useState<number>(0);
   const [error, setError] = useState<string | null>(null);
   const [config, setConfig] = useState<SearchEngineConfig>({
     apiKey: '',
@@ -126,13 +131,6 @@ export default function SearchEngineManager() {
       page
     });
     
-    if (!searchQuery.trim()) {
-      console.log('Search blocked: No query');
-      setError('Please enter a search query');
-      return;
-    }
-
-    // Prevent search if config is not loaded yet
     if (!configLoaded) {
       console.log('Search blocked: Config not loaded');
       setError('Configuration is still loading. Please wait...');
@@ -142,6 +140,18 @@ export default function SearchEngineManager() {
     if (!config.apiKey || !config.searchEngineId) {
       console.log('Search blocked: Missing credentials');
       setError('Please configure your Google Custom Search API credentials');
+      return;
+    }
+
+    if (!isMultipleSearch && !searchQuery.trim()) {
+      console.log('Search blocked: No query');
+      setError('Please enter a search query');
+      return;
+    }
+
+    if (isMultipleSearch && searchQueries.length === 0) {
+      console.log('Search blocked: No multiple queries');
+      setError('Please enter multiple search queries');
       return;
     }
 
@@ -155,6 +165,13 @@ export default function SearchEngineManager() {
 
     setIsLoading(true);
     setError(null);
+    
+    // Set progress indicators for multiple queries
+    if (isMultipleSearch) {
+      setTotalQueries(searchQueries.length);
+      setCurrentQueryIndex(0);
+    }
+
     setSearchResults([]);
     setCurrentPage(page);
     
@@ -164,19 +181,45 @@ export default function SearchEngineManager() {
     }
 
     try {
-      const requestBody = {
-        query: searchQuery,
-        apiKey: config.apiKey,
-        searchEngineId: config.searchEngineId,
-        resultsLimit: config.resultsLimit
-        // Removed filters and page parameters that were causing Google API errors
-      };
-      
+      // Prepare request body based on search type
+      const requestBody = isMultipleSearch 
+        ? {
+            queries: searchQueries,
+            apiKey: config.apiKey,
+            searchEngineId: config.searchEngineId,
+            resultsLimit: config.resultsLimit,
+            filters: filters,
+            page: page
+          }
+        : {
+            query: searchQuery,
+            apiKey: config.apiKey,
+            searchEngineId: config.searchEngineId,
+            resultsLimit: config.resultsLimit,
+            filters: filters,
+            page: page
+          };
+
       console.log('Sending request to API:', {
         ...requestBody,
-        apiKey: requestBody.apiKey ? `${requestBody.apiKey.substring(0, 10)}...` : 'missing',
-        searchEngineId: requestBody.searchEngineId ? `${requestBody.searchEngineId.substring(0, 10)}...` : 'missing'
+        apiKey: requestBody.apiKey ? '***' : 'missing',
+        searchEngineId: requestBody.searchEngineId ? '***' : 'missing'
       });
+
+      // For multiple queries, simulate progress updates
+      if (isMultipleSearch) {
+        const progressInterval = setInterval(() => {
+          setCurrentQueryIndex(prev => {
+            if (prev < searchQueries.length - 1) {
+              return prev + 1;
+            }
+            return prev;
+          });
+        }, 1000); // Update every second to match backend rate limiting
+
+        // Clear interval after a reasonable time
+        setTimeout(() => clearInterval(progressInterval), (searchQueries.length + 5) * 1000);
+      }
       
       const response = await fetch('/api/admin/search-engine/search', {
         method: 'POST',
@@ -198,13 +241,18 @@ export default function SearchEngineManager() {
       }
 
       if (data.success) {
-        console.log('Search successful, setting results:', data.results.length, 'results');
         setSearchResults(data.results);
         setPagination(data.pagination);
         // Ensure totalResults is always a valid number
         const results = parseInt(data.totalResults) || data.results.length || 0;
         setTotalResults(results);
         console.log('Search results set:', data.results.length, 'results, totalResults:', results);
+        
+        // Reset progress indicators
+        if (isMultipleSearch) {
+          setCurrentQueryIndex(0);
+          setTotalQueries(0);
+        }
       } else {
         console.log('Search not successful, throwing error:', data.message);
         throw new Error(data.message || 'Search failed');
@@ -219,6 +267,12 @@ export default function SearchEngineManager() {
       });
       setError(err.message || 'An error occurred during search');
       setPagination(null);
+      
+      // Reset progress indicators on error
+      if (isMultipleSearch) {
+        setCurrentQueryIndex(0);
+        setTotalQueries(0);
+      }
     } finally {
       setIsLoading(false);
       console.log('=== SEARCH DEBUG END ===');
@@ -235,8 +289,8 @@ export default function SearchEngineManager() {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      performSearch(1);
+    if (e.key === 'Enter' && !isLoading && configLoaded && searchQuery.trim()) {
+      performSearch();
     }
   };
 
@@ -454,50 +508,93 @@ export default function SearchEngineManager() {
       {/* Search Interface */}
       <Card>
         <CardContent className="space-y-4">
-          <div className="flex gap-3">
-            <div className="flex-1">
-              <Input
-                type="text"
-                placeholder="Enter your search query..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="text-lg"
-                style={{ 
-                  backgroundColor: 'var(--color-bg-primary)', 
-                  borderColor: 'var(--color-gray-light)',
-                  color: 'var(--color-text-primary)',
-                  '--tw-ring-color': 'var(--color-primary)'
-                } as any}
-              />
+          <div className="space-y-4">
+            {/* Search Type Toggle */}
+            <div className="flex items-center space-x-4">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={isMultipleSearch}
+                  onChange={(e) => setIsMultipleSearch(e.target.checked)}
+                  className="rounded border-gray-300"
+                />
+                <span className="text-sm font-medium">Multiple Queries</span>
+              </label>
             </div>
-            <Button
-              onClick={() => performSearch(1)}
-              disabled={isLoading || !searchQuery.trim() || !configLoaded || !config.apiKey || !config.searchEngineId}
-              className="px-8"
+
+            {/* Single Query Input */}
+            {!isMultipleSearch && (
+              <div>
+                <label htmlFor="searchQuery" className="block text-sm font-medium mb-2">
+                  Search Query
+                </label>
+                <input
+                  id="searchQuery"
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  placeholder="Enter your search query..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  disabled={!configLoaded}
+                />
+              </div>
+            )}
+
+            {/* Multiple Queries Input */}
+            {isMultipleSearch && (
+              <div>
+                <label htmlFor="searchQueries" className="block text-sm font-medium mb-2">
+                  Search Queries (one per line)
+                </label>
+                <textarea
+                  id="searchQueries"
+                  value={searchQueries.join('\n')}
+                  onChange={(e) => {
+                    const lines = e.target.value.split('\n').filter(line => line.trim());
+                    setSearchQueries(lines);
+                  }}
+                  placeholder="Enter multiple search queries, one per line...&#10;Example:&#10;nodejs tutorials&#10;express framework&#10;mongodb best practices"
+                  rows={6}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm"
+                  disabled={!configLoaded}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Each query will be processed separately with 1-second delays between requests to respect Google's rate limits.
+                </p>
+              </div>
+            )}
+
+            {/* Search Button */}
+            <button
+              onClick={() => performSearch()}
+              disabled={isLoading || !configLoaded || (!isMultipleSearch && !searchQuery.trim()) || (isMultipleSearch && searchQueries.length === 0)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Searching...
-                </>
-              ) : !configLoaded ? (
-                <>
-                  <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                  Loading...
-                </>
-              ) : !config.apiKey || !config.searchEngineId ? (
-                <>
-                  <Settings className="h-4 w-4 mr-2" />
-                  Configure API
-                </>
-              ) : (
-                <>
-                  <Search className="h-4 w-4 mr-2" />
-                  Search
-                </>
-              )}
-            </Button>
+              {isLoading ? 'Searching...' : !configLoaded ? 'Loading...' : 'Search'}
+            </button>
+
+            {/* Progress Indicator for Multiple Queries */}
+            {isLoading && isMultipleSearch && totalQueries > 0 && (
+              <div className="mt-4 p-3 border rounded-lg" style={{ borderColor: 'var(--color-gray-light)' }}>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium">Processing Queries</span>
+                  <span className="text-sm text-gray-600">
+                    {currentQueryIndex + 1} of {totalQueries}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${((currentQueryIndex + 1) / totalQueries) * 100}%` }}
+                  ></div>
+                </div>
+                <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
+                  <span>Current: "{searchQueries[currentQueryIndex] || 'Unknown'}"</span>
+                  <span>Est. time: ~{totalQueries} seconds</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Results Per Page Selector */}
@@ -543,113 +640,105 @@ export default function SearchEngineManager() {
       {searchResults.length > 0 && (
         <Card>
           <CardHeader>
-                             <CardTitle className="flex items-center gap-2">
-                   <Globe className="h-5 w-5" />
-                   Search Results ({searchResults.length})
-                 </CardTitle>
-                 <CardDescription>
-                   Found {searchResults.length} results for "{searchQuery}"
-                   {pagination && (
-                     <span className="block text-xs mt-1 opacity-75">
-                       Page {pagination.currentPage} of {pagination.totalPages} • Total: {totalResults > 1000 ? `${(totalResults || 0).toLocaleString()}+ (showing first 1000)` : (totalResults || 0).toLocaleString()} results
-                     </span>
-                   )}
-                   {searchResults.length > 0 && (
-                     <span className="block text-xs mt-1 opacity-75">
-                       Filters applied: {Object.entries(filters).filter(([_, value]) => value).map(([key, _]) => key.replace('exclude', '').toLowerCase()).join(', ')}
-                     </span>
-                   )}
-                 </CardDescription>
+            <CardTitle className="flex items-center gap-2">
+              <Globe className="h-5 w-5" />
+              Search Results ({searchResults.length})
+            </CardTitle>
+            <CardDescription>
+              Found {searchResults.length} results for "{searchQuery}"
+              {pagination && (
+                <span className="block text-xs mt-1 opacity-75">
+                  Page {pagination.currentPage} of {pagination.totalPages} • Total: {totalResults > 1000 ? `${(totalResults || 0).toLocaleString()}+ (showing first 1000)` : (totalResults || 0).toLocaleString()} results
+                </span>
+              )}
+              {searchResults.length > 0 && (
+                <span className="block text-xs mt-1 opacity-75">
+                  Filters applied: {Object.entries(filters).filter(([_, value]) => value).map(([key, _]) => key.replace('exclude', '').toLowerCase()).join(', ')}
+                </span>
+              )}
+            </CardDescription>
           </CardHeader>
           <CardContent>
+            {/* Individual Query Results (for multiple queries) */}
+            {isMultipleSearch && searchResults.length > 0 && (
+              <div className="mb-6 p-4 border rounded-lg" style={{ borderColor: 'var(--color-gray-light)' }}>
+                <h3 className="text-lg font-semibold mb-3">Query Breakdown</h3>
+                <div className="space-y-3">
+                  {searchResults.map((result, index) => (
+                    <div key={index} className="text-sm">
+                      <span className="font-medium text-blue-600">Query:</span> "{result.query || 'Unknown'}"
+                      <span className="mx-2">•</span>
+                      <span className="text-gray-600">Position {result.position}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Results List */}
             <div className="space-y-4">
-              {searchResults.map((result) => (
-                <div
-                  key={result.position}
-                  className="p-4 rounded-lg border transition-colors hover:bg-opacity-50"
-                  style={{ 
-                    backgroundColor: 'var(--color-bg-primary)', 
-                    borderColor: 'var(--color-gray-light)',
-                    '--tw-hover-bg-opacity': 'var(--color-bg-secondary)'
-                  } as any}
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-sm font-medium px-2 py-1 rounded-full" style={{ 
-                          backgroundColor: 'var(--color-primary-light)', 
-                          color: 'var(--color-primary)' 
+                {searchResults.map((result) => (
+                  <div
+                    key={result.cacheId || result.url}
+                    className="p-4 border rounded-lg hover:shadow-md transition-shadow"
+                    style={{ borderColor: 'var(--color-gray-light)' }}
+                  >
+                    {/* Query Label (for multiple queries) */}
+                    {isMultipleSearch && result.query && (
+                      <div className="mb-2">
+                        <span className="inline-block px-2 py-1 text-xs font-medium rounded-full" style={{
+                          backgroundColor: 'var(--color-primary-light)',
+                          color: 'var(--color-primary-dark)'
                         }}>
-                          #{result.position}
+                          Query: {result.query}
                         </span>
-                        <h3 className="text-lg font-semibold line-clamp-2" style={{ color: 'var(--color-text-primary)' }}>
-                          {result.title}
+                      </div>
+                    )}
+                    
+                    <div className="space-y-2">
+                      <div className="flex items-start justify-between">
+                        <h3 className="text-lg font-semibold">
+                          <a
+                            href={result.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:underline"
+                            style={{ color: 'var(--color-primary)' }}
+                          >
+                            {result.title}
+                          </a>
                         </h3>
+                        <span className="text-sm text-gray-500">#{result.position}</span>
                       </div>
                       
-                      <p className="text-sm mb-3" style={{ color: 'var(--color-text-secondary)' }}>
+                      <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                         {result.description}
                       </p>
                       
-                      <div className="flex items-center gap-3 text-sm">
-                        <div className="flex items-center gap-2">
-                          <Globe className="h-3 w-3" style={{ color: 'var(--color-text-muted)' }} />
-                          <div className="group relative">
-                            <span className="font-medium px-2 py-1 rounded text-xs cursor-help flex items-center gap-1" style={{ 
-                              backgroundColor: 'var(--color-bg-secondary)', 
-                              color: 'var(--color-primary)' 
-                            }}>
-                              {result.displayUrl}
-                              {result.fullUrl !== result.url && (
-                                <span className="text-xs opacity-60">⋯</span>
-                              )}
-                            </span>
-                            <div className="absolute bottom-full left-0 mb-2 px-2 py-1 text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10 shadow-lg" style={{
-                              backgroundColor: 'var(--color-bg-secondary)',
-                              color: 'var(--color-text-secondary)',
-                              border: '1px solid var(--color-gray-light)',
-                              whiteSpace: 'nowrap',
-                              maxWidth: '300px',
-                              wordBreak: 'break-all'
-                            }}>
-                              <div className="font-mono text-xs">{result.fullUrl}</div>
-                            </div>
-                          </div>
-                        </div>
+                      <div className="flex items-center justify-between">
+                        <a
+                          href={result.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm text-blue-600 hover:underline break-all"
+                        >
+                          {result.displayUrl}
+                        </a>
+                        
                         {result.cacheId && (
-                          <span className="text-xs px-2 py-1 rounded" style={{ 
-                            backgroundColor: 'var(--color-info-light)', 
-                            color: 'var(--color-info-dark)' 
-                          }}>
-                            Cache: {result.cacheId}
-                          </span>
+                          <a
+                            href={`https://webcache.googleusercontent.com/search?q=cache:${result.cacheId}:${result.url}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-gray-500 hover:underline"
+                          >
+                            Cached
+                          </a>
                         )}
                       </div>
                     </div>
-                    
-                    <div className="flex flex-col gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => window.open(result.url, '_blank')}
-                        className="flex items-center gap-1"
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                        Visit
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(result.url)}
-                        className="flex items-center gap-1"
-                      >
-                        <Copy className="h-3 w-3" />
-                        Copy URL
-                      </Button>
-                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
             </div>
 
             {/* Pagination Controls */}

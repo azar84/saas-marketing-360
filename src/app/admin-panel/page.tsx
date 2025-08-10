@@ -27,7 +27,8 @@ import {
   Mail,
   LogOut,
   Clock,
-  Search
+  Search,
+  Building
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -46,12 +47,14 @@ import GeographicManager from './components/GeographicManager';
 import NAICSManager from './components/NAICSManager';
 import KeywordsResult from './components/KeywordsResult';
 import SearchEngineManager from './components/SearchEngineManager';
+import IndustrySearchManager from './components/IndustrySearchManager';
+import BusinessDirectoryManager from './components/BusinessDirectoryManager';
 import TestSearch from './test-search';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'tech-discovery' | 'geographic-manager' | 'naics-manager' | 'search-engine' | 'test-search';
+type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'tech-discovery' | 'geographic-manager' | 'naics-manager' | 'search-engine' | 'industry-search' | 'business-directory' | 'test-search';
 
 // Navigation items with design system colors
 const getNavigationItems = (designSystem: any) => {
@@ -59,9 +62,12 @@ const getNavigationItems = (designSystem: any) => {
   
   return [
     { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard, color: colors.primary },
+    { id: 'industry-search', name: 'Industry Search', icon: Building, color: colors.success },
+    { id: 'search-engine', name: 'Search Engine', icon: Search, color: colors.info },
     { id: 'tech-discovery', name: 'Tech Discovery', icon: Search, color: colors.accent },
     { id: 'geographic-manager', name: 'Geographic Database', icon: Globe, color: colors.success },
     { id: 'naics-manager', name: 'NAICS Industries', icon: BarChart3, color: colors.accent },
+    { id: 'business-directory', name: 'Business Directory', icon: Building, color: colors.warning },
     { id: 'media-library', name: 'Media Library', icon: FolderOpen, color: colors.primary },
     { id: 'pricing', name: 'Pricing Plans', icon: DollarSign, color: colors.success },
     { id: 'faq-management', name: 'FAQ Management', icon: MessageSquare, color: colors.accent },
@@ -72,7 +78,6 @@ const getNavigationItems = (designSystem: any) => {
     { id: 'scheduler', name: 'Scheduler', icon: Clock, color: colors.warning },
     { id: 'design-system', name: 'Design System', icon: Layers, color: colors.primary },
     { id: 'site-settings', name: 'Site Settings', icon: Settings, color: colors.textSecondary },
-    { id: 'search-engine', name: 'Search Engine', icon: Search, color: colors.info },
     { id: 'test-search', name: 'Test Search', icon: Search, color: colors.warning },
   ];
 };
@@ -394,6 +399,15 @@ export default function AdminPanel() {
             <SearchEngineManager />
           </div>
         );
+      case 'industry-search':
+        return (
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
+            <IndustrySearchManager />
+          </div>
+        );
       case 'test-search':
         return (
           <div 
@@ -401,6 +415,15 @@ export default function AdminPanel() {
             style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
           >
             <TestSearch />
+          </div>
+        );
+      case 'business-directory':
+        return (
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
+            <BusinessDirectoryManager />
           </div>
         );
       case 'dashboard':

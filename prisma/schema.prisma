@@ -1482,4 +1482,51 @@ model Keyword {
   @@map("keywords")
 }
 
+// ===================================
+// BUSINESS DIRECTORY
+// ===================================
+
+model BusinessDirectory {
+  id              Int      @id @default(autoincrement())
+  website         String   // Mandatory field
+  companyName     String?
+  city            String?
+  stateProvince   String?
+  phoneNumber     String?
+  email           String?
+  employeesCount  Int?
+  contactPersonId Int?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  contactPerson   ContactPerson? @relation(fields: [contactPersonId], references: [id])
+
+  @@unique([website]) // Prevent duplicate websites
+  @@index([city])
+  @@index([stateProvince])
+  @@index([isActive])
+  @@map("business_directory")
+}
+
+model ContactPerson {
+  id          Int      @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  title       String?
+  email       String?
+  phone       String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  businesses  BusinessDirectory[]
+
+  @@index([firstName, lastName])
+  @@index([isActive])
+  @@map("contact_persons")
+}
+
 
