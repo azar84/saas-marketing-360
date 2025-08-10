@@ -423,38 +423,78 @@ export async function getBusinessDirectoryStats() {
 }
 
 /**
- * Search businesses in the directory
+ * Search businesses in the directory with advanced filtering
  */
 export async function searchBusinesses(query: string, options: {
   page?: number;
   limit?: number;
   city?: string;
   stateProvince?: string;
+  country?: string;
+  industry?: string;
+  isActive?: boolean;
 } = {}) {
-  const { page = 1, limit = 20, city, stateProvince } = options;
+  const { page = 1, limit = 20, city, stateProvince, country, industry, isActive = true } = options;
   const skip = (page - 1) * limit;
 
   try {
+    // Build the where clause for business directory
     const where: any = {
-      OR: [
-        { website: { contains: query, mode: 'insensitive' } },
-        { companyName: { contains: query, mode: 'insensitive' } },
-        { city: { contains: query, mode: 'insensitive' } },
-        { stateProvince: { contains: query, mode: 'insensitive' } }
-      ]
+      isActive
     };
 
+    // Add text search if query is provided
+    if (query && query.trim()) {
+      where.OR = [
+        { website: { contains: query } },
+        { companyName: { contains: query } },
+        { city: { contains: query } },
+        { stateProvince: { contains: query } },
+        { country: { contains: query } }
+      ];
+    }
+
+    // Add geographic filters
     if (city) {
-      where.city = { contains: city, mode: 'insensitive' };
+      where.city = { contains: city };
     }
 
     if (stateProvince) {
-      where.stateProvince = { contains: stateProvince, mode: 'insensitive' };
+      where.stateProvince = { contains: stateProvince };
     }
+
+    if (country) {
+      where.country = { contains: country };
+    }
+
+    // Handle industry filtering - make it more flexible and intelligent
+    let industryWhere = undefined;
+    if (industry) {
+      // Convert to lowercase for case-insensitive comparison
+      const industryQuery = industry.toLowerCase().trim();
+      
+      industryWhere = {
+        industries: {
+          some: {
+            industry: {
+              label: { 
+                contains: industryQuery
+                // Note: SQLite doesn't support mode: 'insensitive', but contains is case-sensitive
+              }
+            }
+          }
+        }
+      };
+    }
+
+    // Combine business filters with industry filters
+    const finalWhere = industryWhere 
+      ? { AND: [where, industryWhere] }
+      : where;
 
     const [businesses, totalCount] = await Promise.all([
       prisma.businessDirectory.findMany({
-        where,
+        where: finalWhere,
         include: {
           contactPerson: {
             select: {
@@ -465,13 +505,26 @@ export async function searchBusinesses(query: string, options: {
               email: true,
               phone: true
             }
+          },
+          industries: {
+            include: {
+              industry: {
+                select: {
+                  id: true,
+                  label: true
+                }
+              }
+            },
+            orderBy: {
+              isPrimary: 'desc' // Primary industries first
+            }
           }
         },
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit
       }),
-      prisma.businessDirectory.count({ where })
+      prisma.businessDirectory.count({ where: finalWhere })
     ]);
 
     const totalPages = Math.ceil(totalCount / limit);

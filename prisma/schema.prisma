@@ -212,8 +212,8 @@ model HeroSection {
   backgroundImage           String?
   backgroundOverlay         String?
   backgroundSize            String        @default("cover")
-  ctaPrimary                CTA?          @relation("HeroPrimaryCTA", fields: [ctaPrimaryId], references: [id])
   ctaSecondary              CTA?          @relation("HeroSecondaryCTA", fields: [ctaSecondaryId], references: [id])
+  ctaPrimary                CTA?          @relation("HeroPrimaryCTA", fields: [ctaPrimaryId], references: [id])
   pageSections              PageSection[]
 
   @@map("hero_sections")
@@ -279,23 +279,23 @@ model HeaderNavItem {
   isVisible      Boolean      @default(true)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
-  headerConfig   HeaderConfig @relation(fields: [headerConfigId], references: [id], onDelete: Cascade)
   page           Page?        @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  headerConfig   HeaderConfig @relation(fields: [headerConfigId], references: [id], onDelete: Cascade)
 
   @@map("header_nav_items")
 }
 
 model HeaderConfig {
-  id              Int                @id @default(autoincrement())
+  id              Int             @id @default(autoincrement())
   logoUrl         String?
   logoAlt         String?
-  isActive        Boolean            @default(true)
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  backgroundColor String?            @default("#ffffff")
-  menuActiveColor String?            @default("#5243E9")
-  menuHoverColor  String?            @default("#5243E9")
-  menuTextColor   String?            @default("#374151")
+  isActive        Boolean         @default(true)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  backgroundColor String?         @default("#ffffff")
+  menuActiveColor String?         @default("#5243E9")
+  menuHoverColor  String?         @default("#5243E9")
+  menuTextColor   String?         @default("#374151")
   headerCTAs      HeaderCTA[]
   navItems        HeaderNavItem[]
 
@@ -315,10 +315,10 @@ model CTA {
   events            Json?
   customId          String?
   headerCTAs        HeaderCTA[]
-  heroPrimary       HeroSection[]  @relation("HeroPrimaryCTA")
   heroSecondary     HeroSection[]  @relation("HeroSecondaryCTA")
-  homeHeroPrimary   HomePageHero[] @relation("HomeHeroPrimaryCTA")
+  heroPrimary       HeroSection[]  @relation("HeroPrimaryCTA")
   homeHeroSecondary HomePageHero[] @relation("HomeHeroSecondaryCTA")
+  homeHeroPrimary   HomePageHero[] @relation("HomeHeroPrimaryCTA")
   mediaSection      MediaSection[] @relation("MediaSectionCTA")
 
   @@map("ctas")
@@ -341,8 +341,8 @@ model HeaderCTA {
   isVisible      Boolean      @default(true)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
-  cta            CTA          @relation(fields: [ctaId], references: [id], onDelete: Cascade)
   headerConfig   HeaderConfig @relation(fields: [headerConfigId], references: [id], onDelete: Cascade)
+  cta            CTA          @relation(fields: [ctaId], references: [id], onDelete: Cascade)
 
   @@map("header_ctas")
 }
@@ -377,8 +377,8 @@ model HomePageHero {
   subheadingColor               String?  @default("#6B7280")
   trustIndicatorBackgroundColor String?  @default("#F9FAFB")
   trustIndicatorTextColor       String?  @default("#6B7280")
-  ctaPrimary                    CTA?     @relation("HomeHeroPrimaryCTA", fields: [ctaPrimaryId], references: [id])
   ctaSecondary                  CTA?     @relation("HomeHeroSecondaryCTA", fields: [ctaSecondaryId], references: [id])
+  ctaPrimary                    CTA?     @relation("HomeHeroPrimaryCTA", fields: [ctaPrimaryId], references: [id])
 
   @@map("home_page_hero")
 }
@@ -441,8 +441,8 @@ model FeatureGroupItem {
   isVisible      Boolean       @default(true)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
-  featureGroup   FeatureGroup  @relation(fields: [featureGroupId], references: [id], onDelete: Cascade)
   feature        GlobalFeature @relation(fields: [featureId], references: [id], onDelete: Cascade)
+  featureGroup   FeatureGroup  @relation(fields: [featureGroupId], references: [id], onDelete: Cascade)
 
   @@unique([featureGroupId, featureId])
   @@map("feature_group_items")
@@ -456,8 +456,8 @@ model PageFeatureGroup {
   isVisible      Boolean      @default(true)
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
-  featureGroup   FeatureGroup @relation(fields: [featureGroupId], references: [id], onDelete: Cascade)
   page           Page         @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  featureGroup   FeatureGroup @relation(fields: [featureGroupId], references: [id], onDelete: Cascade)
 
   @@unique([pageId, featureGroupId])
   @@map("page_feature_groups")
@@ -486,19 +486,19 @@ model PageSection {
   scriptSectionId  Int?
   headerSectionId  Int?
   teamSectionId    Int?
-  contactSection   ContactSection?  @relation(fields: [contactSectionId], references: [id])
-  faqCategory      FAQCategory?     @relation(fields: [faqCategoryId], references: [id])
-  faqSection       FAQSection?      @relation(fields: [faqSectionId], references: [id])
-  featureGroup     FeatureGroup?    @relation(fields: [featureGroupId], references: [id])
-  form             Form?            @relation(fields: [formId], references: [id])
-  header_sections  header_sections? @relation(fields: [headerSectionId], references: [id])
-  heroSection      HeroSection?     @relation(fields: [heroSectionId], references: [id])
-  htmlSection      HtmlSection?     @relation(fields: [htmlSectionId], references: [id])
-  mediaSection     MediaSection?    @relation(fields: [mediaSectionId], references: [id])
-  page             Page             @relation(fields: [pageId], references: [id], onDelete: Cascade)
-  pricingSection   PricingSection?  @relation(fields: [pricingSectionId], references: [id])
-  script_sections  script_sections? @relation(fields: [scriptSectionId], references: [id])
   teamSection      TeamSection?     @relation(fields: [teamSectionId], references: [id])
+  script_sections  script_sections? @relation(fields: [scriptSectionId], references: [id])
+  pricingSection   PricingSection?  @relation(fields: [pricingSectionId], references: [id])
+  page             Page             @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  mediaSection     MediaSection?    @relation(fields: [mediaSectionId], references: [id])
+  htmlSection      HtmlSection?     @relation(fields: [htmlSectionId], references: [id])
+  heroSection      HeroSection?     @relation(fields: [heroSectionId], references: [id])
+  header_sections  header_sections? @relation(fields: [headerSectionId], references: [id])
+  form             Form?            @relation(fields: [formId], references: [id])
+  featureGroup     FeatureGroup?    @relation(fields: [featureGroupId], references: [id])
+  faqSection       FAQSection?      @relation(fields: [faqSectionId], references: [id])
+  faqCategory      FAQCategory?     @relation(fields: [faqCategoryId], references: [id])
+  contactSection   ContactSection?  @relation(fields: [contactSectionId], references: [id])
 
   @@map("page_sections")
 }
@@ -604,8 +604,8 @@ model FAQSectionCategory {
   sortOrder    Int         @default(0)
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
-  category     FAQCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   faqSection   FAQSection  @relation(fields: [faqSectionId], references: [id], onDelete: Cascade)
+  category     FAQCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@unique([faqSectionId, categoryId])
   @@map("faq_section_categories")
@@ -735,8 +735,8 @@ model PlanPricing {
   events         Json?
   createdAt      DateTime     @default(now())
   updatedAt      DateTime     @updatedAt
-  billingCycle   BillingCycle @relation(fields: [billingCycleId], references: [id], onDelete: Cascade)
   plan           Plan         @relation(fields: [planId], references: [id], onDelete: Cascade)
+  billingCycle   BillingCycle @relation(fields: [billingCycleId], references: [id], onDelete: Cascade)
 
   @@unique([planId, billingCycleId])
   @@map("plan_pricing")
@@ -767,8 +767,8 @@ model PlanFeatureLimit {
   isUnlimited   Boolean         @default(false)
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
-  featureType   PlanFeatureType @relation(fields: [featureTypeId], references: [id], onDelete: Cascade)
   plan          Plan            @relation(fields: [planId], references: [id], onDelete: Cascade)
+  featureType   PlanFeatureType @relation(fields: [featureTypeId], references: [id], onDelete: Cascade)
 
   @@unique([planId, featureTypeId])
   @@map("plan_feature_limits")
@@ -795,8 +795,8 @@ model PlanFeature {
   icon      String?
   createdAt DateTime       @default(now())
   updatedAt DateTime       @updatedAt
-  feature   SharedFeature? @relation(fields: [featureId], references: [id])
   plan      Plan           @relation(fields: [planId], references: [id], onDelete: Cascade)
+  feature   SharedFeature? @relation(fields: [featureId], references: [id])
 
   @@map("plan_features")
 }
@@ -879,8 +879,8 @@ model PlanBasicFeature {
   planId         String
   basicFeatureId String
   createdAt      DateTime     @default(now())
-  basicFeature   BasicFeature @relation(fields: [basicFeatureId], references: [id], onDelete: Cascade)
   plan           Plan         @relation(fields: [planId], references: [id], onDelete: Cascade)
+  basicFeature   BasicFeature @relation(fields: [basicFeatureId], references: [id], onDelete: Cascade)
 
   @@unique([planId, basicFeatureId])
   @@map("plan_basic_features")
@@ -912,8 +912,8 @@ model PricingSectionPlan {
   isVisible        Boolean        @default(true)
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
-  plan             Plan           @relation(fields: [planId], references: [id], onDelete: Cascade)
   pricingSection   PricingSection @relation(fields: [pricingSectionId], references: [id], onDelete: Cascade)
+  plan             Plan           @relation(fields: [planId], references: [id], onDelete: Cascade)
 
   @@unique([pricingSectionId, planId])
   @@map("pricing_section_plans")
@@ -927,8 +927,8 @@ model PagePricingSection {
   isVisible        Boolean        @default(true)
   createdAt        DateTime       @default(now())
   updatedAt        DateTime       @updatedAt
-  page             Page           @relation(fields: [pageId], references: [id], onDelete: Cascade)
   pricingSection   PricingSection @relation(fields: [pricingSectionId], references: [id], onDelete: Cascade)
+  page             Page           @relation(fields: [pageId], references: [id], onDelete: Cascade)
 
   @@unique([pageId, pricingSectionId])
   @@map("page_pricing_sections")
@@ -1070,8 +1070,8 @@ model PageHtmlSection {
   isVisible     Boolean     @default(true)
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
-  htmlSection   HtmlSection @relation(fields: [htmlSectionId], references: [id], onDelete: Cascade)
   page          Page        @relation(fields: [pageId], references: [id], onDelete: Cascade)
+  htmlSection   HtmlSection @relation(fields: [htmlSectionId], references: [id], onDelete: Cascade)
 
   @@unique([pageId, htmlSectionId])
   @@map("page_html_sections")
@@ -1189,144 +1189,119 @@ model AdminUser {
   @@map("admin_users")
 }
 
-// ===================================
-// GEOGRAPHIC DATABASE SCHEMA
-// ===================================
-
-// Continents/Geographic Regions
 model Continent {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique // e.g., "North America", "Europe", "Asia"
-  code        String    @unique // e.g., "NA", "EU", "AS"
-  slug        String    @unique // e.g., "north-america", "europe"
-  countries   Country[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  code      String    @unique
+  slug      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  countries Country[]
 
   @@map("continents")
 }
 
-// Countries
 model Country {
-  id            Int             @id @default(autoincrement())
-  name          String          // e.g., "United States", "Canada"
-  officialName  String?         // e.g., "United States of America"
-  code2         String          @unique // ISO 3166-1 alpha-2: "US", "CA"
-  code3         String          @unique // ISO 3166-1 alpha-3: "USA", "CAN"
-  numericCode   String?         // ISO 3166-1 numeric: "840", "124"
-  slug          String          @unique // e.g., "united-states", "canada"
-  capital       String?         // Capital city name
-  currency      String?         // Currency code: "USD", "CAD"
-  languages     String?         // JSON array of language codes
-  timezone      String?         // Primary timezone
-  phoneCode     String?         // International calling code
-  latitude      Float?
-  longitude     Float?
-  continent     Continent       @relation(fields: [continentId], references: [id])
-  continentId   Int
-  states        State[]
-  cities        City[]
-  isActive      Boolean         @default(true)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  id           Int       @id @default(autoincrement())
+  name         String
+  officialName String?
+  code2        String    @unique
+  code3        String    @unique
+  numericCode  String?
+  slug         String    @unique
+  capital      String?
+  currency     String?
+  languages    String?
+  timezone     String?
+  phoneCode    String?
+  latitude     Float?
+  longitude    Float?
+  continentId  Int
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  cities       City[]
+  continent    Continent @relation(fields: [continentId], references: [id])
+  states       State[]
 
   @@map("countries")
 }
 
-// States/Provinces/Administrative Divisions Level 1
 model State {
-  id            Int       @id @default(autoincrement())
-  name          String    // e.g., "California", "Ontario"
-  officialName  String?   // Full official name if different
-  code          String    // State/province code: "CA", "ON"
-  type          String    @default("state") // "state", "province", "territory", "region"
-  slug          String    // e.g., "california", "ontario"
-  capital       String?   // State/province capital
-  latitude      Float?
-  longitude     Float?
-  country       Country   @relation(fields: [countryId], references: [id])
-  countryId     Int
-  counties      County[]
-  cities        City[]
-  isActive      Boolean   @default(true)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id           Int      @id @default(autoincrement())
+  name         String
+  officialName String?
+  code         String
+  type         String   @default("state")
+  slug         String
+  capital      String?
+  latitude     Float?
+  longitude    Float?
+  countryId    Int
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  cities       City[]
+  counties     County[]
+  country      Country  @relation(fields: [countryId], references: [id])
 
   @@unique([countryId, code])
   @@unique([countryId, slug])
   @@map("states")
 }
 
-// Counties/Administrative Divisions Level 2
 model County {
-  id          Int       @id @default(autoincrement())
-  name        String    // e.g., "Los Angeles County", "Cook County"
-  type        String    @default("county") // "county", "parish", "borough", "district"
-  slug        String    // e.g., "los-angeles-county"
-  fipsCode    String?   // FIPS code for US counties
-  latitude    Float?
-  longitude   Float?
-  state       State     @relation(fields: [stateId], references: [id])
-  stateId     Int
-  cities      City[]
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      String   @default("county")
+  slug      String
+  fipsCode  String?
+  latitude  Float?
+  longitude Float?
+  stateId   Int
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  cities    City[]
+  state     State    @relation(fields: [stateId], references: [id])
 
   @@unique([stateId, slug])
   @@map("counties")
 }
 
-// Cities, Towns, Villages, and other populated places
 model City {
-  id              Int                 @id @default(autoincrement())
-  name            String              // e.g., "New York", "Los Angeles", "Toronto"
-  officialName    String?             // Full official name if different
-  type            String              @default("city") // "city", "town", "village", "hamlet", "borough", "municipality"
-  slug            String              // e.g., "new-york", "los-angeles"
-  
-  // Geographic coordinates
-  latitude        Float?
-  longitude       Float?
-  elevation       Int?                // Elevation in meters
-  
-  // Administrative hierarchy
-  country         Country             @relation(fields: [countryId], references: [id])
-  countryId       Int
-  state           State?              @relation(fields: [stateId], references: [id])
-  stateId         Int?
-  county          County?             @relation(fields: [countyId], references: [id])
-  countyId        Int?
-  
-  // Demographics and characteristics
-  population      Int?                // Latest population count
-  populationYear  Int?                // Year of population data
-  area            Float?              // Area in square kilometers
-  density         Float?              // Population density per sq km
-  timezone        String?             // Local timezone
-  
-  // Postal and administrative codes
-  postalCodes     String?             // JSON array of postal/ZIP codes
-  areaCode        String?             // Phone area code
-  fipsCode        String?             // FIPS code (US)
-  geonameId       Int?                // GeoNames ID for reference
-  
-  // Additional metadata
-  founded         Int?                // Year founded
-  incorporated    Int?                // Year incorporated
-  website         String?             // Official city website
-  
-  // Status flags
-  isCapital       Boolean             @default(false) // Is this a capital city?
-  isMetropolitan  Boolean             @default(false) // Is this a major metropolitan area?
-  isActive        Boolean             @default(true)
-  
-  // Relations
-  alternateNames  CityAlternateName[]
-  
-  // Timestamps
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
+  id             Int                 @id @default(autoincrement())
+  name           String
+  officialName   String?
+  type           String              @default("city")
+  slug           String
+  latitude       Float?
+  longitude      Float?
+  elevation      Int?
+  countryId      Int
+  stateId        Int?
+  countyId       Int?
+  population     Int?
+  populationYear Int?
+  area           Float?
+  density        Float?
+  timezone       String?
+  postalCodes    String?
+  areaCode       String?
+  fipsCode       String?
+  geonameId      Int?
+  founded        Int?
+  incorporated   Int?
+  website        String?
+  isCapital      Boolean             @default(false)
+  isMetropolitan Boolean             @default(false)
+  isActive       Boolean             @default(true)
+  createdAt      DateTime            @default(now())
+  updatedAt      DateTime            @updatedAt
+  county         County?             @relation(fields: [countyId], references: [id])
+  state          State?              @relation(fields: [stateId], references: [id])
+  country        Country             @relation(fields: [countryId], references: [id])
+  alternateNames CityAlternateName[]
 
   @@unique([countryId, stateId, slug])
   @@index([countryId])
@@ -1337,51 +1312,35 @@ model City {
   @@map("cities")
 }
 
-// Alternative names and translations for cities
 model CityAlternateName {
-  id              Int       @id @default(autoincrement())
-  city            City      @relation(fields: [cityId], references: [id], onDelete: Cascade)
-  cityId          Int
-  name            String    // Alternative name
-  language        String?   // Language code (ISO 639-1)
-  type            String    @default("alternate") // "alternate", "historic", "colloquial", "short"
-  isPreferred     Boolean   @default(false)
-  isShort         Boolean   @default(false)
-  isColloquial    Boolean   @default(false)
-  isHistoric      Boolean   @default(false)
-  createdAt       DateTime  @default(now())
+  id           Int      @id @default(autoincrement())
+  cityId       Int
+  name         String
+  language     String?
+  type         String   @default("alternate")
+  isPreferred  Boolean  @default(false)
+  isShort      Boolean  @default(false)
+  isColloquial Boolean  @default(false)
+  isHistoric   Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  city         City     @relation(fields: [cityId], references: [id], onDelete: Cascade)
 
   @@unique([cityId, name, language])
   @@map("city_alternate_names")
 }
 
-// ===================================
-// NAICS INDUSTRY CLASSIFICATION SCHEMA
-// ===================================
-
-// Main NAICS Classifications table - hierarchical industry structure
 model NAICSClassification {
-  id                      Int       @id @default(autoincrement())
-  
-  // NAICS code and title
-  code                    String    @unique // The NAICS code (e.g., "11", "541511", "31-33")
-  title                   String    // The industry title
-  
-  // Hierarchy information
-  level                   String    // Level: "sector", "subsector", "industry_group", "industry", "national_industry"
-  parentCode              String?   // Code of the parent classification
-  
-  // Metadata
-  isActive                Boolean   @default(true)
-  createdAt               DateTime  @default(now())
-  updatedAt               DateTime  @updatedAt
-
-  // Self-referential relations for hierarchy
-  parent                  NAICSClassification? @relation("NAICSHierarchy", fields: [parentCode], references: [code])
-  children                NAICSClassification[] @relation("NAICSHierarchy")
-
-  // Relations
-  companyClassifications  CompanyNAICSClassification[]
+  id                     Int                          @id @default(autoincrement())
+  code                   String                       @unique
+  title                  String
+  level                  String
+  parentCode             String?
+  isActive               Boolean                      @default(true)
+  createdAt              DateTime                     @default(now())
+  updatedAt              DateTime                     @updatedAt
+  companyClassifications CompanyNAICSClassification[]
+  parent                 NAICSClassification?         @relation("NAICSHierarchy", fields: [parentCode], references: [code])
+  children               NAICSClassification[]        @relation("NAICSHierarchy")
 
   @@index([code])
   @@index([level])
@@ -1390,48 +1349,43 @@ model NAICSClassification {
   @@map("naics_classifications")
 }
 
-// NAICS Aliases - for mapping Canadian wholesale codes to US equivalents
 model NAICSAlias {
-  id          Int       @id @default(autoincrement())
-  aliasCode   String    @unique // The alias code (e.g., "411", "412")
-  mapsTo      String    // The canonical code it maps to (e.g., "423", "424")
-  note        String?   // Explanation of the mapping
-  isActive    Boolean   @default(true)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        Int      @id @default(autoincrement())
+  aliasCode String   @unique
+  mapsTo    String
+  note      String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@map("naics_aliases")
 }
 
-// NAICS Changes - historical concordance from 2017 to 2022
 model NAICSChange {
-  id          Int       @id @default(autoincrement())
-  code2017    String    // 2017 NAICS code
-  title2017   String    // 2017 title
-  code2022    String    // 2022 NAICS code
-  title2022   String    // 2022 title
-  method      String    @default("official_concordance") // Method of concordance
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id        Int      @id @default(autoincrement())
+  code2017  String
+  title2017 String
+  code2022  String
+  title2022 String
+  method    String   @default("official_concordance")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([code2017])
   @@index([code2022])
   @@map("naics_changes")
 }
 
-// Company NAICS Classifications - for associating companies with industry codes
 model CompanyNAICSClassification {
   id                    Int                 @id @default(autoincrement())
-  companyId             Int                 // Foreign key to Company table (when implemented)
-  naicsClassificationId Int                 // Foreign key to NAICSClassification
-  isPrimary             Boolean             @default(false) // Is this the primary classification?
-  confidence            Float?              @default(1.0) // Confidence score (0.0 to 1.0)
-  source                String?             // Source of classification (e.g., "manual", "api", "import")
-  verifiedAt            DateTime?           // When this classification was last verified
+  companyId             Int
+  naicsClassificationId Int
+  isPrimary             Boolean             @default(false)
+  confidence            Float?              @default(1.0)
+  source                String?
+  verifiedAt            DateTime?
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
-
-  // Relations
   naicsClassification   NAICSClassification @relation(fields: [naicsClassificationId], references: [id], onDelete: Cascade)
 
   @@unique([companyId, naicsClassificationId])
@@ -1440,73 +1394,51 @@ model CompanyNAICSClassification {
   @@map("company_naics_classifications")
 }
 
-
-// ===================================
-// SIMPLE INDUSTRY LIST (FLAT)
-// ===================================
-
 model Industry {
-  id        Int      @id @default(autoincrement())
-  label     String   @unique
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  // Relations
-  keywords  Keyword[]
-  businesses BusinessIndustry[] // Many-to-many relationship with businesses
+  id         Int                @id @default(autoincrement())
+  label      String             @unique
+  isActive   Boolean            @default(true)
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  businesses BusinessIndustry[]
+  keywords   Keyword[]
 
   @@map("industries")
 }
 
-// ===================================
-// KEYWORDS STORAGE
-// ===================================
-
 model Keyword {
-  id          Int      @id @default(autoincrement())
-  searchTerm  String   // The actual search term (e.g., "plumbing contractor")
-  industryId  Int      // Foreign key to Industry table
-  
-  // Metadata
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Relations
+  id         Int      @id @default(autoincrement())
+  searchTerm String
+  industryId Int
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
   industry   Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
 
-  @@unique([searchTerm, industryId]) // Prevent duplicate terms per industry
+  @@unique([searchTerm, industryId])
   @@index([industryId])
   @@index([searchTerm])
   @@index([isActive])
   @@map("keywords")
 }
 
-// ===================================
-// BUSINESS DIRECTORY
-// ===================================
-
 model BusinessDirectory {
-  id              Int      @id @default(autoincrement())
-  website         String   // Mandatory field
+  id              Int                @id @default(autoincrement())
+  website         String             @unique
   companyName     String?
   city            String?
   stateProvince   String?
-  country         String?  // Added country field
   phoneNumber     String?
   email           String?
   employeesCount  Int?
   contactPersonId Int?
-  isActive        Boolean  @default(true)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  // Relations
-  contactPerson   ContactPerson? @relation(fields: [contactPersonId], references: [id])
-  industries      BusinessIndustry[] // Many-to-many relationship with industries
+  isActive        Boolean            @default(true)
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  country         String?
+  contactPerson   ContactPerson?     @relation(fields: [contactPersonId], references: [id])
+  industries      BusinessIndustry[]
 
-  @@unique([website]) // Prevent duplicate websites
   @@index([city])
   @@index([stateProvince])
   @@index([country])
@@ -1514,44 +1446,34 @@ model BusinessDirectory {
   @@map("business_directory")
 }
 
-// ===================================
-// BUSINESS-INDUSTRY JUNCTION TABLE
-// ===================================
-
 model BusinessIndustry {
-  id              Int      @id @default(autoincrement())
-  businessId      Int
-  industryId      Int
-  isPrimary       Boolean  @default(false) // Mark primary industry
-  createdAt       DateTime @default(now())
-  
-  // Relations
-  business        BusinessDirectory @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  industry        Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
-  
-  @@unique([businessId, industryId]) // Prevent duplicate relationships
+  id         Int               @id @default(autoincrement())
+  businessId Int
+  industryId Int
+  isPrimary  Boolean           @default(false)
+  createdAt  DateTime          @default(now())
+  industry   Industry          @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  business   BusinessDirectory @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@unique([businessId, industryId])
   @@index([businessId])
   @@index([industryId])
   @@map("business_industries")
 }
 
 model ContactPerson {
-  id          Int      @id @default(autoincrement())
-  firstName   String
-  lastName    String
-  title       String?
-  email       String?
-  phone       String?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  // Relations
-  businesses  BusinessDirectory[]
+  id         Int                 @id @default(autoincrement())
+  firstName  String
+  lastName   String
+  title      String?
+  email      String?
+  phone      String?
+  isActive   Boolean             @default(true)
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+  businesses BusinessDirectory[]
 
   @@index([firstName, lastName])
   @@index([isActive])
   @@map("contact_persons")
 }
-
-

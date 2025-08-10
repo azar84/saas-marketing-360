@@ -26,6 +26,7 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
+import { AutocompleteInput } from '@/components/ui/AutocompleteInput';
 import { useAdminApi } from '@/hooks/useApi';
 
 interface BusinessDirectory {
@@ -80,10 +81,11 @@ interface ApiResponse<T> {
 
 interface PaginatedResponse<T> extends ApiResponse<T> {
   pagination?: {
+    currentPage: number;
     totalPages: number;
     totalCount: number;
-    currentPage: number;
-    resultsPerPage: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
   };
 }
 
@@ -101,6 +103,15 @@ export default function BusinessDirectoryManager() {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterActive, setFilterActive] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  
+  // Search filters
+  const [searchFilters, setSearchFilters] = useState({
+    city: '',
+    stateProvince: '',
+    country: '',
+    industry: ''
+  });
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -146,8 +157,35 @@ export default function BusinessDirectoryManager() {
   const loadData = async (page: number = 1) => {
     setLoading(true);
     try {
+      // Build search query with filters
+      const searchParams = new URLSearchParams({
+        page: page.toString(),
+        limit: resultsPerPage.toString(),
+        isActive: filterActive.toString()
+      });
+
+      if (searchTerm.trim()) {
+        searchParams.set('q', searchTerm.trim());
+      }
+
+      if (searchFilters.city.trim()) {
+        searchParams.set('city', searchFilters.city.trim());
+      }
+
+      if (searchFilters.stateProvince.trim()) {
+        searchParams.set('stateProvince', searchFilters.stateProvince.trim());
+      }
+
+      if (searchFilters.country.trim()) {
+        searchParams.set('country', searchFilters.country.trim());
+      }
+
+      if (searchFilters.industry.trim()) {
+        searchParams.set('industry', searchFilters.industry.trim());
+      }
+
       const [businessesData, contactsData] = await Promise.all([
-        get(`/api/admin/business-directory?page=${page}&limit=${resultsPerPage}&search=${searchTerm}&isActive=${filterActive}`) as Promise<PaginatedResponse<BusinessDirectory[]>>,
+        get(`/api/admin/business-directory/search?${searchParams.toString()}`) as Promise<PaginatedResponse<BusinessDirectory[]>>,
         get('/api/admin/contact-persons') as Promise<ApiResponse<ContactPerson[]>>
       ]);
       
@@ -354,7 +392,7 @@ export default function BusinessDirectoryManager() {
     alert('Bulk import functionality coming soon!');
   };
 
-  // Debounced search effect
+  // Debounced search effect for search term
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchTerm !== '') {
@@ -367,19 +405,18 @@ export default function BusinessDirectoryManager() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  const filteredBusinesses = businesses.filter(business => {
-    const matchesSearch = !searchTerm || 
-      business.companyName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      business.website.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      business.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      business.stateProvince?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      business.country?.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesFilter = filterActive ? business.isActive : true;
-    
-    return matchesSearch && matchesFilter;
-  });
+  // Debounced search effect for search filters
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchLoading(true);
+      setCurrentPage(1);
+      loadData(1).finally(() => setSearchLoading(false));
+    }, 500);
 
+    return () => clearTimeout(timer);
+  }, [searchFilters.city, searchFilters.stateProvince, searchFilters.country, searchFilters.industry]);
+
+  // Client-side filtering for contacts only (businesses use server-side search)
   const filteredContacts = contactPersons.filter(contact => {
     const matchesSearch = !searchTerm || 
       `${contact.firstName} ${contact.lastName}`.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -452,57 +489,135 @@ export default function BusinessDirectoryManager() {
       </div>
 
       {/* Search and Filters */}
-      <div className="flex items-center gap-4">
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-            <Input
-              type="text"
-              placeholder={`Search ${activeTab === 'businesses' ? 'businesses' : 'contacts'}...`}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-            {searchLoading && (
-              <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-              </div>
-            )}
+      <div className="space-y-4">
+        <div className="flex items-center gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Input
+                type="text"
+                placeholder={`Search ${activeTab === 'businesses' ? 'businesses' : 'contacts'}...`}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+              {searchLoading && (
+                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setFilterActive(!filterActive)}
+              className="flex items-center gap-2"
+            >
+              {filterActive ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+              {filterActive ? 'Active Only' : 'All'}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className="flex items-center gap-2"
+            >
+              <Filter className="h-4 w-4" />
+              Advanced
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSearchTerm('');
+                setSearchFilters({ city: '', stateProvince: '', country: '', industry: '' });
+                setFilterActive(true);
+                setCurrentPage(1);
+                loadData(1);
+              }}
+            >
+              <X className="h-4 w-4 mr-2" />
+              Clear
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => loadData(currentPage)}
+              disabled={loading}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => setFilterActive(!filterActive)}
-            className="flex items-center gap-2"
-          >
-            {filterActive ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-            {filterActive ? 'Active Only' : 'All'}
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              setSearchTerm('');
-              setFilterActive(true);
-              setCurrentPage(1);
-              loadData(1);
-            }}
-          >
-            <X className="h-4 w-4 mr-2" />
-            Clear
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => loadData(currentPage)}
-            disabled={loading}
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
-        </div>
+
+        {/* Advanced Search Filters */}
+        {showAdvancedFilters && activeTab === 'businesses' && (
+          <Card>
+            <CardContent className="pt-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                    City
+                  </label>
+                  <AutocompleteInput
+                    field="city"
+                    placeholder="Filter by city..."
+                    value={searchFilters.city}
+                    onChange={(value) => setSearchFilters(prev => ({ ...prev, city: value }))}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                    State/Province
+                  </label>
+                  <AutocompleteInput
+                    field="stateProvince"
+                    placeholder="Filter by state/province..."
+                    value={searchFilters.stateProvince}
+                    onChange={(value) => setSearchFilters(prev => ({ ...prev, stateProvince: value }))}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                    Country
+                  </label>
+                  <AutocompleteInput
+                    field="country"
+                    placeholder="Filter by country..."
+                    value={searchFilters.country}
+                    onChange={(value) => setSearchFilters(prev => ({ ...prev, country: value }))}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                    Industry
+                  </label>
+                  <AutocompleteInput
+                    field="industry"
+                    placeholder="Filter by industry..."
+                    value={searchFilters.industry}
+                    onChange={(value) => setSearchFilters(prev => ({ ...prev, industry: value }))}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end mt-4">
+                <Button
+                  onClick={() => {
+                    setCurrentPage(1);
+                    loadData(1);
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Search className="h-4 w-4" />
+                  Apply Filters
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
       
       {/* Status Indicator */}
@@ -525,7 +640,7 @@ export default function BusinessDirectoryManager() {
                     Business Directory
                   </CardTitle>
                   <CardDescription>
-                    {filteredBusinesses.length} businesses found
+                    {totalCount} businesses found
                   </CardDescription>
                 </div>
                 <div className="flex gap-2">
@@ -554,14 +669,14 @@ export default function BusinessDirectoryManager() {
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
                   <p className="mt-2 text-gray-500">Loading businesses...</p>
                 </div>
-              ) : filteredBusinesses.length === 0 ? (
+              ) : businesses.length === 0 ? (
                 <div className="text-center py-8">
                   <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-500">No businesses found</p>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {filteredBusinesses.map((business) => (
+                  {businesses.map((business) => (
                     <div
                       key={business.id}
                       className="p-4 border rounded-lg hover:shadow-md transition-shadow"

@@ -19,21 +19,21 @@ export async function GET(request: NextRequest) {
     
     if (search) {
       where.OR = [
-        { website: { contains: search, mode: 'insensitive' } },
-        { companyName: { contains: search, mode: 'insensitive' } },
-        { city: { contains: search, mode: 'insensitive' } },
-        { stateProvince: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } }
+        { website: { contains: search } },
+        { companyName: { contains: search } },
+        { city: { contains: search } },
+        { stateProvince: { contains: search } },
+        { email: { contains: search } }
       ];
     }
 
-    if (city) {
-      where.city = { contains: city, mode: 'insensitive' };
-    }
+          if (city) {
+        where.city = { contains: city };
+      }
 
-    if (stateProvince) {
-      where.stateProvince = { contains: stateProvince, mode: 'insensitive' };
-    }
+      if (stateProvince) {
+        where.stateProvince = { contains: stateProvince };
+      }
 
     if (isActive !== null && isActive !== undefined) {
       where.isActive = isActive === 'true';
