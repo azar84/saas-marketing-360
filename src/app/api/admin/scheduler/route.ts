@@ -115,4 +115,35 @@ export async function PUT(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+// DELETE - Remove a task
+export async function DELETE(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const taskId = searchParams.get('taskId');
+
+    if (!taskId) {
+      return NextResponse.json(
+        { error: 'Task ID is required' },
+        { status: 400 }
+      );
+    }
+
+    const removed = scheduler.removeTask(taskId);
+    if (removed) {
+      return NextResponse.json({ success: true });
+    } else {
+      return NextResponse.json(
+        { error: 'Task not found' },
+        { status: 404 }
+      );
+    }
+  } catch (error) {
+    console.error('Failed to delete task:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete task' },
+      { status: 500 }
+    );
+  }
 } 

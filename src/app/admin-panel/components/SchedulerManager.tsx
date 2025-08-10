@@ -8,8 +8,8 @@ interface ScheduledTask {
   id: string;
   name: string;
   cronExpression: string;
-  lastRun?: Date;
-  nextRun?: Date;
+  lastRun?: string | null;
+  nextRun?: string | null;
   isRunning: boolean;
   enabled: boolean;
 }
@@ -18,7 +18,7 @@ interface SchedulerStatus {
   isRunning: boolean;
   taskCount: number;
   enabledTaskCount: number;
-  nextTask?: { id: string; name: string; nextRun: Date };
+  nextTask?: { id: string; name: string; nextRun: string };
 }
 
 interface CronSchedule {
@@ -358,21 +358,48 @@ export default function SchedulerManager() {
       });
       
       if (response.ok) {
-        showMessage('success', 'Schedule updated successfully');
-        fetchData();
+        showMessage('success', 'Task updated successfully');
         setEditingTask(null);
+        fetchData();
       } else {
         const error = await response.json();
-        showMessage('error', error.error || 'Failed to update schedule');
+        showMessage('error', error.error || 'Failed to update task');
       }
     } catch (error) {
       console.error('Failed to update task:', error);
-      showMessage('error', 'Failed to update schedule');
+      showMessage('error', 'Failed to update task');
     }
   };
 
-  const formatDate = (date: Date | string) => {
+  const handleDeleteTask = async (taskId: string) => {
+    if (!confirm('Are you sure you want to delete this task? This action cannot be undone.')) {
+      return;
+    }
+
     try {
+      const response = await fetch(`/api/admin/scheduler?taskId=${taskId}`, {
+        method: 'DELETE'
+      });
+      
+      if (response.ok) {
+        showMessage('success', 'Task deleted successfully');
+        fetchData();
+      } else {
+        const error = await response.json();
+        showMessage('error', error.error || 'Failed to delete task');
+      }
+    } catch (error) {
+      console.error('Failed to delete task:', error);
+      showMessage('error', 'Failed to delete task');
+    }
+  };
+
+  const formatDate = (date: Date | string | null | undefined) => {
+    try {
+      if (!date) {
+        return 'Never';
+      }
+      
       const dateObj = new Date(date);
       
       // Check if date is valid
@@ -596,6 +623,20 @@ export default function SchedulerManager() {
                       title={task.enabled ? 'Disable task' : 'Enable task'}
                     >
                       {task.enabled ? 'Disable' : 'Enable'}
+                    </Button>
+                    <Button
+                      onClick={() => handleDeleteTask(task.id)}
+                      variant="outline"
+                      size="sm"
+                      leftIcon={<X className="w-4 h-4" />}
+                      style={{ 
+                        color: 'var(--color-error)', 
+                        borderColor: 'var(--color-error-light)',
+                        backgroundColor: 'var(--color-bg-primary)'
+                      }}
+                      title="Delete task"
+                    >
+                      Delete
                     </Button>
                   </div>
                 </div>

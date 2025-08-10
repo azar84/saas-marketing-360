@@ -49,12 +49,11 @@ import KeywordsResult from './components/KeywordsResult';
 import SearchEngineManager from './components/SearchEngineManager';
 import IndustrySearchManager from './components/IndustrySearchManager';
 import BusinessDirectoryManager from './components/BusinessDirectoryManager';
-import TestSearch from './test-search';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'tech-discovery' | 'geographic-manager' | 'naics-manager' | 'search-engine' | 'industry-search' | 'business-directory' | 'test-search';
+type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'tech-discovery' | 'geographic-manager' | 'naics-manager' | 'search-engine' | 'industry-search' | 'business-directory';
 
 // Navigation items with design system colors
 const getNavigationItems = (designSystem: any) => {
@@ -63,11 +62,11 @@ const getNavigationItems = (designSystem: any) => {
   return [
     { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard, color: colors.primary },
     { id: 'industry-search', name: 'Industry Search', icon: Building, color: colors.success },
+    { id: 'business-directory', name: 'Business Directory', icon: Building, color: colors.warning },
+    { id: 'naics-manager', name: 'NAICS Industries', icon: BarChart3, color: colors.accent },
     { id: 'search-engine', name: 'Search Engine', icon: Search, color: colors.info },
     { id: 'tech-discovery', name: 'Tech Discovery', icon: Search, color: colors.accent },
     { id: 'geographic-manager', name: 'Geographic Database', icon: Globe, color: colors.success },
-    { id: 'naics-manager', name: 'NAICS Industries', icon: BarChart3, color: colors.accent },
-    { id: 'business-directory', name: 'Business Directory', icon: Building, color: colors.warning },
     { id: 'media-library', name: 'Media Library', icon: FolderOpen, color: colors.primary },
     { id: 'pricing', name: 'Pricing Plans', icon: DollarSign, color: colors.success },
     { id: 'faq-management', name: 'FAQ Management', icon: MessageSquare, color: colors.accent },
@@ -78,7 +77,6 @@ const getNavigationItems = (designSystem: any) => {
     { id: 'scheduler', name: 'Scheduler', icon: Clock, color: colors.warning },
     { id: 'design-system', name: 'Design System', icon: Layers, color: colors.primary },
     { id: 'site-settings', name: 'Site Settings', icon: Settings, color: colors.textSecondary },
-    { id: 'test-search', name: 'Test Search', icon: Search, color: colors.warning },
   ];
 };
 
@@ -408,15 +406,6 @@ export default function AdminPanel() {
             <IndustrySearchManager />
           </div>
         );
-      case 'test-search':
-        return (
-          <div 
-            className="p-8 space-y-8"
-            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
-          >
-            <TestSearch />
-          </div>
-        );
       case 'business-directory':
         return (
           <div 
@@ -636,7 +625,7 @@ export default function AdminPanel() {
       >
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="flex items-center justify-center p-4 border-b border-gray-200" style={{ height: '73px' }}>
+          <div className="flex items-center justify-center p-3 border-b border-gray-200" style={{ height: '60px' }}>
             {sidebarOpen ? (
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center space-x-3">
@@ -679,7 +668,7 @@ export default function AdminPanel() {
           </div>
 
           {/* Navigation */}
-          <nav className={`flex-1 ${sidebarOpen ? 'p-4' : 'p-2'} space-y-2 ${sidebarOpen ? 'overflow-y-auto' : 'overflow-y-auto overflow-x-visible'}`}>
+          <nav className={`flex-1 ${sidebarOpen ? 'p-3' : 'p-2'} space-y-1 ${sidebarOpen ? 'overflow-y-auto' : 'overflow-y-auto overflow-x-visible'}`}>
             {navigationItems.map((item) => (
               <div key={item.id} className="relative">
                 <button
@@ -691,7 +680,7 @@ export default function AdminPanel() {
                     }
                   }}
                   title={!sidebarOpen ? item.name : ''}
-                  className={`w-full flex items-center ${sidebarOpen ? 'space-x-3 px-4 py-3' : 'justify-center p-3'} rounded-lg text-left transition-colors ${
+                  className={`w-full flex items-center ${sidebarOpen ? 'space-x-3 px-4 py-2' : 'justify-center p-2'} rounded-lg text-left transition-colors ${
                     activeSection === item.id
                       ? 'font-medium'
                       : ''
@@ -731,7 +720,7 @@ export default function AdminPanel() {
                     style={{
                       position: 'fixed',
                       left: '80px',
-                      top: `${80 + (navigationItems.findIndex(nav => nav.id === item.id) * 56)}px`,
+                      top: `${80 + (navigationItems.findIndex(nav => nav.id === item.id) * 44)}px`,
                       backgroundColor: '#1f2937',
                       color: 'white',
                       padding: '8px 12px',
