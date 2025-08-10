@@ -4,7 +4,15 @@ import scheduler from '@/lib/scheduler';
 // GET - Get scheduler status and tasks
 export async function GET(request: NextRequest) {
   try {
+    // Auto-start scheduler if not running
     const status = scheduler.getStatus();
+    if (!status.isRunning) {
+      console.log('🚀 [Scheduler API] Auto-starting scheduler...');
+      scheduler.start();
+    }
+    // Ensure due tasks execute on each poll (helps in dev to progress schedules)
+    await scheduler.runDueTasksNow();
+    
     const tasks = scheduler.getTasks();
 
     return NextResponse.json({
@@ -16,7 +24,9 @@ export async function GET(request: NextRequest) {
         enabled: task.enabled,
         isRunning: task.isRunning,
         lastRun: task.lastRun,
-        nextRun: task.nextRun
+        nextRun: task.nextRun,
+        // Include logs to avoid client-side undefined access (SchedulerManager uses task.logs.length)
+        logs: task.logs
       }))
     });
   } catch (error) {
@@ -60,6 +70,10 @@ export async function POST(request: NextRequest) {
             { status: 404 }
           );
         }
+
+      case 'refresh':
+        scheduler.forceRefreshSchedules();
+        return NextResponse.json({ success: true });
 
       default:
         return NextResponse.json(

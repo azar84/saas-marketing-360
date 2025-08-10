@@ -22,11 +22,12 @@ interface SchedulerStatus {
 }
 
 interface CronSchedule {
-  frequency: 'daily' | 'weekly' | 'monthly' | 'custom';
+  frequency: 'every-minute' | 'every-x-minutes' | 'every-x-hours' | 'daily' | 'weekly' | 'monthly' | 'custom';
   time: string;
   dayOfWeek?: number;
   dayOfMonth?: number;
   customExpression?: string;
+  interval?: number; // For every X minutes/hours
 }
 
 interface Message {
@@ -49,6 +50,35 @@ const CronExpressionEditor = ({
     if (parts.length === 5) {
       const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
       
+      // Check for every minute: * * * * *
+      if (minute === '*' && hour === '*' && dayOfMonth === '*' && month === '*' && dayOfWeek === '*') {
+        return {
+          frequency: 'every-minute',
+          time: '00:00'
+        };
+      }
+      
+      // Check for every X minutes: */X * * * *
+      if (minute.startsWith('*/') && hour === '*' && dayOfMonth === '*' && month === '*' && dayOfWeek === '*') {
+        const interval = parseInt(minute.substring(2));
+        return {
+          frequency: 'every-x-minutes',
+          time: '00:00',
+          interval: interval
+        };
+      }
+      
+      // Check for every X hours: 0 */X * * *
+      if (minute === '0' && hour.startsWith('*/') && dayOfMonth === '*' && month === '*' && dayOfWeek === '*') {
+        const interval = parseInt(hour.substring(2));
+        return {
+          frequency: 'every-x-hours',
+          time: '00:00',
+          interval: interval
+        };
+      }
+      
+      // Check for daily: X X * * *
       if (dayOfWeek === '*' && dayOfMonth === '*') {
         return {
           frequency: 'daily',
@@ -80,6 +110,12 @@ const CronExpressionEditor = ({
     const [hour, minute] = schedule.time.split(':');
     
     switch (schedule.frequency) {
+      case 'every-minute':
+        return '* * * * *';
+      case 'every-x-minutes':
+        return `*/${schedule.interval || 1} * * * *`;
+      case 'every-x-hours':
+        return `0 */${schedule.interval || 1} * * *`;
       case 'daily':
         return `${minute} ${hour} * * *`;
       case 'weekly':
@@ -101,6 +137,48 @@ const CronExpressionEditor = ({
   const getDayName = (day: number) => {
     const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
     return days[day];
+  };
+
+  const getCronDescription = (cronExpression: string): string => {
+    const parts = cronExpression.split(' ');
+    if (parts.length !== 5) return 'Invalid cron expression';
+    
+    const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
+    
+    // Every minute
+    if (minute === '*' && hour === '*' && dayOfMonth === '*' && month === '*' && dayOfWeek === '*') {
+      return 'Every minute';
+    }
+    
+    // Every X minutes
+    if (minute.startsWith('*/') && hour === '*' && dayOfMonth === '*' && month === '*' && dayOfWeek === '*') {
+      const interval = minute.substring(2);
+      return `Every ${interval} minute(s)`;
+    }
+    
+    // Every X hours
+    if (minute === '0' && hour.startsWith('*/') && dayOfMonth === '*' && month === '*' && dayOfWeek === '*') {
+      const interval = hour.substring(2);
+      return `Every ${interval} hour(s)`;
+    }
+    
+    // Daily at specific time
+    if (dayOfWeek === '*' && dayOfMonth === '*') {
+      return `Daily at ${hour.padStart(2, '0')}:${minute.padStart(2, '0')} UTC`;
+    }
+    
+    // Weekly on specific day
+    if (dayOfWeek !== '*') {
+      const dayName = getDayName(parseInt(dayOfWeek));
+      return `Weekly on ${dayName} at ${hour.padStart(2, '0')}:${minute.padStart(2, '0')} UTC`;
+    }
+    
+    // Monthly on specific day
+    if (dayOfMonth !== '*') {
+      return `Monthly on day ${dayOfMonth} at ${hour.padStart(2, '0')}:${minute.padStart(2, '0')} UTC`;
+    }
+    
+    return 'Custom schedule';
   };
 
   return (
@@ -146,6 +224,9 @@ const CronExpressionEditor = ({
               backgroundColor: 'var(--color-bg-primary)'
             }}
           >
+            <option value="every-minute">Every Minute</option>
+            <option value="every-x-minutes">Every X Minutes</option>
+            <option value="every-x-hours">Every X Hours</option>
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
             <option value="monthly">Monthly</option>
@@ -153,21 +234,51 @@ const CronExpressionEditor = ({
           </select>
         </div>
 
-        {/* Time Selection */}
-        <div>
-          <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Time (UTC)</label>
-          <input
-            type="time"
-            value={schedule.time}
-            onChange={(e) => setSchedule({ ...schedule, time: e.target.value })}
-            className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2"
-            style={{ 
-              borderColor: 'var(--color-gray-light)',
-              color: 'var(--color-text-primary)',
-              backgroundColor: 'var(--color-bg-primary)'
-            }}
-          />
-        </div>
+        {/* Interval Selection for Every X Minutes/Hours */}
+        {(schedule.frequency === 'every-x-minutes' || schedule.frequency === 'every-x-hours') && (
+          <div>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+              {schedule.frequency === 'every-x-minutes' ? 'Minutes Interval' : 'Hours Interval'}
+            </label>
+            <input
+              type="number"
+              min="1"
+              max={schedule.frequency === 'every-x-minutes' ? "59" : "23"}
+              value={schedule.interval || 1}
+              onChange={(e) => setSchedule({ ...schedule, interval: parseInt(e.target.value) || 1 })}
+              className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2"
+              style={{ 
+                borderColor: 'var(--color-gray-light)',
+                color: 'var(--color-text-primary)',
+                backgroundColor: 'var(--color-bg-primary)'
+              }}
+            />
+            <p className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
+              {schedule.frequency === 'every-x-minutes' 
+                ? 'Enter a number between 1-59 (e.g., 5 for every 5 minutes)' 
+                : 'Enter a number between 1-23 (e.g., 2 for every 2 hours)'
+              }
+            </p>
+          </div>
+        )}
+
+        {/* Time Selection - Only show for daily, weekly, monthly */}
+        {(schedule.frequency === 'daily' || schedule.frequency === 'weekly' || schedule.frequency === 'monthly') && (
+          <div>
+            <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Time (UTC)</label>
+            <input
+              type="time"
+              value={schedule.time}
+              onChange={(e) => setSchedule({ ...schedule, time: e.target.value })}
+              className="w-full border rounded-md px-3 py-2 focus:outline-none focus:ring-2"
+              style={{ 
+                borderColor: 'var(--color-gray-light)',
+                color: 'var(--color-text-primary)',
+                backgroundColor: 'var(--color-bg-primary)'
+              }}
+            />
+          </div>
+        )}
 
         {/* Day of Week (for weekly) */}
         {schedule.frequency === 'weekly' && (
@@ -243,11 +354,27 @@ const CronExpressionEditor = ({
             <strong style={{ color: 'var(--color-text-primary)' }}>Generated Expression:</strong> {generateCronExpression()}
           </p>
           <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>
+            {schedule.frequency === 'every-minute' && 'Runs every minute'}
+            {schedule.frequency === 'every-x-minutes' && `Runs every ${schedule.interval || 1} minute(s)`}
+            {schedule.frequency === 'every-x-hours' && `Runs every ${schedule.interval || 1} hour(s)`}
             {schedule.frequency === 'daily' && `Runs daily at ${schedule.time} UTC`}
             {schedule.frequency === 'weekly' && `Runs weekly on ${getDayName(schedule.dayOfWeek || 0)} at ${schedule.time} UTC`}
             {schedule.frequency === 'monthly' && `Runs monthly on day ${schedule.dayOfMonth || 1} at ${schedule.time} UTC`}
             {schedule.frequency === 'custom' && 'Custom schedule'}
           </p>
+          
+          {/* Cron Expression Help */}
+          <div className="mt-3 pt-3 border-t" style={{ borderColor: 'var(--color-gray-light)' }}>
+            <p className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+              <strong>Cron Format:</strong> minute hour day month weekday<br/>
+              <strong>Examples:</strong><br/>
+              • <code>* * * * *</code> = Every minute<br/>
+              • <code>*/5 * * * *</code> = Every 5 minutes<br/>
+              • <code>0 */2 * * *</code> = Every 2 hours<br/>
+              • <code>0 2 * * *</code> = Daily at 2:00 AM<br/>
+              • <code>0 9 * * 1</code> = Weekly on Monday at 9:00 AM
+            </p>
+          </div>
         </div>
       </div>
     </Card>
@@ -260,6 +387,53 @@ export default function SchedulerManager() {
   const [loading, setLoading] = useState(true);
   const [editingTask, setEditingTask] = useState<string | null>(null);
   const [message, setMessage] = useState<Message | null>(null);
+  const [selectedTaskForLogs, setSelectedTaskForLogs] = useState<string | null>(null);
+  const [taskLogs, setTaskLogs] = useState<any[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
+
+  // Helper function to get human-readable cron description
+  const getCronDescription = (cronExpression: string): string => {
+    const parts = cronExpression.split(' ');
+    if (parts.length !== 5) return 'Invalid cron expression';
+    
+    const [minute, hour, dayOfMonth, month, dayOfWeek] = parts;
+    
+    // Every minute
+    if (minute === '*' && hour === '*' && dayOfMonth === '*' && month === '*' && dayOfWeek === '*') {
+      return 'Every minute';
+    }
+    
+    // Every X minutes
+    if (minute.startsWith('*/') && hour === '*' && dayOfMonth === '*' && month === '*' && dayOfWeek === '*') {
+      const interval = minute.substring(2);
+      return `Every ${interval} minute(s)`;
+    }
+    
+    // Every X hours
+    if (minute === '0' && hour.startsWith('*/') && dayOfMonth === '*' && month === '*' && dayOfWeek === '*') {
+      const interval = hour.substring(2);
+      return `Every ${interval} hour(s)`;
+    }
+    
+    // Daily at specific time
+    if (dayOfWeek === '*' && dayOfMonth === '*') {
+      return `Daily at ${hour.padStart(2, '0')}:${minute.padStart(2, '0')} UTC`;
+    }
+    
+    // Weekly on specific day
+    if (dayOfWeek !== '*') {
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const dayName = days[parseInt(dayOfWeek)] || 'Unknown';
+      return `Weekly on ${dayName} at ${hour.padStart(2, '0')}:${minute.padStart(2, '0')} UTC`;
+    }
+    
+    // Monthly on specific day
+    if (dayOfMonth !== '*') {
+      return `Monthly on day ${dayOfMonth} at ${hour.padStart(2, '0')}:${minute.padStart(2, '0')} UTC`;
+    }
+    
+    return 'Custom schedule';
+  };
 
   const showMessage = (type: 'success' | 'error', text: string) => {
     setMessage({ type, text });
@@ -272,6 +446,8 @@ export default function SchedulerManager() {
       const data = await response.json();
       setStatus(data.status);
       setTasks(data.tasks);
+      setLastUpdated(new Date());
+      await fetchTaskLogs();
     } catch (error) {
       console.error('Failed to fetch scheduler data:', error);
       showMessage('error', 'Failed to load scheduler data');
@@ -280,11 +456,54 @@ export default function SchedulerManager() {
     }
   };
 
+  const fetchTaskLogs = async () => {
+    try {
+      const url = selectedTaskForLogs 
+        ? `/api/admin/scheduler/logs?taskId=${selectedTaskForLogs}`
+        : '/api/admin/scheduler/logs';
+      
+      const response = await fetch(url);
+      if (response.ok) {
+        const data = await response.json();
+        // Ensure we're setting an array, with fallback to empty array
+        const logs = Array.isArray(data.logs) ? data.logs : [];
+        setTaskLogs(logs);
+      } else {
+        // If response is not ok, set empty array
+        setTaskLogs([]);
+      }
+    } catch (error) {
+      console.error('Failed to fetch task logs:', error);
+      // On error, set empty array
+      setTaskLogs([]);
+    }
+  };
+
   useEffect(() => {
     fetchData();
+    
+    // Set up automatic refresh every 30 seconds to keep UI in sync
+    const interval = setInterval(() => {
+      fetchData();
+    }, 30000); // 30 seconds
+    
+    return () => clearInterval(interval);
   }, []);
 
-  const handleSchedulerAction = async (action: 'start' | 'stop') => {
+  useEffect(() => {
+    if (selectedTaskForLogs !== null) {
+      fetchTaskLogs();
+      
+      // Set up frequent refresh for task logs when viewing them
+      const interval = setInterval(() => {
+        fetchTaskLogs();
+      }, 10000); // 10 seconds
+      
+      return () => clearInterval(interval);
+    }
+  }, [selectedTaskForLogs]);
+
+  const handleSchedulerAction = async (action: 'start' | 'stop' | 'refresh') => {
     try {
       const response = await fetch('/api/admin/scheduler', {
         method: 'POST',
@@ -293,7 +512,11 @@ export default function SchedulerManager() {
       });
       
       if (response.ok) {
-        showMessage('success', `Scheduler ${action === 'start' ? 'started' : 'stopped'} successfully`);
+        if (action === 'refresh') {
+          showMessage('success', 'Task schedules refreshed successfully');
+        } else {
+          showMessage('success', `Scheduler ${action === 'start' ? 'started' : 'stopped'} successfully`);
+        }
         fetchData();
       } else {
         const error = await response.json();
@@ -489,6 +712,19 @@ export default function SchedulerManager() {
             </Button>
           )}
           <Button 
+            onClick={() => handleSchedulerAction('refresh')}
+            variant="outline" 
+            leftIcon={<RefreshCw className="w-4 h-4" />}
+            style={{ 
+              color: 'var(--color-info)', 
+              borderColor: 'var(--color-info-light)',
+              backgroundColor: 'var(--color-bg-primary)'
+            }}
+            title="Refresh task schedules"
+          >
+            Refresh Schedules
+          </Button>
+          <Button 
             onClick={fetchData} 
             variant="outline" 
             leftIcon={<RefreshCw className="w-4 h-4" />}
@@ -498,7 +734,7 @@ export default function SchedulerManager() {
               backgroundColor: 'var(--color-bg-primary)'
             }}
           >
-            Refresh
+            Refresh Data
           </Button>
         </div>
       </div>
@@ -536,6 +772,11 @@ export default function SchedulerManager() {
             <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Next Task</div>
           </div>
         </div>
+        <div className="mt-4 text-center">
+          <div className="text-xs" style={{ color: 'var(--color-text-tertiary)' }}>
+            Last updated: {lastUpdated.toLocaleTimeString()} (Auto-refreshes every 30s)
+          </div>
+        </div>
       </Card>
 
       {/* Tasks List */}
@@ -552,14 +793,14 @@ export default function SchedulerManager() {
           <div className="space-y-4">
             {tasks.map((task) => (
               <Card key={task.id} className="p-6 hover:shadow-lg transition-shadow" style={{ backgroundColor: 'var(--color-bg-primary)', borderColor: 'var(--color-gray-light)' }}>
-              {editingTask === task.id ? (
-                <CronExpressionEditor
-                  cronExpression={task.cronExpression}
-                  onSave={(expression) => handleUpdateTask(task.id, { cronExpression: expression })}
-                  onCancel={() => setEditingTask(null)}
-                />
-              ) : (
-                                  <div className="flex items-start justify-between">
+                {editingTask === task.id ? (
+                  <CronExpressionEditor
+                    cronExpression={task.cronExpression}
+                    onSave={(expression) => handleUpdateTask(task.id, { cronExpression: expression })}
+                    onCancel={() => setEditingTask(null)}
+                  />
+                ) : (
+                  <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-3">
                         <h3 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>{task.name}</h3>
@@ -575,12 +816,20 @@ export default function SchedulerManager() {
                         )}
                       </div>
                       <div className="text-sm space-y-1" style={{ color: 'var(--color-text-secondary)' }}>
-                        <div><strong style={{ color: 'var(--color-text-primary)' }}>Schedule:</strong> {task.cronExpression}</div>
+                        <div>
+                          <strong style={{ color: 'var(--color-text-primary)' }}>Schedule:</strong> 
+                          <span className="ml-1 font-mono text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                            {task.cronExpression}
+                          </span>
+                        </div>
+                        <div style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem' }}>
+                          {getCronDescription(task.cronExpression)}
+                        </div>
                         <div><strong style={{ color: 'var(--color-text-primary)' }}>Last Run:</strong> {task.lastRun ? formatDate(task.lastRun) : 'Never'}</div>
                         <div><strong style={{ color: 'var(--color-text-primary)' }}>Next Run:</strong> {task.nextRun ? formatDate(task.nextRun) : 'Not scheduled'}</div>
                       </div>
                     </div>
-                  <div className="flex items-center gap-2 ml-4">
+                    <div className="flex items-center gap-2 ml-4">
                     <Button
                       onClick={() => setEditingTask(task.id)}
                       variant="outline"
@@ -641,8 +890,108 @@ export default function SchedulerManager() {
                   </div>
                 </div>
               )}
-            </Card>
+              </Card>
             ))}
+
+            {/* Task Logs Section */}
+            <div className="mt-8">
+              <h3 className="text-xl font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
+                Task Execution Logs
+              </h3>
+              <div className="flex items-center gap-2 mb-4">
+                <Button
+                  onClick={() => setSelectedTaskForLogs(null)}
+                  variant="outline"
+                  size="sm"
+                  style={{ 
+                    color: 'var(--color-text-secondary)', 
+                    borderColor: 'var(--color-gray-light)',
+                    backgroundColor: 'var(--color-bg-primary)'
+                  }}
+                >
+                  All Tasks
+                </Button>
+              </div>
+
+              {/* Task Selection for Logs */}
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                  Select Task to View Logs:
+                </label>
+                <select
+                  value={selectedTaskForLogs || ''}
+                  onChange={(e) => setSelectedTaskForLogs(e.target.value || null)}
+                  className="w-full p-2 border rounded-md"
+                  style={{ 
+                    backgroundColor: 'var(--color-bg-primary)', 
+                    borderColor: 'var(--color-gray-light)',
+                    color: 'var(--color-text-primary)'
+                  }}
+                >
+                  <option value="">All Tasks</option>
+                  {tasks.map((task) => (
+                    <option key={task.id} value={task.id}>
+                      {task.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Logs Display */}
+              <div className="space-y-2 max-h-96 overflow-y-auto">
+                {!Array.isArray(taskLogs) || taskLogs.length === 0 ? (
+                  <p className="text-sm text-center py-4" style={{ color: 'var(--color-text-muted)' }}>
+                    No logs available. Run a task to see execution logs.
+                  </p>
+                ) : (
+                  taskLogs.map((log, index) => {
+                    // Ensure log has required properties with fallbacks
+                    const level = log?.level || 'info';
+                    const message = log?.message || 'No message';
+                    const timestamp = log?.timestamp || new Date().toISOString();
+                    const details = log?.details;
+                    
+                    return (
+                      <div
+                        key={index}
+                        className={`p-3 rounded-md text-sm ${
+                          level === 'error' ? 'bg-red-50 border border-red-200' :
+                          level === 'warn' ? 'bg-yellow-50 border border-yellow-200' :
+                          level === 'success' ? 'bg-green-50 border border-green-200' :
+                          'bg-gray-50 border border-gray-200'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                                level === 'error' ? 'bg-red-100 text-red-800' :
+                                level === 'warn' ? 'bg-yellow-100 text-yellow-800' :
+                                level === 'success' ? 'bg-green-100 text-green-800' :
+                                'bg-blue-100 text-blue-800'
+                              }`}>
+                                {level.toUpperCase()}
+                              </span>
+                              <span className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                                {new Date(timestamp).toLocaleString()}
+                              </span>
+                            </div>
+                            <p className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                              {message}
+                            </p>
+                            {details && (
+                              <pre className="mt-2 text-xs overflow-x-auto" style={{ color: 'var(--color-text-secondary)' }}>
+                                {typeof details === 'object' ? JSON.stringify(details, null, 2) : String(details)}
+                              </pre>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
           </div>
         )}
       </Card>
