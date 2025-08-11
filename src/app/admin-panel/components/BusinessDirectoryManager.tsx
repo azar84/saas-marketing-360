@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Building, 
   Users, 
@@ -22,12 +22,13 @@ import {
   Upload,
   RefreshCw
 } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
+
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { AutocompleteInput } from '@/components/ui/AutocompleteInput';
 import { useAdminApi } from '@/hooks/useApi';
+import { EnhancedSearch, type SearchFilter, type SortOption } from '@/components/ui/EnhancedSearch';
 
 interface BusinessDirectory {
   id: number;
@@ -99,19 +100,32 @@ export default function BusinessDirectoryManager() {
   const [businesses, setBusinesses] = useState<BusinessDirectory[]>([]);
   const [contactPersons, setContactPersons] = useState<ContactPerson[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchLoading, setSearchLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterActive, setFilterActive] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   
-  // Search filters
+  // Enhanced search state
   const [searchFilters, setSearchFilters] = useState({
     city: '',
     stateProvince: '',
     country: '',
-    industry: ''
+    industry: '',
+    minEmployees: undefined,
+    maxEmployees: undefined,
+    hasContactPerson: undefined,
+    hasIndustries: undefined,
+    createdAfter: undefined,
+    createdBefore: undefined,
+    updatedAfter: undefined,
+    updatedBefore: undefined
   });
-  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  
+  const [searchSort, setSearchSort] = useState({
+    id: 'createdAt',
+    label: 'Date Created',
+    field: 'createdAt',
+    direction: 'desc' as 'asc' | 'desc'
+  });
   
   // Pagination State
   const [currentPage, setCurrentPage] = useState(1);
@@ -149,40 +163,148 @@ export default function BusinessDirectoryManager() {
     phone: ''
   });
 
+  // Enhanced search configuration
+  const businessSearchFilters: SearchFilter[] = [
+    {
+      id: 'city',
+      label: 'City',
+      value: '',
+      type: 'text'
+    },
+    {
+      id: 'stateProvince',
+      label: 'State/Province',
+      value: '',
+      type: 'text'
+    },
+    {
+      id: 'country',
+      label: 'Country',
+      value: '',
+      type: 'text'
+    },
+    {
+      id: 'industry',
+      label: 'Industry',
+      value: '',
+      type: 'text'
+    },
+    {
+      id: 'minEmployees',
+      label: 'Min Employees',
+      value: '',
+      type: 'number'
+    },
+    {
+      id: 'maxEmployees',
+      label: 'Max Employees',
+      value: '',
+      type: 'number'
+    },
+    {
+      id: 'hasContactPerson',
+      label: 'Has Contact Person',
+      value: '',
+      type: 'select',
+      options: [
+        { value: 'true', label: 'Yes' },
+        { value: 'false', label: 'No' }
+      ]
+    },
+    {
+      id: 'hasIndustries',
+      label: 'Has Industries',
+      value: '',
+      type: 'select',
+      options: [
+        { value: 'true', label: 'Yes' },
+        { value: 'false', label: 'No' }
+      ]
+    },
+    {
+      id: 'createdAfter',
+      label: 'Created After',
+      value: '',
+      type: 'date'
+    },
+    {
+      id: 'createdBefore',
+      label: 'Created Before',
+      value: '',
+      type: 'date'
+    },
+    {
+      id: 'updatedAfter',
+      label: 'Updated After',
+      value: '',
+      type: 'date'
+    },
+    {
+      id: 'updatedBefore',
+      label: 'Updated Before',
+      value: '',
+      type: 'date'
+    }
+  ];
+
+  const businessSortOptions: SortOption[] = [
+    { id: 'createdAt', label: 'Date Created', field: 'createdAt', direction: 'desc' },
+    { id: 'updatedAt', label: 'Last Updated', field: 'updatedAt', direction: 'desc' },
+    { id: 'companyName', label: 'Company Name', field: 'companyName', direction: 'asc' },
+    { id: 'website', label: 'Website', field: 'website', direction: 'asc' },
+    { id: 'city', label: 'City', field: 'city', direction: 'asc' },
+    { id: 'stateProvince', label: 'State/Province', field: 'stateProvince', direction: 'asc' },
+    { id: 'country', label: 'Country', field: 'country', direction: 'asc' },
+    { id: 'employeesCount', label: 'Employee Count', field: 'employeesCount', direction: 'desc' }
+  ];
+
+  // Enhanced search handlers
+  const handleFilterChange = useCallback((filterId: string, value: any) => {
+    setSearchFilters(prev => ({
+      ...prev,
+      [filterId]: value
+    }));
+  }, []);
+
+  const handleSortChange = useCallback((sort: SortOption) => {
+    setSearchSort(sort);
+  }, []);
+
   // Load data on component mount
   useEffect(() => {
     loadData();
   }, []);
 
+  // Trigger search when filters or sort change
+  useEffect(() => {
+    if (activeTab === 'businesses') {
+      setCurrentPage(1);
+      loadData(1);
+    }
+  }, [searchFilters, searchSort]);
+
   const loadData = async (page: number = 1) => {
     setLoading(true);
     try {
-      // Build search query with filters
+      // Build search query with enhanced filters
       const searchParams = new URLSearchParams({
         page: page.toString(),
         limit: resultsPerPage.toString(),
-        isActive: filterActive.toString()
+        isActive: filterActive.toString(),
+        sortBy: searchSort.field,
+        sortOrder: searchSort.direction
       });
 
       if (searchTerm.trim()) {
         searchParams.set('q', searchTerm.trim());
       }
 
-      if (searchFilters.city.trim()) {
-        searchParams.set('city', searchFilters.city.trim());
-      }
-
-      if (searchFilters.stateProvince.trim()) {
-        searchParams.set('stateProvince', searchFilters.stateProvince.trim());
-      }
-
-      if (searchFilters.country.trim()) {
-        searchParams.set('country', searchFilters.country.trim());
-      }
-
-      if (searchFilters.industry.trim()) {
-        searchParams.set('industry', searchFilters.industry.trim());
-      }
+      // Add all filter parameters
+      Object.entries(searchFilters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          searchParams.set(key, String(value));
+        }
+      });
 
       const [businessesData, contactsData] = await Promise.all([
         get(`/api/admin/business-directory/search?${searchParams.toString()}`) as Promise<PaginatedResponse<BusinessDirectory[]>>,
@@ -396,9 +518,8 @@ export default function BusinessDirectoryManager() {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (searchTerm !== '') {
-        setSearchLoading(true);
         setCurrentPage(1);
-        loadData(1).finally(() => setSearchLoading(false));
+        loadData(1);
       }
     }, 500);
 
@@ -408,9 +529,8 @@ export default function BusinessDirectoryManager() {
   // Debounced search effect for search filters
   useEffect(() => {
     const timer = setTimeout(() => {
-      setSearchLoading(true);
       setCurrentPage(1);
-      loadData(1).finally(() => setSearchLoading(false));
+      loadData(1);
     }, 500);
 
     return () => clearTimeout(timer);
@@ -429,425 +549,685 @@ export default function BusinessDirectoryManager() {
   });
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>
-            Business Directory Manager
-          </h1>
-          <p className="text-base" style={{ color: 'var(--color-text-secondary)' }}>
-            Manage business directory entries and contact persons
-          </p>
-        </div>
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            onClick={() => setShowBusinessForm(true)}
-            className="flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Add Business
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => setShowContactForm(true)}
-            className="flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Add Contact
-          </Button>
+    <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+      {/* Header Section */}
+      <div className="border-b" style={{ borderColor: 'var(--color-gray-light)', backgroundColor: 'var(--color-bg-primary)' }}>
+        <div className="px-8 py-10">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold mb-3" style={{ color: 'var(--color-text-primary)' }}>
+                Business Directory Manager
+              </h1>
+              <p className="text-lg" style={{ color: 'var(--color-text-secondary)' }}>
+                Manage your business directory and contact information with powerful search and filtering
+              </p>
+            </div>
+            <div className="flex gap-4">
+              <Button
+                onClick={() => setShowBusinessForm(true)}
+                size="lg"
+                className="shadow-lg hover:shadow-xl transition-all duration-200 h-12 px-6"
+              >
+                <Plus className="h-5 w-5" />
+                Add Business
+              </Button>
+              <Button
+                onClick={() => setShowContactForm(true)}
+                variant="outline"
+                size="lg"
+                className="border-2 hover:shadow-lg transition-all duration-200 h-12 px-6"
+              >
+                <Users className="h-5 w-5" />
+                Add Contact
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="border-b" style={{ borderColor: 'var(--color-gray-light)' }}>
-        <nav className="-mb-px flex space-x-8">
-          <button
-            onClick={() => setActiveTab('businesses')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-              activeTab === 'businesses'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            <Building className="inline-block w-4 h-4 mr-2" />
-            Businesses ({businesses.length})
-          </button>
-          <button
-            onClick={() => setActiveTab('contacts')}
-            className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
-              activeTab === 'contacts'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            <Users className="inline-block w-4 h-4 mr-2" />
-            Contact Persons ({contactPersons.length})
-          </button>
-        </nav>
+      <div className="border-b" style={{ borderColor: 'var(--color-gray-light)', backgroundColor: 'var(--color-bg-primary)' }}>
+        <div className="px-8">
+          <nav className="-mb-px flex space-x-8">
+            <button
+              onClick={() => setActiveTab('businesses')}
+              className="group inline-flex items-center py-5 px-1 border-b-2 font-semibold text-sm transition-all duration-200"
+              style={{
+                borderColor: activeTab === 'businesses' ? 'var(--color-primary)' : 'transparent',
+                color: activeTab === 'businesses' ? 'var(--color-primary)' : 'var(--color-text-secondary)'
+              }}
+            >
+              <Building className="mr-3 h-5 w-5 transition-colors" />
+              Businesses
+              {activeTab === 'businesses' && (
+                <span className="ml-3 px-3 py-1 text-xs font-medium rounded-full" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-bg-primary)' }}>
+                  {totalCount}
+                </span>
+              )}
+            </button>
+            <button
+              onClick={() => setActiveTab('contacts')}
+              className="group inline-flex items-center py-5 px-1 border-b-2 font-semibold text-sm transition-all duration-200"
+              style={{
+                borderColor: activeTab === 'contacts' ? 'var(--color-primary)' : 'transparent',
+                color: activeTab === 'contacts' ? 'var(--color-primary)' : 'var(--color-text-secondary)'
+              }}
+            >
+              <Users className="mr-3 h-5 w-5 transition-colors" />
+              Contacts
+              {activeTab === 'contacts' && (
+                <span className="ml-3 px-3 py-1 text-xs font-medium rounded-full" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-bg-primary)' }}>
+                  {contactPersons.length}
+                </span>
+              )}
+            </button>
+          </nav>
+        </div>
       </div>
 
-      {/* Search and Filters */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-4">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                type="text"
-                placeholder={`Search ${activeTab === 'businesses' ? 'businesses' : 'contacts'}...`}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-              {searchLoading && (
-                <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                </div>
-              )}
+      {/* Main Content */}
+      <div className="px-8 py-10">
+        <div className="max-w-7xl mx-auto">
+        {/* Enhanced Search Section */}
+        <div className="mb-10">
+          {activeTab === 'businesses' ? (
+            <EnhancedSearch
+              searchValue={searchTerm}
+              onSearchChange={setSearchTerm}
+              searchPlaceholder="Search businesses by name, website, location, or industry..."
+              searchDebounce={300}
+              filters={businessSearchFilters}
+              activeFilters={searchFilters}
+              onFilterChange={handleFilterChange}
+              sortOptions={businessSortOptions}
+              currentSort={searchSort}
+              onSortChange={handleSortChange}
+              totalResults={totalCount}
+              isLoading={loading}
+              enableAdvancedSearch={true}
+              onAdvancedSearch={(query) => setSearchTerm(query)}
+              className="mb-6"
+            />
+          ) : (
+            <div className="max-w-lg">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5" style={{ color: 'var(--color-text-muted)' }} />
+                <Input
+                  type="text"
+                  placeholder="Search contacts by name, title, or email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-12 h-14 text-base border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                  style={{ 
+                    backgroundColor: 'var(--color-bg-primary)',
+                    borderColor: 'var(--color-gray-light)',
+                    color: 'var(--color-text-primary)',
+                    '--tw-ring-color': 'var(--color-primary)'
+                  } as any}
+                />
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2">
+          )}
+        </div>
+
+        {/* Action Bar */}
+        <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center gap-4">
             <Button
-              variant="outline"
+              variant={filterActive ? "primary" : "outline"}
               size="sm"
               onClick={() => setFilterActive(!filterActive)}
-              className="flex items-center gap-2"
             >
               {filterActive ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
               {filterActive ? 'Active Only' : 'All'}
             </Button>
             <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-              className="flex items-center gap-2"
-            >
-              <Filter className="h-4 w-4" />
-              Advanced
-            </Button>
-            <Button
-              variant="outline"
+              variant="destructive"
               size="sm"
               onClick={() => {
                 setSearchTerm('');
-                setSearchFilters({ city: '', stateProvince: '', country: '', industry: '' });
+                setSearchFilters({
+                  city: '', stateProvince: '', country: '', industry: '',
+                  minEmployees: undefined, maxEmployees: undefined,
+                  hasContactPerson: undefined, hasIndustries: undefined,
+                  createdAfter: undefined, createdBefore: undefined,
+                  updatedAfter: undefined, updatedBefore: undefined
+                });
+                setSearchSort({
+                  id: 'createdAt',
+                  label: 'Date Created',
+                  field: 'createdAt',
+                  direction: 'desc'
+                });
                 setFilterActive(true);
                 setCurrentPage(1);
                 loadData(1);
               }}
             >
-              <X className="h-4 w-4 mr-2" />
-              Clear
+              <X className="h-4 w-4" />
+              Clear All
             </Button>
+          </div>
+          
+          <div className="flex items-center gap-4">
             <Button
               variant="outline"
               size="sm"
               onClick={() => loadData(currentPage)}
               disabled={loading}
             >
-              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
               Refresh
             </Button>
+            {lastUpdated && (
+              <div className="text-sm px-4 py-2 rounded-lg" style={{ backgroundColor: 'var(--color-bg-primary)', color: 'var(--color-text-muted)' }}>
+                Last updated: {lastUpdated.toLocaleTimeString()}
+              </div>
+            )}
           </div>
+                </div>
+
+        {/* TOP PAGINATION SECTION - Enhanced Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="mt-8 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-gray-light)' }}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
+                    Showing {((currentPage - 1) * resultsPerPage) + 1} - {Math.min(currentPage * resultsPerPage, totalCount)} of {totalCount} businesses
+                  </span>
+                  <select
+                    value={resultsPerPage}
+                    onChange={(e) => handleResultsPerPageChange(parseInt(e.target.value))}
+                    className="px-3 py-2 border rounded-md text-sm font-medium transition-all duration-200"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light)',
+                      backgroundColor: 'var(--color-bg-secondary)',
+                      color: 'var(--color-text-primary)'
+                    }}
+                  >
+                    <option value={10}>10 per page</option>
+                    <option value={25}>25 per page</option>
+                    <option value={50}>50 per page</option>
+                    <option value={100}>100 per page</option>
+                  </select>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(1)}
+                    disabled={currentPage === 1}
+                    className="h-9 px-3 transition-all duration-200"
+                  >
+                    First
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="h-9 px-3 transition-all duration-200"
+                  >
+                    Previous
+                  </Button>
+                  <span className="px-4 py-2 text-sm font-medium rounded-lg" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-bg-primary)' }}>
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="h-9 px-3 transition-all duration-200"
+                  >
+                    Next
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className="h-9 px-3 transition-all duration-200"
+                  >
+                    Last
+                  </Button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Advanced Search Filters */}
-        {showAdvancedFilters && activeTab === 'businesses' && (
-          <Card>
-            <CardContent className="pt-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
-                    City
-                  </label>
-                  <AutocompleteInput
-                    field="city"
-                    placeholder="Filter by city..."
-                    value={searchFilters.city}
-                    onChange={(value) => setSearchFilters(prev => ({ ...prev, city: value }))}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
-                    State/Province
-                  </label>
-                  <AutocompleteInput
-                    field="stateProvince"
-                    placeholder="Filter by state/province..."
-                    value={searchFilters.stateProvince}
-                    onChange={(value) => setSearchFilters(prev => ({ ...prev, stateProvince: value }))}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
-                    Country
-                  </label>
-                  <AutocompleteInput
-                    field="country"
-                    placeholder="Filter by country..."
-                    value={searchFilters.country}
-                    onChange={(value) => setSearchFilters(prev => ({ ...prev, country: value }))}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
-                    Industry
-                  </label>
-                  <AutocompleteInput
-                    field="industry"
-                    placeholder="Filter by industry..."
-                    value={searchFilters.industry}
-                    onChange={(value) => setSearchFilters(prev => ({ ...prev, industry: value }))}
-                  />
-                </div>
+        {/* Enhanced Search Results */}
+        {activeTab === 'businesses' && filterActive && (
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                Enhanced Search Results
+              </h3>
+              <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                {businesses.length} results
+              </span>
+            </div>
+            
+            {businesses.length > 0 && (
+              <div className="grid gap-4">
+                {businesses.slice(0, 3).map((business) => (
+                  <div
+                    key={business.id}
+                    className="group border-2 rounded-xl p-6 hover:shadow-xl transition-all duration-200 cursor-pointer"
+                    style={{ 
+                      backgroundColor: 'var(--color-bg-primary)',
+                      borderColor: business.isActive ? 'var(--color-gray-light)' : 'var(--color-text-muted)'
+                    }}
+                    onClick={() => handleEditBusiness(business)}
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        {/* Header Row */}
+                        <div className="flex items-center gap-4 mb-4">
+                          <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)' }}>
+                            <Building className="h-6 w-6" style={{ color: 'var(--color-bg-primary)' }} />
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="text-xl font-semibold mb-1" style={{ color: 'var(--color-text-primary)' }}>
+                              {business.companyName || business.website}
+                            </h3>
+                            <div className="flex items-center gap-3">
+                              <Badge
+                                variant={business.isActive ? 'default' : 'secondary'}
+                                className="text-xs font-medium px-2 py-1"
+                              >
+                                {business.isActive ? 'Active' : 'Inactive'}
+                              </Badge>
+                              {business.employeesCount && (
+                                <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                                  {business.employeesCount} employees
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Details Grid */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                          <div className="space-y-3">
+                            <div className="flex items-center gap-3 text-sm">
+                              <Globe className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                              <a
+                                href={business.website.startsWith('http') ? business.website : `https://${business.website}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="hover:underline font-medium"
+                                style={{ color: 'var(--color-primary)' }}
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {business.website}
+                              </a>
+                            </div>
+                            {(business.city || business.stateProvince || business.country) && (
+                              <div className="flex items-center gap-3 text-sm">
+                                <MapPin className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                                <span style={{ color: 'var(--color-text-secondary)' }}>
+                                  {[business.city, business.stateProvince, business.country].filter(Boolean).join(', ')}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="space-y-3">
+                            {business.phoneNumber && (
+                              <div className="flex items-center gap-3 text-sm">
+                                <Phone className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                                <span style={{ color: 'var(--color-text-secondary)' }}>{business.phoneNumber}</span>
+                              </div>
+                            )}
+                            {business.email && (
+                              <div className="flex items-center gap-3 text-sm">
+                                <Mail className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                                <span style={{ color: 'var(--color-text-secondary)' }}>{business.email}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Contact Person */}
+                        {business.contactPerson && (
+                          <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+                            <div className="flex items-center gap-3">
+                              <Users className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                              <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                                Contact: {business.contactPerson.firstName} {business.contactPerson.lastName}
+                                {business.contactPerson.title && ` - ${business.contactPerson.title}`}
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Industries */}
+                        {business.industries && business.industries.length > 0 && (
+                          <div className="mb-4">
+                            <h4 className="text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Industries</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {business.industries.map((businessIndustry) => (
+                                <Badge
+                                  key={businessIndustry.id}
+                                  variant={businessIndustry.isPrimary ? "success" : "outline"}
+                                  size="sm"
+                                  className="text-xs font-medium"
+                                >
+                                  {businessIndustry.industry.label}
+                                  {businessIndustry.isPrimary && ' (Primary)'}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Action Buttons */}
+                      <div className="flex gap-2 ml-6 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleEditBusiness(business);
+                          }}
+                        >
+                          <Edit className="h-4 w-4" />
+                          Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setItemToDelete({ id: business.id, type: 'business', name: business.companyName || business.website });
+                            setShowDeleteConfirm(true);
+                          }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="flex justify-end mt-4">
-                <Button
-                  onClick={() => {
-                    setCurrentPage(1);
-                    loadData(1);
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <Search className="h-4 w-4" />
-                  Apply Filters
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+            )}
+          </div>
         )}
-      </div>
-      
-      {/* Status Indicator */}
-      {lastUpdated && (
-        <div className="text-xs text-gray-500 text-center">
-          Last updated: {lastUpdated.toLocaleTimeString()}
-        </div>
-      )}
 
       {/* Tab Content */}
       {activeTab === 'businesses' && (
-        <div className="space-y-4">
-          {/* Business Directory List */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building className="h-5 w-5" />
-                    Business Directory
-                  </CardTitle>
-                  <CardDescription>
-                    {totalCount} businesses found
-                  </CardDescription>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleBulkExport}
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Export
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleBulkImport}
-                  >
-                    <Upload className="h-4 w-4 mr-2" />
-                    Import
-                  </Button>
-                </div>
+        <div className="space-y-6">
+          {/* Business Directory Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                Business Directory
+              </h2>
+              <p className="text-base" style={{ color: 'var(--color-text-secondary)' }}>
+                {totalCount} businesses found • {businesses.filter(b => b.isActive).length} active
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBulkExport}
+              >
+                <Download className="h-4 w-4" />
+                Export CSV
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleBulkImport}
+              >
+                <Upload className="h-4 w-4" />
+                Import CSV
+              </Button>
+            </div>
+          </div>
+
+          {/* Business List */}
+          {loading ? (
+            <div className="text-center py-16">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: 'var(--color-primary)' }}></div>
+              <p className="text-lg" style={{ color: 'var(--color-text-secondary)' }}>Loading businesses...</p>
+            </div>
+          ) : businesses.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-gray-light)' }}>
+                <Building className="h-12 w-12" style={{ color: 'var(--color-text-muted)' }} />
               </div>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                  <p className="mt-2 text-gray-500">Loading businesses...</p>
-                </div>
-              ) : businesses.length === 0 ? (
-                <div className="text-center py-8">
-                  <Building className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">No businesses found</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {businesses.map((business) => (
-                    <div
-                      key={business.id}
-                      className="p-4 border rounded-lg hover:shadow-md transition-shadow"
-                      style={{ borderColor: 'var(--color-gray-light)' }}
-                    >
-                      <div className="flex items-start justify-between">
+              <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>No businesses found</h3>
+              <p className="text-base mb-6" style={{ color: 'var(--color-text-secondary)' }}>
+                Try adjusting your search criteria or add your first business
+              </p>
+              <Button
+                variant="primary"
+                onClick={() => setShowBusinessForm(true)}
+              >
+                <Plus className="h-4 w-4" />
+                Add First Business
+              </Button>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {businesses.map((business) => (
+                <div
+                  key={business.id}
+                  className="group border-2 rounded-xl p-6 hover:shadow-xl transition-all duration-200 cursor-pointer"
+                  style={{ 
+                    backgroundColor: 'var(--color-bg-primary)',
+                    borderColor: business.isActive ? 'var(--color-gray-light)' : 'var(--color-text-muted)'
+                  }}
+                  onClick={() => handleEditBusiness(business)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      {/* Header Row */}
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)' }}>
+                          <Building className="h-6 w-6" style={{ color: 'var(--color-bg-primary)' }} />
+                        </div>
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-                              {business.companyName || 'Unnamed Company'}
-                            </h3>
-                            <Badge variant={business.isActive ? 'default' : 'secondary'}>
+                          <h3 className="text-xl font-semibold mb-1" style={{ color: 'var(--color-text-primary)' }}>
+                            {business.companyName || business.website}
+                          </h3>
+                          <div className="flex items-center gap-3">
+                            <Badge
+                              variant={business.isActive ? 'default' : 'secondary'}
+                              className="text-xs font-medium px-2 py-1"
+                            >
                               {business.isActive ? 'Active' : 'Inactive'}
                             </Badge>
+                            {business.employeesCount && (
+                              <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                                {business.employeesCount} employees
+                              </span>
+                            )}
                           </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <div className="space-y-2">
-                              <div className="flex items-center gap-2">
-                                <Globe className="h-4 w-4 text-gray-400" />
-                                <a 
-                                  href={business.website.startsWith('http') ? business.website : `https://${business.website}`} 
-                                  target="_blank" 
-                                  rel="noopener noreferrer"
-                                  className="text-blue-600 hover:underline"
-                                >
-                                  {business.website}
-                                </a>
-                              </div>
-                              {(business.city || business.stateProvince || business.country) && (
-                                <div className="flex items-center gap-2">
-                                  <MapPin className="h-4 w-4 text-gray-400" />
-                                  <span>
-                                    {[business.city, business.stateProvince, business.country].filter(Boolean).join(', ')}
-                                  </span>
-                                </div>
-                              )}
-                            </div>
-                            
-                            <div className="space-y-2">
-                              {business.phoneNumber && (
-                                <div className="flex items-center gap-2">
-                                  <Phone className="h-4 w-4 text-gray-400" />
-                                  <span>{business.phoneNumber}</span>
-                                </div>
-                              )}
-                              {business.email && (
-                                <div className="flex items-center gap-2">
-                                  <Mail className="h-4 w-4 text-gray-400" />
-                                  <span>{business.email}</span>
-                                </div>
-                              )}
-                              {business.employeesCount && (
-                                <div className="flex items-center gap-2">
-                                  <UsersIcon className="h-4 w-4 text-gray-400" />
-                                  <span>{business.employeesCount} employees</span>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          
-                          {business.contactPerson && (
-                            <div className="mt-3 p-2 rounded bg-gray-50">
-                              <p className="text-sm text-gray-600">
-                                <strong>Contact:</strong> {business.contactPerson.firstName} {business.contactPerson.lastName}
-                                {business.contactPerson.title && ` - ${business.contactPerson.title}`}
-                              </p>
-                            </div>
-                          )}
-                          
-                          {business.industries && business.industries.length > 0 && (
-                            <div className="mt-3 p-2 rounded bg-blue-50">
-                              <p className="text-sm text-blue-800 mb-2">
-                                <strong>Industries:</strong>
-                              </p>
-                              <div className="flex flex-wrap gap-2">
-                                {business.industries.map((businessIndustry) => (
-                                  <Badge 
-                                    key={businessIndustry.id} 
-                                    variant={businessIndustry.isPrimary ? 'default' : 'secondary'}
-                                    className="text-xs"
-                                  >
-                                    {businessIndustry.industry.label}
-                                    {businessIndustry.isPrimary && ' (Primary)'}
-                                  </Badge>
-                                ))}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                        
-                        <div className="flex gap-2 ml-4">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditBusiness(business)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDeleteBusiness(business.id)}
-                            style={{ color: 'var(--color-error)' }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
                         </div>
                       </div>
+
+                      {/* Details Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3 text-sm">
+                            <Globe className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                            <a
+                              href={business.website.startsWith('http') ? business.website : `https://${business.website}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:underline font-medium"
+                              style={{ color: 'var(--color-primary)' }}
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {business.website}
+                            </a>
+                          </div>
+                          {(business.city || business.stateProvince || business.country) && (
+                            <div className="flex items-center gap-3 text-sm">
+                              <MapPin className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                              <span style={{ color: 'var(--color-text-secondary)' }}>
+                                {[business.city, business.stateProvince, business.country].filter(Boolean).join(', ')}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="space-y-3">
+                          {business.phoneNumber && (
+                            <div className="flex items-center gap-3 text-sm">
+                              <Phone className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                              <span style={{ color: 'var(--color-text-secondary)' }}>{business.phoneNumber}</span>
+                            </div>
+                          )}
+                          {business.email && (
+                            <div className="flex items-center gap-3 text-sm">
+                              <Mail className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                              <span style={{ color: 'var(--color-text-secondary)' }}>{business.email}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Contact Person */}
+                      {business.contactPerson && (
+                        <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+                          <div className="flex items-center gap-3">
+                            <Users className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                            <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                              Contact: {business.contactPerson.firstName} {business.contactPerson.lastName}
+                              {business.contactPerson.title && ` - ${business.contactPerson.title}`}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Industries */}
+                      {business.industries && business.industries.length > 0 && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Industries</h4>
+                          <div className="flex flex-wrap gap-2">
+                            {business.industries.map((businessIndustry) => (
+                              <Badge
+                                key={businessIndustry.id}
+                                variant={businessIndustry.isPrimary ? "success" : "outline"}
+                                size="sm"
+                                className="text-xs font-medium"
+                              >
+                                {businessIndustry.industry.label}
+                                {businessIndustry.isPrimary && ' (Primary)'}
+                              </Badge>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  ))}
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 ml-6 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditBusiness(business);
+                        }}
+                        className="h-9 px-3"
+                      >
+                        <Edit className="h-4 w-4" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setItemToDelete({ id: business.id, type: 'business', name: business.companyName || business.website });
+                          setShowDeleteConfirm(true);
+                        }}
+                        className="h-9 px-3"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
-          
-          {/* Pagination Controls */}
+              ))}
+            </div>
+          )}
+
+          {/* BOTTOM PAGINATION SECTION - Enhanced Pagination Controls */}
           {totalPages > 1 && (
-            <div className="mt-6 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-gray-600">
-                  Showing {((currentPage - 1) * resultsPerPage) + 1} - {Math.min(currentPage * resultsPerPage, totalCount)} of {totalCount} businesses
-                </span>
-                <select
-                  value={resultsPerPage}
-                  onChange={(e) => handleResultsPerPageChange(parseInt(e.target.value))}
-                  className="px-3 py-2 border border-gray-300 rounded-md text-sm"
-                >
-                  <option value={10}>10 per page</option>
-                  <option value={25}>25 per page</option>
-                  <option value={50}>50 per page</option>
-                  <option value={100}>100 per page</option>
-                </select>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(1)}
-                  disabled={currentPage === 1}
-                >
-                  First
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  Previous
-                </Button>
-                <span className="px-3 py-2 text-sm text-gray-600">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                >
-                  Next
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handlePageChange(totalPages)}
-                  disabled={currentPage === totalPages}
-                >
-                  Last
-                </Button>
+            <div className="mt-8 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-gray-light)' }}>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
+                    Showing {((currentPage - 1) * resultsPerPage) + 1} - {Math.min(currentPage * resultsPerPage, totalCount)} of {totalCount} businesses
+                  </span>
+                  <select
+                    value={resultsPerPage}
+                    onChange={(e) => handleResultsPerPageChange(parseInt(e.target.value))}
+                    className="px-3 py-2 border rounded-md text-sm font-medium transition-all duration-200"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light)',
+                      backgroundColor: 'var(--color-bg-secondary)',
+                      color: 'var(--color-text-primary)'
+                    }}
+                  >
+                    <option value={10}>10 per page</option>
+                    <option value={25}>25 per page</option>
+                    <option value={50}>50 per page</option>
+                    <option value={100}>100 per page</option>
+                  </select>
+                </div>
+                
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(1)}
+                    disabled={currentPage === 1}
+                    className="h-9 px-3 transition-all duration-200"
+                  >
+                    First
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className="h-9 px-3 transition-all duration-200"
+                  >
+                    Previous
+                  </Button>
+                  <span className="px-4 py-2 text-sm font-medium rounded-lg" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-bg-primary)' }}>
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    disabled={currentPage === totalPages}
+                    className="h-9 px-3 transition-all duration-200"
+                  >
+                    Next
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(totalPages)}
+                    disabled={currentPage === totalPages}
+                    className="h-9 px-3 transition-all duration-200"
+                  >
+                    Last
+                  </Button>
+                </div>
               </div>
             </div>
           )}
@@ -855,209 +1235,313 @@ export default function BusinessDirectoryManager() {
       )}
 
       {activeTab === 'contacts' && (
-        <div className="space-y-4">
-          {/* Contact Persons List */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
+        <div className="space-y-6">
+          {/* Contact Persons Header */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
                 Contact Persons
-              </CardTitle>
-              <CardDescription>
-                {filteredContacts.length} contacts found
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                  <p className="mt-2 text-gray-500">Loading contacts...</p>
-                </div>
-              ) : filteredContacts.length === 0 ? (
-                <div className="text-center py-8">
-                  <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">No contacts found</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {filteredContacts.map((contact) => (
-                    <div
-                      key={contact.id}
-                      className="p-4 border rounded-lg hover:shadow-md transition-shadow"
-                      style={{ borderColor: 'var(--color-gray-light)' }}
-                    >
-                      <div className="flex items-start justify-between">
+              </h2>
+              <p className="text-base" style={{ color: 'var(--color-text-secondary)' }}>
+                {filteredContacts.length} contacts found • {filteredContacts.filter(c => c.isActive).length} active
+              </p>
+            </div>
+          </div>
+
+          {/* Contact List */}
+          {loading ? (
+            <div className="text-center py-16">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: 'var(--color-primary)' }}></div>
+              <p className="text-lg" style={{ color: 'var(--color-text-secondary)' }}>Loading contacts...</p>
+            </div>
+          ) : filteredContacts.length === 0 ? (
+            <div className="text-center py-16">
+              <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-gray-light)' }}>
+                <Users className="h-12 w-12" style={{ color: 'var(--color-text-muted)' }} />
+              </div>
+              <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>No contacts found</h3>
+              <p className="text-base mb-6" style={{ color: 'var(--color-text-secondary)' }}>
+                Try adjusting your search criteria or add your first contact
+              </p>
+              <Button
+                onClick={() => setShowContactForm(true)}
+              >
+                <Plus className="h-4 w-4" />
+                Add First Contact
+              </Button>
+            </div>
+          ) : (
+            <div className="grid gap-4">
+              {filteredContacts.map((contact) => (
+                <div
+                  key={contact.id}
+                  className="group border-2 rounded-xl p-6 hover:shadow-xl transition-all duration-200 cursor-pointer"
+                  style={{ 
+                    backgroundColor: 'var(--color-bg-primary)',
+                    borderColor: contact.isActive ? 'var(--color-gray-light)' : 'var(--color-text-muted)'
+                  }}
+                  onClick={() => handleEditContact(contact)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      {/* Header Row */}
+                      <div className="flex items-center gap-4 mb-4">
+                        <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--color-secondary)' }}>
+                          <Users className="h-6 w-6" style={{ color: 'var(--color-bg-primary)' }} />
+                        </div>
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-                              {contact.firstName} {contact.lastName}
-                            </h3>
-                            <Badge variant={contact.isActive ? 'default' : 'secondary'}>
+                          <h3 className="text-xl font-semibold mb-1" style={{ color: 'var(--color-text-primary)' }}>
+                            {contact.firstName} {contact.lastName}
+                          </h3>
+                          <div className="flex items-center gap-3">
+                            <Badge
+                              variant={contact.isActive ? 'default' : 'secondary'}
+                              className="text-xs font-medium px-2 py-1"
+                            >
                               {contact.isActive ? 'Active' : 'Inactive'}
                             </Badge>
+                            {contact.title && (
+                              <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                                {contact.title}
+                              </span>
+                            )}
                           </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                            <div className="space-y-2">
-                              {contact.title && (
-                                <div className="flex items-center gap-2">
-                                  <UsersIcon className="h-4 w-4 text-gray-400" />
-                                  <span>{contact.title}</span>
-                                </div>
-                              )}
-                              {contact.email && (
-                                <div className="flex items-center gap-2">
-                                  <Mail className="h-4 w-4 text-gray-400" />
-                                  <span>{contact.email}</span>
-                                </div>
-                              )}
+                        </div>
+                      </div>
+
+                      {/* Details Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                        <div className="space-y-3">
+                          {contact.email && (
+                            <div className="flex items-center gap-3 text-sm">
+                              <Mail className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                              <span style={{ color: 'var(--color-text-secondary)' }}>{contact.email}</span>
                             </div>
-                            
-                            <div className="space-y-2">
-                              {contact.phone && (
-                                <div className="flex items-center gap-2">
-                                  <Phone className="h-4 w-4 text-gray-400" />
-                                  <span>{contact.phone}</span>
-                                </div>
-                              )}
-                              <div className="flex items-center gap-2">
-                                <Building className="h-4 w-4 text-gray-400" />
-                                <span>{contact.businesses.length} businesses</span>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          {contact.businesses.length > 0 && (
-                            <div className="mt-3 p-2 rounded bg-gray-50">
-                              <p className="text-sm text-gray-600 mb-2">
-                                <strong>Associated Businesses:</strong>
-                              </p>
-                              <div className="space-y-1">
-                                {contact.businesses.map((business) => (
-                                  <div key={business.id} className="text-sm text-gray-600">
-                                    • {business.companyName || business.website}
-                                  </div>
-                                ))}
-                              </div>
+                          )}
+                          {contact.phone && (
+                            <div className="flex items-center gap-3 text-sm">
+                              <Phone className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                              <span style={{ color: 'var(--color-text-secondary)' }}>{contact.phone}</span>
                             </div>
                           )}
                         </div>
-                        
-                        <div className="flex gap-2 ml-4">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEditContact(contact)}
-                          >
-                            <Edit className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleDeleteContact(contact.id)}
-                            style={{ color: 'var(--color-error)' }}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
+                        <div className="space-y-3">
+                          <div className="flex items-center gap-3 text-sm">
+                            <Building className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                            <span style={{ color: 'var(--color-text-secondary)' }}>
+                              {contact.businesses.length} associated businesses
+                            </span>
+                          </div>
                         </div>
                       </div>
+
+                      {/* Associated Businesses */}
+                      {contact.businesses.length > 0 && (
+                        <div className="mb-4">
+                          <h4 className="text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Associated Businesses</h4>
+                          <div className="space-y-2">
+                            {contact.businesses.map((business) => (
+                              <div 
+                                key={business.id} 
+                                className="text-sm px-3 py-2 rounded-lg" 
+                                style={{ backgroundColor: 'var(--color-bg-secondary)' }}
+                              >
+                                <span style={{ color: 'var(--color-text-secondary)' }}>
+                                  • {business.companyName || business.website}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  ))}
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-2 ml-6 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleEditContact(contact);
+                        }}
+                        className="h-9 px-3"
+                      >
+                        <Edit className="h-4 w-4" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setItemToDelete({ id: contact.id, type: 'contact', name: `${contact.firstName} ${contact.lastName}` });
+                          setShowDeleteConfirm(true);
+                        }}
+                        className="h-9 px-3"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        Delete
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-              )}
-            </CardContent>
-          </Card>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
+        </div> {/* Close max-w-7xl container */}
+
       {/* Business Form Modal */}
       {showBusinessForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">
-                {editingBusiness ? 'Edit Business' : 'Add New Business'}
-              </h2>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setShowBusinessForm(false);
-                  resetBusinessForm();
-                }}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div className="w-full max-w-4xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+            <div className="sticky top-0 p-6 border-b" style={{ borderColor: 'var(--color-gray-light)', backgroundColor: 'var(--color-bg-primary)' }}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                    {editingBusiness ? 'Edit Business' : 'Add New Business'}
+                  </h2>
+                  <p className="text-base mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+                    {editingBusiness ? 'Update business information' : 'Create a new business directory entry'}
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setShowBusinessForm(false);
+                    resetBusinessForm();
+                  }}
+                  className="h-10 w-10 p-0 rounded-full"
+                  style={{ borderColor: 'var(--color-gray-light)' }}
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
             
-            <form onSubmit={handleBusinessSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Website *</label>
+            <form onSubmit={handleBusinessSubmit} className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                    Website *
+                  </label>
                   <Input
                     type="url"
                     value={businessForm.website}
                     onChange={(e) => setBusinessForm(prev => ({ ...prev, website: e.target.value }))}
                     placeholder="https://example.com"
                     required
+                    className="h-11 border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light)',
+                      '--tw-ring-color': 'var(--color-primary)'
+                    } as any}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Company Name</label>
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                    Company Name
+                  </label>
                   <Input
                     type="text"
                     value={businessForm.companyName}
                     onChange={(e) => setBusinessForm(prev => ({ ...prev, companyName: e.target.value }))}
                     placeholder="Company Name"
+                    className="h-11 border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light)',
+                      '--tw-ring-color': 'var(--color-primary)'
+                    } as any}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">City</label>
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                    City
+                  </label>
                   <Input
                     type="text"
                     value={businessForm.city}
                     onChange={(e) => setBusinessForm(prev => ({ ...prev, city: e.target.value }))}
                     placeholder="City"
+                    className="h-11 border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light)',
+                      '--tw-ring-color': 'var(--color-primary)'
+                    } as any}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">State/Province</label>
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                    State/Province
+                  </label>
                   <Input
                     type="text"
                     value={businessForm.stateProvince}
                     onChange={(e) => setBusinessForm(prev => ({ ...prev, stateProvince: e.target.value }))}
                     placeholder="State/Province"
+                    className="h-11 border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light)',
+                      '--tw-ring-color': 'var(--color-primary)'
+                    } as any}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Country</label>
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                    Country
+                  </label>
                   <Input
                     type="text"
                     value={businessForm.country}
                     onChange={(e) => setBusinessForm(prev => ({ ...prev, country: e.target.value }))}
                     placeholder="Country"
+                    className="h-11 border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light)',
+                      '--tw-ring-color': 'var(--color-primary)'
+                    } as any}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Phone Number</label>
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                    Phone Number
+                  </label>
                   <Input
                     type="tel"
                     value={businessForm.phoneNumber}
                     onChange={(e) => setBusinessForm(prev => ({ ...prev, phoneNumber: e.target.value }))}
                     placeholder="Phone Number"
+                    className="h-11 border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light)',
+                      '--tw-ring-color': 'var(--color-primary)'
+                    } as any}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Email</label>
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                    Email
+                  </label>
                   <Input
                     type="email"
                     value={businessForm.email}
                     onChange={(e) => setBusinessForm(prev => ({ ...prev, email: e.target.value }))}
                     placeholder="Email"
+                    className="h-11 border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light)',
+                      '--tw-ring-color': 'var(--color-primary)'
+                    } as any}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Employee Count</label>
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                    Employee Count
+                  </label>
                   <Input
                     type="number"
                     value={businessForm.employeesCount}
@@ -1071,7 +1555,11 @@ export default function BusinessDirectoryManager() {
                   <select
                     value={businessForm.contactPersonId}
                     onChange={(e) => setBusinessForm(prev => ({ ...prev, contactPersonId: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border rounded-md transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                    style={{
+                      borderColor: 'var(--color-gray-light)',
+                      '--tw-ring-color': 'var(--color-primary)'
+                    } as any}
                   >
                     <option value="">Select a contact person</option>
                     {contactPersons.map((contact) => (
@@ -1083,7 +1571,7 @@ export default function BusinessDirectoryManager() {
                 </div>
               </div>
               
-              <div className="flex justify-end gap-2 pt-4">
+              <div className="flex justify-end gap-3 mt-8 pt-6 border-t" style={{ borderColor: 'var(--color-gray-light)' }}>
                 <Button
                   type="button"
                   variant="outline"
@@ -1091,11 +1579,17 @@ export default function BusinessDirectoryManager() {
                     setShowBusinessForm(false);
                     resetBusinessForm();
                   }}
+                  className="h-11 px-6 transition-all duration-200"
+                  style={{ borderColor: 'var(--color-gray-light)' }}
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? 'Saving...' : editingBusiness ? 'Update Business' : 'Add Business'}
+                <Button 
+                  type="submit" 
+                  disabled={loading}
+                  className="h-11 px-6 shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  {loading ? 'Saving...' : (editingBusiness ? 'Update Business' : 'Add Business')}
                 </Button>
               </div>
             </form>
@@ -1105,79 +1599,123 @@ export default function BusinessDirectoryManager() {
 
       {/* Contact Form Modal */}
       {showContactForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">
-                {editingContact ? 'Edit Contact Person' : 'Add New Contact Person'}
-              </h2>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setShowContactForm(false);
-                  resetContactForm();
-                }}
-              >
-                <X className="h-4 w-4" />
-              </Button>
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+            <div className="sticky top-0 p-6 border-b" style={{ borderColor: 'var(--color-gray-light)', backgroundColor: 'var(--color-bg-primary)' }}>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                    {editingContact ? 'Edit Contact Person' : 'Add New Contact Person'}
+                  </h2>
+                  <p className="text-base mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+                    {editingContact ? 'Update contact information' : 'Create a new contact person'}
+                  </p>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setShowContactForm(false);
+                    resetContactForm();
+                  }}
+                  className="h-10 w-10 p-0 rounded-full"
+                  style={{ borderColor: 'var(--color-gray-light)' }}
+                >
+                  <X className="h-5 w-5" />
+                </Button>
+              </div>
             </div>
             
-            <form onSubmit={handleContactSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">First Name *</label>
+            <form onSubmit={handleContactSubmit} className="p-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                    First Name *
+                  </label>
                   <Input
                     type="text"
                     value={contactForm.firstName}
                     onChange={(e) => setContactForm(prev => ({ ...prev, firstName: e.target.value }))}
                     placeholder="First Name"
                     required
+                    className="h-11 border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light)',
+                      '--tw-ring-color': 'var(--color-primary)'
+                    } as any}
                   />
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Last Name *</label>
+                <div className="space-y-2">
+                  <label className="block text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                    Last Name *
+                  </label>
                   <Input
                     type="text"
                     value={contactForm.lastName}
                     onChange={(e) => setContactForm(prev => ({ ...prev, lastName: e.target.value }))}
                     placeholder="Last Name"
                     required
+                    className="h-11 border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                    style={{ 
+                      borderColor: 'var(--color-gray-light)',
+                      '--tw-ring-color': 'var(--color-primary)'
+                    } as any}
                   />
                 </div>
               </div>
               
-              <div>
-                <label className="block text-sm font-medium mb-1">Title</label>
+              <div className="mt-6 space-y-2">
+                <label className="block text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                  Title
+                </label>
                 <Input
                   type="text"
                   value={contactForm.title}
                   onChange={(e) => setContactForm(prev => ({ ...prev, title: e.target.value }))}
                   placeholder="Job Title"
+                  className="h-11 border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                  style={{ 
+                    borderColor: 'var(--color-gray-light)',
+                    '--tw-ring-color': 'var(--color-primary)'
+                  } as any}
                 />
               </div>
               
-              <div>
-                <label className="block text-sm font-medium mb-1">Email</label>
+              <div className="mt-6 space-y-2">
+                <label className="block text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                  Email
+                </label>
                 <Input
                   type="email"
                   value={contactForm.email}
                   onChange={(e) => setContactForm(prev => ({ ...prev, email: e.target.value }))}
                   placeholder="Email"
+                  className="h-11 border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                  style={{ 
+                    borderColor: 'var(--color-gray-light)',
+                    '--tw-ring-color': 'var(--color-primary)'
+                  } as any}
                 />
               </div>
               
-              <div>
-                <label className="block text-sm font-medium mb-1">Phone</label>
+              <div className="mt-6 space-y-2">
+                <label className="block text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                  Phone
+                </label>
                 <Input
                   type="tel"
                   value={contactForm.phone}
                   onChange={(e) => setContactForm(prev => ({ ...prev, phone: e.target.value }))}
                   placeholder="Phone Number"
+                  className="h-11 border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                  style={{ 
+                    borderColor: 'var(--color-gray-light)',
+                    '--tw-ring-color': 'var(--color-primary)'
+                  } as any}
                 />
               </div>
               
-              <div className="flex justify-end gap-2 pt-4">
+              <div className="flex justify-end gap-3 mt-8 pt-6 border-t" style={{ borderColor: 'var(--color-gray-light)' }}>
                 <Button
                   type="button"
                   variant="outline"
@@ -1185,11 +1723,17 @@ export default function BusinessDirectoryManager() {
                     setShowContactForm(false);
                     resetContactForm();
                   }}
+                  className="h-11 px-6 transition-all duration-200"
+                  style={{ borderColor: 'var(--color-gray-light)' }}
                 >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={loading}>
-                  {loading ? 'Saving...' : editingContact ? 'Update Contact' : 'Add Contact'}
+                <Button 
+                  type="submit" 
+                  disabled={loading}
+                  className="h-11 px-6 shadow-lg hover:shadow-xl transition-all duration-200"
+                >
+                  {loading ? 'Saving...' : (editingContact ? 'Update Contact' : 'Add Contact')}
                 </Button>
               </div>
             </form>
@@ -1199,14 +1743,14 @@ export default function BusinessDirectoryManager() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && itemToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+        <div className="fixed inset-0 flex items-center justify-center z-50" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}>
+          <div className="rounded-lg p-6 w-full max-w-md" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
             <div className="flex items-center gap-3 mb-4">
-              <Trash2 className="h-6 w-6 text-red-500" />
-              <h2 className="text-xl font-semibold">Confirm Deletion</h2>
+              <Trash2 className="h-6 w-6" style={{ color: 'var(--color-error)' }} />
+              <h2 className="text-xl font-semibold" style={{ color: 'var(--color-text-primary)' }}>Confirm Deletion</h2>
             </div>
             
-            <p className="text-gray-600 mb-6">
+            <p className="mb-6" style={{ color: 'var(--color-text-secondary)' }}>
               Are you sure you want to delete this {itemToDelete.type === 'business' ? 'business' : 'contact person'}?
               <br />
               <strong>{itemToDelete.name}</strong>

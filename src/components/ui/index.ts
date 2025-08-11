@@ -15,4 +15,12 @@ export { default as ManagerCard } from './ManagerCard';
 export * from '../../lib/iconUtils';
 export { default as ErrorBoundary } from './ErrorBoundary';
 export { default as MediaSelector } from './MediaSelector';
-export { ColorPicker } from './ColorPicker'; 
+export { ColorPicker } from './ColorPicker';
+
+// Export new CTA components
+export { IconButton, iconButtonVariants } from './IconButton';
+export { LinkButton, linkButtonVariants } from './LinkButton';
+export { ActionGroup } from './ActionGroup';
+export { FloatingActionButton, fabVariants } from './FloatingActionButton';
+export { ProgressButton, progressButtonVariants } from './ProgressButton';
+export { SplitButton, splitButtonVariants } from './SplitButton'; 

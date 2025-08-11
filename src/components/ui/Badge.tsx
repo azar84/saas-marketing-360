@@ -10,26 +10,26 @@ const badgeVariants = cva(
     variants: {
       variant: {
         default: [
-          'border-transparent bg-[#5243E9] text-white',
-          'hover:bg-[#4338CA]'
+          'border-transparent text-white',
+          'hover:opacity-90'
         ],
-        secondary: 'border-transparent bg-[#E2E8F0] text-[#475569] hover:bg-[#CBD4E1]',
+        secondary: 'border-transparent text-white hover:opacity-90',
         success: [
-          'border-transparent bg-[#10B981] text-white',
-          'hover:bg-[#059669]'
+          'border-transparent text-white',
+          'hover:opacity-90'
         ],
         warning: [
-          'border-transparent bg-[#F59E0B] text-white',
-          'hover:bg-[#D97706]'
+          'border-transparent text-white',
+          'hover:opacity-90'
         ],
         destructive: [
-          'border-transparent bg-[#EF4444] text-white',
-          'hover:bg-[#DC2626]'
+          'border-transparent text-white',
+          'hover:opacity-90'
         ],
-        outline: 'text-[#475569] border-[#E2E8F0] bg-transparent hover:bg-[#F6F8FC]',
+        outline: 'text-white bg-transparent hover:opacity-90',
         gradient: [
-          'border-transparent bg-gradient-to-r from-[#5243E9] to-[#7C3AED] text-white',
-          'hover:from-[#4338CA] hover:to-[#6D28D9]'
+          'border-transparent text-white',
+          'hover:opacity-90'
         ],
       },
       size: {
@@ -56,41 +56,139 @@ export interface BadgeProps
 
 const Badge = React.forwardRef<HTMLDivElement, BadgeProps>(
   ({ className, variant, size, icon, children, onRemove, ...props }, ref) => {
+    // Get badge colors based on variant
+    const getBadgeColors = () => {
+      switch (variant) {
+        case 'default':
+          return {
+            backgroundColor: 'var(--color-primary)',
+            borderColor: 'var(--color-primary)',
+            color: 'var(--color-bg-primary)'
+          };
+        case 'secondary':
+          return {
+            backgroundColor: 'var(--color-secondary)',
+            borderColor: 'var(--color-secondary)',
+            color: 'var(--color-bg-primary)'
+          };
+        case 'success':
+          return {
+            backgroundColor: 'var(--color-success)',
+            borderColor: 'var(--color-success)',
+            color: 'var(--color-bg-primary)'
+          };
+        case 'warning':
+          return {
+            backgroundColor: 'var(--color-warning)',
+            borderColor: 'var(--color-warning)',
+            color: 'var(--color-bg-primary)'
+          };
+        case 'destructive':
+          return {
+            backgroundColor: 'var(--color-error)',
+            borderColor: 'var(--color-error)',
+            color: 'var(--color-bg-primary)'
+          };
+        case 'outline':
+          return {
+            backgroundColor: 'transparent',
+            borderColor: 'var(--color-gray-light)',
+            color: 'var(--color-text-primary)'
+          };
+        case 'gradient':
+          return {
+            background: 'linear-gradient(to right, var(--color-primary), var(--color-accent))',
+            borderColor: 'transparent',
+            color: 'var(--color-bg-primary)'
+          };
+        default:
+          return {
+            backgroundColor: 'var(--color-primary)',
+            borderColor: 'var(--color-primary)',
+            color: 'var(--color-bg-primary)'
+          };
+      }
+    };
+
+    const badgeColors = getBadgeColors();
+
     return (
-      <div
-        ref={ref}
-        className={cn(badgeVariants({ variant, size, className }))}
-        {...props}
-      >
-        {icon && (
-          <span className="mr-1 flex-shrink-0">
-            {icon}
-          </span>
-        )}
-        {children}
-        {onRemove && (
-          <button
-            onClick={onRemove}
-            className="ml-1 flex-shrink-0 h-3 w-3 rounded-full hover:bg-black/10 flex items-center justify-center transition-colors"
-            aria-label="Remove"
-          >
-            <svg
-              className="h-2 w-2"
-              viewBox="0 0 8 8"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+      <>
+        {/* Inject dynamic styles */}
+        <style dangerouslySetInnerHTML={{ __html: `
+          .badge-default {
+            background-color: var(--color-primary);
+            border-color: var(--color-primary);
+            color: var(--color-bg-primary);
+          }
+          .badge-secondary {
+            background-color: var(--color-secondary);
+            border-color: var(--color-secondary);
+            color: var(--color-bg-primary);
+          }
+          .badge-success {
+            background-color: var(--color-success);
+            border-color: var(--color-success);
+            color: var(--color-bg-primary);
+          }
+          .badge-warning {
+            background-color: var(--color-warning);
+            border-color: var(--color-warning);
+            color: var(--color-bg-primary);
+          }
+          .badge-destructive {
+            background-color: var(--color-error);
+            border-color: var(--color-error);
+            color: var(--color-bg-primary);
+          }
+          .badge-outline {
+            background-color: transparent;
+            border-color: var(--color-gray-light);
+            color: var(--color-text-primary);
+          }
+          .badge-gradient {
+            background: linear-gradient(to right, var(--color-primary), var(--color-accent));
+            border-color: transparent;
+            color: var(--color-bg-primary);
+          }
+        `}} />
+        
+        <div
+          ref={ref}
+          className={cn(badgeVariants({ variant, size, className }))}
+          style={badgeColors}
+          {...props}
+        >
+          {icon && (
+            <span className="mr-1 flex-shrink-0">
+              {icon}
+            </span>
+          )}
+          {children}
+          {onRemove && (
+            <button
+              onClick={onRemove}
+              className="ml-1 flex-shrink-0 h-3 w-3 rounded-full hover:bg-black/10 flex items-center justify-center transition-colors"
+              aria-label="Remove"
             >
-              <path
-                d="M1 1L7 7M7 1L1 7"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        )}
-      </div>
+              <svg
+                className="h-2 w-2"
+                viewBox="0 0 8 8"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M1 1L7 7M7 1L1 7"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          )}
+        </div>
+      </>
     );
   }
 );
