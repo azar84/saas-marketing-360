@@ -13,7 +13,7 @@ echo "Current API key in .env:"
 grep BUILTWITH_API_KEY .env
 echo ""
 echo "To update it, edit your .env file and replace:"
-echo "BUILTWITH_API_KEY=\"fbbb2126-d86e-4c44-b453-5617ed15713f\""
+echo "BUILTWITH_API_KEY=\"your_api_key_here\""
 echo ""
 echo "With your real API key:"
 echo "BUILTWITH_API_KEY=\"your_real_api_key_here\""
