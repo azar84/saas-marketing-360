@@ -39,12 +39,14 @@ export function NotificationCenter({
   maxNotifications = 10 
 }: NotificationCenterProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
+  const unreadCount = notifications.length; // All notifications are considered unread for now
   const dropdownRef = useRef<HTMLDivElement>(null);
 
+  // Debug logging
   useEffect(() => {
-    setUnreadCount(notifications.filter(n => n.type !== 'success').length);
-  }, [notifications]);
+    console.log('🔔 NotificationCenter received notifications:', notifications);
+    console.log('🔔 Unread count:', unreadCount);
+  }, [notifications, unreadCount]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -107,12 +109,17 @@ export function NotificationCenter({
       <Button
         variant="ghost"
         size="sm"
-        onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2"
+        onClick={() => {
+          console.log('🔔 Bell clicked, current isOpen:', isOpen);
+          setIsOpen(!isOpen);
+          console.log('🔔 New isOpen state:', !isOpen);
+        }}
+        className="relative p-0 border border-gray-300 bg-white flex items-center justify-center"
+        style={{ minWidth: '32px', minHeight: '32px' }}
       >
-        <Bell className="w-5 h-5" />
+        <Bell className="w-6 h-6" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+          <span className="absolute top-0.5 right-0.5 bg-red-500 text-white text-[8px] rounded-full w-3 h-3 flex items-center justify-center">
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
@@ -120,10 +127,10 @@ export function NotificationCenter({
 
       {/* Notification Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 top-12 w-96 max-h-96 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+        <div className="fixed right-4 top-20 w-96 max-h-96 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg z-[9999]">
           <div className="p-4 border-b border-gray-200">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">Notifications</h3>
+              <h3 className="text-lg font-semibold">Notifications ({notifications.length})</h3>
               <div className="flex items-center gap-2">
                 {notifications.length > 0 && (
                   <Button
@@ -152,6 +159,7 @@ export function NotificationCenter({
               <div className="text-center py-8 text-gray-500">
                 <Bell className="w-12 h-12 mx-auto mb-2 text-gray-300" />
                 <p>No notifications</p>
+                <p className="text-xs text-gray-400 mt-1">Total: {notifications.length}</p>
               </div>
             ) : (
               displayedNotifications.map((notification) => (

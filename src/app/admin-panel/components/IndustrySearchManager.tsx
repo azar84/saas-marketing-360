@@ -913,20 +913,24 @@ export default function IndustrySearchManager() {
 
   const startBackgroundExtraction = async () => {
     if (backgroundExtractionInProgress) {
-      addNotification({
+      console.log('🔔 Adding warning notification: Extraction Already Running');
+      const notificationId = addNotification({
         type: 'warning',
         title: 'Extraction Already Running',
         message: 'A background extraction job is already in progress.'
       });
+      console.log('🔔 Warning notification added with ID:', notificationId);
       return;
     }
 
     if (searchResults.length === 0) {
-      addNotification({
+      console.log('🔔 Adding error notification: No Search Results');
+      const notificationId = addNotification({
         type: 'error',
         title: 'No Search Results',
         message: 'Please perform a search first to extract business information.'
       });
+      console.log('🔔 Error notification added with ID:', notificationId);
       return;
     }
 
@@ -984,6 +988,7 @@ export default function IndustrySearchManager() {
         setBackgroundExtractionJob(job);
 
         // Add notification
+        console.log('🔔 Adding progress notification: Background Extraction Started');
         const notificationId = addNotification({
           type: 'progress',
           title: 'Background Extraction Started',
@@ -1004,6 +1009,8 @@ export default function IndustrySearchManager() {
             }
           ]
         });
+        console.log('🔔 Progress notification added with ID:', notificationId);
+        console.log('🔔 Current notifications count:', notifications.length);
 
         // Start monitoring the job
         monitorBackgroundJob(jobId, notificationId);
@@ -1012,16 +1019,17 @@ export default function IndustrySearchManager() {
       } else {
         throw new Error(data.error || 'Failed to start background extraction');
       }
-
     } catch (error) {
-      console.error('❌ Failed to start background extraction:', error);
+      console.error('❌ Background extraction error:', error);
       setError(`Failed to start background extraction: ${error instanceof Error ? error.message : 'Unknown error'}`);
       
-      addNotification({
+      console.log('🔔 Adding error notification: Background Extraction Failed');
+      const notificationId = addNotification({
         type: 'error',
-        title: 'Extraction Failed',
+        title: 'Background Extraction Failed',
         message: `Failed to start background extraction: ${error instanceof Error ? error.message : 'Unknown error'}`
       });
+      console.log('🔔 Error notification added with ID:', notificationId);
     } finally {
       setBackgroundExtractionInProgress(false);
     }
@@ -1332,6 +1340,16 @@ export default function IndustrySearchManager() {
     setCitySearch('');
     setGeneratedQueries([]);
   };
+
+  // Debug logging for notifications
+  useEffect(() => {
+    console.log('🔔 Notification context initialized');
+    console.log('🔔 Current notifications:', notifications);
+  }, []);
+
+  useEffect(() => {
+    console.log('🔔 Notifications updated:', notifications);
+  }, [notifications]);
 
   return (
     <div className="space-y-6 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
@@ -2604,6 +2622,75 @@ export default function IndustrySearchManager() {
           </div>
         </div>
       )}
+
+      {/* Test Notification Button */}
+      <div className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+        <h3 className="text-lg font-semibold mb-2">🔔 Test Notification System</h3>
+        <p className="text-sm text-gray-600 mb-3">Click these buttons to test if notifications are working:</p>
+        <div className="flex flex-wrap gap-2">
+          <Button
+            onClick={() => {
+              console.log('🔔 Testing success notification');
+              const id = addNotification({
+                type: 'success',
+                title: 'Test Success',
+                message: 'This is a test success notification!'
+              });
+              console.log('🔔 Success notification added with ID:', id);
+            }}
+            variant="success"
+            size="sm"
+          >
+            Test Success
+          </Button>
+          <Button
+            onClick={() => {
+              console.log('🔔 Testing progress notification');
+              const id = addNotification({
+                type: 'progress',
+                title: 'Test Progress',
+                message: 'This is a test progress notification!',
+                progress: {
+                  current: 5,
+                  total: 10,
+                  percentage: 50,
+                  status: 'Processing...'
+                }
+              });
+              console.log('🔔 Progress notification added with ID:', id);
+            }}
+            variant="info"
+            size="sm"
+          >
+            Test Progress
+          </Button>
+          <Button
+            onClick={() => {
+              console.log('🔔 Testing error notification');
+              const id = addNotification({
+                type: 'error',
+                title: 'Test Error',
+                message: 'This is a test error notification!'
+              });
+              console.log('🔔 Error notification added with ID:', id);
+            }}
+            variant="destructive"
+            size="sm"
+          >
+            Test Error
+          </Button>
+          <Button
+            onClick={() => {
+              console.log('🔔 Current notifications:', notifications);
+              console.log('🔔 Notification context functions:', { addNotification, dismissNotification, clearAllNotifications, updateNotification });
+            }}
+            variant="outline"
+            size="sm"
+          >
+            Debug Info
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

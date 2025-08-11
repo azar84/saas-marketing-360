@@ -109,8 +109,29 @@ export default function AdminPanel() {
   const router = useRouter();
   const { designSystem } = useDesignSystem();
   const { get } = useAdminApi();
-  const { notifications, dismissNotification, clearAllNotifications } = useNotificationContext();
+  const { notifications, dismissNotification, clearAllNotifications, addNotification } = useNotificationContext();
   
+  // Debug logging for notifications
+  useEffect(() => {
+    console.log('🔔 Admin Panel: Notification context initialized');
+    console.log('🔔 Admin Panel: Current notifications:', notifications);
+    
+    // Add a test notification to see if the system is working
+    setTimeout(() => {
+      console.log('🔔 Admin Panel: Adding test notification...');
+      const testId = addNotification({
+        type: 'info',
+        title: 'Admin Panel Loaded',
+        message: 'Notification system is working! Click the bell icon to see notifications.'
+      });
+      console.log('🔔 Admin Panel: Test notification added with ID:', testId);
+    }, 2000);
+  }, []);
+
+  useEffect(() => {
+    console.log('🔔 Admin Panel: Notifications updated:', notifications);
+  }, [notifications]);
+
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [showKeywordsResult, setShowKeywordsResult] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
