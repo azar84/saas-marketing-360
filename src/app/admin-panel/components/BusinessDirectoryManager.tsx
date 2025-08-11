@@ -628,8 +628,16 @@ export default function BusinessDirectoryManager() {
       {/* Main Content */}
       <div className="px-8 py-10">
         <div className="max-w-7xl mx-auto">
-        {/* Enhanced Search Section */}
-        <div className="mb-10">
+        {/* ===== SEARCH & FILTERS SECTION ===== */}
+        <div className="mb-8 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-gray-light)' }}>
+          <div className="mb-4">
+            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+              Search & Filters
+            </h3>
+            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+              Use advanced search and filters to find specific businesses
+            </p>
+          </div>
           {activeTab === 'businesses' ? (
             <EnhancedSearch
               searchValue={searchTerm}
@@ -670,8 +678,12 @@ export default function BusinessDirectoryManager() {
           )}
         </div>
 
-        {/* Action Bar */}
-        <div className="flex items-center justify-between mb-8">
+        {/* ===== QUICK ACTIONS BAR ===== */}
+        <div className="mb-8 p-4 rounded-xl" style={{ backgroundColor: 'var(--color-bg-secondary)', border: '1px solid var(--color-gray-light)' }}>
+          <div className="mb-3">
+            <h4 className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Quick Actions</h4>
+          </div>
+          <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button
               variant={filterActive ? "primary" : "outline"}
@@ -725,9 +737,10 @@ export default function BusinessDirectoryManager() {
               </div>
             )}
           </div>
-                </div>
+          </div>
+        </div>
 
-        {/* TOP PAGINATION SECTION - Enhanced Pagination Controls */}
+        {/* ===== RESULTS SUMMARY & PAGINATION ===== */}
           {totalPages > 1 && (
             <div className="mt-8 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-gray-light)' }}>
               <div className="flex items-center justify-between">
