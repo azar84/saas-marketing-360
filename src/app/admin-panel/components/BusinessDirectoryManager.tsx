@@ -798,165 +798,7 @@ export default function BusinessDirectoryManager() {
           )}
         </div>
 
-        {/* Enhanced Search Results */}
-        {activeTab === 'businesses' && filterActive && (
-          <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
-                Enhanced Search Results
-              </h3>
-              <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                {businesses.length} results
-              </span>
-            </div>
-            
-            {businesses.length > 0 && (
-              <div className="grid gap-4">
-                {businesses.slice(0, 3).map((business) => (
-                  <div
-                    key={business.id}
-                    className="group border-2 rounded-xl p-6 hover:shadow-xl transition-all duration-200 cursor-pointer"
-                    style={{ 
-                      backgroundColor: 'var(--color-bg-primary)',
-                      borderColor: business.isActive ? 'var(--color-gray-light)' : 'var(--color-text-muted)'
-                    }}
-                    onClick={() => handleEditBusiness(business)}
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        {/* Header Row */}
-                        <div className="flex items-center gap-4 mb-4">
-                          <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)' }}>
-                            <Building className="h-6 w-6" style={{ color: 'var(--color-bg-primary)' }} />
-                          </div>
-                          <div className="flex-1">
-                            <h3 className="text-xl font-semibold mb-1" style={{ color: 'var(--color-text-primary)' }}>
-                              {business.companyName || business.website}
-                            </h3>
-                            <div className="flex items-center gap-3">
-                              <Badge
-                                variant={business.isActive ? 'default' : 'secondary'}
-                                className="text-xs font-medium px-2 py-1"
-                              >
-                                {business.isActive ? 'Active' : 'Inactive'}
-                              </Badge>
-                              {business.employeesCount && (
-                                <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                                  {business.employeesCount} employees
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </div>
 
-                        {/* Details Grid */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                          <div className="space-y-3">
-                            <div className="flex items-center gap-3 text-sm">
-                              <Globe className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
-                              <a
-                                href={business.website.startsWith('http') ? business.website : `https://${business.website}`}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="hover:underline font-medium"
-                                style={{ color: 'var(--color-primary)' }}
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                {business.website}
-                              </a>
-                            </div>
-                            {(business.city || business.stateProvince || business.country) && (
-                              <div className="flex items-center gap-3 text-sm">
-                                <MapPin className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
-                                <span style={{ color: 'var(--color-text-secondary)' }}>
-                                  {[business.city, business.stateProvince, business.country].filter(Boolean).join(', ')}
-                                </span>
-                              </div>
-                            )}
-                          </div>
-                          <div className="space-y-3">
-                            {business.phoneNumber && (
-                              <div className="flex items-center gap-3 text-sm">
-                                <Phone className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
-                                <span style={{ color: 'var(--color-text-secondary)' }}>{business.phoneNumber}</span>
-                              </div>
-                            )}
-                            {business.email && (
-                              <div className="flex items-center gap-3 text-sm">
-                                <Mail className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
-                                <span style={{ color: 'var(--color-text-secondary)' }}>{business.email}</span>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Contact Person */}
-                        {business.contactPerson && (
-                          <div className="mb-4 p-3 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
-                            <div className="flex items-center gap-3">
-                              <Users className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
-                              <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
-                                Contact: {business.contactPerson.firstName} {business.contactPerson.lastName}
-                                {business.contactPerson.title && ` - ${business.contactPerson.title}`}
-                              </span>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Industries */}
-                        {business.industries && business.industries.length > 0 && (
-                          <div className="mb-4">
-                            <h4 className="text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>Industries</h4>
-                            <div className="flex flex-wrap gap-2">
-                              {business.industries.map((businessIndustry) => (
-                                <Badge
-                                  key={businessIndustry.id}
-                                  variant={businessIndustry.isPrimary ? "success" : "outline"}
-                                  size="sm"
-                                  className="text-xs font-medium"
-                                >
-                                  {businessIndustry.industry.label}
-                                  {businessIndustry.isPrimary && ' (Primary)'}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className="flex gap-2 ml-6 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEditBusiness(business);
-                          }}
-                        >
-                          <Edit className="h-4 w-4" />
-                          Edit
-                        </Button>
-                        <Button
-                          variant="destructive"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setItemToDelete({ id: business.id, type: 'business', name: business.companyName || business.website });
-                            setShowDeleteConfirm(true);
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                          Delete
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
 
       {/* Tab Content */}
       {activeTab === 'businesses' && (
@@ -969,6 +811,9 @@ export default function BusinessDirectoryManager() {
               </h2>
               <p className="text-base" style={{ color: 'var(--color-text-secondary)' }}>
                 {totalCount} businesses found • {businesses.filter(b => b.isActive).length} active
+              </p>
+              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                Use the search and filters above to find specific businesses
               </p>
             </div>
             <div className="flex gap-3">
