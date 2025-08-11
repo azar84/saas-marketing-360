@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createChatModel } from '@/lib/llm/core/modelFactory';
+import { llmModel } from '@/lib/llm/model';
 import type { ChainDefinition, RunOptions } from '@/lib/llm/core/types';
 import { extractJson, normalizeList } from '@/lib/llm/json';
 
@@ -119,13 +119,6 @@ export const KeywordsChain: ChainDefinition<z.infer<typeof KeywordsInputSchema>,
       throw new Error('DEEPSEEK_API_KEY not configured for DeepSeek model');
     }
 
-    const chat = createChatModel({
-      model,
-      temperature,
-      apiKey,
-      timeoutMs,
-    });
-    
     const prompt = buildPrompt(parsed.industry);
     const debug = process.env.KEYWORDS_DEBUG === '1' || process.env.KEYWORDS_DEBUG === 'true';
     
@@ -137,12 +130,9 @@ export const KeywordsChain: ChainDefinition<z.infer<typeof KeywordsInputSchema>,
         console.log('Calling DeepSeek model:', model, 'timeout:', timeoutMs);
         console.log('Prompt being sent:', content.substring(0, 200) + '...');
         
-        const resp = await chat.invoke([
-          { role: 'system', content: 'You must return strict JSON that validates against the described schema. No prose.' },
-          { role: 'user', content },
-        ]);
+        const response = await llmModel.call(content);
         
-        const text = resp?.content?.toString?.() || (Array.isArray(resp?.content) ? resp.content.map((c: any) => c?.text || '').join('\n') : '');
+        const text = response.content;
         console.log('=== LLM RAW RESPONSE START ===');
         console.log('Full LLM response:', text);
         console.log('Response length:', text?.length || 0);

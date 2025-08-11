@@ -43,10 +43,7 @@ export function NotificationCenter({
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // Debug logging
-  useEffect(() => {
-    console.log('🔔 NotificationCenter received notifications:', notifications);
-    console.log('🔔 Unread count:', unreadCount);
-  }, [notifications, unreadCount]);
+
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -110,9 +107,7 @@ export function NotificationCenter({
         variant="ghost"
         size="sm"
         onClick={() => {
-          console.log('🔔 Bell clicked, current isOpen:', isOpen);
           setIsOpen(!isOpen);
-          console.log('🔔 New isOpen state:', !isOpen);
         }}
         className="relative p-0 border border-gray-300 bg-white flex items-center justify-center"
         style={{ minWidth: '32px', minHeight: '32px' }}

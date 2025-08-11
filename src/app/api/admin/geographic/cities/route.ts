@@ -15,10 +15,13 @@ export async function GET(request: NextRequest) {
     if (countryId) where.countryId = parseInt(countryId);
     if (stateId) where.stateId = parseInt(stateId);
     if (search) {
+      const searchTerm = search.trim();
       where.OR = [
-        { name: { contains: search } },
-        { officialName: { contains: search } },
-        { type: { contains: search } }
+        { name: { contains: searchTerm, mode: 'insensitive' } },
+        { officialName: { contains: searchTerm, mode: 'insensitive' } },
+        { type: { contains: searchTerm, mode: 'insensitive' } },
+        // Also search for cities that start with the search term
+        { name: { startsWith: searchTerm, mode: 'insensitive' } }
       ];
     }
 

@@ -36,36 +36,28 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
       timestamp: new Date()
     };
     
-    console.log('🔔 NotificationProvider: Adding notification:', newNotification);
     setNotifications(prev => {
       const newNotifications = [newNotification, ...prev];
-      console.log('🔔 NotificationProvider: Updated notifications array:', newNotifications);
       return newNotifications;
     });
     return id;
   };
 
   const dismissNotification = (id: string) => {
-    console.log('🔔 NotificationProvider: Dismissing notification:', id);
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
   const clearAllNotifications = () => {
-    console.log('🔔 NotificationProvider: Clearing all notifications');
     setNotifications([]);
   };
 
   const updateNotification = (id: string, updates: Partial<Notification>) => {
-    console.log('🔔 NotificationProvider: Updating notification:', id, updates);
     setNotifications(prev => 
       prev.map(n => n.id === id ? { ...n, ...updates } : n)
     );
   };
 
-  // Debug logging for notifications state changes
-  useEffect(() => {
-    console.log('🔔 NotificationProvider: Notifications state changed:', notifications);
-  }, [notifications]);
+
 
   const value: NotificationContextType = {
     notifications,
@@ -75,7 +67,7 @@ export function NotificationProvider({ children }: NotificationProviderProps) {
     updateNotification
   };
 
-  console.log('🔔 NotificationProvider: Rendering with value:', value);
+
 
   return (
     <NotificationContext.Provider value={value}>

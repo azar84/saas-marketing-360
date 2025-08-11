@@ -40,30 +40,44 @@ export interface SaveResult {
 
 /**
  * Create a business-industry relationship
+ * Uses upsert to prevent duplicate industries and relationships
  */
 async function createBusinessIndustryRelationship(businessId: number, industryLabel: string, isPrimary: boolean = false) {
   try {
-    // Find or create the industry
-    let industry = await prisma.industry.findUnique({
-      where: { label: industryLabel }
-    });
-
-    if (!industry) {
-      industry = await prisma.industry.create({
-        data: { label: industryLabel }
-      });
-    }
-
-    // Create the relationship
-    await prisma.businessIndustry.create({
-      data: {
-        businessId,
-        industryId: industry.id,
-        isPrimary
+    // Use upsert to find or create the industry (prevents duplicates)
+    const industry = await prisma.industry.upsert({
+      where: { label: industryLabel },
+      update: {}, // No updates needed if exists
+      create: { 
+        label: industryLabel,
+        isActive: true
       }
     });
 
-    console.log(`✅ Created industry relationship: Business ${businessId} -> Industry ${industryLabel} (${isPrimary ? 'Primary' : 'Secondary'})`);
+    // Check if relationship already exists to prevent duplicates
+    const existingRelationship = await prisma.businessIndustry.findUnique({
+      where: {
+        businessId_industryId: {
+          businessId,
+          industryId: industry.id
+        }
+      }
+    });
+
+    if (!existingRelationship) {
+      // Create the relationship only if it doesn't exist
+      await prisma.businessIndustry.create({
+        data: {
+          businessId,
+          industryId: industry.id,
+          isPrimary
+        }
+      });
+
+      console.log(`✅ Created industry relationship: Business ${businessId} -> Industry ${industryLabel} (${isPrimary ? 'Primary' : 'Secondary'})`);
+    } else {
+      console.log(`ℹ️  Industry relationship already exists: Business ${businessId} -> Industry ${industryLabel}`);
+    }
   } catch (error) {
     console.error(`❌ Failed to create industry relationship:`, error);
   }
@@ -71,19 +85,19 @@ async function createBusinessIndustryRelationship(businessId: number, industryLa
 
 /**
  * Update a business-industry relationship
+ * Uses upsert to prevent duplicate industries and relationships
  */
 async function updateBusinessIndustryRelationship(businessId: number, industryLabel: string) {
   try {
-    // Find or create the industry
-    let industry = await prisma.industry.findUnique({
-      where: { label: industryLabel }
+    // Use upsert to find or create the industry (prevents duplicates)
+    const industry = await prisma.industry.upsert({
+      where: { label: industryLabel },
+      update: {}, // No updates needed if exists
+      create: { 
+        label: industryLabel,
+        isActive: true
+      }
     });
-
-    if (!industry) {
-      industry = await prisma.industry.create({
-        data: { label: industryLabel }
-      });
-    }
 
     // Check if relationship already exists
     const existingRelationship = await prisma.businessIndustry.findUnique({
@@ -96,7 +110,7 @@ async function updateBusinessIndustryRelationship(businessId: number, industryLa
     });
 
     if (!existingRelationship) {
-      // Create the relationship
+      // Create the relationship only if it doesn't exist
       await prisma.businessIndustry.create({
         data: {
           businessId,
@@ -106,9 +120,81 @@ async function updateBusinessIndustryRelationship(businessId: number, industryLa
       });
 
       console.log(`✅ Created industry relationship: Business ${businessId} -> Industry ${industryLabel}`);
+    } else {
+      console.log(`ℹ️  Industry relationship already exists: Business ${businessId} -> Industry ${industryLabel}`);
     }
   } catch (error) {
     console.error(`❌ Failed to update industry relationship:`, error);
+  }
+}
+
+/**
+ * Create or update multiple business-industry relationships
+ * Handles deduplication efficiently for multiple industries
+ */
+async function createBusinessIndustryRelationships(businessId: number, industryLabels: string[], primaryIndustry?: string) {
+  try {
+    const results = [];
+    
+    for (const industryLabel of industryLabels) {
+      if (!industryLabel || industryLabel.trim() === '') continue;
+      
+      const trimmedLabel = industryLabel.trim();
+      
+      // Use upsert to find or create the industry (prevents duplicates)
+      const industry = await prisma.industry.upsert({
+        where: { label: trimmedLabel },
+        update: {}, // No updates needed if exists
+        create: { 
+          label: trimmedLabel,
+          isActive: true
+        }
+      });
+
+      // Check if relationship already exists
+      const existingRelationship = await prisma.businessIndustry.findUnique({
+        where: {
+          businessId_industryId: {
+            businessId,
+            industryId: industry.id
+          }
+        }
+      });
+
+      if (!existingRelationship) {
+        // Create the relationship only if it doesn't exist
+        const isPrimary = primaryIndustry === trimmedLabel;
+        
+        await prisma.businessIndustry.create({
+          data: {
+            businessId,
+            industryId: industry.id,
+            isPrimary
+          }
+        });
+
+        results.push({
+          industry: trimmedLabel,
+          action: 'created',
+          isPrimary
+        });
+        
+        console.log(`✅ Created industry relationship: Business ${businessId} -> Industry ${trimmedLabel} (${isPrimary ? 'Primary' : 'Secondary'})`);
+      } else {
+        results.push({
+          industry: trimmedLabel,
+          action: 'exists',
+          isPrimary: false
+        });
+        
+        console.log(`ℹ️  Industry relationship already exists: Business ${businessId} -> Industry ${trimmedLabel}`);
+      }
+    }
+    
+    return results;
+  } catch (error) {
+    console.error(`❌ Failed to create industry relationships:`, error);
+    return [];
   }
 }
 
@@ -428,13 +514,41 @@ export async function getBusinessDirectoryStats() {
 export async function searchBusinesses(query: string, options: {
   page?: number;
   limit?: number;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
   city?: string;
   stateProvince?: string;
   country?: string;
   industry?: string;
   isActive?: boolean;
+  minEmployees?: number;
+  maxEmployees?: number;
+  hasContactPerson?: boolean;
+  hasIndustries?: boolean;
+  createdAfter?: string;
+  createdBefore?: string;
+  updatedAfter?: string;
+  updatedBefore?: string;
 } = {}) {
-  const { page = 1, limit = 20, city, stateProvince, country, industry, isActive = true } = options;
+  const { 
+    page = 1, 
+    limit = 20, 
+    sortBy = 'createdAt',
+    sortOrder = 'desc',
+    city, 
+    stateProvince, 
+    country, 
+    industry, 
+    isActive = true,
+    minEmployees,
+    maxEmployees,
+    hasContactPerson,
+    hasIndustries,
+    createdAfter,
+    createdBefore,
+    updatedAfter,
+    updatedBefore
+  } = options;
   const skip = (page - 1) * limit;
 
   try {
@@ -446,25 +560,67 @@ export async function searchBusinesses(query: string, options: {
     // Add text search if query is provided
     if (query && query.trim()) {
       where.OR = [
-        { website: { contains: query } },
-        { companyName: { contains: query } },
-        { city: { contains: query } },
-        { stateProvince: { contains: query } },
-        { country: { contains: query } }
+        { website: { contains: query, mode: 'insensitive' } },
+        { companyName: { contains: query, mode: 'insensitive' } },
+        { city: { contains: query, mode: 'insensitive' } },
+        { stateProvince: { contains: query, mode: 'insensitive' } },
+        { country: { contains: query, mode: 'insensitive' } },
+        { phoneNumber: { contains: query, mode: 'insensitive' } },
+        { email: { contains: query, mode: 'insensitive' } }
       ];
     }
 
     // Add geographic filters
     if (city) {
-      where.city = { contains: city };
+      where.city = { contains: city, mode: 'insensitive' };
     }
 
     if (stateProvince) {
-      where.stateProvince = { contains: stateProvince };
+      where.stateProvince = { contains: stateProvince, mode: 'insensitive' };
     }
 
     if (country) {
-      where.country = { contains: country };
+      where.country = { contains: country, mode: 'insensitive' };
+    }
+
+    // Add employee count filters
+    if (minEmployees !== undefined) {
+      where.employeesCount = { ...where.employeesCount, gte: minEmployees };
+    }
+    if (maxEmployees !== undefined) {
+      where.employeesCount = { ...where.employeesCount, lte: maxEmployees };
+    }
+
+    // Add contact person filter
+    if (hasContactPerson !== undefined) {
+      if (hasContactPerson) {
+        where.contactPersonId = { not: null };
+      } else {
+        where.contactPersonId = null;
+      }
+    }
+
+    // Add industries filter
+    if (hasIndustries !== undefined) {
+      if (hasIndustries) {
+        where.industries = { some: {} };
+      } else {
+        where.industries = { none: {} };
+      }
+    }
+
+    // Add date filters
+    if (createdAfter) {
+      where.createdAt = { ...where.createdAt, gte: new Date(createdAfter) };
+    }
+    if (createdBefore) {
+      where.createdAt = { ...where.createdAt, lte: new Date(createdBefore) };
+    }
+    if (updatedAfter) {
+      where.updatedAt = { ...where.updatedAt, gte: new Date(updatedAfter) };
+    }
+    if (updatedBefore) {
+      where.updatedAt = { ...where.updatedAt, lte: new Date(updatedBefore) };
     }
 
     // Handle industry filtering - make it more flexible and intelligent
@@ -520,7 +676,7 @@ export async function searchBusinesses(query: string, options: {
             }
           }
         },
-        orderBy: { createdAt: 'desc' },
+        orderBy: { [sortBy]: sortOrder },
         skip,
         take: limit
       }),

@@ -141,6 +141,10 @@ export default function BusinessDirectoryManager() {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<{ id: number; type: 'business' | 'contact'; name: string } | null>(null);
   
+  // Bulk selection state
+  const [selectedBusinesses, setSelectedBusinesses] = useState<Set<number>>(new Set());
+  const [selectAll, setSelectAll] = useState(false);
+  
   // Business Form Data
   const [businessForm, setBusinessForm] = useState({
     website: '',
@@ -164,30 +168,34 @@ export default function BusinessDirectoryManager() {
   });
 
   // Enhanced search configuration
-  const businessSearchFilters: SearchFilter[] = [
+  const [businessSearchFilters, setBusinessSearchFilters] = useState<SearchFilter[]>([
     {
       id: 'city',
       label: 'City',
       value: '',
-      type: 'text'
+      type: 'autocomplete',
+      options: []
     },
     {
       id: 'stateProvince',
       label: 'State/Province',
       value: '',
-      type: 'text'
+      type: 'autocomplete',
+      options: []
     },
     {
       id: 'country',
       label: 'Country',
       value: '',
-      type: 'text'
+      type: 'autocomplete',
+      options: []
     },
     {
       id: 'industry',
       label: 'Industry',
       value: '',
-      type: 'text'
+      type: 'autocomplete',
+      options: []
     },
     {
       id: 'minEmployees',
@@ -245,7 +253,7 @@ export default function BusinessDirectoryManager() {
       value: '',
       type: 'date'
     }
-  ];
+  ]);
 
   const businessSortOptions: SortOption[] = [
     { id: 'createdAt', label: 'Date Created', field: 'createdAt', direction: 'desc' },
@@ -258,13 +266,69 @@ export default function BusinessDirectoryManager() {
     { id: 'employeesCount', label: 'Employee Count', field: 'employeesCount', direction: 'desc' }
   ];
 
+  // Update autocomplete options based on user input
+  const updateAutocompleteOptions = useCallback((filterId: string, value: string) => {
+    if (!value || value.length < 2) {
+      // Clear options if input is too short
+      setBusinessSearchFilters(prev => prev.map(filter => 
+        filter.id === filterId ? { ...filter, options: [] } : filter
+      ));
+      return;
+    }
+    
+    // Filter existing data to find matching options
+    const matchingOptions: { value: string; label: string }[] = [];
+    
+    if (filterId === 'city') {
+      const cities = [...new Set(businesses.map(b => b.city).filter((city): city is string => Boolean(city)))];
+      cities.forEach(city => {
+        if (city.toLowerCase().includes(value.toLowerCase())) {
+          matchingOptions.push({ value: city, label: city });
+        }
+      });
+    } else if (filterId === 'stateProvince') {
+      const states = [...new Set(businesses.map(b => b.stateProvince).filter((state): state is string => Boolean(state)))];
+      states.forEach(state => {
+        if (state.toLowerCase().includes(value.toLowerCase())) {
+          matchingOptions.push({ value: state, label: state });
+        }
+      });
+    } else if (filterId === 'country') {
+      const countries = [...new Set(businesses.map(b => b.country).filter((country): country is string => Boolean(country)))];
+      countries.forEach(country => {
+        if (country.toLowerCase().includes(value.toLowerCase())) {
+          matchingOptions.push({ value: country, label: country });
+        }
+      });
+    } else if (filterId === 'industry') {
+      const industries = [...new Set(
+        businesses.flatMap(b => b.industries?.map(bi => bi.industry.label) || [])
+      )];
+      industries.forEach(industry => {
+        if (industry.toLowerCase().includes(value.toLowerCase())) {
+          matchingOptions.push({ value: industry, label: industry });
+        }
+      });
+    }
+    
+    // Update the filter options
+    setBusinessSearchFilters(prev => prev.map(filter => 
+      filter.id === filterId ? { ...filter, options: matchingOptions.slice(0, 10) } : filter
+    ));
+  }, [businesses]);
+
   // Enhanced search handlers
   const handleFilterChange = useCallback((filterId: string, value: any) => {
     setSearchFilters(prev => ({
       ...prev,
       [filterId]: value
     }));
-  }, []);
+    
+    // Update autocomplete options when user types
+    if (['city', 'stateProvince', 'country', 'industry'].includes(filterId)) {
+      updateAutocompleteOptions(filterId, value);
+    }
+  }, [updateAutocompleteOptions]);
 
   const handleSortChange = useCallback((sort: SortOption) => {
     setSearchSort(sort);
@@ -283,9 +347,15 @@ export default function BusinessDirectoryManager() {
     }
   }, [searchFilters, searchSort]);
 
-  const loadData = async (page: number = 1) => {
+  const loadData = useCallback(async (page: number = 1) => {
     setLoading(true);
     try {
+      // Clear selections when loading new data
+      if (page !== currentPage) {
+        setSelectedBusinesses(new Set());
+        setSelectAll(false);
+      }
+      
       // Build search query with enhanced filters
       const searchParams = new URLSearchParams({
         page: page.toString(),
@@ -294,6 +364,8 @@ export default function BusinessDirectoryManager() {
         sortBy: searchSort.field,
         sortOrder: searchSort.direction
       });
+      
+      console.log('loadData called with:', { page, resultsPerPage, searchParams: searchParams.toString() });
 
       if (searchTerm.trim()) {
         searchParams.set('q', searchTerm.trim());
@@ -327,7 +399,7 @@ export default function BusinessDirectoryManager() {
       setLoading(false);
       setLastUpdated(new Date());
     }
-  };
+  }, [resultsPerPage, filterActive, searchSort.field, searchSort.direction, searchTerm, searchFilters, get]);
 
   const handleBusinessSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -425,13 +497,22 @@ export default function BusinessDirectoryManager() {
     if (!itemToDelete) return;
     
     try {
-      const endpoint = itemToDelete.type === 'business' 
-        ? `/api/admin/business-directory/${itemToDelete.id}`
-        : `/api/admin/contact-persons/${itemToDelete.id}`;
-      
-      const response = await del(endpoint) as ApiResponse<any>;
-      if (response.success) {
-        await loadData(); // Reload all data to ensure consistency
+      if (itemToDelete.type === 'business') {
+        if (itemToDelete.id === -1) {
+          // Bulk delete
+          await handleBulkDeleteConfirm();
+        } else {
+          // Single delete
+          const response = await del(`/api/admin/business-directory/${itemToDelete.id}`) as ApiResponse<any>;
+          if (response.success) {
+            await loadData(); // Reload all data to ensure consistency
+          }
+        }
+      } else {
+        const response = await del(`/api/admin/contact-persons/${itemToDelete.id}`) as ApiResponse<any>;
+        if (response.success) {
+          await loadData(); // Reload all data to ensure consistency
+        }
       }
     } catch (error) {
       console.error('Failed to delete item:', error);
@@ -474,8 +555,10 @@ export default function BusinessDirectoryManager() {
   };
 
   const handleResultsPerPageChange = (newLimit: number) => {
+    console.log('Changing results per page from', resultsPerPage, 'to', newLimit);
     setResultsPerPage(newLimit);
     setCurrentPage(1);
+    console.log('Calling loadData(1) with new limit:', newLimit);
     loadData(1);
   };
 
@@ -514,6 +597,71 @@ export default function BusinessDirectoryManager() {
     alert('Bulk import functionality coming soon!');
   };
 
+  // Bulk selection handlers
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedBusinesses(new Set());
+      setSelectAll(false);
+    } else {
+      const allIds = new Set(businesses.map(b => b.id));
+      setSelectedBusinesses(allIds);
+      setSelectAll(true);
+    }
+  };
+
+  const handleSelectBusiness = (businessId: number) => {
+    const newSelected = new Set(selectedBusinesses);
+    if (newSelected.has(businessId)) {
+      newSelected.delete(businessId);
+    } else {
+      newSelected.add(businessId);
+    }
+    setSelectedBusinesses(newSelected);
+    setSelectAll(newSelected.size === businesses.length);
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedBusinesses.size === 0) return;
+    
+    const selectedNames = businesses
+      .filter(b => selectedBusinesses.has(b.id))
+      .map(b => b.companyName || b.website)
+      .join(', ');
+    
+    setItemToDelete({
+      id: -1, // Special ID for bulk delete
+      type: 'business',
+      name: `Selected businesses: ${selectedNames}`
+    });
+    setShowDeleteConfirm(true);
+  };
+
+  const handleBulkDeleteConfirm = async () => {
+    if (selectedBusinesses.size === 0) return;
+    
+    setLoading(true);
+    try {
+      // Delete all selected businesses
+      const deletePromises = Array.from(selectedBusinesses).map(id => 
+        del(`/api/admin/business-directory/${id}`)
+      );
+      
+      await Promise.all(deletePromises);
+      
+      // Clear selection and reload data
+      setSelectedBusinesses(new Set());
+      setSelectAll(false);
+      await loadData(currentPage);
+      
+      setShowDeleteConfirm(false);
+      setItemToDelete(null);
+    } catch (error) {
+      console.error('Failed to delete businesses:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Debounced search effect for search term
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -524,7 +672,7 @@ export default function BusinessDirectoryManager() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchTerm]);
+  }, [searchTerm, loadData]);
 
   // Debounced search effect for search filters
   useEffect(() => {
@@ -534,7 +682,7 @@ export default function BusinessDirectoryManager() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [searchFilters.city, searchFilters.stateProvince, searchFilters.country, searchFilters.industry]);
+  }, [searchFilters.city, searchFilters.stateProvince, searchFilters.country, searchFilters.industry, loadData]);
 
   // Client-side filtering for contacts only (businesses use server-side search)
   const filteredContacts = contactPersons.filter(contact => {
@@ -628,205 +776,16 @@ export default function BusinessDirectoryManager() {
       {/* Main Content */}
       <div className="px-8 py-10">
         <div className="max-w-7xl mx-auto">
-        {/* ===== SEARCH & FILTERS SECTION ===== */}
+        {/* ===== UNIFIED BUSINESS DIRECTORY HEADER ===== */}
         <div className="mb-8 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-gray-light)' }}>
-          <div className="mb-4">
-            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
-              Search & Filters
-            </h3>
-            <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-              Use advanced search and filters to find specific businesses
-            </p>
-          </div>
-          {activeTab === 'businesses' ? (
-            <EnhancedSearch
-              searchValue={searchTerm}
-              onSearchChange={setSearchTerm}
-              searchPlaceholder="Search businesses by name, website, location, or industry..."
-              searchDebounce={300}
-              filters={businessSearchFilters}
-              activeFilters={searchFilters}
-              onFilterChange={handleFilterChange}
-              sortOptions={businessSortOptions}
-              currentSort={searchSort}
-              onSortChange={handleSortChange}
-              totalResults={totalCount}
-              isLoading={loading}
-              enableAdvancedSearch={true}
-              onAdvancedSearch={(query) => setSearchTerm(query)}
-              className="mb-6"
-            />
-          ) : (
-            <div className="max-w-lg">
-              <div className="relative">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5" style={{ color: 'var(--color-text-muted)' }} />
-                <Input
-                  type="text"
-                  placeholder="Search contacts by name, title, or email..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-12 h-14 text-base border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
-                  style={{ 
-                    backgroundColor: 'var(--color-bg-primary)',
-                    borderColor: 'var(--color-gray-light)',
-                    color: 'var(--color-text-primary)',
-                    '--tw-ring-color': 'var(--color-primary)'
-                  } as any}
-                />
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* ===== QUICK ACTIONS BAR ===== */}
-        <div className="mb-8 p-4 rounded-xl" style={{ backgroundColor: 'var(--color-bg-secondary)', border: '1px solid var(--color-gray-light)' }}>
-          <div className="mb-3">
-            <h4 className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Quick Actions</h4>
-          </div>
-          <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Button
-              variant={filterActive ? "primary" : "outline"}
-              size="sm"
-              onClick={() => setFilterActive(!filterActive)}
-            >
-              {filterActive ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
-              {filterActive ? 'Active Only' : 'All'}
-            </Button>
-            <Button
-              variant="destructive"
-              size="sm"
-              onClick={() => {
-                setSearchTerm('');
-                setSearchFilters({
-                  city: '', stateProvince: '', country: '', industry: '',
-                  minEmployees: undefined, maxEmployees: undefined,
-                  hasContactPerson: undefined, hasIndustries: undefined,
-                  createdAfter: undefined, createdBefore: undefined,
-                  updatedAfter: undefined, updatedBefore: undefined
-                });
-                setSearchSort({
-                  id: 'createdAt',
-                  label: 'Date Created',
-                  field: 'createdAt',
-                  direction: 'desc'
-                });
-                setFilterActive(true);
-                setCurrentPage(1);
-                loadData(1);
-              }}
-            >
-              <X className="h-4 w-4" />
-              Clear All
-            </Button>
-          </div>
-          
-          <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => loadData(currentPage)}
-              disabled={loading}
-            >
-              <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
-            </Button>
-            {lastUpdated && (
-              <div className="text-sm px-4 py-2 rounded-lg" style={{ backgroundColor: 'var(--color-bg-primary)', color: 'var(--color-text-muted)' }}>
-                Last updated: {lastUpdated.toLocaleTimeString()}
-              </div>
-            )}
-          </div>
-          </div>
-        </div>
-
-        {/* ===== RESULTS SUMMARY & PAGINATION ===== */}
-          {totalPages > 1 && (
-            <div className="mt-8 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-gray-light)' }}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-                    Showing {((currentPage - 1) * resultsPerPage) + 1} - {Math.min(currentPage * resultsPerPage, totalCount)} of {totalCount} businesses
-                  </span>
-                  <select
-                    value={resultsPerPage}
-                    onChange={(e) => handleResultsPerPageChange(parseInt(e.target.value))}
-                    className="px-3 py-2 border rounded-md text-sm font-medium transition-all duration-200"
-                    style={{ 
-                      borderColor: 'var(--color-gray-light)',
-                      backgroundColor: 'var(--color-bg-secondary)',
-                      color: 'var(--color-text-primary)'
-                    }}
-                  >
-                    <option value={10}>10 per page</option>
-                    <option value={25}>25 per page</option>
-                    <option value={50}>50 per page</option>
-                    <option value={100}>100 per page</option>
-                  </select>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(1)}
-                    disabled={currentPage === 1}
-                    className="h-9 px-3 transition-all duration-200"
-                  >
-                    First
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="h-9 px-3 transition-all duration-200"
-                  >
-                    Previous
-                  </Button>
-                  <span className="px-4 py-2 text-sm font-medium rounded-lg" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-bg-primary)' }}>
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="h-9 px-3 transition-all duration-200"
-                  >
-                    Next
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(totalPages)}
-                    disabled={currentPage === totalPages}
-                    className="h-9 px-3 transition-all duration-200"
-                  >
-                    Last
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-
-
-      {/* Tab Content */}
-      {activeTab === 'businesses' && (
-        <div className="space-y-6">
-          {/* Business Directory Header */}
-          <div className="flex items-center justify-between">
+          {/* Main Header Row */}
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+              <h2 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>
                 Business Directory
               </h2>
-              <p className="text-base" style={{ color: 'var(--color-text-secondary)' }}>
+              <p className="text-lg" style={{ color: 'var(--color-text-secondary)' }}>
                 {totalCount} businesses found • {businesses.filter(b => b.isActive).length} active
-              </p>
-              <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                Use the search and filters above to find specific businesses
               </p>
             </div>
             <div className="flex gap-3">
@@ -848,6 +807,234 @@ export default function BusinessDirectoryManager() {
               </Button>
             </div>
           </div>
+
+          {/* Search & Filters Section */}
+          <div className="mb-6">
+            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
+              Search & Filters
+            </h3>
+            <p className="text-sm mb-4" style={{ color: 'var(--color-text-muted)' }}>
+              Use advanced search and filters to find specific businesses
+            </p>
+            {activeTab === 'businesses' ? (
+              <EnhancedSearch
+                searchValue={searchTerm}
+                onSearchChange={setSearchTerm}
+                searchPlaceholder="Search businesses by name, website, location, or industry..."
+                searchDebounce={300}
+                filters={businessSearchFilters}
+                activeFilters={searchFilters}
+                onFilterChange={handleFilterChange}
+                sortOptions={businessSortOptions}
+                currentSort={searchSort}
+                onSortChange={handleSortChange}
+                totalResults={totalCount}
+                isLoading={loading}
+                enableAdvancedSearch={true}
+                onAdvancedSearch={(query) => setSearchTerm(query)}
+                className="mb-6"
+              />
+            ) : (
+              <div className="max-w-lg">
+                <div className="relative">
+                  <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5" style={{ color: 'var(--color-text-muted)' }} />
+                  <Input
+                    type="text"
+                    placeholder="Search contacts by name, title, or email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-12 h-14 text-base border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
+                    style={{ 
+                      backgroundColor: 'var(--color-bg-primary)',
+                      borderColor: 'var(--color-gray-light)',
+                      color: 'var(--color-text-primary)',
+                      '--tw-ring-color': 'var(--color-primary)'
+                    } as any}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Quick Actions Section */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>Quick Actions:</span>
+              <Button
+                variant={filterActive ? "primary" : "outline"}
+                size="sm"
+                onClick={() => setFilterActive(!filterActive)}
+              >
+                {filterActive ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                {filterActive ? 'Active Only' : 'All'}
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => {
+                  setSearchTerm('');
+                  setSearchFilters({
+                    city: '', stateProvince: '', country: '', industry: '',
+                    minEmployees: undefined, maxEmployees: undefined,
+                    hasContactPerson: undefined, hasIndustries: undefined,
+                    createdAfter: undefined, createdBefore: undefined,
+                    updatedAfter: undefined, updatedBefore: undefined
+                  });
+                  setSearchSort({
+                    id: 'createdAt',
+                    label: 'Date Created',
+                    field: 'createdAt',
+                    direction: 'desc'
+                  });
+                  setFilterActive(true);
+                  setCurrentPage(1);
+                  loadData(1);
+                }}
+              >
+                <X className="h-4 w-4" />
+                Clear All
+              </Button>
+            </div>
+            
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => loadData(currentPage)}
+                disabled={loading}
+              >
+                <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+              {lastUpdated && (
+                <div className="text-sm px-4 py-2 rounded-lg" style={{ backgroundColor: 'var(--color-bg-secondary)', color: 'var(--color-text-muted)' }}>
+                  Last updated: {lastUpdated.toLocaleTimeString()}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ===== TOP PAGINATION ===== */}
+        {activeTab === 'businesses' && (
+          <div className="mb-6 p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {/* Bulk Selection Controls */}
+                <div className="flex items-center gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={selectAll}
+                      onChange={handleSelectAll}
+                      className="w-5 h-5 rounded border-2 bg-white focus:ring-2"
+                      style={{ 
+                        borderColor: selectAll ? 'var(--color-primary)' : 'var(--color-gray-light)',
+                        backgroundColor: selectAll ? 'var(--color-primary)' : 'white',
+                        '--tw-ring-color': 'var(--color-primary)'
+                      } as any}
+                    />
+                    <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
+                      Select All ({businesses.length})
+                    </span>
+                  </label>
+                  {selectedBusinesses.size > 0 && (
+                    <span className="text-sm font-medium" style={{ color: 'var(--color-primary)' }}>
+                      {selectedBusinesses.size} selected
+                    </span>
+                  )}
+                </div>
+                
+                <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
+                  Showing {((currentPage - 1) * resultsPerPage) + 1} - {Math.min(currentPage * resultsPerPage, totalCount)} of {totalCount} businesses
+                </span>
+                <select
+                  value={resultsPerPage}
+                  onChange={(e) => handleResultsPerPageChange(parseInt(e.target.value))}
+                  className="px-3 py-2 border rounded-md text-sm font-medium transition-all duration-200"
+                  style={{ 
+                    borderColor: 'var(--color-gray-light)',
+                    backgroundColor: 'var(--color-bg-primary)',
+                    color: 'var(--color-text-primary)'
+                  }}
+                >
+                  <option value={10}>10 per page</option>
+                  <option value={25}>25 per page</option>
+                  <option value={50}>50 per page</option>
+                  <option value={100}>100 per page</option>
+                </select>
+              </div>
+              
+              <div className="flex items-center gap-2">
+                {/* Bulk Delete Button */}
+                {selectedBusinesses.size > 0 && (
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleBulkDelete}
+                    disabled={loading}
+                    className="h-9 px-3"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Delete Selected ({selectedBusinesses.size})
+                  </Button>
+                )}
+                
+                {currentPage > 1 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(1)}
+                    className="h-9 px-3"
+                  >
+                    First
+                  </Button>
+                )}
+                {currentPage > 1 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className="h-9 px-3"
+                  >
+                    Previous
+                  </Button>
+                )}
+                <span className="px-3 py-2 text-sm font-medium rounded-md border" style={{ backgroundColor: 'var(--color-bg-primary)', color: 'var(--color-text-primary)', borderColor: 'var(--color-gray-light)' }}>
+                  Page {currentPage} of {totalPages}
+                </span>
+                {currentPage < totalPages && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className="h-9 px-3"
+                  >
+                    Next
+                  </Button>
+                )}
+                {currentPage < totalPages && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => handlePageChange(totalPages)}
+                    className="h-9 px-3"
+                  >
+                    Last
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+
+      {/* Tab Content */}
+      {activeTab === 'businesses' && (
+        <div className="space-y-6">
+
+
+          {/* Bulk Actions Bar */}
+
 
           {/* Business List */}
           {loading ? (
@@ -873,25 +1060,46 @@ export default function BusinessDirectoryManager() {
               </Button>
             </div>
           ) : (
-            <div className="grid gap-4">
-              {businesses.map((business) => (
-                <div
-                  key={business.id}
-                  className="group border-2 rounded-xl p-6 hover:shadow-xl transition-all duration-200 cursor-pointer"
-                  style={{ 
-                    backgroundColor: 'var(--color-bg-primary)',
-                    borderColor: business.isActive ? 'var(--color-gray-light)' : 'var(--color-text-muted)'
-                  }}
-                  onClick={() => handleEditBusiness(business)}
-                >
+            <div className="bg-white border-2 border-gray-200 rounded-lg shadow-sm">
+              <div className="p-6">
+                <div className="grid gap-4">
+                  {businesses.map((business) => (
+                    <div
+                      key={business.id}
+                      className="group border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 bg-white"
+                      style={{ 
+                        borderColor: business.isActive ? 'var(--color-gray-light)' : 'var(--color-text-muted)'
+                      }}
+                    >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       {/* Header Row */}
                       <div className="flex items-center gap-4 mb-4">
-                        <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ backgroundColor: 'var(--color-primary)' }}>
-                          <Building className="h-6 w-6" style={{ color: 'var(--color-bg-primary)' }} />
+                        <div className="flex items-center gap-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedBusinesses.has(business.id)}
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              handleSelectBusiness(business.id);
+                            }}
+                            className="w-5 h-5 rounded border-2 bg-white focus:ring-2"
+                            style={{ 
+                              borderColor: selectedBusinesses.has(business.id) ? 'var(--color-primary)' : 'var(--color-gray-light)',
+                              backgroundColor: selectedBusinesses.has(business.id) ? 'var(--color-primary)' : 'white',
+                              '--tw-ring-color': 'var(--color-primary)'
+                            } as any}
+                            onClick={(e) => e.stopPropagation()}
+                          />
+                          <div 
+                            className="w-12 h-12 rounded-lg flex items-center justify-center cursor-pointer"
+                            style={{ backgroundColor: 'var(--color-primary)' }}
+                            onClick={() => handleEditBusiness(business)}
+                          >
+                            <Building className="h-6 w-6" style={{ color: 'var(--color-bg-primary)' }} />
+                          </div>
                         </div>
-                        <div className="flex-1">
+                        <div className="flex-1 cursor-pointer" onClick={() => handleEditBusiness(business)}>
                           <h3 className="text-xl font-semibold mb-1" style={{ color: 'var(--color-text-primary)' }}>
                             {business.companyName || business.website}
                           </h3>
@@ -987,7 +1195,10 @@ export default function BusinessDirectoryManager() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-2 ml-6 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                    <div 
+                      className="flex gap-2 ml-6 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <Button
                         variant="outline"
                         size="sm"
@@ -1017,78 +1228,12 @@ export default function BusinessDirectoryManager() {
                   </div>
                 </div>
               ))}
-            </div>
-          )}
-
-          {/* BOTTOM PAGINATION SECTION - Enhanced Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="mt-8 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-gray-light)' }}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-secondary)' }}>
-                    Showing {((currentPage - 1) * resultsPerPage) + 1} - {Math.min(currentPage * resultsPerPage, totalCount)} of {totalCount} businesses
-                  </span>
-                  <select
-                    value={resultsPerPage}
-                    onChange={(e) => handleResultsPerPageChange(parseInt(e.target.value))}
-                    className="px-3 py-2 border rounded-md text-sm font-medium transition-all duration-200"
-                    style={{ 
-                      borderColor: 'var(--color-gray-light)',
-                      backgroundColor: 'var(--color-bg-secondary)',
-                      color: 'var(--color-text-primary)'
-                    }}
-                  >
-                    <option value={10}>10 per page</option>
-                    <option value={25}>25 per page</option>
-                    <option value={50}>50 per page</option>
-                    <option value={100}>100 per page</option>
-                  </select>
-                </div>
-                
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(1)}
-                    disabled={currentPage === 1}
-                    className="h-9 px-3 transition-all duration-200"
-                  >
-                    First
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                    disabled={currentPage === 1}
-                    className="h-9 px-3 transition-all duration-200"
-                  >
-                    Previous
-                  </Button>
-                  <span className="px-4 py-2 text-sm font-medium rounded-lg" style={{ backgroundColor: 'var(--color-primary)', color: 'var(--color-bg-primary)' }}>
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                    disabled={currentPage === totalPages}
-                    className="h-9 px-3 transition-all duration-200"
-                  >
-                    Next
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => handlePageChange(totalPages)}
-                    disabled={currentPage === totalPages}
-                    className="h-9 px-3 transition-all duration-200"
-                  >
-                    Last
-                  </Button>
                 </div>
               </div>
             </div>
           )}
+
+
         </div>
       )}
 
@@ -1598,6 +1743,10 @@ export default function BusinessDirectoryManager() {
           </div>
         </div>
       )}
+
+      {/* ===== BOTTOM PAGINATION ===== */}
+
+    </div>
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && itemToDelete && (

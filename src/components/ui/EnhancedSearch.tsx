@@ -7,7 +7,7 @@ export interface SearchFilter {
   id: string;
   label: string;
   value: string;
-  type: 'text' | 'select' | 'boolean' | 'date' | 'number';
+  type: 'text' | 'select' | 'boolean' | 'date' | 'number' | 'autocomplete';
   options?: { value: string; label: string }[];
 }
 
@@ -79,6 +79,7 @@ export function EnhancedSearch({
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [showAdvancedSearch, setShowAdvancedSearch] = useState(false);
   const [advancedQuery, setAdvancedQuery] = useState("");
+  const [visibleAutocomplete, setVisibleAutocomplete] = useState<string | null>(null);
   
   const filtersRef = useRef<HTMLDivElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
@@ -219,6 +220,58 @@ export function EnhancedSearch({
               '--tw-ring-color': 'var(--color-primary)'
             } as any}
           />
+        );
+        
+      case 'autocomplete':
+        return (
+          <div className="relative">
+            <input
+              type="text"
+              value={value || ''}
+              onChange={(e) => {
+                onFilterChange(filter.id, e.target.value || undefined);
+                // Show dropdown when typing if there are options
+                if (filter.options && filter.options.length > 0) {
+                  setVisibleAutocomplete(filter.id);
+                }
+              }}
+              onFocus={() => {
+                // Show dropdown when input is focused if there are options
+                if (filter.options && filter.options.length > 0) {
+                  setVisibleAutocomplete(filter.id);
+                }
+              }}
+              onBlur={() => {
+                // Hide dropdown when input loses focus (with a small delay to allow clicking)
+                setTimeout(() => setVisibleAutocomplete(null), 150);
+              }}
+              placeholder={filter.label}
+              className="w-full px-3 py-2 rounded-md border text-sm transition-colors focus:outline-none focus:ring-2 focus:ring-opacity-50"
+              style={{ 
+                backgroundColor: 'var(--color-bg-primary)', 
+                borderColor: 'var(--color-gray-light)',
+                color: 'var(--color-text-primary)',
+                '--tw-ring-color': 'var(--color-primary)'
+              } as any}
+            />
+            {filter.options && filter.options.length > 0 && visibleAutocomplete === filter.id && (
+              <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-auto">
+                {filter.options.map((option, index) => (
+                  <div
+                    key={index}
+                    className="px-3 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                    onClick={() => {
+                      onFilterChange(filter.id, option.value);
+                      // Hide dropdown after selection
+                      setVisibleAutocomplete(null);
+                    }}
+                  >
+                    {option.label}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         );
         
       default: // text

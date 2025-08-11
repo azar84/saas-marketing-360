@@ -1,0 +1,296 @@
+{
+  "exportDate": "2025-08-11T05:22:12.159Z",
+  "totalRecords": 46353,
+  "tables": [
+    {
+      "name": "SiteSettings",
+      "recordCount": 1
+    },
+    {
+      "name": "ServiceAccountCredentials",
+      "recordCount": 0
+    },
+    {
+      "name": "SitemapSubmissionLog",
+      "recordCount": 0
+    },
+    {
+      "name": "DesignSystem",
+      "recordCount": 1
+    },
+    {
+      "name": "Page",
+      "recordCount": 0
+    },
+    {
+      "name": "HeroSection",
+      "recordCount": 0
+    },
+    {
+      "name": "MediaSection",
+      "recordCount": 0
+    },
+    {
+      "name": "MediaSectionFeature",
+      "recordCount": 0
+    },
+    {
+      "name": "HeaderNavItem",
+      "recordCount": 0
+    },
+    {
+      "name": "HeaderConfig",
+      "recordCount": 0
+    },
+    {
+      "name": "CTA",
+      "recordCount": 0
+    },
+    {
+      "name": "GlobalFunctions",
+      "recordCount": 0
+    },
+    {
+      "name": "HeaderCTA",
+      "recordCount": 0
+    },
+    {
+      "name": "HomePageHero",
+      "recordCount": 0
+    },
+    {
+      "name": "TrustIndicator",
+      "recordCount": 0
+    },
+    {
+      "name": "GlobalFeature",
+      "recordCount": 0
+    },
+    {
+      "name": "FeatureGroup",
+      "recordCount": 0
+    },
+    {
+      "name": "FeatureGroupItem",
+      "recordCount": 0
+    },
+    {
+      "name": "PageFeatureGroup",
+      "recordCount": 0
+    },
+    {
+      "name": "PageSection",
+      "recordCount": 0
+    },
+    {
+      "name": "SectionTemplate",
+      "recordCount": 0
+    },
+    {
+      "name": "Testimonial",
+      "recordCount": 0
+    },
+    {
+      "name": "FAQCategory",
+      "recordCount": 0
+    },
+    {
+      "name": "FAQ",
+      "recordCount": 0
+    },
+    {
+      "name": "FAQSection",
+      "recordCount": 0
+    },
+    {
+      "name": "FAQSectionCategory",
+      "recordCount": 0
+    },
+    {
+      "name": "ContactSection",
+      "recordCount": 0
+    },
+    {
+      "name": "ContactField",
+      "recordCount": 0
+    },
+    {
+      "name": "ContactEmailSettings",
+      "recordCount": 0
+    },
+    {
+      "name": "ContactSubmission",
+      "recordCount": 0
+    },
+    {
+      "name": "Plan",
+      "recordCount": 0
+    },
+    {
+      "name": "BillingCycle",
+      "recordCount": 0
+    },
+    {
+      "name": "PlanPricing",
+      "recordCount": 0
+    },
+    {
+      "name": "PlanFeatureType",
+      "recordCount": 0
+    },
+    {
+      "name": "PlanFeatureLimit",
+      "recordCount": 0
+    },
+    {
+      "name": "SharedFeature",
+      "recordCount": 0
+    },
+    {
+      "name": "PlanFeature",
+      "recordCount": 0
+    },
+    {
+      "name": "MediaLibrary",
+      "recordCount": 0
+    },
+    {
+      "name": "MediaFolder",
+      "recordCount": 0
+    },
+    {
+      "name": "MediaUsage",
+      "recordCount": 0
+    },
+    {
+      "name": "BasicFeature",
+      "recordCount": 0
+    },
+    {
+      "name": "PlanBasicFeature",
+      "recordCount": 0
+    },
+    {
+      "name": "PricingSection",
+      "recordCount": 0
+    },
+    {
+      "name": "PricingSectionPlan",
+      "recordCount": 0
+    },
+    {
+      "name": "PagePricingSection",
+      "recordCount": 0
+    },
+    {
+      "name": "Form",
+      "recordCount": 0
+    },
+    {
+      "name": "FormField",
+      "recordCount": 0
+    },
+    {
+      "name": "FormSubmission",
+      "recordCount": 0
+    },
+    {
+      "name": "HtmlSection",
+      "recordCount": 0
+    },
+    {
+      "name": "PageHtmlSection",
+      "recordCount": 0
+    },
+    {
+      "name": "script_sections",
+      "recordCount": 0
+    },
+    {
+      "name": "NewsletterSubscriber",
+      "recordCount": 0
+    },
+    {
+      "name": "header_sections",
+      "recordCount": 0
+    },
+    {
+      "name": "TeamSection",
+      "recordCount": 0
+    },
+    {
+      "name": "TeamMember",
+      "recordCount": 0
+    },
+    {
+      "name": "AdminUser",
+      "recordCount": 1
+    },
+    {
+      "name": "Continent",
+      "recordCount": 1
+    },
+    {
+      "name": "Country",
+      "recordCount": 2
+    },
+    {
+      "name": "State",
+      "recordCount": 64
+    },
+    {
+      "name": "County",
+      "recordCount": 0
+    },
+    {
+      "name": "City",
+      "recordCount": 31009
+    },
+    {
+      "name": "CityAlternateName",
+      "recordCount": 0
+    },
+    {
+      "name": "NAICSClassification",
+      "recordCount": 0
+    },
+    {
+      "name": "NAICSAlias",
+      "recordCount": 0
+    },
+    {
+      "name": "NAICSChange",
+      "recordCount": 0
+    },
+    {
+      "name": "CompanyNAICSClassification",
+      "recordCount": 0
+    },
+    {
+      "name": "Industry",
+      "recordCount": 1242
+    },
+    {
+      "name": "Keyword",
+      "recordCount": 13806
+    },
+    {
+      "name": "BusinessDirectory",
+      "recordCount": 53
+    },
+    {
+      "name": "BusinessIndustry",
+      "recordCount": 173
+    },
+    {
+      "name": "ContactPerson",
+      "recordCount": 0
+    }
+  ],
+  "notes": [
+    "This export contains all data from SQLite database",
+    "Use this file to restore data in PostgreSQL after migration",
+    "Timestamp format: ISO 8601",
+    "Data structure matches Prisma schema"
+  ]
+}

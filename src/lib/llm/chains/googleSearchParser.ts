@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { createChatModel } from '@/lib/llm/core/modelFactory';
+import { llmModel } from '@/lib/llm/model';
 import type { ChainDefinition, RunOptions } from '@/lib/llm/core/types';
 import { extractJson, normalizeList } from '@/lib/llm/json';
 
@@ -160,18 +160,11 @@ export const googleSearchParser: ChainDefinition<
     console.log(`🏭 Industry: ${industry || 'Not specified'}`);
     console.log(`📍 Location: ${location || 'Not specified'}`);
 
-    const model = createChatModel(options);
     let prompt = buildPrompt(searchResults, industry, location);
-
-    // Ensure the model has the call method
-    if (typeof model.call !== 'function') {
-      console.error('Model does not have call method:', model);
-      throw new Error('Model does not support call method');
-    }
 
     const call = async (content: string) => {
       try {
-        const response = await model.call(content);
+        const response = await llmModel.call(content);
         return response.content;
       } catch (error) {
         console.error('Model call failed:', error);

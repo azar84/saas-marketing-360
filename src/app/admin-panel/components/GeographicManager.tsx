@@ -17,7 +17,6 @@ import {
   Eye,
   Users,
   Map,
-  Layers,
   RefreshCw
 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
@@ -98,6 +97,7 @@ export default function GeographicManager() {
   const [selectedState, setSelectedState] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [expandedItems, setExpandedItems] = useState<Set<number>>(new Set());
+  const [continentCountries, setContinentCountries] = useState<Record<number, Country[]>>({});
 
   // Data states
   const [continents, setContinents] = useState<Continent[]>([]);
@@ -139,6 +139,7 @@ export default function GeographicManager() {
           await loadCities();
           break;
       }
+      
     } catch (error) {
       console.error('Error loading data:', error);
     } finally {
@@ -155,6 +156,19 @@ export default function GeographicManager() {
     const params = selectedContinent ? `?continentId=${selectedContinent}` : '';
     const response: any = await get(`/api/admin/geographic/countries${params}`);
     setCountries(response?.data || []);
+  };
+
+  const loadCountriesForContinent = async (continentId: number) => {
+    try {
+      const response: any = await get(`/api/admin/geographic/countries?continentId=${continentId}`);
+      const countries = response?.data || [];
+      setContinentCountries(prev => ({
+        ...prev,
+        [continentId]: countries
+      }));
+    } catch (error) {
+      console.error('Error loading countries for continent:', error);
+    }
   };
 
   const loadStates = async () => {
@@ -209,6 +223,10 @@ export default function GeographicManager() {
       newExpanded.delete(id);
     } else {
       newExpanded.add(id);
+      // If expanding a continent, load its countries
+      if (viewMode === 'continents') {
+        loadCountriesForContinent(id);
+      }
     }
     setExpandedItems(newExpanded);
   };
@@ -243,6 +261,12 @@ export default function GeographicManager() {
         return { total: 0, filtered: 0, label: 'items' };
     }
   };
+
+
+
+
+
+
 
   const stats = getStats();
 
@@ -297,7 +321,7 @@ export default function GeographicManager() {
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             {[
-              { mode: 'continents', icon: Layers, label: 'Continents' },
+              { mode: 'continents', icon: Globe, label: 'Continents' },
               { mode: 'countries', icon: Globe, label: 'Countries' },
               { mode: 'states', icon: Building, label: 'States/Provinces' },
               { mode: 'cities', icon: MapPin, label: 'Cities' }
@@ -339,11 +363,14 @@ export default function GeographicManager() {
             ))}
           </div>
           
-          <div 
-            className="text-sm"
-            style={{ color: 'var(--color-text-secondary)' }}
-          >
-            {stats.filtered} of {stats.total} {stats.label}
+          <div className="flex items-center space-x-6">
+            {/* Current View Stats */}
+            <div 
+              className="text-sm"
+              style={{ color: 'var(--color-text-secondary)' }}
+            >
+              {stats.filtered} of {stats.total} {stats.label}
+            </div>
           </div>
         </div>
 
@@ -431,6 +458,63 @@ export default function GeographicManager() {
             </select>
           )}
         </div>
+        
+        {/* Filter Summary */}
+        {(searchTerm || selectedContinent || selectedCountry || selectedState) && (
+          <div className="mt-4 p-3 rounded-lg border" style={{ 
+            borderColor: 'var(--color-gray-light)',
+            backgroundColor: 'var(--color-bg-secondary)'
+          }}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4 text-sm">
+                <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                  Active Filters:
+                </span>
+                {searchTerm && (
+                  <span className="px-2 py-1 rounded text-xs" style={{
+                    backgroundColor: 'var(--color-primary-light)',
+                    color: 'var(--color-primary-dark)'
+                  }}>
+                    Search: "{searchTerm}"
+                  </span>
+                )}
+                {selectedContinent && (
+                  <span className="px-2 py-1 rounded text-xs" style={{
+                    backgroundColor: 'var(--color-info-light)',
+                    color: 'var(--color-info-dark)'
+                  }}>
+                    Continent: {continents.find(c => c.id.toString() === selectedContinent)?.name}
+                  </span>
+                )}
+                {selectedCountry && (
+                  <span className="px-2 py-1 rounded text-xs" style={{
+                    backgroundColor: 'var(--color-info-light)',
+                    color: 'var(--color-info-dark)'
+                  }}>
+                    Country: {countries.find(c => c.id.toString() === selectedCountry)?.name}
+                  </span>
+                )}
+                {selectedState && (
+                  <span className="px-2 py-1 rounded text-xs" style={{
+                    backgroundColor: 'var(--color-info-light)',
+                    color: 'var(--color-info-dark)'
+                  }}>
+                    State: {states.find(s => s.id.toString() === selectedState)?.name}
+                  </span>
+                )}
+              </div>
+              
+              <div className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                Showing {filteredData.length} of {stats.total} {stats.label}
+                {filteredData.length !== stats.total && (
+                  <span className="ml-2">
+                    ({Math.round((filteredData.length / stats.total) * 100)}%)
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
       </Card>
 
       {/* Data Table */}
@@ -485,7 +569,7 @@ export default function GeographicManager() {
                     </button>
 
                     {/* Icon */}
-                    {viewMode === 'continents' && <Layers className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />}
+                    {viewMode === 'continents' && <Globe className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />}
                     {viewMode === 'countries' && <Globe className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />}
                     {viewMode === 'states' && <Building className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />}
                     {viewMode === 'cities' && <MapPin className="h-5 w-5" style={{ color: 'var(--color-primary)' }} />}
@@ -693,6 +777,87 @@ export default function GeographicManager() {
                 {/* Expanded Details */}
                 {expandedItems.has(item.id) && (
                   <div className="mt-4 pt-4 border-t" style={{ borderColor: 'var(--color-gray-light)' }}>
+                    {/* Show countries if this is a continent */}
+                    {viewMode === 'continents' && (
+                      <div className="mb-4">
+                        <h4 className="font-medium mb-3" style={{ color: 'var(--color-text-primary)' }}>
+                          Countries
+                        </h4>
+                        {continentCountries[item.id] ? (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {continentCountries[item.id].map((country) => (
+                              <div
+                                key={country.id}
+                                className="p-3 rounded border"
+                                style={{
+                                  borderColor: 'var(--color-gray-light)',
+                                  backgroundColor: 'var(--color-bg-secondary)'
+                                }}
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div>
+                                    <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                                      {country.name}
+                                    </div>
+                                    <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                                      {country.code2} • {country._count?.states || 0} states/provinces • {country._count?.cities || 0} cities
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center space-x-2">
+                                    {country.capital && (
+                                      <span className="text-xs px-2 py-1 rounded" style={{
+                                        backgroundColor: 'var(--color-info-light)',
+                                        color: 'var(--color-info-dark)'
+                                      }}>
+                                        Capital: {country.capital}
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="flex items-center justify-center py-4">
+                            <RefreshCw className="h-4 w-4 animate-spin mr-2" style={{ color: 'var(--color-primary)' }} />
+                            <span style={{ color: 'var(--color-text-secondary)' }}>Loading countries...</span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Show aggregated counts for continent */}
+                    {viewMode === 'continents' && continentCountries[item.id] && (
+                      <div className="mt-4 p-3 rounded-lg border" style={{
+                        borderColor: 'var(--color-gray-light)',
+                        backgroundColor: 'var(--color-bg-secondary)'
+                      }}>
+                        <div className="text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
+                          📊 {item.name} Totals
+                        </div>
+                        <div className="grid grid-cols-3 gap-4 text-xs">
+                          <div className="text-center">
+                            <div className="font-semibold" style={{ color: 'var(--color-primary)' }}>
+                              {continentCountries[item.id].length}
+                            </div>
+                            <div style={{ color: 'var(--color-text-secondary)' }}>Countries</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="font-semibold" style={{ color: 'var(--color-primary)' }}>
+                              {continentCountries[item.id].reduce((sum, country) => sum + (country._count?.states || 0), 0)}
+                            </div>
+                            <div style={{ color: 'var(--color-text-secondary)' }}>States/Provinces</div>
+                          </div>
+                          <div className="text-center">
+                            <div className="font-semibold" style={{ color: 'var(--color-primary)' }}>
+                              {continentCountries[item.id].reduce((sum, country) => sum + (country._count?.cities || 0), 0)}
+                            </div>
+                            <div style={{ color: 'var(--color-text-secondary)' }}>Cities</div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
                       {/* Location Info */}
                       {(item.latitude || item.longitude) && (

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Building, 
   Building2, 
@@ -31,11 +31,15 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
 import { useNotificationContext } from '@/components/providers/NotificationProvider';
+import { EnhancedSearch, type SearchFilter, type SortOption } from '@/components/ui/EnhancedSearch';
 
 interface Industry {
   id: number;
   title: string;
   keywordsCount: number;
+  businessesCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface City {
@@ -253,13 +257,10 @@ export default function IndustrySearchManager() {
     const fetchConfig = async () => {
       try {
         setIsLoadingConfig(true);
-        console.log('Fetching config from /api/admin/search-engine/config');
         const response = await fetch('/api/admin/search-engine/config');
         const data = await response.json();
-        console.log('Config response:', data);
         
         if (data.success && data.config.hasCredentials) {
-          console.log('Config loaded successfully, has credentials');
           setConfig(prev => ({
             ...prev,
             apiKey: data.config.apiKey,
@@ -269,7 +270,6 @@ export default function IndustrySearchManager() {
           setConfigLoaded(true);
           setError(null);
         } else {
-          console.log('Config loaded but no credentials');
           setShowConfig(true);
           setConfigLoaded(true);
         }
@@ -354,32 +354,134 @@ export default function IndustrySearchManager() {
     return () => clearInterval(interval);
   }, [backgroundExtractionJob?.jobId, backgroundExtractionJob?.status, notifications, addNotification]);
 
-  // Fetch industries when search changes
-  useEffect(() => {
-    const fetchIndustries = async () => {
-      if (industrySearch.trim().length < 2) {
-        setIndustries([]);
-        return;
-      }
+  // Enhanced industry search with filters
+  const [industryFilters, setIndustryFilters] = useState({
+    isActive: undefined,
+    minKeywords: undefined,
+    maxKeywords: undefined,
+    minBusinesses: undefined,
+    maxBusinesses: undefined,
+    createdAfter: undefined,
+    createdBefore: undefined
+  });
 
-      setIsLoadingIndustries(true);
-      try {
-        const response = await fetch(`/api/admin/industries/search?search=${encodeURIComponent(industrySearch)}&limit=20`);
-        const data = await response.json();
-        
-        if (data.success) {
-          setIndustries(data.data);
+  const [industrySort, setIndustrySort] = useState({
+    id: 'label',
+    label: 'Industry Name',
+    field: 'label',
+    direction: 'asc' as 'asc' | 'desc'
+  });
+
+  // Enhanced search configuration for industries
+  const industrySearchFilters: SearchFilter[] = [
+    {
+      id: 'isActive',
+      label: 'Status',
+      value: '',
+      type: 'select',
+      options: [
+        { value: 'true', label: 'Active' },
+        { value: 'false', label: 'Inactive' }
+      ]
+    },
+    {
+      id: 'minKeywords',
+      label: 'Min Keywords',
+      value: '',
+      type: 'number'
+    },
+    {
+      id: 'maxKeywords',
+      label: 'Max Keywords',
+      value: '',
+      type: 'number'
+    },
+    {
+      id: 'minBusinesses',
+      label: 'Min Businesses',
+      value: '',
+      type: 'number'
+    },
+    {
+      id: 'maxBusinesses',
+      label: 'Max Businesses',
+      value: '',
+      type: 'number'
+    },
+    {
+      id: 'createdAfter',
+      label: 'Created After',
+      value: '',
+      type: 'date'
+    },
+    {
+      id: 'createdBefore',
+      label: 'Created Before',
+      value: '',
+      type: 'date'
+    }
+  ];
+
+  const industrySortOptions: SortOption[] = [
+    { id: 'label', label: 'Industry Name', field: 'label', direction: 'asc' },
+    { id: 'keywordsCount', label: 'Keywords Count', field: 'keywordsCount', direction: 'desc' },
+    { id: 'businessesCount', label: 'Businesses Count', field: 'businessesCount', direction: 'desc' },
+    { id: 'createdAt', label: 'Date Created', field: 'createdAt', direction: 'desc' },
+    { id: 'updatedAt', label: 'Last Updated', field: 'updatedAt', direction: 'desc' }
+  ];
+
+  // Handle industry filter changes
+  const handleIndustryFilterChange = useCallback((filterId: string, value: any) => {
+    setIndustryFilters(prev => ({
+      ...prev,
+      [filterId]: value
+    }));
+  }, []);
+
+  // Handle industry sort changes
+  const handleIndustrySortChange = useCallback((sort: SortOption) => {
+    setIndustrySort(sort);
+  }, []);
+
+  const fetchIndustries = useCallback(async (search: string, filters: any, sort: any) => {
+    if (search.trim().length < 2) {
+      setIndustries([]);
+      return;
+    }
+
+    setIsLoadingIndustries(true);
+    try {
+      const params = new URLSearchParams({
+        search: search.trim(),
+        limit: '20',
+        sortBy: sort.field,
+        sortOrder: sort.direction
+      });
+
+      // Add filters to params
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          params.append(key, String(value));
         }
-      } catch (error) {
-        console.error('Failed to fetch industries:', error);
-      } finally {
-        setIsLoadingIndustries(false);
-      }
-    };
+      });
 
-    const timeoutId = setTimeout(fetchIndustries, 300);
-    return () => clearTimeout(timeoutId);
-  }, [industrySearch]);
+      const response = await fetch(`/api/admin/industries/search?${params.toString()}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setIndustries(data.data);
+      }
+    } catch (error) {
+      console.error('Failed to fetch industries:', error);
+    } finally {
+      setIsLoadingIndustries(false);
+    }
+  }, []);
+
+  // Fetch industries when search, filters, or sort changes
+  useEffect(() => {
+    fetchIndustries(industrySearch, industryFilters, industrySort);
+  }, [industrySearch, industryFilters, industrySort, fetchIndustries]);
 
   // Fetch cities when search changes
   useEffect(() => {
@@ -410,18 +512,15 @@ export default function IndustrySearchManager() {
 
   // Fetch keywords when industry changes
   useEffect(() => {
-    console.log('useEffect for keywords triggered, selectedIndustry:', selectedIndustry);
     
     const fetchKeywords = async () => {
       if (!selectedIndustry) {
-        console.log('No selected industry, clearing keywords and queries');
         setIndustryKeywords([]);
         setGeneratedQueries([]);
         return;
       }
 
       try {
-        console.log('Fetching keywords for industry:', selectedIndustry.title);
         
         // Add timeout to the fetch request
         const controller = new AbortController();
@@ -433,33 +532,22 @@ export default function IndustrySearchManager() {
         });
         
         clearTimeout(timeoutId);
-        console.log('Keywords API response status:', response.status);
         
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
-        console.log('Keywords response:', data);
         
         if (data.success && data.keywords?.search_terms) {
           const keywords = data.keywords.search_terms.map((term: string, index: number) => ({
             id: index + 1,
             searchTerm: term
           }));
-          console.log('Processed keywords:', keywords);
           setIndustryKeywords(keywords);
         } else {
-          console.log('Keywords response not successful or missing search_terms');
-          console.log('Full response data:', data);
-          console.log('Response structure:', {
-            success: data.success,
-            hasKeywords: !!data.keywords,
-            hasSearchTerms: !!data.keywords?.search_terms,
-            searchTermsLength: data.keywords?.search_terms?.length,
-            source: data._source,
-            message: data._message
-          });
+          // Keywords response not successful or missing search_terms
+          setIndustryKeywords([]);
         }
       } catch (error) {
         console.error('Failed to fetch keywords:', error);
@@ -473,13 +561,11 @@ export default function IndustrySearchManager() {
   // Generate queries when industry keywords or city changes
   useEffect(() => {
     if (selectedIndustry && selectedCity && industryKeywords.length > 0) {
-      console.log('Generating queries due to change in industry, city, or keywords');
       generateQueries(industryKeywords, selectedCity);
     }
   }, [selectedIndustry?.id, selectedCity?.id, industryKeywords.length]);
 
   const generateQueries = (keywords: Keyword[], city: City) => {
-    console.log('Generating queries for:', { keywords, city });
     const cityName = city.name;
     const stateName = city.state?.name;
     const countryName = city.country.name;
@@ -494,13 +580,11 @@ export default function IndustrySearchManager() {
       }
     });
     
-    console.log('Generated queries:', queries);
     setGeneratedQueries(queries);
   };
 
   const performSearch = async (page: number = 1) => {
     if (!configLoaded || !config.apiKey || !config.searchEngineId) {
-      console.log('Config check failed:', { configLoaded, hasApiKey: !!config.apiKey, hasSearchEngineId: !!config.searchEngineId });
       setError('Search engine not configured. Please configure your Google Custom Search Engine first.');
       return null;
     }
@@ -543,7 +627,6 @@ export default function IndustrySearchManager() {
         requireDateFiltering: dateFiltering.enabled
       };
 
-      console.log('Sending search request:', { ...requestBody, apiKey: '***' });
 
       const response = await fetch('/api/admin/search-engine/search', {
         method: 'POST',
@@ -559,15 +642,7 @@ export default function IndustrySearchManager() {
       }
 
       if (data.success) {
-        console.log('Search successful:', {
-          resultsCount: data.results.length,
-          totalResults: data.totalResults,
-          pagination: data.pagination,
-          currentPage: page,
-          queryResults: data.queryResults,
-          searchTime: data.searchTime,
-          dateFiltering: data.dateFiltering
-        });
+        // Search successful
         
         // Convert to enhanced search results with full API response data
         const enhancedResults: EnhancedSearchResult[] = data.results.map((result: any) => ({
@@ -601,7 +676,6 @@ export default function IndustrySearchManager() {
       }
     } catch (err: any) {
       if (err.name === 'AbortError') {
-        console.log('Search was cancelled');
         setError('Search was cancelled');
       } else {
         console.error('Search error:', err);
@@ -735,7 +809,6 @@ export default function IndustrySearchManager() {
       
       if (data.success) {
         setSavedBusinesses(prev => new Set([...prev, result.url]));
-        console.log('✅ Business saved to directory successfully');
         
         // Show success message
         if (saveToDirectory) {
@@ -753,37 +826,25 @@ export default function IndustrySearchManager() {
   };
 
   const extractAllBusinesses = async () => {
-    console.log('🔍 extractAllBusinesses called with:', {
-      extractionInProgress,
-      searchResultsLength: searchResults.length,
-      searchResults: searchResults,
-      pagination: pagination,
-      totalResults: totalResults
-    });
+    // Check if extraction is already in progress
 
     if (extractionInProgress) {
-      console.log('⚠️ Extraction already in progress, skipping');
       return;
     }
 
     if (searchResults.length === 0) {
-      console.log('⚠️ No search results available, skipping');
       setError('No search results available. Please perform a search first.');
       return;
     }
 
     // Check if we have pagination info and multiple pages
     if (pagination && pagination.totalPages > 1 && totalResults > searchResults.length) {
-      console.log(`📄 Multiple pages detected: ${pagination.totalPages} pages with ${totalResults} total results`);
-      console.log(`📄 Current page has ${searchResults.length} results, but ${totalResults} total available`);
       
       // Ask user if they want to process all pages
       if (window.confirm(`This search has ${pagination.totalPages} pages with ${totalResults} total results.\n\nDo you want to process ALL pages (up to 1000 results) instead of just the current page?\n\nThis will take longer but will extract business information from all available results.`)) {
-        console.log('✅ User chose to process all pages');
         await processAllPages();
         return;
       } else {
-        console.log('ℹ️ User chose to process only current page');
       }
     }
 
@@ -806,8 +867,6 @@ export default function IndustrySearchManager() {
         displayLink: result.displayUrl
       }));
 
-      console.log('🔍 Processing search results:', transformedResults.length);
-      console.log('🔍 First result sample:', transformedResults[0]);
 
       const response = await fetch('/api/admin/industry-search/process-results', {
         method: 'POST',
@@ -829,10 +888,8 @@ export default function IndustrySearchManager() {
       }
 
       const data = await response.json();
-      console.log('📡 API response received:', data);
       
       if (data.success && data.data) {
-        console.log('✅ Extraction completed:', data.data);
         
         // Check if we have business data from the chain
         if (!data.data.businesses || !Array.isArray(data.data.businesses)) {
@@ -857,7 +914,6 @@ export default function IndustrySearchManager() {
           }
         }));
 
-        console.log(`🔄 Transformed ${transformedExtractions.length} extractions`);
 
         // Update all results with extraction data
         setSearchResults(prev => prev.map(result => {
@@ -886,9 +942,7 @@ export default function IndustrySearchManager() {
           }, {});
 
           setExtractionResults(extractionResultsMap);
-          console.log('📊 Extraction results updated:', Object.keys(extractionResultsMap).length);
         } else {
-          console.log('📊 No extraction results to display');
           setExtractionResults({});
         }
 
@@ -913,24 +967,20 @@ export default function IndustrySearchManager() {
 
   const startBackgroundExtraction = async () => {
     if (backgroundExtractionInProgress) {
-      console.log('🔔 Adding warning notification: Extraction Already Running');
       const notificationId = addNotification({
         type: 'warning',
         title: 'Extraction Already Running',
         message: 'A background extraction job is already in progress.'
       });
-      console.log('🔔 Warning notification added with ID:', notificationId);
       return;
     }
 
     if (searchResults.length === 0) {
-      console.log('🔔 Adding error notification: No Search Results');
       const notificationId = addNotification({
         type: 'error',
         title: 'No Search Results',
         message: 'Please perform a search first to extract business information.'
       });
-      console.log('🔔 Error notification added with ID:', notificationId);
       return;
     }
 
@@ -988,7 +1038,6 @@ export default function IndustrySearchManager() {
         setBackgroundExtractionJob(job);
 
         // Add notification
-        console.log('🔔 Adding progress notification: Background Extraction Started');
         const notificationId = addNotification({
           type: 'progress',
           title: 'Background Extraction Started',
@@ -1009,8 +1058,6 @@ export default function IndustrySearchManager() {
             }
           ]
         });
-        console.log('🔔 Progress notification added with ID:', notificationId);
-        console.log('🔔 Current notifications count:', notifications.length);
 
         // Start monitoring the job
         monitorBackgroundJob(jobId, notificationId);
@@ -1023,13 +1070,11 @@ export default function IndustrySearchManager() {
       console.error('❌ Background extraction error:', error);
       setError(`Failed to start background extraction: ${error instanceof Error ? error.message : 'Unknown error'}`);
       
-      console.log('🔔 Adding error notification: Background Extraction Failed');
       const notificationId = addNotification({
         type: 'error',
         title: 'Background Extraction Failed',
         message: `Failed to start background extraction: ${error instanceof Error ? error.message : 'Unknown error'}`
       });
-      console.log('🔔 Error notification added with ID:', notificationId);
     } finally {
       setBackgroundExtractionInProgress(false);
     }
@@ -1139,26 +1184,20 @@ export default function IndustrySearchManager() {
    */
   const processAllPages = async () => {
     if (processingAllPages || !pagination) {
-      console.log('⚠️ Already processing all pages or no pagination info');
       return;
     }
 
     if (pagination.totalPages <= 1) {
-      console.log('ℹ️ Only one page, using regular extraction');
       await extractAllBusinesses();
       return;
     }
 
     // Check if we have a very large number of results (more than 1000)
     if (pagination.totalResults > 1000) {
-      console.log(`⚠️ Very large result set detected: ${pagination.totalResults} results`);
       if (window.confirm(`This search has ${pagination.totalResults} total results, but we can only process up to 1000 results.\n\nDo you want to process the first 1000 results?`)) {
-        console.log('✅ User chose to process first 1000 results');
         // Limit to 1000 results
         const maxPages = Math.ceil(1000 / pagination.resultsPerPage);
-        console.log(`📄 Will process first ${maxPages} pages to get ~1000 results`);
       } else {
-        console.log('❌ User cancelled processing');
         return;
       }
     }
@@ -1173,19 +1212,16 @@ export default function IndustrySearchManager() {
     setSuccessMessage(null); // Clear any previous success messages
 
     try {
-      console.log(`🚀 Starting to process ${maxPages} pages (up to ${maxResults} results)`);
       
       const allResults: EnhancedSearchResult[] = [];
       let totalProcessed = 0;
       let totalBusinesses = 0;
 
-      console.log(`📄 Will process ${maxPages} pages to get up to ${maxResults} results`);
       
       // Process each page (up to the limit)
       for (let page = 1; page <= maxPages; page++) {
         setAllPagesProgress(prev => ({ ...prev, current: page }));
         
-        console.log(`📄 Processing page ${page}/${maxPages}`);
         
         // Fetch the page
         const pageResults = await performSearch(page);
@@ -1193,11 +1229,9 @@ export default function IndustrySearchManager() {
           allResults.push(...pageResults.results);
           totalProcessed += pageResults.results.length;
           
-          console.log(`✅ Page ${page}: ${pageResults.results.length} results`);
           
           // Check if we've reached the 1000 result limit
           if (totalProcessed >= maxResults) {
-            console.log(`✅ Reached ${maxResults} result limit, stopping page processing`);
             break;
           }
         } else {
@@ -1205,7 +1239,6 @@ export default function IndustrySearchManager() {
         }
       }
 
-      console.log(`📊 Total results collected: ${totalProcessed}`);
 
       // Now process all collected results through the business extraction
       if (allResults.length > 0) {
@@ -1219,7 +1252,6 @@ export default function IndustrySearchManager() {
           displayLink: result.displayUrl
         }));
 
-        console.log(`🔍 Processing ${transformedResults.length} total results through business extraction`);
 
         const response = await fetch('/api/admin/industry-search/process-results', {
           method: 'POST',
@@ -1288,7 +1320,6 @@ export default function IndustrySearchManager() {
             setExtractionResults(extractionResultsMap);
             totalBusinesses = transformedExtractions.length;
             
-            console.log(`🎉 Successfully processed all pages: ${totalBusinesses} businesses extracted`);
             
             // Show success message
             if (saveToDirectory) {
@@ -1343,12 +1374,9 @@ export default function IndustrySearchManager() {
 
   // Debug logging for notifications
   useEffect(() => {
-    console.log('🔔 Notification context initialized');
-    console.log('🔔 Current notifications:', notifications);
   }, []);
 
   useEffect(() => {
-    console.log('🔔 Notifications updated:', notifications);
   }, [notifications]);
 
   return (
@@ -1474,62 +1502,88 @@ export default function IndustrySearchManager() {
             <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
               Industry
             </label>
-            <div className="relative">
-              <Input
-                value={industrySearch}
-                onChange={(e) => setIndustrySearch(e.target.value)}
-                placeholder="Search for an industry..."
-                className="pr-10"
-                onFocus={() => setShowIndustryDropdown(true)}
-              />
-              {selectedIndustry && (
-                <button
-                  onClick={clearIndustry}
-                  className="absolute right-8 top-1/2 -translate-y-1/2 p-1 rounded transition-colors"
-                  style={{
-                    color: 'var(--color-text-muted)',
-                    backgroundColor: 'transparent'
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
-              
-              {showIndustryDropdown && (
-                <div className="absolute z-10 w-full mt-1 border rounded-md shadow-lg max-h-60 overflow-auto" style={{
-                  backgroundColor: 'var(--color-bg-secondary)',
-                  borderColor: 'var(--color-gray-light)'
-                }}>
-                  {isLoadingIndustries ? (
-                    <div className="p-3 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>Loading...</div>
-                  ) : industries.length > 0 ? (
-                    industries.map((industry) => (
-                      <button
-                        key={industry.id}
-                        onClick={() => selectIndustry(industry)}
-                        className="w-full text-left px-3 py-2 focus:outline-none transition-colors hover:bg-opacity-10 focus:bg-opacity-10"
-                        style={{
-                          color: 'var(--color-text-primary)',
-                          backgroundColor: 'transparent'
-                        }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)'}
-                        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                        onFocus={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)'}
-                        onBlur={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                      >
-                        <div className="font-medium">{industry.title}</div>
-                        <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>{industry.keywordsCount} keywords</div>
-                      </button>
-                    ))
-                  ) : industrySearch.trim().length >= 2 ? (
-                    <div className="p-3 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>No industries found</div>
-                  ) : null}
+            
+            {/* Enhanced Industry Search */}
+            <EnhancedSearch
+              searchValue={industrySearch}
+              onSearchChange={setIndustrySearch}
+              searchPlaceholder="Search for an industry..."
+              searchDebounce={300}
+              filters={industrySearchFilters}
+              activeFilters={industryFilters}
+              onFilterChange={handleIndustryFilterChange}
+              sortOptions={industrySortOptions}
+              currentSort={industrySort}
+              onSortChange={handleIndustrySortChange}
+              totalResults={industries.length}
+              isLoading={isLoadingIndustries}
+              enableAdvancedSearch={true}
+              onAdvancedSearch={(query) => setIndustrySearch(query)}
+              onFocus={() => setShowIndustryDropdown(true)}
+              className="mb-4"
+            />
+            
+            {/* Industry Results Dropdown */}
+            {showIndustryDropdown && (
+              <div className="absolute z-10 w-full mt-1 border rounded-md shadow-lg max-h-60 overflow-auto" style={{
+                backgroundColor: 'var(--color-bg-secondary)',
+                borderColor: 'var(--color-gray-light)'
+              }}>
+                {isLoadingIndustries ? (
+                  <div className="p-3 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>Loading...</div>
+                ) : industries.length > 0 ? (
+                  industries.map((industry) => (
+                    <button
+                      key={industry.id}
+                      onClick={() => selectIndustry(industry)}
+                      className="w-full text-left px-3 py-2 focus:outline-none transition-colors hover:bg-opacity-10 focus:bg-opacity-10"
+                      style={{
+                        color: 'var(--color-text-primary)',
+                        backgroundColor: 'transparent'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                      onFocus={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)'}
+                      onBlur={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <div className="font-medium">{industry.title}</div>
+                      <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                        {industry.keywordsCount} keywords • {industry.businessesCount || 0} businesses
+                      </div>
+                    </button>
+                  ))
+                ) : industrySearch.trim().length >= 2 ? (
+                  <div className="p-3 text-center text-sm" style={{ color: 'var(--color-text-muted)' }}>No industries found</div>
+                ) : null}
+              </div>
+            )}
+            
+            {/* Selected Industry Display */}
+            {selectedIndustry && (
+              <div className="mt-2 p-3 rounded-lg border" style={{ 
+                backgroundColor: 'var(--color-bg-secondary)',
+                borderColor: 'var(--color-gray-light)'
+              }}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                      {selectedIndustry.title}
+                    </div>
+                    <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                      {selectedIndustry.keywordsCount} keywords • {selectedIndustry.businessesCount || 0} businesses
+                    </div>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={clearIndustry}
+                    className="text-sm"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
 
           {/* City Selection */}
@@ -1622,8 +1676,6 @@ export default function IndustrySearchManager() {
           <div className="flex gap-2">
             <Button
               onClick={() => {
-                console.log('Search button clicked!');
-                console.log('Button state:', { isLoading, configLoaded, generatedQueriesLength: generatedQueries.length });
                 performSearch();
               }}
               disabled={isLoading || !configLoaded || generatedQueries.length === 0}
@@ -1636,7 +1688,6 @@ export default function IndustrySearchManager() {
               <Button
                 variant="outline"
                 onClick={() => {
-                  console.log('Cancel button clicked!');
                   if (abortController) {
                     abortController.abort();
                   }
@@ -1945,27 +1996,7 @@ export default function IndustrySearchManager() {
               </div>
               
               <div className="flex gap-2">
-                {/* Business Directory Save Toggle */}
-                <div className="flex items-center gap-3 mr-4">
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="saveToDirectory"
-                      checked={saveToDirectory}
-                      onChange={(e) => setSaveToDirectory(e.target.checked)}
-                      className="w-4 h-4"
-                    />
-                    <label htmlFor="saveToDirectory" className="text-sm font-medium">
-                      Save to Business Directory
-                    </label>
-                    <span className="text-xs px-2 py-1 rounded-full" style={{
-                      backgroundColor: saveToDirectory ? 'var(--color-success-light)' : 'var(--color-warning-light)',
-                      color: saveToDirectory ? 'var(--color-success-dark)' : 'var(--color-warning-dark)'
-                    }}>
-                      {saveToDirectory ? 'Live Save' : 'Dry Run'}
-                    </span>
-                  </div>
-                </div>
+
                 
                 <Button
                   variant="outline"
@@ -2021,30 +2052,7 @@ export default function IndustrySearchManager() {
                 />
               </div>
               
-              {/* Processing Mode Information */}
-              <div className="mt-3 p-3 rounded-lg text-sm" style={{
-                backgroundColor: 'var(--color-bg-secondary)',
-                border: '1px solid var(--color-gray-light)'
-              }}>
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0">
-                    <Info className="h-4 w-4 mt-0.5" style={{ color: 'var(--color-primary)' }} />
-                  </div>
-                  <div>
-                    <p className="font-medium mb-1" style={{ color: 'var(--color-text-primary)' }}>
-                      Processing Mode: {saveToDirectory ? 'Live Save' : 'Dry Run'}
-                    </p>
-                    <p className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
-                      <strong>Live Save (Default):</strong> Process, classify, and save valid businesses to the business directory. 
-                      <strong>Dry Run:</strong> Process and classify businesses without saving to database (for testing).
-                    </p>
-                    <p className="text-xs mt-1" style={{ color: 'var(--color-text-secondary)' }}>
-                      <strong>Note:</strong> Currently processing {searchResults.length} results from page {pagination?.currentPage || 1}. 
-                      To process all {totalResults} results, use the "Process All Pages" button above, or click "Extract All Businesses" to be prompted for all-page processing.
-                    </p>
-                  </div>
-                </div>
-              </div>
+
               
               {/* All Pages Progress Indicator */}
               {processingAllPages && (
@@ -2623,74 +2631,7 @@ export default function IndustrySearchManager() {
         </div>
       )}
 
-      {/* Test Notification Button */}
-      <div className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-        <h3 className="text-lg font-semibold mb-2">🔔 Test Notification System</h3>
-        <p className="text-sm text-gray-600 mb-3">Click these buttons to test if notifications are working:</p>
-        <div className="flex flex-wrap gap-2">
-          <Button
-            onClick={() => {
-              console.log('🔔 Testing success notification');
-              const id = addNotification({
-                type: 'success',
-                title: 'Test Success',
-                message: 'This is a test success notification!'
-              });
-              console.log('🔔 Success notification added with ID:', id);
-            }}
-            variant="success"
-            size="sm"
-          >
-            Test Success
-          </Button>
-          <Button
-            onClick={() => {
-              console.log('🔔 Testing progress notification');
-              const id = addNotification({
-                type: 'progress',
-                title: 'Test Progress',
-                message: 'This is a test progress notification!',
-                progress: {
-                  current: 5,
-                  total: 10,
-                  percentage: 50,
-                  status: 'Processing...'
-                }
-              });
-              console.log('🔔 Progress notification added with ID:', id);
-            }}
-            variant="info"
-            size="sm"
-          >
-            Test Progress
-          </Button>
-          <Button
-            onClick={() => {
-              console.log('🔔 Testing error notification');
-              const id = addNotification({
-                type: 'error',
-                title: 'Test Error',
-                message: 'This is a test error notification!'
-              });
-              console.log('🔔 Error notification added with ID:', id);
-            }}
-            variant="destructive"
-            size="sm"
-          >
-            Test Error
-          </Button>
-          <Button
-            onClick={() => {
-              console.log('🔔 Current notifications:', notifications);
-              console.log('🔔 Notification context functions:', { addNotification, dismissNotification, clearAllNotifications, updateNotification });
-            }}
-            variant="outline"
-            size="sm"
-          >
-            Debug Info
-          </Button>
-        </div>
-      </div>
+
     </div>
   );
 }

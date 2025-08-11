@@ -128,7 +128,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
     
     setDeletingId(id);
     try {
-      const response = await fetch(`/api/admin/industries/${id}`, {
+      const response = await fetch(`/api/admin/industries?id=${id}`, {
         method: 'DELETE',
       });
       
@@ -142,7 +142,16 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
         }
       } else {
         const errorData = await response.json();
-        alert(`Failed to delete industry: ${errorData.error || 'Unknown error'}`);
+        if (errorData.error === 'Cannot delete industry with related data') {
+          const details = errorData.details;
+          const message = `Cannot delete industry "${items.find(item => item.id === id)?.title}" because it has:\n` +
+            `• ${details.keywordsCount} keywords\n` +
+            `• ${details.businessesCount} business associations\n\n` +
+            `Please delete the keywords and business associations first, or contact an administrator for assistance.`;
+          alert(message);
+        } else {
+          alert(`Failed to delete industry: ${errorData.error || 'Unknown error'}`);
+        }
       }
     } catch (error) {
       console.error('Failed to delete industry:', error);
@@ -256,10 +265,12 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
 
   const saveEditedKeyword = async (keywordId: number) => {
     try {
-      const response = await fetch(`/api/admin/industries/keywords/${keywordId}`, {
+      const response = await fetch(`/api/admin/industries/${encodeURIComponent(selectedIndustry?.title || '')}/keywords/${keywordId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ searchTerm: editingKeywordText })
+        body: JSON.stringify({ 
+          searchTerm: editingKeywordText 
+        })
       });
 
       if (response.ok) {
@@ -293,9 +304,17 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
     }
 
     try {
-      const response = await fetch(`/api/admin/industries/keywords/${keywordId}`, {
+      const url = `/api/admin/industries/${encodeURIComponent(selectedIndustry?.title || '')}/keywords/${keywordId}`;
+      console.log('Deleting keyword with URL:', url);
+      console.log('Keyword ID:', keywordId);
+      console.log('Industry title:', selectedIndustry?.title);
+      
+      const response = await fetch(url, {
         method: 'DELETE',
       });
+
+      console.log('Delete response status:', response.status);
+      console.log('Delete response ok:', response.ok);
 
       if (response.ok) {
         // Remove from local state
@@ -307,8 +326,10 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
             totalKeywords: prev.totalKeywords - 1
           };
         });
+        console.log('Keyword deleted successfully from local state');
       } else {
         const errorData = await response.json();
+        console.error('Delete failed with error:', errorData);
         alert(`Failed to delete keyword: ${errorData.error || 'Unknown error'}`);
       }
     } catch (error) {
@@ -352,6 +373,81 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
     } catch (error) {
       console.error('Failed to add keyword:', error);
       alert('Failed to add keyword. Please try again.');
+    }
+  };
+
+  const deleteAllKeywords = async () => {
+    if (!selectedIndustry || !industryKeywords) return;
+
+    try {
+      const response = await fetch(`/api/admin/industries/keywords/delete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          industryId: industryKeywords.id,
+          searchTerms: industryKeywords.keywords.map(k => k.searchTerm)
+        })
+      });
+
+      if (response.ok) {
+        // Clear local state
+        setIndustryKeywords(prev => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            keywords: [],
+            totalKeywords: 0
+          };
+        });
+        alert(`Successfully deleted all ${industryKeywords.totalKeywords} keywords for "${industryKeywords.label}"`);
+      } else {
+        const errorData = await response.json();
+        alert(`Failed to delete keywords: ${errorData.error || 'Unknown error'}`);
+      }
+    } catch (error) {
+      console.error('Failed to delete keywords:', error);
+      alert('Failed to delete keywords. Please try again.');
+    }
+  };
+
+  const deleteIndustryFromKeywordsView = async () => {
+    if (!selectedIndustry) return;
+
+    try {
+      // First delete all keywords if they exist
+      if (industryKeywords && industryKeywords.totalKeywords > 0) {
+        await deleteAllKeywords();
+      }
+
+      // Now delete the industry
+      const response = await fetch(`/api/admin/industries?id=${selectedIndustry.id}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        // Remove from local state and go back to list
+        setItems(prev => prev.filter(item => item.id !== selectedIndustry.id));
+        setTotal(prev => prev - 1);
+        setSelectedIndustry(null);
+        setIndustryKeywords(null);
+        setCurrentView('list');
+        alert(`Successfully deleted industry "${selectedIndustry.title}"`);
+      } else {
+        const errorData = await response.json();
+        if (errorData.error === 'Cannot delete industry with related data') {
+          const details = errorData.details;
+          const message = `Cannot delete industry "${selectedIndustry.title}" because it has:\n` +
+            `• ${details.keywordsCount} keywords\n` +
+            `• ${details.businessesCount} business associations\n\n` +
+            `Please delete the keywords and business associations first, or contact an administrator for assistance.`;
+          alert(message);
+        } else {
+          alert(`Failed to delete industry: ${errorData.error || 'Unknown error'}`);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to delete industry:', error);
+      alert('Failed to delete industry. Please try again.');
     }
   };
 
@@ -788,9 +884,23 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
             View existing keywords for {selectedIndustry?.title}
           </p>
         </div>
-        <Button variant="outline" onClick={() => setCurrentView('list')}>
-          Back to Industries
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setCurrentView('list')}>
+            Back to Industries
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              if (confirm(`Are you sure you want to delete the industry "${selectedIndustry?.title}"? This will also delete all its keywords. This action cannot be undone.`)) {
+                deleteIndustryFromKeywordsView();
+              }
+            }}
+            style={{ color: 'var(--color-error)' }}
+          >
+            <Trash2 className="h-4 w-4 mr-1" />
+            Delete Industry
+          </Button>
+        </div>
       </div>
 
       {loadingKeywords ? (
@@ -807,12 +917,29 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
               <h3 className="text-lg font-semibold" style={{ color: 'var(--color-text-primary)' }}>
                 Keywords for {industryKeywords.label}
               </h3>
-              <span className="text-sm px-2 py-1 rounded-full" style={{ 
-                backgroundColor: 'var(--color-bg-secondary)', 
-                color: 'var(--color-text-secondary)' 
-              }}>
-                {industryKeywords.totalKeywords} keywords
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-sm px-2 py-1 rounded-full" style={{ 
+                  backgroundColor: 'var(--color-bg-secondary)', 
+                  color: 'var(--color-text-secondary)' 
+                }}>
+                  {industryKeywords.totalKeywords} keywords
+                </span>
+                {industryKeywords.totalKeywords > 0 && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      if (confirm(`Are you sure you want to delete ALL ${industryKeywords.totalKeywords} keywords for "${industryKeywords.label}"? This action cannot be undone.`)) {
+                        deleteAllKeywords();
+                      }
+                    }}
+                    style={{ color: 'var(--color-error)' }}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Delete All Keywords
+                  </Button>
+                )}
+              </div>
             </div>
 
             {/* Add New Keyword */}

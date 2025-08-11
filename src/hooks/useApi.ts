@@ -13,12 +13,14 @@ export function useAdminApi() {
     url: string,
     options: RequestInit = {}
   ): Promise<T> => {
-    console.log('🔗 useApi: Starting API call to:', url);
+    // Ensure URL starts with /api if it's an admin endpoint
+    const fullUrl = url.startsWith('/api') ? url : `/api${url}`;
+    console.log('🔗 useApi: Starting API call to:', fullUrl);
     setLoading(true);
     try {
       console.log('🔗 useApi: Making fetch request...');
       
-      const response = await fetch(url, {
+      const response = await fetch(fullUrl, {
         headers: {
           'Content-Type': 'application/json',
           ...options.headers,

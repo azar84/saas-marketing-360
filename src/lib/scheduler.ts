@@ -37,42 +37,13 @@ class AppScheduler {
       name: 'Test Console Output Task',
       cronExpression: '* * * * *', // Every minute
       task: async () => {
-        console.log('🧪 [TEST TASK] === TASK FUNCTION STARTED ===');
-        console.log('🧪 [TEST TASK] this context:', this);
-        console.log('🧪 [TEST TASK] this.logTask exists:', typeof this.logTask);
-        
         try {
-          console.log('🧪 [TEST TASK] Step 1: About to call logTask...');
-          if (typeof this.logTask === 'function') {
-            this.logTask('test-task', 'info', 'Test task started');
-            console.log('🧪 [TEST TASK] Step 2: logTask called successfully');
-          } else {
-            console.log('🧪 [TEST TASK] ERROR: this.logTask is not a function!');
-          }
-          
-          console.log('🧪 [TEST TASK] Step 3: About to simulate work...');
+          this.logTask('test-task', 'info', 'Test task started');
           // Simulate some work
           await new Promise(resolve => setTimeout(resolve, 1000));
-          console.log('🧪 [TEST TASK] Step 4: Work simulation completed');
-          
-          console.log('🧪 [TEST TASK] Step 5: About to log success...');
-          if (typeof this.logTask === 'function') {
-            this.logTask('test-task', 'success', 'Test task completed successfully');
-            console.log('🧪 [TEST TASK] Step 6: Success logged');
-          } else {
-            console.log('🧪 [TEST TASK] ERROR: this.logTask is not a function!');
-          }
-          
-          console.log('🧪 [TEST TASK] === TASK FUNCTION COMPLETED SUCCESSFULLY ===');
+          this.logTask('test-task', 'success', 'Test task completed successfully');
         } catch (error) {
-          console.error('🧪 [TEST TASK] ERROR CAUGHT:', error);
-          console.error('🧪 [TEST TASK] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
-          if (typeof this.logTask === 'function') {
-            this.logTask('test-task', 'error', 'Test task failed', error);
-            console.log('🧪 [TEST TASK] Error logged');
-          } else {
-            console.log('🧪 [TEST TASK] ERROR: this.logTask is not a function!');
-          }
+          this.logTask('test-task', 'error', 'Test task failed', error);
         }
       },
       enabled: true,
@@ -112,7 +83,6 @@ class AppScheduler {
     };
 
     this.tasks.set(task.id, scheduledTask);
-    console.log(`📅 [Scheduler] Added task: ${task.name} (${task.cronExpression})`);
   }
 
   /**
@@ -121,7 +91,7 @@ class AppScheduler {
   removeTask(taskId: string): boolean {
     const removed = this.tasks.delete(taskId);
     if (removed) {
-      console.log(`🗑️ [Scheduler] Removed task: ${taskId}`);
+      // Task removed
     }
     return removed;
   }
@@ -136,7 +106,7 @@ class AppScheduler {
       if (enabled) {
         task.nextRun = this.calculateNextRun(task.cronExpression);
       }
-      console.log(`📅 [Scheduler] Task ${taskId} ${enabled ? 'enabled' : 'disabled'}`);
+
       return true;
     }
     return false;
@@ -150,7 +120,7 @@ class AppScheduler {
     if (task) {
       task.cronExpression = cronExpression;
       task.nextRun = this.calculateNextRun(cronExpression);
-      console.log(`📅 [Scheduler] Updated task ${taskId} cron to: ${cronExpression}`);
+
       return true;
     }
     return false;
@@ -175,7 +145,6 @@ class AppScheduler {
    */
   start(): void {
     if (this.isInitialized) {
-      console.log('📅 [Scheduler] Already running');
       return;
     }
 
@@ -184,7 +153,7 @@ class AppScheduler {
       this.checkAndRunTasks();
     }, 1000); // Check every second
 
-    console.log('📅 [Scheduler] Started');
+
   }
 
   /**
@@ -196,7 +165,7 @@ class AppScheduler {
       this.interval = null;
     }
     this.isInitialized = false;
-    console.log('📅 [Scheduler] Stopped');
+
   }
 
   /**
@@ -207,7 +176,7 @@ class AppScheduler {
     
     for (const [taskId, task] of this.tasks) {
       if (task.enabled && !task.isRunning && task.nextRun && task.nextRun <= now) {
-        console.log(`📅 [Scheduler] Running due task: ${task.name}`);
+
         await this.runTask(taskId, task);
       }
     }
@@ -217,7 +186,7 @@ class AppScheduler {
    * Manually run all due tasks now
    */
   async runDueTasksNow(): Promise<void> {
-    console.log('📅 [Scheduler] Manually running all due tasks...');
+
     await this.checkAndRunTasks();
   }
 
@@ -226,7 +195,6 @@ class AppScheduler {
    */
   private async runTask(taskId: string, task: ScheduledTask): Promise<void> {
     if (task.isRunning) {
-      console.log(`📅 [Scheduler] Task ${taskId} is already running`);
       return;
     }
 
@@ -234,7 +202,7 @@ class AppScheduler {
     task.lastRun = new Date();
     
     try {
-      console.log(`📅 [Scheduler] Starting task: ${task.name}`);
+
       await task.task();
       
       // Update next run time
@@ -242,10 +210,10 @@ class AppScheduler {
       
       // Log success
       this.logTask(taskId, 'success', 'Task completed successfully');
-      console.log(`📅 [Scheduler] Task ${taskId} completed successfully`);
+
       
     } catch (error) {
-      console.error(`📅 [Scheduler] Task ${taskId} failed:`, error);
+
       this.logTask(taskId, 'error', 'Task failed', error);
       
       // Update next run time even on failure
@@ -263,7 +231,7 @@ class AppScheduler {
       // Simple cron parsing for common patterns
       const parts = cronExpression.split(' ');
       if (parts.length !== 5) {
-        console.warn(`📅 [Scheduler] Invalid cron expression: ${cronExpression}, using default`);
+
         return this.getDefaultNextRun();
       }
 
@@ -355,7 +323,7 @@ class AppScheduler {
   async triggerTask(taskId: string): Promise<boolean> {
     const task = this.tasks.get(taskId);
     if (task && task.enabled) {
-      console.log(`📅 [Scheduler] Manually triggering task: ${task.name}`);
+
       await this.runTask(taskId, task);
       return true;
     }
@@ -382,18 +350,7 @@ class AppScheduler {
         task.logs = task.logs.slice(-task.maxLogs);
       }
 
-      // Also log to console for debugging
-      const emoji = {
-        info: 'ℹ️',
-        warn: '⚠️',
-        error: '❌',
-        success: '✅'
-      }[level];
 
-      console.log(`${emoji} [${taskId}] ${message}`);
-      if (details) {
-        console.log(`   Details:`, details);
-      }
     }
   }
 
@@ -412,7 +369,7 @@ class AppScheduler {
     const task = this.tasks.get(taskId);
     if (task) {
       task.logs = [];
-      console.log(`📅 [Scheduler] Cleared logs for task: ${taskId}`);
+
       return true;
     }
     return false;
@@ -434,13 +391,9 @@ class AppScheduler {
    */
   private async generateKeywordsForOneIndustry(): Promise<any> {
     try {
-      console.log('🔑 [Keywords] Starting keyword generation for one industry...');
-      
       // Import Prisma client dynamically to avoid circular dependencies
-      console.log(`📦 [Scheduler] Importing PrismaClient...`);
       const { PrismaClient } = await import('@prisma/client');
       const prisma = new PrismaClient();
-      console.log(`✅ [Scheduler] PrismaClient imported successfully`);
 
       // Get industries that need keywords
       const industries = await prisma.industry.findMany({
@@ -453,12 +406,12 @@ class AppScheduler {
       });
 
       if (industries.length === 0) {
-        console.log('🔑 [Keywords] No industries need keywords');
+
         return { message: 'No industries need keywords' };
       }
 
       const industry = industries[0];
-      console.log(`🔑 [Keywords] Processing industry: ${industry.label}`);
+      
 
       // Generate keywords using LLM
       const keywords = await this.generateKeywordsForIndustry(industry.label);
@@ -474,14 +427,14 @@ class AppScheduler {
           data: keywordData
         });
 
-        console.log(`🔑 [Keywords] Generated and saved ${keywords.length} keywords for ${industry.label}`);
+
         return {
           industry: industry.label,
           keywordsGenerated: keywords.length,
           keywords: keywords
         };
       } else {
-        console.log(`🔑 [Keywords] No keywords generated for ${industry.label}`);
+
         return {
           industry: industry.label,
           keywordsGenerated: 0,
@@ -490,7 +443,7 @@ class AppScheduler {
       }
 
     } catch (keywordError: any) {
-      console.error('🔑 [Keywords] Error generating keywords:', keywordError);
+
       throw keywordError;
     }
   }
@@ -512,7 +465,7 @@ class AppScheduler {
 
       return basicKeywords;
     } catch (error) {
-      console.error('🔑 [Keywords] Error in LLM keyword generation:', error);
+
       return [];
     }
   }
@@ -521,11 +474,9 @@ class AppScheduler {
    * Refresh all task schedules
    */
   refreshTaskSchedules(): void {
-    console.log('📅 [Scheduler] Refreshing all task schedules...');
     for (const [taskId, task] of this.tasks) {
       if (task.enabled) {
         task.nextRun = this.calculateNextRun(task.cronExpression);
-        console.log(`📅 [Scheduler] Updated ${taskId}: next run at ${task.nextRun}`);
       }
     }
   }
@@ -534,10 +485,8 @@ class AppScheduler {
    * Force refresh all schedules (even disabled tasks)
    */
   forceRefreshSchedules(): void {
-    console.log('📅 [Scheduler] Force refreshing all task schedules...');
     for (const [taskId, task] of this.tasks) {
       task.nextRun = this.calculateNextRun(task.cronExpression);
-      console.log(`📅 [Scheduler] Updated ${taskId}: next run at ${task.nextRun}`);
     }
   }
 

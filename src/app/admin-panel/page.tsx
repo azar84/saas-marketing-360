@@ -28,7 +28,8 @@ import {
   LogOut,
   Clock,
   Search,
-  Building
+  Building,
+  FileText
 } from 'lucide-react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -45,6 +46,7 @@ import SchedulerManager from './components/SchedulerManager';
 import TechDiscoveryManager from './components/TechDiscoveryManager';
 import GeographicManager from './components/GeographicManager';
 import NAICSManager from './components/NAICSManager';
+import KeywordsManager from './components/KeywordsManager';
 import KeywordsResult from './components/KeywordsResult';
 import SearchEngineManager from './components/SearchEngineManager';
 import IndustrySearchManager from './components/IndustrySearchManager';
@@ -56,7 +58,7 @@ import { useNotificationContext } from '@/components/providers/NotificationProvi
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'tech-discovery' | 'geographic-manager' | 'naics-manager' | 'search-engine' | 'industry-search' | 'business-directory' | 'enrichment';
+type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'tech-discovery' | 'geographic-manager' | 'naics-manager' | 'search-engine' | 'industry-search' | 'business-directory' | 'enrichment' | 'keywords-manager';
 
 // Navigation items with design system colors
 const getNavigationItems = (designSystem: any) => {
@@ -64,10 +66,11 @@ const getNavigationItems = (designSystem: any) => {
   
   return [
     { id: 'dashboard', name: 'Dashboard', icon: LayoutDashboard, color: colors.primary },
-    { id: 'industry-search', name: 'Industry Search', icon: Building, color: colors.success },
+    { id: 'industry-search', name: 'Industry Search', icon: Search, color: colors.success },
     { id: 'business-directory', name: 'Business Directory', icon: Building, color: colors.warning },
     { id: 'enrichment', name: 'Data Enrichment', icon: Zap, color: colors.info },
     { id: 'naics-manager', name: 'NAICS Industries', icon: BarChart3, color: colors.accent },
+    { id: 'keywords-manager', name: 'Keywords Manager', icon: FileText, color: colors.warning },
     { id: 'search-engine', name: 'Search Engine', icon: Search, color: colors.info },
     { id: 'tech-discovery', name: 'Tech Discovery', icon: Search, color: colors.accent },
     { id: 'geographic-manager', name: 'Geographic Database', icon: Globe, color: colors.success },
@@ -111,26 +114,7 @@ export default function AdminPanel() {
   const { get } = useAdminApi();
   const { notifications, dismissNotification, clearAllNotifications, addNotification } = useNotificationContext();
   
-  // Debug logging for notifications
-  useEffect(() => {
-    console.log('🔔 Admin Panel: Notification context initialized');
-    console.log('🔔 Admin Panel: Current notifications:', notifications);
-    
-    // Add a test notification to see if the system is working
-    setTimeout(() => {
-      console.log('🔔 Admin Panel: Adding test notification...');
-      const testId = addNotification({
-        type: 'info',
-        title: 'Admin Panel Loaded',
-        message: 'Notification system is working! Click the bell icon to see notifications.'
-      });
-      console.log('🔔 Admin Panel: Test notification added with ID:', testId);
-    }, 2000);
-  }, []);
 
-  useEffect(() => {
-    console.log('🔔 Admin Panel: Notifications updated:', notifications);
-  }, [notifications]);
 
   const [activeSection, setActiveSection] = useState<Section>('dashboard');
   const [showKeywordsResult, setShowKeywordsResult] = useState(false);
@@ -169,38 +153,26 @@ export default function AdminPanel() {
   });
 
   useEffect(() => {
-    console.log('🔍 Admin Panel: Checking user authentication...');
-    console.log('🔍 Admin Panel: User:', user);
-    console.log('🔍 Admin Panel: isLoading:', isLoading);
-    
     // Don't redirect while still loading
     if (isLoading) {
-      console.log('⏳ Admin Panel: Still loading authentication...');
       return;
     }
     
     if (!user) {
-      console.log('❌ Admin Panel: No user, redirecting to login...');
       router.push('/admin-panel/login');
       return;
     }
 
-    console.log('✅ Admin Panel: User authenticated, fetching data...');
-
     const fetchData = async () => {
       try {
-        console.log('🔍 Admin Panel: Fetching site settings...');
         // Fetch site settings
         const settingsResponse = await get<{ success: boolean; data: SiteSettings }>('/api/admin/site-settings');
-        console.log('🔍 Admin Panel: Site settings response:', settingsResponse);
         if (settingsResponse.success) {
           setSiteSettings(settingsResponse.data);
         }
 
-        console.log('🔍 Admin Panel: Fetching dashboard stats...');
         // Fetch dashboard stats
         const statsResponse = await get<{ success: boolean; data: any }>('/api/admin/dashboard-stats');
-        console.log('🔍 Admin Panel: Dashboard stats response:', statsResponse);
         if (statsResponse.success) {
           setDashboardStats(statsResponse.data);
         }
@@ -376,6 +348,15 @@ export default function AdminPanel() {
                 }
               }} />
             )}
+          </div>
+        );
+      case 'keywords-manager':
+        return (
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
+            <KeywordsManager />
           </div>
         );
       case 'users':
