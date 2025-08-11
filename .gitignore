@@ -45,3 +45,8 @@ data/*.xlsx
 *.db
 *.sqlite
 *.sqlite3
+
+# Backup files (often large)
+backups/
+*.backup
+*.backup.*
