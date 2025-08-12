@@ -634,7 +634,9 @@ export default function IndustrySearchManager() {
         page: page,
         // Add date filtering parameters
         maxAgeDays: dateFiltering.enabled ? dateFiltering.maxAgeDays : undefined,
-        requireDateFiltering: dateFiltering.enabled
+        requireDateFiltering: dateFiltering.enabled,
+        // Enable traceability for search session
+        enableTraceability: true
       };
 
 
@@ -684,6 +686,8 @@ export default function IndustrySearchManager() {
         if (data.traceability && data.traceability.enabled && data.traceability.sessionId) {
           setTraceabilitySessionId(data.traceability.sessionId);
           console.log('🔍 Traceability session ID captured:', data.traceability.sessionId);
+        } else {
+          console.log('⚠️ No traceability data in search response:', data.traceability);
         }
         
         return data; // Return the full response for processing
@@ -927,6 +931,9 @@ export default function IndustrySearchManager() {
           searchResultIds: searchResults.map((_, index) => `result_${index}`)
         })
       });
+      
+      console.log('🔍 Debug - traceabilitySessionId:', traceabilitySessionId);
+      console.log('🔍 Debug - searchSessionId being sent:', traceabilitySessionId || undefined);
 
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
