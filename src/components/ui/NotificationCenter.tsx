@@ -41,6 +41,8 @@ export function NotificationCenter({
   const [isOpen, setIsOpen] = useState(false);
   const unreadCount = notifications.length; // All notifications are considered unread for now
   const dropdownRef = useRef<HTMLDivElement>(null);
+  // Track which progress popups are temporarily hidden (but kept in the center)
+  const [hiddenProgressIds, setHiddenProgressIds] = useState<Record<string, boolean>>({});
 
   // Debug logging
 
@@ -55,6 +57,22 @@ export function NotificationCenter({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Auto-hide progress popups after their duration (default 5000ms), but keep them in the center
+  useEffect(() => {
+    const timers: NodeJS.Timeout[] = [];
+    notifications
+      .filter(n => n.type === 'progress')
+      .forEach(n => {
+        if (hiddenProgressIds[n.id]) return;
+        const ms = n.duration ?? 5000;
+        const t = setTimeout(() => {
+          setHiddenProgressIds(prev => ({ ...prev, [n.id]: true }));
+        }, ms);
+        timers.push(t);
+      });
+    return () => timers.forEach(clearTimeout);
+  }, [notifications, hiddenProgressIds]);
 
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
@@ -121,7 +139,7 @@ export function NotificationCenter({
       </Button>
 
       {/* Auto-show Progress Notifications */}
-      {notifications.filter(n => n.type === 'progress').map((notification, index) => (
+      {notifications.filter(n => n.type === 'progress' && !hiddenProgressIds[n.id]).map((notification, index) => (
         <div
           key={notification.id}
           className={`fixed right-4 w-96 bg-white border rounded-lg shadow-lg z-[9999] ${getNotificationColor(notification.type)}`}
@@ -142,7 +160,7 @@ export function NotificationCenter({
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => onDismiss(notification.id)}
+                onClick={() => setHiddenProgressIds(prev => ({ ...prev, [notification.id]: true }))}
                 className="p-1 h-6 w-6"
               >
                 <X className="w-4 h-4" />

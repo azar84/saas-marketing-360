@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
+import { useNotificationContext } from '@/components/providers/NotificationProvider';
 
 interface SearchSession {
   id: string;
@@ -12,6 +13,11 @@ interface SearchSession {
   totalResults: number;
   status: string;
   createdAt: string;
+  industry?: string | null;
+  location?: string | null;
+  city?: string | null;
+  stateProvince?: string | null;
+  country?: string | null;
 }
 
 interface SearchResult {
@@ -82,6 +88,7 @@ interface TraceabilityData {
 }
 
 const TraceabilityViewer: React.FC = () => {
+  const { addNotification, updateNotification } = useNotificationContext();
   const [sessions, setSessions] = useState<SearchSession[]>([]);
   const [selectedSession, setSelectedSession] = useState<TraceabilityData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -95,6 +102,7 @@ const TraceabilityViewer: React.FC = () => {
   const [srPerPage, setSrPerPage] = useState(25);
   const [llmPage, setLlmPage] = useState(1);
   const [llmPerPage, setLlmPerPage] = useState(25);
+  const [monitorTimer, setMonitorTimer] = useState<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     fetchSessions();
@@ -175,6 +183,21 @@ const TraceabilityViewer: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Fetch details and return the data (without changing tabs)
+  const refreshSessionDetails = async (sessionId: string) => {
+    try {
+      const response = await fetch(`/api/admin/industry-search/traceability?action=traceability&sessionId=${sessionId}`);
+      const data = await response.json();
+      if (data.success) {
+        setSelectedSession(data.data);
+        return data.data as TraceabilityData;
+      }
+    } catch (error) {
+      console.error('Failed to refresh session details:', error);
+    }
+    return null;
   };
 
   const handleSort = (field: 'createdAt' | 'query' | 'status' | 'totalResults') => {
@@ -365,6 +388,45 @@ const TraceabilityViewer: React.FC = () => {
 
   const sortedSessions = getSortedSessions();
 
+  // Helper to compute counts
+  const computeCounts = (session: TraceabilityData) => {
+    const total = session.searchResults.length;
+    const processed = session.searchResults.filter(r => r.isProcessed).length;
+    const pending = total - processed;
+    return { total, processed, pending };
+  };
+
+  // Start a temporary monitor to refresh session details and update progress
+  const startSessionMonitor = (sessionId: string, notifId: string, mode: 'pending' | 'all') => {
+    if (monitorTimer) {
+      clearInterval(monitorTimer);
+      setMonitorTimer(null);
+    }
+    let ticks = 0;
+    const maxTicks = 40; // ~60s total at 1.5s interval
+    const timer = setInterval(async () => {
+      ticks++;
+      try {
+        const data = await refreshSessionDetails(sessionId);
+        if (data) {
+          const { total, processed, pending } = computeCounts(data);
+          const targetTotal = mode === 'pending' ? pending + processed : total;
+          const percentage = targetTotal === 0 ? 100 : Math.round((processed / Math.max(1, targetTotal)) * 100);
+          updateNotification(notifId, {
+            progress: { current: processed, total: targetTotal, percentage, status: pending > 0 ? 'Processing...' : 'Done' }
+          });
+          if (pending === 0 || ticks >= maxTicks) {
+            clearInterval(timer);
+            setMonitorTimer(null);
+          }
+        }
+      } catch {
+        // swallow
+      }
+    }, 1500);
+    setMonitorTimer(timer);
+  };
+
   return (
     <div id="traceability-view-root" className="space-y-6">
       <div className="flex items-center justify-between">
@@ -484,14 +546,132 @@ const TraceabilityViewer: React.FC = () => {
             <h2 className="text-xl font-semibold">
               LLM Traceability Details - Session {selectedSession.session.id.slice(-8)}
             </h2>
-            <Button variant="outline" onClick={() => {
-              setActiveTab('sessions');
-              if (typeof window !== 'undefined' && window.location.hash.startsWith('#traceability')) {
-                try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch {}
-              }
-            }}>
-              ← Back to Sessions
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setActiveTab('sessions')}
+              >
+                ← Back to Sessions
+              </Button>
+              <Button
+                onClick={async () => {
+                  try {
+                    const totalPending = selectedSession.searchResults.filter(r => !r.isProcessed).length;
+                    const notifId = addNotification({
+                      type: 'progress',
+                      title: 'Extract Pending Only',
+                      message: `Starting extraction for ${totalPending} pending links...`,
+                      progress: { current: 0, total: totalPending, percentage: totalPending ? 0 : 100, status: 'Starting...' }
+                    });
+                    // Move to processing state
+                    updateNotification(notifId, {
+                      progress: { current: 0, total: totalPending, percentage: totalPending ? 10 : 100, status: 'Processing...' }
+                    });
+                    const resp = await fetch('/api/admin/industry-search/process-results', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        searchResults: [],
+                        industry: selectedSession.session.industry,
+                        location: selectedSession.session.location,
+                        city: selectedSession.session.city,
+                        stateProvince: selectedSession.session.stateProvince,
+                        country: selectedSession.session.country,
+                        minConfidence: 0.7,
+                        dryRun: false,
+                        enableTraceability: true,
+                        searchSessionId: selectedSession.session.id,
+                        pendingOnly: true
+                      })
+                    });
+                    const data = await resp.json();
+                    if (resp.ok && data?.success) {
+                      updateNotification(notifId, {
+                        type: 'success',
+                        title: 'Pending Extraction Complete',
+                        message: `Saved: ${(data?.data?.saved?.length || 0)} • Skipped: ${(data?.data?.skipped?.length || 0)} • Errors: ${(data?.data?.errors?.length || 0)}`,
+                        progress: { current: totalPending, total: totalPending, percentage: 100, status: 'Done' }
+                      });
+                      // Refresh details to reflect new processed state
+                      startSessionMonitor(selectedSession.session.id, notifId, 'pending');
+                    } else {
+                      updateNotification(notifId, {
+                        type: 'error',
+                        title: 'Pending Extraction Failed',
+                        message: data?.error || 'Request failed'
+                      });
+                    }
+                  } catch (e: any) {
+                    console.error('Failed to process pending only:', e);
+                    const notifId = addNotification({
+                      type: 'error',
+                      title: 'Pending Extraction Failed',
+                      message: e?.message || 'Unknown error'
+                    });
+                  }
+                }}
+              >
+                Extract Pending Only
+              </Button>
+              <Button
+                onClick={async () => {
+                  try {
+                    const totalAll = selectedSession.searchResults.length;
+                    const notifId = addNotification({
+                      type: 'progress',
+                      title: 'Reprocess All',
+                      message: `Reprocessing ${totalAll} links in this session...`,
+                      progress: { current: 0, total: totalAll, percentage: totalAll ? 0 : 100, status: 'Starting...' }
+                    });
+                    updateNotification(notifId, {
+                      progress: { current: 0, total: totalAll, percentage: totalAll ? 10 : 100, status: 'Processing...' }
+                    });
+                    const resp = await fetch('/api/admin/industry-search/process-results', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        searchResults: [],
+                        industry: selectedSession.session.industry,
+                        location: selectedSession.session.location,
+                        city: selectedSession.session.city,
+                        stateProvince: selectedSession.session.stateProvince,
+                        country: selectedSession.session.country,
+                        minConfidence: 0.7,
+                        dryRun: false,
+                        enableTraceability: true,
+                        searchSessionId: selectedSession.session.id,
+                        pendingOnly: false
+                      })
+                    });
+                    const data = await resp.json();
+                    if (resp.ok && data?.success) {
+                      updateNotification(notifId, {
+                        type: 'success',
+                        title: 'Reprocess Complete',
+                        message: `Saved: ${(data?.data?.saved?.length || 0)} • Skipped: ${(data?.data?.skipped?.length || 0)} • Errors: ${(data?.data?.errors?.length || 0)}`,
+                        progress: { current: totalAll, total: totalAll, percentage: 100, status: 'Done' }
+                      });
+                      startSessionMonitor(selectedSession.session.id, notifId, 'all');
+                    } else {
+                      updateNotification(notifId, {
+                        type: 'error',
+                        title: 'Reprocess Failed',
+                        message: data?.error || 'Request failed'
+                      });
+                    }
+                  } catch (e: any) {
+                    console.error('Failed to reprocess all:', e);
+                    const notifId = addNotification({
+                      type: 'error',
+                      title: 'Reprocess Failed',
+                      message: e?.message || 'Unknown error'
+                    });
+                  }
+                }}
+              >
+                Reprocess All
+              </Button>
+            </div>
           </div>
 
           {/* Summary Cards */}

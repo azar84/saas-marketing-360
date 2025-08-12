@@ -28,10 +28,11 @@ export async function POST(request: NextRequest) {
       enableTraceability = true,
       searchSessionId, // Optional: link to existing search session
       searchResultIds, // Optional: array of search result IDs for traceability
+      pendingOnly = false,
     } = body;
 
     // Validate input
-    if (!searchResults || !Array.isArray(searchResults) || searchResults.length === 0) {
+    if ((!searchResults || !Array.isArray(searchResults) || searchResults.length === 0) && !searchSessionId) {
       return NextResponse.json(
         { success: false, error: 'searchResults array is required and must not be empty' },
         { status: 400 }
@@ -47,11 +48,12 @@ export async function POST(request: NextRequest) {
     let actualSearchResults: any[] = [];
     let actualSearchResultIds: string[] = [];
     
+    let sessionContext: any = null;
     if (enableTraceability && searchSessionId) {
       try {
         // Fetch the actual SearchResult records from the database
         const searchResultsFromDB = await prisma.searchResult.findMany({
-          where: { searchSessionId: searchSessionId },
+          where: { searchSessionId: searchSessionId, ...(pendingOnly ? { isProcessed: false } : {}) },
           orderBy: { position: 'asc' },
           select: {
             id: true,
@@ -61,6 +63,11 @@ export async function POST(request: NextRequest) {
             snippet: true,
             description: true,
           }
+        });
+        // Fetch session context (industry/location) if available
+        sessionContext = await prisma.searchSession.findUnique({
+          where: { id: searchSessionId },
+          select: { industry: true, location: true, city: true, stateProvince: true, country: true }
         });
         
         if (searchResultsFromDB.length > 0) {
@@ -79,7 +86,13 @@ export async function POST(request: NextRequest) {
           }));
           
           // Update the searchResults variable
-          Object.assign(searchResults, updatedSearchResults);
+          // If caller provided empty array, create one in place; otherwise replace contents
+          if (!searchResults || !Array.isArray(searchResults)) {
+            (body as any).searchResults = updatedSearchResults;
+          } else {
+            searchResults.length = 0;
+            searchResults.push(...updatedSearchResults);
+          }
         } else {
           console.log(`⚠️ No SearchResult records found for session: ${searchSessionId}`);
         }
@@ -113,10 +126,10 @@ export async function POST(request: NextRequest) {
     // Process search results through the chain and save businesses
     // Note: We don't pass categories here - let the LLM extract them from search results
     const result = await processAndSaveSearchResults(searchResults, {
-      location,
-      city,
-      stateProvince,
-      country,
+      location: location || sessionContext?.location,
+      city: city || sessionContext?.city,
+      stateProvince: stateProvince || sessionContext?.stateProvince,
+      country: country || sessionContext?.country,
       minConfidence,
       dryRun,
       // Add traceability context
@@ -191,7 +204,8 @@ export async function POST(request: NextRequest) {
         } : {
           enabled: false,
           reason: searchSessionId ? 'Failed to create LLM session' : 'No search session ID provided'
-        }
+        },
+        pendingOnly
       }
     });
 
