@@ -100,6 +100,23 @@ const TraceabilityViewer: React.FC = () => {
     fetchSessions();
   }, []);
 
+  // Auto-open a session when linked via hash: #traceability?sessionId=<id>
+  useEffect(() => {
+    const tryOpenLinkedSession = async () => {
+      if (typeof window === 'undefined') return;
+      const hash = window.location.hash || '';
+      if (!hash.startsWith('#traceability')) return;
+      const qsIndex = hash.indexOf('?');
+      if (qsIndex === -1) return;
+      const params = new URLSearchParams(hash.substring(qsIndex + 1));
+      const sessionId = params.get('sessionId');
+      if (sessionId) {
+        await fetchSessionDetails(sessionId);
+      }
+    };
+    tryOpenLinkedSession();
+  }, [activeTab]);
+
   const fetchSessions = async () => {
     try {
       const response = await fetch('/api/admin/industry-search/traceability?action=sessions');

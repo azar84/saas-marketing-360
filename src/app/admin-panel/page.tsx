@@ -208,6 +208,20 @@ export default function AdminPanel() {
     return () => clearInterval(interval);
   }, [user, router, get, isLoading]);
 
+  // Lightweight hash-based routing for deep-link actions (e.g., View Traceability)
+  useEffect(() => {
+    const applyHashRoute = () => {
+      if (typeof window === 'undefined') return;
+      const hash = window.location.hash || '';
+      if (hash.startsWith('#traceability')) {
+        setActiveSection('traceability');
+      }
+    };
+    applyHashRoute();
+    window.addEventListener('hashchange', applyHashRoute);
+    return () => window.removeEventListener('hashchange', applyHashRoute);
+  }, []);
+
   const handleLogout = () => {
     logout();
   };

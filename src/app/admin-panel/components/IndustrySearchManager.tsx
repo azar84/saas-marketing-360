@@ -29,7 +29,6 @@ import {
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
-import { NotificationCenter } from '@/components/ui/NotificationCenter';
 import { useNotificationContext } from '@/components/providers/NotificationProvider';
 import { EnhancedSearch, type SearchFilter, type SortOption } from '@/components/ui/EnhancedSearch';
 
@@ -736,10 +735,32 @@ export default function IndustrySearchManager() {
           setAppliedDateFiltering(data.dateFiltering);
         }
         
+        const sessionId = (data as any)?.traceability?.sessionId as string | undefined;
+
+        // Notify in header notification center
+        addNotification({
+          type: 'success',
+          title: 'Search Completed',
+          message: `Found ${results} results.`,
+          actions: sessionId ? [
+            {
+              label: 'View Traceability',
+              onClick: () => {
+                try { sessionStorage.setItem('traceability:lastSessionId', String(sessionId)); } catch {}
+                if (typeof window !== 'undefined') {
+                  try { history.pushState(null, '', `#traceability?sessionId=${encodeURIComponent(String(sessionId))}`); } catch {}
+                  // Fire a custom event so AdminPanel can react immediately
+                  try { window.dispatchEvent(new HashChangeEvent('hashchange')); } catch {}
+                }
+              }
+            }
+          ] : undefined
+        });
+        
         // Store traceability session ID for extraction
-        if (data.traceability && data.traceability.enabled && data.traceability.sessionId) {
-          setTraceabilitySessionId(data.traceability.sessionId);
-          console.log('🔍 Traceability session ID captured:', data.traceability.sessionId);
+        if ((data as any)?.traceability && (data as any).traceability.enabled && sessionId) {
+          setTraceabilitySessionId(sessionId);
+          console.log('🔍 Traceability session ID captured:', sessionId);
         } else {
           console.log('⚠️ No traceability data in search response:', data.traceability);
         }
@@ -2102,28 +2123,6 @@ export default function IndustrySearchManager() {
         </div>
       </div>
 
-      {/* Success Message */}
-      {successMessage && (
-        <div className="mb-4 p-4 rounded-lg border-2" style={{
-          backgroundColor: 'var(--color-success-light)',
-          borderColor: 'var(--color-success)',
-          color: 'var(--color-success-dark)'
-        }}>
-          <div className="flex items-center gap-2">
-            <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-success)' }}>
-              <span className="text-white text-sm font-bold">✓</span>
-            </div>
-            <span className="font-medium">{successMessage}</span>
-            <button
-              onClick={() => setSuccessMessage(null)}
-              className="ml-auto text-sm opacity-75 hover:opacity-100"
-            >
-              ×
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* Error Display */}
       {error && (
         <div className="p-4 rounded-lg border" style={{ 
@@ -2250,13 +2249,6 @@ export default function IndustrySearchManager() {
                   </>
                   )}
                 </Button>
-
-                {/* Notification Center */}
-                <NotificationCenter
-                  notifications={notifications}
-                  onDismiss={dismissNotification}
-                  onClearAll={clearAllNotifications}
-                />
               </div>
               
 
