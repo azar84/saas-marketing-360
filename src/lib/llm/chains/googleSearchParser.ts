@@ -43,6 +43,8 @@ export const GoogleSearchInputSchema = z.object({
   searchSessionId: z.string().optional(),
   // Add search result IDs for proper traceability
   searchResultIds: z.array(z.string()).optional(),
+  // Concurrency options (number of parallel LLM calls)
+  concurrency: z.number().optional().default(6)
 });
 
 // Output schema for extracted business information
@@ -184,7 +186,7 @@ export const googleSearchParser: ChainDefinition<
   outputSchema: GoogleSearchOutputSchema,
 
   async run(input: z.infer<typeof GoogleSearchInputSchema>): Promise<z.infer<typeof GoogleSearchOutputSchema>> {
-    const { searchResults, industry, location, enableTraceability = true, llmProcessingSessionId, searchSessionId, searchResultIds } = input;
+    const { searchResults, industry, location, enableTraceability = true, llmProcessingSessionId, searchSessionId, searchResultIds, concurrency = 6 } = input;
     
     console.log(`🔍 Google Search Parser: Processing ${searchResults.length} search results`);
     console.log(`🏭 Industry: ${industry || 'Not specified'}`);
@@ -314,17 +316,22 @@ export const googleSearchParser: ChainDefinition<
           }
         }
 
-        // Process each search result individually for better traceability
-        const processedBusinesses = [];
-        const processingDetails = [];
-        const traceabilityResults = []; // Store traceability results for later linking
-        
-        for (let i = 0; i < searchResults.length; i++) {
+        // Process each search result individually with concurrency for better performance and traceability
+        const boundedConcurrency = Math.max(1, Math.min(Number.isFinite(concurrency) ? concurrency : 6, 10));
+        console.log(`⚙️ Using concurrency: ${boundedConcurrency}`);
+
+        type PerItemOutcome = {
+          business: any | null;
+          detail?: { url: string; processingTime: number; status: 'accepted' | 'rejected' | 'error'; confidence?: number };
+          accepted?: boolean;
+        };
+
+        const processOne = async (i: number): Promise<PerItemOutcome> => {
           try {
             const searchResult = searchResults[i];
             const startTime = Date.now();
             console.log(`   🔍 Processing result ${i + 1}/${searchResults.length}: ${searchResult.link}`);
-            
+
             // Create individual prompt for this search result
             const individualPrompt = `You are a business intelligence analyst specializing in analyzing Google search results to identify company websites and extract business information.
 
@@ -377,26 +384,19 @@ Return ONLY valid JSON with this exact structure:
 }
 
 Focus on accuracy and only include results where you're confident about the classification.`;
-
             // Call LLM for individual result
             const individualResponse = await call(individualPrompt);
-            
-            // Store the raw response for traceability BEFORE processing
-            const rawIndividualResponse = individualResponse;
-            
+            const rawIndividualResponse = individualResponse; // preserve raw
+
             // Extract JSON from response
             const individualExtracted = extractJson(individualResponse);
-            if (!individualExtracted) {
-              console.log(`   ❌ Failed to extract JSON from individual response ${i + 1}`);
-              debugStats.totalProcessed++;
-              continue;
-            }
-
-            // Validate individual business structure
-            if (!individualExtracted.website || typeof individualExtracted.isCompanyWebsite !== 'boolean') {
-              console.log(`   ❌ Invalid business structure for result ${i + 1}`);
-              debugStats.totalProcessed++;
-              continue;
+            if (!individualExtracted || !individualExtracted.website || typeof individualExtracted.isCompanyWebsite !== 'boolean') {
+              console.log(`   ❌ Invalid or no JSON for result ${i + 1}`);
+              const processingTime = (Date.now() - startTime) / 1000;
+              return {
+                business: null,
+                detail: { url: searchResult.link, processingTime, status: 'error' }
+              };
             }
 
             // Process the extracted business data
@@ -417,60 +417,70 @@ Focus on accuracy and only include results where you're confident about the clas
               },
             };
 
-            processedBusinesses.push(business);
             const processingTime = (Date.now() - startTime) / 1000;
-            
-            // Record processing details
-            processingDetails.push({
-              url: searchResult.link,
-              processingTime,
-              status: business.isCompanyWebsite ? 'accepted' : 'rejected',
-              confidence: business.confidence,
-            });
-
-            // Update debug statistics
-            debugStats.totalProcessed++;
-            if (business.isCompanyWebsite) {
-              debugStats.accepted++;
-            } else {
-              debugStats.rejected++;
-            }
 
             // Record in traceability system if enabled
             if (enableTraceability && finalLLMProcessingSessionId) {
               try {
-                // Use searchResultIds if provided, otherwise create a placeholder
                 const searchResultId = searchResultIds && searchResultIds.length > i ? searchResultIds[i] : `placeholder_${i}_${Date.now()}`;
-                
-                const traceabilityResult = await industrySearchTraceability.processSearchResult(
+                await industrySearchTraceability.processSearchResult(
                   searchResultId,
                   finalLLMProcessingSessionId,
                   individualPrompt,
-                  rawIndividualResponse, // Pass the raw LLM response
+                  rawIndividualResponse,
                   processingTime
                 );
-                
-                // Store traceability result for later business linking
-                traceabilityResults.push({
-                  traceabilityId: traceabilityResult.id,
-                  website: business.website,
-                  isCompanyWebsite: business.isCompanyWebsite,
-                  confidence: business.confidence
-                });
-                
                 console.log(`   📝 Recorded in traceability system with ID: ${searchResultId}`);
               } catch (traceabilityError) {
                 console.error(`   ⚠️ Failed to record in traceability system:`, traceabilityError);
               }
             }
-            
+
             console.log(`   ✅ Processed: ${business.companyName || 'Unknown'} (${business.isCompanyWebsite ? 'Company' : 'Not Company'}) - Confidence: ${business.confidence}`);
+
+            return {
+              business,
+              detail: {
+                url: searchResult.link,
+                processingTime,
+                status: business.isCompanyWebsite ? 'accepted' : 'rejected',
+                confidence: business.confidence,
+              },
+              accepted: !!business.isCompanyWebsite
+            };
           } catch (error) {
             console.error(`   ❌ Error processing result ${i + 1}:`, error);
-            debugStats.totalProcessed++;
-            // Continue with next result
+            const processingTime = 0;
+            return { business: null, detail: { url: searchResults[i].link, processingTime, status: 'error' } };
           }
-        }
+        };
+
+        // Concurrency pool
+        const tasks: Array<Promise<PerItemOutcome>> = [];
+        let nextIndex = 0;
+        const runWorker = async () => {
+          while (nextIndex < searchResults.length) {
+            const current = nextIndex++;
+            const outcome = await processOne(current);
+            tasks.push(Promise.resolve(outcome));
+          }
+        };
+        const workers = Array.from({ length: Math.min(boundedConcurrency, searchResults.length) }, () => runWorker());
+        await Promise.all(workers);
+
+        const outcomes = await Promise.all(tasks);
+
+        // Aggregate outcomes
+        const processedBusinesses = outcomes.filter(o => o.business).map(o => o.business);
+        const processingDetails = outcomes.filter(o => o.detail).map(o => o.detail!);
+        outcomes.forEach(o => {
+          if (o.business) {
+            debugStats.totalProcessed++;
+            if (o.accepted) debugStats.accepted++; else debugStats.rejected++;
+          } else if (o.detail) {
+            debugStats.totalProcessed++;
+          }
+        });
 
         // Remove duplicates based on website
         const uniqueBusinesses = processedBusinesses.filter((business: any, index: number, self: any[]) => 

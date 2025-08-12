@@ -90,6 +90,12 @@ const TraceabilityViewer: React.FC = () => {
   const [sortField, setSortField] = useState<'createdAt' | 'query' | 'status' | 'totalResults'>('createdAt');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
 
+  // Pagination state for detailed view tables
+  const [srPage, setSrPage] = useState(1);
+  const [srPerPage, setSrPerPage] = useState(25);
+  const [llmPage, setLlmPage] = useState(1);
+  const [llmPerPage, setLlmPerPage] = useState(25);
+
   useEffect(() => {
     fetchSessions();
   }, []);
@@ -115,6 +121,9 @@ const TraceabilityViewer: React.FC = () => {
         setSelectedSession(data.data);
         setActiveTab('details');
         setShowAllQueries(false);
+        // Reset pagination when opening a new session
+        setSrPage(1);
+        setLlmPage(1);
       }
     } catch (error) {
       console.error('Failed to fetch session details:', error);
@@ -194,6 +203,119 @@ const TraceabilityViewer: React.FC = () => {
 
   const formatProcessingTime = (time: number) => {
     return `${time.toFixed(2)}s`;
+  };
+
+  const renderLLMRow = (result: LLMProcessingResult) => {
+    if (!selectedSession) return null;
+    const searchResult = selectedSession.searchResults.find(sr => sr.id === result.searchResultId);
+    return (
+      <tr key={result.id} className="hover:bg-gray-50">
+        {/* Status Column */}
+        <td className="px-4 py-4 whitespace-nowrap">
+          <div className="flex flex-col items-start space-y-2">
+            <Badge variant={result.status === 'accepted' ? 'success' : result.status === 'rejected' ? 'destructive' : 'warning'}>
+              {result.status}
+            </Badge>
+            {result.confidence && (
+              <Badge variant="outline" className="text-xs">
+                {(result.confidence * 100).toFixed(0)}% confidence
+              </Badge>
+            )}
+          </div>
+        </td>
+
+        {/* Input Data Column */}
+        <td className="px-4 py-4">
+          {searchResult ? (
+            <div className="space-y-2">
+              <div>
+                <span className="text-xs font-medium text-gray-500">Title:</span>
+                <div className="text-sm font-medium text-gray-900 max-w-xs truncate" title={searchResult.title}>
+                  {searchResult.title}
+                </div>
+              </div>
+              <div>
+                <span className="text-xs font-medium text-gray-500">URL:</span>
+                <div className="text-sm text-blue-600 max-w-xs truncate" title={searchResult.url}>
+                  {searchResult.url}
+                </div>
+              </div>
+              {searchResult.snippet && (
+                <div>
+                  <span className="text-xs font-medium text-gray-500">Snippet:</span>
+                  <div className="text-sm text-gray-600 max-w-xs truncate" title={searchResult.snippet}>
+                    {searchResult.snippet}
+                  </div>
+                </div>
+              )}
+              <div>
+                <span className="text-xs font-medium text-gray-500">Query:</span>
+                <div className="text-sm text-gray-600">
+                  {searchResult.query}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="text-sm text-gray-500">Search result not found</div>
+          )}
+        </td>
+
+        {/* Extracted Data Column */}
+        <td className="px-4 py-4">
+          {result.status === 'accepted' ? (
+            <div className="space-y-2">
+              <div>
+                <span className="text-xs font-medium text-gray-500">Company:</span>
+                <div className="text-sm font-medium text-green-700">
+                  {result.companyName || 'N/A'}
+                </div>
+              </div>
+              <div>
+                <span className="text-xs font-medium text-gray-500">Website:</span>
+                <div className="text-sm font-medium text-blue-600">
+                  {result.website || 'N/A'}
+                </div>
+              </div>
+              <div>
+                <span className="text-xs font-medium text-gray-500">Categories:</span>
+                <div className="text-sm text-gray-600">
+                  {result.categories?.join(', ') || 'N/A'}
+                </div>
+              </div>
+              <div>
+                <span className="text-xs font-medium text-gray-500">Location:</span>
+                <div className="text-sm text-gray-600">
+                  {[result.city, result.stateProvince, result.country].filter(Boolean).join(', ') || 'N/A'}
+                </div>
+              </div>
+              <div>
+                <span className="text-xs font-medium text-gray-500">Extracted From:</span>
+                <div className="text-sm text-gray-600">
+                  {result.extractedFrom || 'N/A'}
+                </div>
+              </div>
+            </div>
+          ) : result.status === 'rejected' ? (
+            <div className="text-sm text-red-600">
+              <strong>Rejected:</strong> {result.rejectionReason || 'No reason provided'}
+            </div>
+          ) : (
+            <div className="text-sm text-red-600">
+              <strong>Error:</strong> {result.errorMessage || 'Unknown error'}
+            </div>
+          )}
+        </td>
+
+        {/* Processing Details Column */}
+        <td className="px-4 py-4">
+          <div className="space-y-1 text-sm">
+            <div><strong>Time:</strong> {formatProcessingTime(result.processingTime)}</div>
+            <div><strong>Created:</strong> {formatDate(result.createdAt)}</div>
+            <div><strong>ID:</strong> <span className="font-mono text-xs">{result.id.slice(-8)}</span></div>
+          </div>
+        </td>
+      </tr>
+    );
   };
 
   const sortedSessions = getSortedSessions();
@@ -444,6 +566,57 @@ const TraceabilityViewer: React.FC = () => {
                 </Badge>
               </div>
             </div>
+
+            {/* Search Results Pagination Controls */}
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-xs text-gray-600">
+                {(() => {
+                  const total = selectedSession.searchResults.length;
+                  const start = total === 0 ? 0 : (srPage - 1) * srPerPage + 1;
+                  const end = Math.min(srPage * srPerPage, total);
+                  return `Showing ${start}-${end} of ${total}`;
+                })()}
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="text-xs text-gray-600">Per page:</label>
+                <select
+                  value={srPerPage}
+                  onChange={(e) => { setSrPerPage(parseInt(e.target.value) || 25); setSrPage(1); }}
+                  className="px-2 py-1 border rounded text-sm"
+                  style={{ borderColor: 'var(--color-gray-light)', backgroundColor: 'var(--color-bg-primary)', color: 'var(--color-text-primary)' }}
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+                <div className="flex items-center gap-1">
+                  <Button variant="outline" size="sm" onClick={() => setSrPage(1)} disabled={srPage === 1}>First</Button>
+                  <Button variant="outline" size="sm" onClick={() => setSrPage(p => Math.max(1, p - 1))} disabled={srPage === 1}>Prev</Button>
+                  <span className="text-xs text-gray-600">
+                    {(() => {
+                      const totalPages = Math.max(1, Math.ceil(selectedSession.searchResults.length / srPerPage));
+                      return `Page ${srPage} of ${totalPages}`;
+                    })()}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSrPage(p => {
+                      const totalPages = Math.max(1, Math.ceil(selectedSession.searchResults.length / srPerPage));
+                      return Math.min(totalPages, p + 1);
+                    })}
+                    disabled={srPage >= Math.max(1, Math.ceil(selectedSession.searchResults.length / srPerPage))}
+                  >Next</Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSrPage(Math.max(1, Math.ceil(selectedSession.searchResults.length / srPerPage)))}
+                    disabled={srPage >= Math.max(1, Math.ceil(selectedSession.searchResults.length / srPerPage))}
+                  >Last</Button>
+                </div>
+              </div>
+            </div>
             
             {selectedSession.searchResults.length === 0 ? (
               <Card className="p-4 text-center text-gray-500">
@@ -456,7 +629,7 @@ const TraceabilityViewer: React.FC = () => {
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
-                        Position
+                        Row
                       </th>
                       <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider border-b">
                         Title & URL
@@ -476,13 +649,15 @@ const TraceabilityViewer: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {selectedSession.searchResults.map((result) => (
+                    {selectedSession.searchResults
+                      .slice((srPage - 1) * srPerPage, (srPage - 1) * srPerPage + srPerPage)
+                      .map((result, idx) => (
                       <tr key={result.id} className="hover:bg-gray-50">
                         {/* Position Column */}
                         <td className="px-4 py-4 whitespace-nowrap text-center">
                           <div className="flex items-center justify-center">
                             <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-100 text-blue-800 text-sm font-medium">
-                              {result.position}
+                              {(srPage - 1) * srPerPage + idx + 1}
                             </span>
                           </div>
                         </td>
@@ -540,6 +715,7 @@ const TraceabilityViewer: React.FC = () => {
                             <div className="text-sm text-gray-900 font-medium">
                               {result.query}
                             </div>
+                            <div className="text-xs text-gray-500">Google position: {result.position}</div>
                           </div>
                         </td>
 
@@ -640,6 +816,57 @@ const TraceabilityViewer: React.FC = () => {
           {/* Individual LLM Processing Results - Tabular Format */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">LLM Processing Results - Data Flow Analysis</h3>
+            {/* LLM Results Pagination Controls */}
+            <div className="flex items-center justify-between gap-3">
+              <div className="text-xs text-gray-600">
+                {(() => {
+                  const total = selectedSession.llmResults.length;
+                  const start = total === 0 ? 0 : (llmPage - 1) * llmPerPage + 1;
+                  const end = Math.min(llmPage * llmPerPage, total);
+                  return `Showing ${start}-${end} of ${total}`;
+                })()}
+              </div>
+              <div className="flex items-center gap-3">
+                <label className="text-xs text-gray-600">Per page:</label>
+                <select
+                  value={llmPerPage}
+                  onChange={(e) => { setLlmPerPage(parseInt(e.target.value) || 25); setLlmPage(1); }}
+                  className="px-2 py-1 border rounded text-sm"
+                  style={{ borderColor: 'var(--color-gray-light)', backgroundColor: 'var(--color-bg-primary)', color: 'var(--color-text-primary)' }}
+                >
+                  <option value={10}>10</option>
+                  <option value={25}>25</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+                <div className="flex items-center gap-1">
+                  <Button variant="outline" size="sm" onClick={() => setLlmPage(1)} disabled={llmPage === 1}>First</Button>
+                  <Button variant="outline" size="sm" onClick={() => setLlmPage(p => Math.max(1, p - 1))} disabled={llmPage === 1}>Prev</Button>
+                  <span className="text-xs text-gray-600">
+                    {(() => {
+                      const totalPages = Math.max(1, Math.ceil(selectedSession.llmResults.length / llmPerPage));
+                      return `Page ${llmPage} of ${totalPages}`;
+                    })()}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setLlmPage(p => {
+                      const totalPages = Math.max(1, Math.ceil(selectedSession.llmResults.length / llmPerPage));
+                      return Math.min(totalPages, p + 1);
+                    })}
+                    disabled={llmPage >= Math.max(1, Math.ceil(selectedSession.llmResults.length / llmPerPage))}
+                  >Next</Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setLlmPage(Math.max(1, Math.ceil(selectedSession.llmResults.length / llmPerPage)))}
+                    disabled={llmPage >= Math.max(1, Math.ceil(selectedSession.llmResults.length / llmPerPage))}
+                  >Last</Button>
+                </div>
+              </div>
+            </div>
+
             {selectedSession.llmResults.length === 0 ? (
               <Card className="p-4 text-center text-gray-500">
                 <div className="space-y-2">
@@ -673,119 +900,9 @@ const TraceabilityViewer: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {selectedSession.llmResults.map((result) => {
-                      // Find the corresponding search result to show input data
-                      const searchResult = selectedSession.searchResults.find(sr => sr.id === result.searchResultId);
-                      
-                      return (
-                        <tr key={result.id} className="hover:bg-gray-50">
-                          {/* Status Column */}
-                          <td className="px-4 py-4 whitespace-nowrap">
-                            <div className="flex flex-col items-start space-y-2">
-                              <Badge variant={result.status === 'accepted' ? 'success' : result.status === 'rejected' ? 'destructive' : 'warning'}>
-                                {result.status}
-                              </Badge>
-                              {result.confidence && (
-                                <Badge variant="outline" className="text-xs">
-                                  {(result.confidence * 100).toFixed(0)}% confidence
-                                </Badge>
-                              )}
-                            </div>
-                          </td>
-
-                          {/* Input Data Column */}
-                          <td className="px-4 py-4">
-                            {searchResult ? (
-                              <div className="space-y-2">
-                                <div>
-                                  <span className="text-xs font-medium text-gray-500">Title:</span>
-                                  <div className="text-sm font-medium text-gray-900 max-w-xs truncate" title={searchResult.title}>
-                                    {searchResult.title}
-                                  </div>
-                                </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-500">URL:</span>
-                                  <div className="text-sm text-blue-600 max-w-xs truncate" title={searchResult.url}>
-                                    {searchResult.url}
-                                  </div>
-                                </div>
-                                {searchResult.snippet && (
-                                  <div>
-                                    <span className="text-xs font-medium text-gray-500">Snippet:</span>
-                                    <div className="text-sm text-gray-600 max-w-xs truncate" title={searchResult.snippet}>
-                                      {searchResult.snippet}
-                                    </div>
-                                  </div>
-                                )}
-                                <div>
-                                  <span className="text-xs font-medium text-gray-500">Query:</span>
-                                  <div className="text-sm text-gray-600">
-                                    {searchResult.query}
-                                  </div>
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="text-sm text-gray-500">Search result not found</div>
-                            )}
-                          </td>
-
-                          {/* Extracted Data Column */}
-                          <td className="px-4 py-4">
-                            {result.status === 'accepted' ? (
-                              <div className="space-y-2">
-                                <div>
-                                  <span className="text-xs font-medium text-gray-500">Company:</span>
-                                  <div className="text-sm font-medium text-green-700">
-                                    {result.companyName || 'N/A'}
-                                  </div>
-                                </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-500">Website:</span>
-                                  <div className="text-sm font-medium text-blue-600">
-                                    {result.website || 'N/A'}
-                                  </div>
-                                </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-500">Categories:</span>
-                                  <div className="text-sm text-gray-600">
-                                    {result.categories?.join(', ') || 'N/A'}
-                                  </div>
-                                </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-500">Location:</span>
-                                  <div className="text-sm text-gray-600">
-                                    {[result.city, result.stateProvince, result.country].filter(Boolean).join(', ') || 'N/A'}
-                                  </div>
-                                </div>
-                                <div>
-                                  <span className="text-xs font-medium text-gray-500">Extracted From:</span>
-                                  <div className="text-sm text-gray-600">
-                                    {result.extractedFrom || 'N/A'}
-                                  </div>
-                                </div>
-                              </div>
-                            ) : result.status === 'rejected' ? (
-                              <div className="text-sm text-red-600">
-                                <strong>Rejected:</strong> {result.rejectionReason || 'No reason provided'}
-                              </div>
-                            ) : (
-                              <div className="text-sm text-red-600">
-                                <strong>Error:</strong> {result.errorMessage || 'Unknown error'}
-                              </div>
-                            )}
-                          </td>
-
-                          {/* Processing Details Column */}
-                          <td className="px-4 py-4">
-                            <div className="space-y-1 text-sm">
-                              <div><strong>Time:</strong> {formatProcessingTime(result.processingTime)}</div>
-                              <div><strong>Created:</strong> {formatDate(result.createdAt)}</div>
-                              <div><strong>ID:</strong> <span className="font-mono text-xs">{result.id.slice(-8)}</span></div>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
+                    {selectedSession.llmResults
+                      .slice((llmPage - 1) * llmPerPage, (llmPage - 1) * llmPerPage + llmPerPage)
+                      .map(renderLLMRow)}
                   </tbody>
                 </table>
               </div>

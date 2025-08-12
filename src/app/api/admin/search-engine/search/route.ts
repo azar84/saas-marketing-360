@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { industrySearchTraceability } from '@/lib/industrySearchTraceability';
+import { prisma } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -430,13 +431,22 @@ export async function POST(request: Request) {
         // Add search results to the session
         await industrySearchTraceability.addSearchResults(searchSessionId, searchResultsForStorage);
 
-        // Complete the search session
+        // Compute cumulative stats from DB to avoid per-page overwrite
+        const [cumulativeResults, distinctQueries] = await Promise.all([
+          prisma.searchResult.count({ where: { searchSessionId } }),
+          prisma.searchResult.findMany({
+            where: { searchSessionId },
+            distinct: ['query'],
+            select: { query: true }
+          })
+        ]);
+
         const searchTime = (Date.now() - startTime) / 1000;
-        const successfulQueries = Object.values(queryResults).filter((q: any) => q.success).length;
-        
+        const successfulQueries = distinctQueries.length;
+
         await industrySearchTraceability.completeSearchSession(
           searchSessionId,
-          totalResults,
+          cumulativeResults,
           successfulQueries,
           searchTime
         );
@@ -450,7 +460,7 @@ export async function POST(request: Request) {
     console.log('Search completed successfully:', {
       totalQueries: searchQueries.length,
       successfulQueries: Object.values(queryResults).filter((q: any) => q.success).length,
-      totalResults,
+      totalResults: totalResults,
       combinedResults: allResults.length,
       traceabilitySessionId: searchSessionId
     });
