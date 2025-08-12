@@ -2385,3 +2385,233 @@
     "extractionQuality": 0.8666666666666667
   }
 }
+
+
+=== 2025-08-12T07:22:04.306Z ===
+{
+  "timestamp": "2025-08-12T07:22:04.305Z",
+  "totalSearchResults": 17,
+  "location": "Adams Lake",
+  "processingDetails": [
+    {
+      "url": "https://www.acecwi.com/",
+      "processingTime": 11.746,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://acadian.com/",
+      "processingTime": 13.352,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://adamspolishes.com/",
+      "processingTime": 12.405,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.abm.com/",
+      "processingTime": 12.632,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.justice.gov/atr/antitrust-case-filings-alpha",
+      "processingTime": 13.53,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.goodmanmfg.com/",
+      "processingTime": 13.072,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.republicservices.com/",
+      "processingTime": 12.956,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.wisconsinpublicservice.com/",
+      "processingTime": 11.854,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.usgbc.org/",
+      "processingTime": 12.266,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://adamsfarms.com/",
+      "processingTime": 12.516,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.homedepot.com/services/l/co/denver/heating-air-conditioning-repair/673dcc2c8",
+      "processingTime": 13.62,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.homedepot.com/services/l/co/thornton/heating-air-conditioning-repair/673dcc2c8",
+      "processingTime": 14.029,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://adamsfarms.com/",
+      "processingTime": 13.207,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://dchr.dc.gov/sites/default/files/dc/sites/dchr/publication/attachments/public_body_employee_information_123118.pdf",
+      "processingTime": 17.252,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.acehardware.com/",
+      "processingTime": 11.832,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://amsindustries.com/",
+      "processingTime": 13.619,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.scr-mn.com/",
+      "processingTime": 14.337,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 17,
+    "accepted": 16,
+    "rejected": 1,
+    "uniqueBusinesses": 15,
+    "companyWebsites": 14,
+    "directories": 1,
+    "extractionQuality": 0.9411764705882353
+  }
+}
+
+
+=== 2025-08-12T07:35:15.401Z ===
+{
+  "timestamp": "2025-08-12T07:35:15.401Z",
+  "totalSearchResults": 15,
+  "location": "Alaska",
+  "processingDetails": [
+    {
+      "url": "https://www.alaskacommunications.com/",
+      "processingTime": 12.157,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.alaskaair.com/",
+      "processingTime": 12.243,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.lennox.com/residential/locate/",
+      "processingTime": 13.104,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://alaskacommercial.com/",
+      "processingTime": 12.367,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.johnsoncontrols.com/",
+      "processingTime": 12.515,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.jfkairport.com/flight/airlines",
+      "processingTime": 12.939,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.uaa.alaska.edu/",
+      "processingTime": 12.252,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.flylax.com/lax-airline-list",
+      "processingTime": 13.05,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.newarkairport.com/flight/airlines",
+      "processingTime": 12.246,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://tc.canada.ca/en/corporate-services/acts-regulations/list-regulations/canadian-aviation-regulations-sor-96-433/standards/standard-571-maintenance-canadian-aviation-regulations-cars",
+      "processingTime": 13.964,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.bakerhughes.com/",
+      "processingTime": 16.038,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.york.com/residential-equipment/find-a-dealer",
+      "processingTime": 11.101,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://gonorth-alaska.com/rv-service-repair/rv-service-repair-anchorage/",
+      "processingTime": 13.765,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.fluor.com/",
+      "processingTime": 12.222,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.acuren.com/",
+      "processingTime": 13.537,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 15,
+    "accepted": 14,
+    "rejected": 1,
+    "uniqueBusinesses": 15,
+    "companyWebsites": 14,
+    "directories": 1,
+    "extractionQuality": 0.9333333333333333
+  }
+}

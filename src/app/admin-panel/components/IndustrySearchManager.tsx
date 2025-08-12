@@ -886,6 +886,9 @@ export default function IndustrySearchManager() {
       }
     });
     
+    console.log('🔔 Created progress notification with ID:', progressNotificationId);
+    console.log('🔔 Current notifications:', notifications);
+    
     try {
       // Transform search results to match our API format
       const transformedResults = searchResults.map(result => ({
@@ -904,6 +907,8 @@ export default function IndustrySearchManager() {
           status: 'Sending to LLM for processing...'
         }
       });
+      
+      console.log('🔔 Updated notification to 10%:', progressNotificationId);
 
       const response = await fetch('/api/admin/industry-search/process-results', {
         method: 'POST',
@@ -955,6 +960,19 @@ export default function IndustrySearchManager() {
         if (!data.data.businesses || !Array.isArray(data.data.businesses)) {
           console.warn('⚠️ No business data returned from chain');
           setError('No business classification data available');
+          
+          // Update notification to show error
+          updateNotification(progressNotificationId, {
+            type: 'error',
+            title: 'Extraction Failed',
+            message: 'No business classification data available',
+            progress: {
+              current: transformedResults.length,
+              total: transformedResults.length,
+              percentage: 100,
+              status: 'Extraction failed - no results'
+            }
+          });
           return;
         }
         
@@ -1044,18 +1062,27 @@ export default function IndustrySearchManager() {
       }
     } catch (error) {
       console.error('❌ Failed to extract all businesses:', error);
-      setError(`Failed to extract business information: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      
+      // Check if it's an LLM connection error
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const isLLMError = errorMessage.includes('DeepSeek') || errorMessage.includes('connection') || errorMessage.includes('timeout');
+      
+      if (isLLMError) {
+        setError(`LLM service temporarily unavailable. Please try again in a few minutes. (Error: ${errorMessage})`);
+      } else {
+        setError(`Failed to extract business information: ${errorMessage}`);
+      }
       
       // Update notification to show error
       updateNotification(progressNotificationId, {
         type: 'error',
         title: 'Extraction Failed',
-        message: `Failed to extract business information: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        message: isLLMError ? 'LLM service temporarily unavailable. Please try again.' : `Failed to extract business information: ${errorMessage}`,
         progress: {
           current: searchResults.length,
           total: searchResults.length,
           percentage: 100,
-          status: 'Extraction failed'
+          status: isLLMError ? 'LLM service unavailable' : 'Extraction failed'
         }
       });
     } finally {

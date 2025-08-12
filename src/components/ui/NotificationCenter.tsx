@@ -120,6 +120,57 @@ export function NotificationCenter({
         )}
       </Button>
 
+      {/* Auto-show Progress Notifications */}
+      {notifications.filter(n => n.type === 'progress').map((notification, index) => (
+        <div
+          key={notification.id}
+          className={`fixed right-4 w-96 bg-white border rounded-lg shadow-lg z-[9999] ${getNotificationColor(notification.type)}`}
+          style={{ 
+            top: `${80 + (index * 140)}px`,
+            right: '16px'
+          }}
+        >
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2">
+                {getNotificationIcon(notification.type)}
+                <div>
+                  <h4 className="font-semibold text-sm">{notification.title}</h4>
+                  <p className="text-xs text-gray-600">{notification.message}</p>
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => onDismiss(notification.id)}
+                className="p-1 h-6 w-6"
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            
+            {/* Progress Bar */}
+            {notification.progress && (
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs text-gray-600">
+                  <span>{notification.progress.status}</span>
+                  <span>{notification.progress.current} / {notification.progress.total}</span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div 
+                    className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${notification.progress.percentage}%` }}
+                  ></div>
+                </div>
+                <div className="text-right text-xs text-gray-500">
+                  {notification.progress.percentage}%
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+
       {/* Notification Dropdown */}
       {isOpen && (
         <div className="fixed right-4 top-20 w-96 max-h-96 overflow-y-auto bg-white border border-gray-200 rounded-lg shadow-lg z-[9999]">
