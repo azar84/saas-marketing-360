@@ -31,25 +31,6 @@ class AppScheduler {
   }
 
   private initializeDefaultTasks() {
-    // Test task - runs every minute to verify execution
-    this.addTask({
-      id: 'test-task',
-      name: 'Test Console Output Task',
-      cronExpression: '* * * * *', // Every minute
-      task: async () => {
-        try {
-          this.logTask('test-task', 'info', 'Test task started');
-          // Simulate some work
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          this.logTask('test-task', 'success', 'Test task completed successfully');
-        } catch (error) {
-          this.logTask('test-task', 'error', 'Test task failed', error);
-        }
-      },
-      enabled: true,
-      maxLogs: 50
-    });
-
     // Industries keywords generation task - runs every 2 minutes
     this.addTask({
       id: 'industries-keywords',
@@ -453,19 +434,26 @@ class AppScheduler {
    */
   private async generateKeywordsForIndustry(industryName: string): Promise<string[]> {
     try {
-      // This would integrate with your LLM system
-      // For now, return some basic keywords
-      const basicKeywords = [
-        `${industryName} services`,
-        `${industryName} companies`,
-        `${industryName} providers`,
-        `${industryName} solutions`,
-        `${industryName} experts`
-      ];
-
-      return basicKeywords;
+      const { KeywordsChain } = await import('@/lib/llm/chains');
+      // Basic retries around the LLM call
+      const maxAttempts = 2;
+      let lastError: any = null;
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        try {
+          const out = await KeywordsChain.run({ industry: industryName });
+          const terms = Array.isArray((out as any).search_terms) ? (out as any).search_terms : [];
+          if (terms.length > 0) return terms as string[];
+        } catch (err) {
+          lastError = err;
+          // brief delay between retries
+          await new Promise((r) => setTimeout(r, 1000 * attempt));
+        }
+      }
+      // Fallback: return empty list; upstream handles empty => no save
+      this.logTask('industries-keywords', 'warn', 'LLM keyword generation returned empty, falling back to none', { industryName, error: String(lastError) });
+      return [];
     } catch (error) {
-
+      this.logTask('industries-keywords', 'error', 'Failed to import or run KeywordsChain', { industryName, error: String(error) });
       return [];
     }
   }
