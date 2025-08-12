@@ -310,12 +310,14 @@ export const googleSearchParser: ChainDefinition<
             console.log(`🤖 Created LLM processing session: ${finalLLMProcessingSessionId}`);
           } catch (error) {
             console.error('⚠️ Failed to create LLM processing session, continuing without traceability:', error);
+            // Don't disable traceability completely - continue with individual processing
           }
         }
 
         // Process each search result individually for better traceability
         const processedBusinesses = [];
         const processingDetails = [];
+        const traceabilityResults = []; // Store traceability results for later linking
         
         for (let i = 0; i < searchResults.length; i++) {
           try {
@@ -440,13 +442,21 @@ Focus on accuracy and only include results where you're confident about the clas
                 // Use searchResultIds if provided, otherwise create a placeholder
                 const searchResultId = searchResultIds && searchResultIds.length > i ? searchResultIds[i] : `placeholder_${i}_${Date.now()}`;
                 
-                await industrySearchTraceability.processSearchResult(
+                const traceabilityResult = await industrySearchTraceability.processSearchResult(
                   searchResultId,
                   finalLLMProcessingSessionId,
                   individualPrompt,
                   rawIndividualResponse, // Pass the raw LLM response
                   processingTime
                 );
+                
+                // Store traceability result for later business linking
+                traceabilityResults.push({
+                  traceabilityId: traceabilityResult.id,
+                  website: business.website,
+                  isCompanyWebsite: business.isCompanyWebsite,
+                  confidence: business.confidence
+                });
                 
                 console.log(`   📝 Recorded in traceability system with ID: ${searchResultId}`);
               } catch (traceabilityError) {

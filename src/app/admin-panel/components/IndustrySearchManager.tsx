@@ -220,7 +220,7 @@ export default function IndustrySearchManager() {
   
   const [dateFiltering, setDateFiltering] = useState<DateFilteringOptions>({
     enabled: true,
-    maxAgeDays: 365 // Default to 1 year
+    maxAgeDays: 7 // Default to 1 year
   });
 
   // Store date filtering info from search response
@@ -261,6 +261,8 @@ export default function IndustrySearchManager() {
   const [isLoadingIndustries, setIsLoadingIndustries] = useState(false);
   const [isLoadingCities, setIsLoadingCities] = useState(false);
   const [abortController, setAbortController] = useState<AbortController | null>(null);
+  const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
+  const [lastSearchQueries, setLastSearchQueries] = useState<string>('');
 
   // Initialize config from environment variables on component mount
   useEffect(() => {
@@ -609,9 +611,42 @@ export default function IndustrySearchManager() {
       return null;
     }
 
+    // Create a unique identifier for this search
+    const searchIdentifier = `${generatedQueries.join('|')}-${selectedCity?.id}-${page}`;
+    
+    // Check if this is a duplicate search
+    if (lastSearchQueries === searchIdentifier && page === 1) {
+      console.log('🔍 Duplicate search detected, skipping...');
+      return null;
+    }
+
+    // Clear any existing search timeout
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+      setSearchTimeout(null);
+    }
+
+    // Set a new timeout for debouncing
+    const timeout = setTimeout(async () => {
+      try {
+        await executeSearch(page, searchIdentifier);
+      } catch (error) {
+        console.error('Search execution failed:', error);
+      }
+    }, 300); // 300ms debounce delay
+
+    setSearchTimeout(timeout);
+    
+    // For immediate feedback, set loading state
     setIsLoading(true);
     setError('');
     setCurrentPage(page);
+    
+    return null; // Return null since actual search is deferred
+  };
+
+  const executeSearch = async (page: number, searchIdentifier: string) => {
+    console.log(`🔍 Executing search for page ${page} with identifier: ${searchIdentifier}`);
     
     // Clear previous date filtering info for new search
     setAppliedDateFiltering(null);
@@ -639,7 +674,6 @@ export default function IndustrySearchManager() {
         enableTraceability: true
       };
 
-
       const response = await fetch('/api/admin/search-engine/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -655,6 +689,9 @@ export default function IndustrySearchManager() {
 
       if (data.success) {
         // Search successful
+        
+        // Update last search queries to prevent duplicates
+        setLastSearchQueries(searchIdentifier);
         
         // Convert to enhanced search results with full API response data
         const enhancedResults: EnhancedSearchResult[] = data.results.map((result: any) => ({
@@ -711,7 +748,9 @@ export default function IndustrySearchManager() {
 
   const handlePageChange = (newPage: number) => {
     if (newPage >= 1 && newPage <= (pagination?.totalPages || 1)) {
-      performSearch(newPage);
+      // For pagination, use executeSearch directly (no debouncing needed)
+      const searchIdentifier = `${generatedQueries.join('|')}-${selectedCity?.id}-${newPage}`;
+      executeSearch(newPage, searchIdentifier);
     }
   };
 
@@ -719,7 +758,9 @@ export default function IndustrySearchManager() {
     setConfig(prev => ({ ...prev, resultsLimit: newLimit }));
     setCurrentPage(1);
     if (generatedQueries.length > 0) {
-      performSearch(1);
+      // For config changes, use executeSearch directly (no debouncing needed)
+      const searchIdentifier = `${generatedQueries.join('|')}-${selectedCity?.id}-1`;
+      executeSearch(1, searchIdentifier);
     }
   };
 
@@ -821,7 +862,11 @@ export default function IndustrySearchManager() {
           stateProvince: selectedCity?.state?.name,
           country: selectedCity?.country?.name,
           minConfidence: 0.7,
-          dryRun: !saveToDirectory // Use the saveToDirectory state
+          dryRun: !saveToDirectory, // Use the saveToDirectory state
+          // Add traceability parameters
+          enableTraceability: true,
+          searchSessionId: traceabilitySessionId || undefined,
+          searchResultIds: [`result_${result.position || 0}`]
         })
       });
 
@@ -926,6 +971,7 @@ export default function IndustrySearchManager() {
           country: selectedCity?.country?.name,
           minConfidence: 0.7,
           dryRun: !saveToDirectory,
+          // Add traceability parameters
           enableTraceability: true,
           searchSessionId: traceabilitySessionId || undefined,
           searchResultIds: searchResults.map((_, index) => `result_${index}`)
@@ -1354,13 +1400,11 @@ export default function IndustrySearchManager() {
       for (let page = 1; page <= maxPages; page++) {
         setAllPagesProgress(prev => ({ ...prev, current: page }));
         
-        
-        // Fetch the page
-        const pageResults = await performSearch(page);
+        // Fetch the page - use executeSearch directly for pagination
+        const pageResults = await executeSearch(page, `page-${page}`);
         if (pageResults && pageResults.success) {
           allResults.push(...pageResults.results);
           totalProcessed += pageResults.results.length;
-          
           
           // Check if we've reached the 1000 result limit
           if (totalProcessed >= maxResults) {
@@ -1396,7 +1440,11 @@ export default function IndustrySearchManager() {
             stateProvince: selectedCity?.state?.name,
             country: selectedCity?.country?.name,
             minConfidence: 0.7,
-            dryRun: !saveToDirectory
+            dryRun: !saveToDirectory,
+            // Add traceability parameters
+            enableTraceability: true,
+            searchSessionId: traceabilitySessionId || undefined,
+            searchResultIds: allResults.map((_, index) => `result_${index}`)
           })
         });
 
@@ -1510,6 +1558,15 @@ export default function IndustrySearchManager() {
 
   useEffect(() => {
   }, [notifications]);
+
+  // Cleanup search timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+    };
+  }, [searchTimeout]);
 
   return (
     <div className="space-y-6 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>

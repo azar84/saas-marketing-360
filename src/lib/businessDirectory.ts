@@ -212,6 +212,11 @@ export async function saveExtractedBusinesses(
     country?: string;
     categories?: string[]; // Changed from industry to categories
     dryRun?: boolean;
+    // Add traceability options
+    enableTraceability?: boolean;
+    llmProcessingSessionId?: string;
+    searchSessionId?: string;
+    searchResultIds?: string[];
   } = {}
 ): Promise<SaveResult> {
   const {
@@ -220,13 +225,18 @@ export async function saveExtractedBusinesses(
     city,
     stateProvince,
     country,
-    dryRun = false
+    dryRun = false,
+    enableTraceability = false,
+    llmProcessingSessionId,
+    searchSessionId,
+    searchResultIds
   } = options;
 
   console.log(`💾 Saving ${businesses.length} extracted businesses to directory`);
   console.log(`🎯 Minimum confidence: ${minConfidence}`);
   console.log(`📍 Location: ${location || 'Not specified'}`);
   console.log(`🔍 Dry run: ${dryRun}`);
+  console.log(`🔍 Traceability: ${enableTraceability ? 'Enabled' : 'Disabled'}`);
 
   const result: SaveResult = {
     success: true,
@@ -314,6 +324,11 @@ export async function saveExtractedBusinesses(
         result.details.updated.push(business.website);
         result.saved++;
         console.log(`✅ Updated existing business: ${business.website}`);
+
+        // Link to traceability if enabled
+        if (enableTraceability && llmProcessingSessionId) {
+          await linkBusinessToTraceability(existingBusiness.id, business.website, llmProcessingSessionId, searchSessionId, searchResultIds);
+        }
       } else {
         // Create new business entry
         const newBusiness = await prisma.businessDirectory.create({
@@ -345,6 +360,11 @@ export async function saveExtractedBusinesses(
         result.details.created.push(business.website);
         result.saved++;
         console.log(`✅ Created new business: ${business.website}`);
+
+        // Link to traceability if enabled
+        if (enableTraceability && llmProcessingSessionId) {
+          await linkBusinessToTraceability(newBusiness.id, business.website, llmProcessingSessionId, searchSessionId, searchResultIds);
+        }
       }
 
     } catch (error) {
@@ -379,6 +399,41 @@ export async function saveExtractedBusinesses(
 }
 
 /**
+ * Link a saved business to its traceability records
+ */
+async function linkBusinessToTraceability(
+  businessId: number, 
+  website: string, 
+  llmProcessingSessionId: string, 
+  searchSessionId?: string, 
+  searchResultIds?: string[]
+) {
+  try {
+    // Import traceability system
+    const { industrySearchTraceability } = await import('@/lib/industrySearchTraceability');
+    
+    // Find the LLM processing result for this business
+    const llmResult = await prisma.lLMProcessingResult.findFirst({
+      where: {
+        llmProcessingSessionId: llmProcessingSessionId,
+        website: website,
+        isCompanyWebsite: true
+      }
+    });
+
+    if (llmResult) {
+      // Link the business to the LLM processing result
+      await industrySearchTraceability.linkToSavedBusiness(llmResult.id, businessId);
+      console.log(`🔗 Linked business ${businessId} (${website}) to traceability result ${llmResult.id}`);
+    } else {
+      console.log(`⚠️ No traceability result found for business ${website} in session ${llmProcessingSessionId}`);
+    }
+  } catch (error) {
+    console.error(`❌ Failed to link business ${website} to traceability:`, error);
+  }
+}
+
+/**
  * Process Google search results through the parser chain and save valid businesses
  * This is the main integration point between search results and business directory
  */
@@ -404,11 +459,16 @@ export async function processAndSaveSearchResults(
     stateProvince, 
     country, 
     minConfidence = 0.7, 
-    dryRun = false 
+    dryRun = false,
+    enableTraceability = false,
+    llmProcessingSessionId,
+    searchSessionId,
+    searchResultIds
   } = options;
 
   console.log(`🔍 Processing ${searchResults.length} search results for categories: ${options.categories?.join(', ') || 'Not specified'}`);
   console.log(`📍 Location: ${location || 'Not specified'}`);
+  console.log(`🔍 Traceability: ${enableTraceability ? 'Enabled' : 'Disabled'}`);
 
   try {
     // Import the chain dynamically to avoid circular dependencies
@@ -435,7 +495,12 @@ export async function processAndSaveSearchResults(
       city,
       stateProvince,
       country,
-      dryRun
+      dryRun,
+      // Pass traceability options
+      enableTraceability,
+      llmProcessingSessionId,
+      searchSessionId,
+      searchResultIds
     });
 
     // Add chain processing metadata to the result

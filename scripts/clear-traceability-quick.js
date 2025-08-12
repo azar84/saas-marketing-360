@@ -1,28 +1,26 @@
 #!/usr/bin/env node
 
 /**
- * Clear All Traceability Tables Script
+ * Quick Clear Traceability Tables Script (Non-Interactive)
  * 
- * This script safely clears all traceability-related tables to allow
- * fresh testing of the fixed traceability system.
+ * This script quickly clears all traceability-related tables without
+ * confirmation prompts. Use with caution!
  * 
  * Tables cleared:
  * - LLMProcessingResult
  * - LLMProcessingSession  
  * - SearchResult
  * - SearchSession
- * 
- * WARNING: This will delete ALL traceability data!
  */
 
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-async function clearTraceabilityTables() {
-  console.log('🧹 Starting Traceability Tables Cleanup\n');
+async function clearTraceabilityTablesQuick() {
+  console.log('🧹 Quick Traceability Tables Cleanup\n');
   
   try {
-    // Get current counts for verification
+    // Get current counts
     console.log('📊 Current table counts:');
     const [llmResults, llmSessions, searchResults, searchSessions] = await Promise.all([
       prisma.lLMProcessingResult.count(),
@@ -38,31 +36,6 @@ async function clearTraceabilityTables() {
     
     if (llmResults === 0 && llmSessions === 0 && searchResults === 0 && searchSessions === 0) {
       console.log('\n✅ All traceability tables are already empty!');
-      return;
-    }
-    
-    // Confirm deletion
-    console.log('\n⚠️  WARNING: This will delete ALL traceability data!');
-    console.log('This includes:');
-    console.log('   - All search sessions and their metadata');
-    console.log('   - All search results from Google searches');
-    console.log('   - All LLM processing sessions and results');
-    console.log('   - All traceability links between results');
-    
-    const readline = require('readline');
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout
-    });
-    
-    const answer = await new Promise((resolve) => {
-      rl.question('\nAre you sure you want to continue? Type "YES" to confirm: ', resolve);
-    });
-    
-    rl.close();
-    
-    if (answer !== 'YES') {
-      console.log('❌ Operation cancelled by user');
       return;
     }
     
@@ -85,7 +58,7 @@ async function clearTraceabilityTables() {
     const deletedSearchSessions = await prisma.searchSession.deleteMany({});
     console.log(`   ✅ Deleted ${deletedSearchSessions.count} search sessions`);
     
-    // Verify all tables are empty
+    // Verify cleanup
     console.log('\n🔍 Verifying cleanup...');
     const [finalLLMResults, finalLLMSessions, finalSearchResults, finalSearchSessions] = await Promise.all([
       prisma.lLMProcessingResult.count(),
@@ -102,25 +75,13 @@ async function clearTraceabilityTables() {
     
     if (finalLLMResults === 0 && finalLLMSessions === 0 && finalSearchResults === 0 && finalSearchSessions === 0) {
       console.log('\n🎉 SUCCESS: All traceability tables cleared successfully!');
-      console.log('\n✅ You can now test the fixed traceability system with fresh data');
-      console.log('\n💡 Next steps:');
-      console.log('   1. Run a new search in the Industry Search Manager');
-      console.log('   2. Process the results to test traceability');
-      console.log('   3. Check the traceability dashboard to verify links');
-      console.log('   4. Run the test script: node scripts/test-traceability-end-to-end.js');
+      console.log('\n✅ Ready for fresh testing of the traceability system');
     } else {
       console.log('\n⚠️  Some tables still contain data. Manual cleanup may be required.');
     }
     
   } catch (error) {
     console.error('\n❌ ERROR during cleanup:', error);
-    
-    if (error.code === 'P2003') {
-      console.log('\n💡 This error suggests foreign key constraint issues.');
-      console.log('   Try running the deletion in a different order or check for');
-      console.log('   other tables that might reference traceability data.');
-    }
-    
     throw error;
   } finally {
     await prisma.$disconnect();
@@ -129,15 +90,15 @@ async function clearTraceabilityTables() {
 
 // Run the cleanup
 if (require.main === module) {
-  clearTraceabilityTables()
+  clearTraceabilityTablesQuick()
     .then(() => {
-      console.log('\n✅ Cleanup completed');
+      console.log('\n✅ Quick cleanup completed');
       process.exit(0);
     })
     .catch((error) => {
-      console.error('\n❌ Cleanup failed:', error);
+      console.error('\n❌ Quick cleanup failed:', error);
       process.exit(1);
     });
 }
 
-module.exports = { clearTraceabilityTables };
+module.exports = { clearTraceabilityTablesQuick };

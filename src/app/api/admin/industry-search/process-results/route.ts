@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
     console.log(`🚀 Processing ${searchResults.length} search results for industry: ${industry || 'Not specified'}`);
     console.log(`📍 Location: ${location || 'Not specified'}`);
     console.log(`🔍 Traceability: ${enableTraceability ? 'Enabled' : 'Disabled'}`);
+    console.log(`🔗 Search Session ID: ${searchSessionId || 'Not provided'}`);
 
     // If we have a searchSessionId, fetch the actual SearchResult records from database
     let actualSearchResults: any[] = [];
@@ -79,6 +80,8 @@ export async function POST(request: NextRequest) {
           
           // Update the searchResults variable
           Object.assign(searchResults, updatedSearchResults);
+        } else {
+          console.log(`⚠️ No SearchResult records found for session: ${searchSessionId}`);
         }
       } catch (error) {
         console.error('⚠️ Failed to fetch SearchResult records from database, using passed data:', error);
@@ -99,11 +102,12 @@ export async function POST(request: NextRequest) {
         console.log(`🤖 Created LLM processing session: ${llmProcessingSessionId}`);
       } catch (error) {
         console.error('⚠️ Failed to create LLM processing session, continuing without traceability:', error);
+        shouldEnableTraceability = false;
       }
     } else if (shouldEnableTraceability && !searchSessionId) {
       console.log('⚠️ No search session ID provided, skipping LLM processing session creation');
-      // Disable traceability if no search session ID is available
-      shouldEnableTraceability = false;
+      console.log('💡 To enable full traceability, provide a searchSessionId when calling this endpoint');
+      // Don't disable traceability completely - let the chain handle it
     }
 
     // Process search results through the chain and save businesses
@@ -127,7 +131,8 @@ export async function POST(request: NextRequest) {
       skipped: result.skipped,
       errors: result.errors.length,
       chainProcessing: result.chainProcessing,
-      traceabilitySessionId: llmProcessingSessionId
+      traceabilitySessionId: llmProcessingSessionId,
+      searchSessionId: searchSessionId
     });
 
     // Get the business classification data from the chain processing result
@@ -178,13 +183,15 @@ export async function POST(request: NextRequest) {
         details: result.details,
         chainProcessing: result.chainProcessing,
         businesses: chainBusinesses, // Add the actual classified business data
-              traceability: shouldEnableTraceability ? {
-        enabled: true,
-        llmProcessingSessionId,
-        searchSessionId,
-      } : {
-        enabled: false
-      }
+        traceability: shouldEnableTraceability ? {
+          enabled: true,
+          llmProcessingSessionId,
+          searchSessionId,
+          searchResultIds: actualSearchResultIds.length > 0 ? actualSearchResultIds : searchResultIds || undefined,
+        } : {
+          enabled: false,
+          reason: searchSessionId ? 'Failed to create LLM session' : 'No search session ID provided'
+        }
       }
     });
 
