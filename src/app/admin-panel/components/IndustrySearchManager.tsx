@@ -151,6 +151,13 @@ interface EnhancedSearchResponse {
     dateRestrict?: string;
     description: string;
   };
+  // Add traceability information
+  traceability?: {
+    enabled: boolean;
+    sessionId: string;
+    resultsStored: number;
+    queriesStored: number;
+  };
 }
 
 interface SearchFilters {
@@ -223,6 +230,9 @@ export default function IndustrySearchManager() {
     dateRestrict?: string;
     description: string;
   } | null>(null);
+  
+  // Store traceability session ID for extraction
+  const [traceabilitySessionId, setTraceabilitySessionId] = useState<string | null>(null);
   
   // Background extraction state
   const [backgroundExtractionJob, setBackgroundExtractionJob] = useState<{
@@ -670,6 +680,12 @@ export default function IndustrySearchManager() {
           setAppliedDateFiltering(data.dateFiltering);
         }
         
+        // Store traceability session ID for extraction
+        if (data.traceability && data.traceability.enabled && data.traceability.sessionId) {
+          setTraceabilitySessionId(data.traceability.sessionId);
+          console.log('🔍 Traceability session ID captured:', data.traceability.sessionId);
+        }
+        
         return data; // Return the full response for processing
       } else {
         throw new Error(data.message || 'Search failed');
@@ -926,7 +942,7 @@ export default function IndustrySearchManager() {
               minConfidence: 0.7,
               dryRun: !saveToDirectory,
               enableTraceability: true,
-              searchSessionId: undefined,
+              searchSessionId: traceabilitySessionId || undefined,
               searchResultIds: [`result_${i}`]
             })
           });
