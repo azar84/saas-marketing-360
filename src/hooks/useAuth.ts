@@ -26,32 +26,44 @@ export function useAuth() {
     console.log('🔑 useAuth: Token found:', !!token);
     console.log('🔑 useAuth: User data found:', !!userData);
     
-    if (token && userData) {
+    const bootstrap = async () => {
       try {
-        const parsedUser = JSON.parse(userData);
-        console.log('🔑 useAuth: Setting user from localStorage:', parsedUser);
-        setUser(parsedUser);
+        if (token) {
+          // Prefer fetching fresh user from API when token exists
+          const resp = await fetch('/api/admin/users?me=true', { headers: { Authorization: `Bearer ${token}` } });
+          if (resp.ok) {
+            const fresh = await resp.json();
+            setUser(fresh?.user || fresh);
+            localStorage.setItem('adminUser', JSON.stringify(fresh?.user || fresh));
+            return;
+          }
+        }
+        // Fallback to localStorage if present
+        if (userData) {
+          const parsedUser = JSON.parse(userData);
+          setUser(parsedUser);
+          return;
+        }
+        // Final fallback: mock
+        const mockUser: User = {
+          id: 1,
+          username: 'admin',
+          email: 'admin@test.com',
+          role: 'admin',
+          name: 'Test Admin'
+        };
+        setUser(mockUser);
       } catch (error) {
-        console.error('Error parsing user data:', error);
+        console.error('useAuth bootstrap error:', error);
         localStorage.removeItem('adminToken');
         localStorage.removeItem('adminUser');
+        setUser(null);
+      } finally {
+        setIsLoading(false);
       }
-    } else {
-      // For testing purposes, provide a mock user when no token is found
-      // This allows us to test the admin panel functionality without authentication
-      const mockUser: User = {
-        id: 1,
-        username: 'admin',
-        email: 'admin@test.com',
-        role: 'admin',
-        name: 'Test Admin'
-      };
-      console.log('🔑 useAuth: No token found, setting mock user:', mockUser);
-      setUser(mockUser);
-    }
-    
-    console.log('🔑 useAuth: Setting isLoading to false');
-    setIsLoading(false);
+    };
+
+    bootstrap();
   }, []);
 
   console.log('🔑 useAuth: Current state - user:', user, 'isLoading:', isLoading);

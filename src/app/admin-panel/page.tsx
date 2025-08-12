@@ -222,6 +222,14 @@ export default function AdminPanel() {
     return () => window.removeEventListener('hashchange', applyHashRoute);
   }, []);
 
+  // When switching away from traceability, clear any leftover hash
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (activeSection !== 'traceability' && window.location.hash.startsWith('#traceability')) {
+      try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch {}
+    }
+  }, [activeSection]);
+
   const handleLogout = () => {
     logout();
   };
@@ -720,6 +728,10 @@ export default function AdminPanel() {
                     if (window.innerWidth < 1024) {
                       setSidebarOpen(false);
                     }
+                    // Clear traceability hash when leaving that view
+                    if (typeof window !== 'undefined' && (item.id as Section) !== 'traceability') {
+                      try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch {}
+                    }
                   }}
                   title={!sidebarOpen ? item.name : ''}
                   className={`w-full flex items-center ${sidebarOpen ? 'space-x-3 px-4 py-2' : 'justify-center p-2'} rounded-lg text-left transition-colors ${
@@ -790,7 +802,7 @@ export default function AdminPanel() {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Header */}
         <header 
-          className="border-b p-4 flex items-center justify-between"
+          className="border-b p-4 flex items-center justify-between sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/70"
           style={{ 
             backgroundColor: 'var(--color-bg-primary)',
             borderColor: 'var(--color-gray-light)'

@@ -751,6 +751,8 @@ export default function IndustrySearchManager() {
                   try { history.pushState(null, '', `#traceability?sessionId=${encodeURIComponent(String(sessionId))}`); } catch {}
                   // Fire a custom event so AdminPanel can react immediately
                   try { window.dispatchEvent(new HashChangeEvent('hashchange')); } catch {}
+                  // Clear the hash shortly after to keep URL clean
+                  try { setTimeout(() => { history.replaceState(null, '', window.location.pathname + window.location.search); }, 150); } catch {}
                 }
               }
             }

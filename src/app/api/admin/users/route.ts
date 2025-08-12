@@ -1,10 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
 import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-// GET - List all users
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+
+// GET - List all users or current user
 export async function GET(request: NextRequest) {
   try {
+    const { searchParams } = new URL(request.url);
+    const me = searchParams.get('me');
+    if (me === 'true') {
+      const auth = request.headers.get('authorization') || '';
+      const raw = auth.replace(/^Bearer\s+/i, '');
+      if (!raw) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      try {
+        const decoded = jwt.verify(raw, JWT_SECRET) as { userId: number };
+        const current = await prisma.adminUser.findUnique({
+          where: { id: decoded.userId },
+          select: { id: true, username: true, email: true, name: true, role: true, isActive: true, lastLoginAt: true, createdAt: true, updatedAt: true }
+        });
+        if (!current) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+        return NextResponse.json({ user: current });
+      } catch {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+    }
     const users = await prisma.adminUser.findMany({
       select: {
         id: true,

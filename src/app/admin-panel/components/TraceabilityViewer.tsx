@@ -117,6 +117,34 @@ const TraceabilityViewer: React.FC = () => {
     tryOpenLinkedSession();
   }, [activeTab]);
 
+  // Clear hash when switching back to sessions tab
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (activeTab === 'sessions' && window.location.hash.startsWith('#traceability')) {
+      try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch {}
+    }
+  }, [activeTab]);
+
+  // Clear hash when any link inside this view is clicked
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handler = (e: Event) => {
+      const anyEvt = e as any;
+      const path = (anyEvt.composedPath && anyEvt.composedPath()) || [];
+      let anchor: HTMLAnchorElement | null = null;
+      for (const el of path as any[]) {
+        if (el && (el as HTMLElement).tagName === 'A') { anchor = el as HTMLAnchorElement; break; }
+      }
+      if (!anchor) return;
+      if (window.location.hash.startsWith('#traceability')) {
+        try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch {}
+      }
+    };
+    const root = document.getElementById('traceability-view-root') || document;
+    root.addEventListener('click', handler, true);
+    return () => root.removeEventListener('click', handler, true);
+  }, []);
+
   const fetchSessions = async () => {
     try {
       const response = await fetch('/api/admin/industry-search/traceability?action=sessions');
@@ -338,7 +366,7 @@ const TraceabilityViewer: React.FC = () => {
   const sortedSessions = getSortedSessions();
 
   return (
-    <div className="space-y-6">
+    <div id="traceability-view-root" className="space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Industry Search Traceability</h1>
         <div className="flex space-x-2">
@@ -456,7 +484,12 @@ const TraceabilityViewer: React.FC = () => {
             <h2 className="text-xl font-semibold">
               LLM Traceability Details - Session {selectedSession.session.id.slice(-8)}
             </h2>
-            <Button variant="outline" onClick={() => setActiveTab('sessions')}>
+            <Button variant="outline" onClick={() => {
+              setActiveTab('sessions');
+              if (typeof window !== 'undefined' && window.location.hash.startsWith('#traceability')) {
+                try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch {}
+              }
+            }}>
               ← Back to Sessions
             </Button>
           </div>
