@@ -895,89 +895,71 @@ export default function IndustrySearchManager() {
         displayLink: result.displayUrl
       }));
 
-      // Process results one by one for real-time progress updates
-      const totalResults = transformedResults.length;
-      let processedCount = 0;
-      const allResults: any[] = [];
-
-      // Update progress to show we're starting
+      // Update progress to show we're making the API call
       updateNotification(progressNotificationId, {
         progress: {
           current: 0,
-          total: totalResults,
-          percentage: 0,
-          status: 'Starting LLM processing...'
+          total: transformedResults.length,
+          percentage: 10,
+          status: 'Sending to LLM for processing...'
         }
       });
 
-      // Process each result individually for real-time progress
-      for (let i = 0; i < totalResults; i++) {
-        const singleResult = [transformedResults[i]];
-        
-        // Update progress for current result
-        processedCount++;
-        const percentage = Math.round((processedCount / totalResults) * 100);
-        
-        updateNotification(progressNotificationId, {
-          progress: {
-            current: processedCount,
-            total: totalResults,
-            percentage: percentage,
-            status: `Processing result ${processedCount} of ${totalResults}...`
-          }
-        });
+      const response = await fetch('/api/admin/industry-search/process-results', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          searchResults: transformedResults,
+          industry: selectedIndustry?.title,
+          location: selectedCity?.name,
+          city: selectedCity?.name,
+          stateProvince: selectedCity?.state?.name,
+          country: selectedCity?.country?.name,
+          minConfidence: 0.7,
+          dryRun: !saveToDirectory,
+          enableTraceability: true,
+          searchSessionId: traceabilitySessionId || undefined,
+          searchResultIds: searchResults.map((_, index) => `result_${index}`)
+        })
+      });
 
-        try {
-          // Process single result through API
-          const response = await fetch('/api/admin/industry-search/process-results', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              searchResults: singleResult,
-              industry: selectedIndustry?.title,
-              location: selectedCity?.name,
-              city: selectedCity?.name,
-              stateProvince: selectedCity?.state?.name,
-              country: selectedCity?.country?.name,
-              minConfidence: 0.7,
-              dryRun: !saveToDirectory,
-              enableTraceability: true,
-              searchSessionId: traceabilitySessionId || undefined,
-              searchResultIds: [`result_${i}`]
-            })
-          });
-
-          if (response.ok) {
-            const data = await response.json();
-            if (data.success && data.data && data.data.businesses) {
-              allResults.push(...data.data.businesses);
-            }
-          }
-
-          // Small delay to make progress visible
-          await new Promise(resolve => setTimeout(resolve, 100));
-
-        } catch (error) {
-          console.error(`❌ Error processing result ${i + 1}:`, error);
-          // Continue with next result
-        }
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
 
-      // Update progress to show completion
+      // Update progress to show we're processing
       updateNotification(progressNotificationId, {
         progress: {
-          current: totalResults,
-          total: totalResults,
-          percentage: 100,
-          status: 'Processing completed!'
+          current: Math.floor(transformedResults.length * 0.5),
+          total: transformedResults.length,
+          percentage: 50,
+          status: 'LLM processing results...'
         }
       });
 
-      // Process the results
-      if (allResults.length > 0) {
+      const data = await response.json();
+      
+      if (data.success && data.data) {
         
-        // Transform the results to match our BusinessExtractionResult format
-        const transformedExtractions = allResults.map((business: any) => ({
+        // Update progress to show completion
+        updateNotification(progressNotificationId, {
+          progress: {
+            current: transformedResults.length,
+            total: transformedResults.length,
+            percentage: 100,
+            status: 'Processing completed!'
+          }
+        });
+        
+        // Check if we have business data from the chain
+        if (!data.data.businesses || !Array.isArray(data.data.businesses)) {
+          console.warn('⚠️ No business data returned from chain');
+          setError('No business classification data available');
+          return;
+        }
+        
+        // Transform the chain results to match our BusinessExtractionResult format
+        const transformedExtractions = data.data.businesses.map((business: any) => ({
           isCompany: business.isCompanyWebsite,
           businessName: business.companyName,
           baseUrl: business.website,
@@ -1027,10 +1009,10 @@ export default function IndustrySearchManager() {
         updateNotification(progressNotificationId, {
           type: 'success',
           title: 'Extraction Complete',
-          message: `Successfully processed ${allResults.length} businesses`,
+          message: `Successfully processed ${data.data.businesses.length} businesses`,
           progress: {
-            current: totalResults,
-            total: totalResults,
+            current: transformedResults.length,
+            total: transformedResults.length,
             percentage: 100,
             status: 'Extraction completed successfully!'
           }
@@ -1039,24 +1021,24 @@ export default function IndustrySearchManager() {
         // Show success message based on mode
         if (saveToDirectory) {
           setError(null);
-          setSuccessMessage(`Successfully processed and saved ${allResults.length} businesses to the business directory!`);
+          setSuccessMessage(`Successfully processed and saved ${data.data.businesses.length} businesses to the business directory!`);
         } else {
-          setSuccessMessage(`Successfully processed ${allResults.length} businesses (dry run mode - no data saved)`);
+          setSuccessMessage(`Successfully processed ${data.data.businesses.length} businesses (dry run mode - no data saved)`);
         }
       } else {
-        console.error('❌ No extraction results returned');
-        setError('No business classification data available');
+        console.error('❌ Extraction failed:', data);
+        setError(data.error || 'Failed to extract business information');
         
         // Update notification to show error
         updateNotification(progressNotificationId, {
           type: 'error',
           title: 'Extraction Failed',
-          message: 'No business classification data available',
+          message: data.error || 'Failed to extract business information',
           progress: {
-            current: totalResults,
-            total: totalResults,
+            current: transformedResults.length,
+            total: transformedResults.length,
             percentage: 100,
-            status: 'Extraction failed - no results'
+            status: 'Extraction failed'
           }
         });
       }
