@@ -24,6 +24,7 @@ export async function POST(request: Request) {
       city, // City context for traceability
       stateProvince, // State/Province context for traceability
       country, // Country context for traceability
+      existingSearchSessionId, // Optional: reuse an existing session to prevent duplicates
     } = body;
 
     // Support both single query and multiple queries
@@ -64,30 +65,35 @@ export async function POST(request: Request) {
       country
     });
 
-    // Create traceability session if enabled
+    // Create or reuse traceability session if enabled
     let searchSessionId: string | null = null;
     if (enableTraceability) {
-      try {
-        console.log(`🔍 Creating search session for queries:`, searchQueries);
-        console.log(`🔍 Traceability enabled: ${enableTraceability}`);
-        console.log(`🔍 Page number: ${pageNumber}`);
-        
-        const session = await industrySearchTraceability.createSearchSession({
-          searchQueries,
-          industry,
-          location,
-          city,
-          stateProvince,
-          country,
-          apiKey,
-          searchEngineId,
-          resultsLimit: limit,
-          filters,
-        });
-        searchSessionId = session.id;
-        console.log(`🔍 Created traceability session: ${searchSessionId} for page ${pageNumber}`);
-      } catch (error) {
-        console.error('⚠️ Failed to create traceability session, continuing without it:', error);
+      if (existingSearchSessionId) {
+        searchSessionId = existingSearchSessionId;
+        console.log(`🔗 Reusing provided traceability session: ${searchSessionId}`);
+      } else {
+        try {
+          console.log(`🔍 Creating search session for queries:`, searchQueries);
+          console.log(`🔍 Traceability enabled: ${enableTraceability}`);
+          console.log(`🔍 Page number: ${pageNumber}`);
+          
+          const session = await industrySearchTraceability.createSearchSession({
+            searchQueries,
+            industry,
+            location,
+            city,
+            stateProvince,
+            country,
+            apiKey,
+            searchEngineId,
+            resultsLimit: limit,
+            filters,
+          });
+          searchSessionId = session.id;
+          console.log(`🔍 Created traceability session: ${searchSessionId} for page ${pageNumber}`);
+        } catch (error) {
+          console.error('⚠️ Failed to create traceability session, continuing without it:', error);
+        }
       }
     } else {
       console.log(`🔍 Traceability disabled for this request`);

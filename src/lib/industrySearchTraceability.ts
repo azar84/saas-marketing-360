@@ -72,6 +72,30 @@ export class IndustrySearchTraceability {
         console.log(`   Query ${index + 1}: "${q}"`);
       });
 
+      // Idempotency guard: reuse a very recent session with the same context
+      const reuseWindowMs = 60000; // 60s window to coalesce duplicate triggers
+      const recentCutoff = new Date(Date.now() - reuseWindowMs);
+      const existing = await prisma.searchSession.findFirst({
+        where: {
+          createdAt: { gte: recentCutoff },
+          query: primaryQuery,
+          // Match full queries array to avoid near-duplicates creating a new session
+          searchQueries: { equals: input.searchQueries },
+          city: input.city,
+          stateProvince: input.stateProvince,
+          country: input.country,
+          industry: input.industry,
+          resultsLimit: input.resultsLimit ?? 10,
+          searchEngineId: input.searchEngineId || undefined,
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+
+      if (existing) {
+        console.log(`♻️ Reusing recent search session: ${existing.id} (created ${existing.createdAt.toISOString()})`);
+        return existing;
+      }
+
       const session = await prisma.searchSession.create({
         data: {
           query: primaryQuery,

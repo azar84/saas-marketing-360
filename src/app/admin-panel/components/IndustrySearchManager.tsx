@@ -263,6 +263,7 @@ export default function IndustrySearchManager() {
   const [abortController, setAbortController] = useState<AbortController | null>(null);
   const [searchTimeout, setSearchTimeout] = useState<NodeJS.Timeout | null>(null);
   const [lastSearchQueries, setLastSearchQueries] = useState<string>('');
+  const [searchInFlightId, setSearchInFlightId] = useState<string | null>(null);
 
   // Initialize config from environment variables on component mount
   useEffect(() => {
@@ -614,9 +615,15 @@ export default function IndustrySearchManager() {
     // Create a unique identifier for this search
     const searchIdentifier = `${generatedQueries.join('|')}-${selectedCity?.id}-${page}`;
     
-    // Check if this is a duplicate search
+    // Check if this is a duplicate search (no-op if same as last one already completed)
     if (lastSearchQueries === searchIdentifier && page === 1) {
       console.log('🔍 Duplicate search detected, skipping...');
+      return null;
+    }
+
+    // If an identical search is already in-flight, skip
+    if (searchInFlightId === searchIdentifier) {
+      console.log('⏳ Search already in-flight, skipping duplicate trigger:', searchIdentifier);
       return null;
     }
 
@@ -629,9 +636,12 @@ export default function IndustrySearchManager() {
     // Set a new timeout for debouncing
     const timeout = setTimeout(async () => {
       try {
+        setSearchInFlightId(searchIdentifier);
         await executeSearch(page, searchIdentifier);
       } catch (error) {
         console.error('Search execution failed:', error);
+      } finally {
+        setSearchInFlightId((current) => (current === searchIdentifier ? null : current));
       }
     }, 300); // 300ms debounce delay
 
@@ -646,6 +656,12 @@ export default function IndustrySearchManager() {
   };
 
   const executeSearch = async (page: number, searchIdentifier: string) => {
+    // Guard against direct duplicate triggers (e.g., pagination double-clicks)
+    if (searchInFlightId === searchIdentifier) {
+      console.log('⏳ executeSearch skipped; same search in-flight:', searchIdentifier);
+      return null;
+    }
+    setSearchInFlightId(searchIdentifier);
     console.log(`🔍 Executing search for page ${page} with identifier: ${searchIdentifier}`);
     
     // Clear previous date filtering info for new search
@@ -671,7 +687,8 @@ export default function IndustrySearchManager() {
         maxAgeDays: dateFiltering.enabled ? dateFiltering.maxAgeDays : undefined,
         requireDateFiltering: dateFiltering.enabled,
         // Enable traceability for search session
-        enableTraceability: true
+        enableTraceability: true,
+        existingSearchSessionId: page > 1 || lastSearchQueries ? traceabilitySessionId || undefined : undefined
       };
 
       const response = await fetch('/api/admin/search-engine/search', {
@@ -743,6 +760,7 @@ export default function IndustrySearchManager() {
     } finally {
       setIsLoading(false);
       setAbortController(null);
+      setSearchInFlightId((current) => (current === searchIdentifier ? null : current));
     }
   };
 
