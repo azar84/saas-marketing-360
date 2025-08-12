@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
     const businesses = await prisma.businessDirectory.findMany({
       where,
       include: {
-        contactPerson: {
+        contact_persons: {
           select: {
             id: true,
             firstName: true,
@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
         contactPersonId: contactPersonId ? parseInt(contactPersonId) : null
       },
       include: {
-        contactPerson: {
+        contact_persons: {
           select: {
             id: true,
             firstName: true,

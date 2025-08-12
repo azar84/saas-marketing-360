@@ -5,80 +5,132 @@
  * This tests the complete flow: Google search results → LangChain chain → Business classification
  */
 
-const mockSearchResults = [
-  {
-    title: "ABC Plumbing Services - Professional Plumbers in Downtown",
-    link: "https://abcplumbing.com",
-    snippet: "ABC Plumbing Services offers professional plumbing solutions for residential and commercial properties. Licensed and insured plumbers serving Downtown area."
-  },
-  {
-    title: "Best Plumbers Near Me - Top 10 Plumbing Companies",
-    link: "https://bestplumbersdirectory.com",
-    snippet: "Find the best plumbers in your area. Compare reviews, ratings, and prices from top plumbing companies."
-  },
-  {
-    title: "Downtown Plumbing & Heating - 24/7 Emergency Service",
-    link: "https://downtownplumbing.com",
-    snippet: "Downtown Plumbing & Heating provides 24/7 emergency plumbing and heating services. Call us anytime for immediate assistance."
-  }
-];
+const { PrismaClient } = require('@prisma/client');
+
+const prisma = new PrismaClient();
 
 async function testProcessResultsAPI() {
-  console.log('🧪 Testing process-results API endpoint...\n');
-
   try {
-    const response = await fetch('http://localhost:3000/api/admin/industry-search/process-results', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        searchResults: mockSearchResults,
-        industry: 'Plumbing Services',
-        location: 'Downtown',
-        minConfidence: 0.7,
-        dryRun: true
-      })
+    console.log('🧪 Testing Process Results API...\n');
+
+    // Get the latest search session
+    const latestSession = await prisma.searchSession.findFirst({
+      orderBy: { createdAt: 'desc' }
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    if (!latestSession) {
+      console.log('⚠️  No search sessions found. Please run a search first.');
+      return;
     }
 
-    const data = await response.json();
+    console.log(`🔍 Using Search Session: ${latestSession.id}`);
+    console.log(`   Query: ${latestSession.query}`);
+    console.log(`   Total Results: ${latestSession.totalResults}`);
+
+    // Get search results for this session
+    const searchResults = await prisma.searchResult.findMany({
+      where: { searchSessionId: latestSession.id },
+      orderBy: { position: 'asc' },
+      take: 5 // Just test with first 5 results
+    });
+
+    console.log(`\n📝 Found ${searchResults.length} search results to test with`);
+
+    // Prepare test data
+    const testData = {
+      searchResults: searchResults.map(result => ({
+        title: result.title,
+        link: result.url,
+        snippet: result.snippet || result.description || '',
+        displayLink: result.url
+      })),
+      industry: 'AC Maintenance',
+      location: 'Hampton, Canada',
+      city: 'Hampton',
+      stateProvince: 'Canada',
+      country: 'Canada',
+      minConfidence: 0.7,
+      dryRun: true, // Don't actually save businesses
+      enableTraceability: true,
+      searchSessionId: latestSession.id,
+      searchResultIds: searchResults.map(r => r.id)
+    };
+
+    console.log(`\n📤 Test Data Prepared:`);
+    console.log(`   Search Results: ${testData.searchResults.length}`);
+    console.log(`   Industry: ${testData.industry}`);
+    console.log(`   Location: ${testData.location}`);
+    console.log(`   Traceability: ${testData.enableTraceability}`);
+    console.log(`   Search Session ID: ${testData.searchSessionId}`);
+    console.log(`   Search Result IDs: ${testData.searchResultIds.length}`);
+
+    // Test the API endpoint
+    console.log(`\n🚀 Testing API endpoint: /api/admin/industry-search/process-results`);
     
-    console.log('✅ API Response received successfully');
-    console.log('📊 Response data:', JSON.stringify(data, null, 2));
-    
-    if (data.success) {
-      console.log('\n🎯 Test Results:');
-      console.log(`- Total businesses processed: ${data.data?.saved || 0}`);
-      console.log(`- Company websites: ${data.data?.chainProcessing?.companyWebsites || 0}`);
-      console.log(`- Directories: ${data.data?.chainProcessing?.directories || 0}`);
-      console.log(`- Extraction quality: ${data.data?.chainProcessing?.extractionQuality || 0}`);
-      
-      if (data.data?.details?.created) {
-        console.log('\n🏢 Extracted Businesses:');
-        data.data.details.created.forEach((website, index) => {
-          console.log(`${index + 1}. ${website}`);
-        });
-        console.log('');
+    try {
+      const response = await fetch('http://localhost:3000/api/admin/industry-search/process-results', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(testData)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log(`\n✅ API Response:`);
+        console.log(`   Success: ${result.success}`);
+        console.log(`   Message: ${result.message}`);
+        console.log(`   Saved: ${result.data?.saved || 0}`);
+        console.log(`   Skipped: ${result.data?.skipped || 0}`);
+        console.log(`   Traceability: ${result.data?.traceability?.enabled ? 'Enabled' : 'Disabled'}`);
+        console.log(`   LLM Session ID: ${result.data?.traceability?.llmProcessingSessionId || 'None'}`);
+        
+        if (result.data?.traceability?.enabled && result.data?.traceability?.llmProcessingSessionId) {
+          console.log(`\n🎯 LLM Processing Session Created Successfully!`);
+          console.log(`   Session ID: ${result.data.traceability.llmProcessingSessionId}`);
+        } else {
+          console.log(`\n⚠️  No LLM Processing Session Created`);
+        }
+      } else {
+        const errorText = await response.text();
+        console.log(`\n❌ API Error (${response.status}):`);
+        console.log(errorText);
       }
+    } catch (apiError) {
+      console.log(`\n❌ API Call Failed:`);
+      console.log(apiError.message);
       
-      console.log('🎉 Test completed successfully!');
+      if (apiError.code === 'ECONNREFUSED') {
+        console.log('   Make sure the development server is running on port 3000');
+      }
+    }
+
+    // Check if any LLM processing sessions were created
+    console.log(`\n🔍 Checking for newly created LLM Processing Sessions...`);
+    
+    const newLLMSessions = await prisma.lLMProcessingSession.findMany({
+      where: { searchSessionId: latestSession.id },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    if (newLLMSessions.length > 0) {
+      console.log(`✅ Found ${newLLMSessions.length} LLM Processing Sessions:`);
+      newLLMSessions.forEach((session, index) => {
+        console.log(`   ${index + 1}. ID: ${session.id}`);
+        console.log(`      Status: ${session.status}`);
+        console.log(`      Total Results: ${session.totalResults}`);
+        console.log(`      Created: ${session.createdAt}`);
+      });
     } else {
-      console.error('❌ API returned error:', data.error);
+      console.log(`⚠️  No LLM Processing Sessions found for search session ${latestSession.id}`);
     }
-    
+
   } catch (error) {
-    console.error('❌ Test failed:', error.message);
-    
-    if (error.code === 'ECONNREFUSED') {
-      console.log('\n💡 Make sure the development server is running:');
-      console.log('   npm run dev');
-    }
+    console.error('❌ Error testing process results API:', error);
+  } finally {
+    await prisma.$disconnect();
   }
 }
 
-// Run the test
 testProcessResultsAPI();

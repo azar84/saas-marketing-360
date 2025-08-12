@@ -38,34 +38,34 @@ async function main() {
   });
 
   if (!homePage) {
-    console.log('❌ Home page not found. Please create the home page first.');
-    return;
-  }
+    console.log('⚠️  Home page not found in database. This is normal during build time - will be created at runtime.');
+    console.log('✅ Continuing with seed process...');
+  } else {
+    console.log('✅ Found existing home page:', homePage.slug);
 
-  console.log('✅ Found existing home page:', homePage.slug);
-
-  // Check if home hero section already exists for this page
-  const existingHomeHeroSection = await prisma.pageSection.findFirst({
-    where: {
-      pageId: homePage.id,
-      sectionType: 'home_hero'
-    }
-  });
-
-  if (!existingHomeHeroSection) {
-    // Create a page section that links home page to home hero
-    const homeHeroSection = await prisma.pageSection.create({
-      data: {
+    // Check if home hero section already exists for this page
+    const existingHomeHeroSection = await prisma.pageSection.findFirst({
+      where: {
         pageId: homePage.id,
-        sectionType: 'home_hero',
-        title: 'Home Hero',
-        sortOrder: 1,
-        isVisible: true
+        sectionType: 'home_hero'
       }
     });
-    console.log('✅ Home hero section added to home page:', homeHeroSection.id);
-  } else {
-    console.log('✅ Home hero section already exists for home page:', existingHomeHeroSection.id);
+
+    if (!existingHomeHeroSection) {
+      // Create a page section that links home page to home hero
+      const homeHeroSection = await prisma.pageSection.create({
+        data: {
+          pageId: homePage.id,
+          sectionType: 'home_hero',
+          title: 'Home Hero',
+          sortOrder: 1,
+          isVisible: true
+        }
+      });
+      console.log('✅ Home hero section added to home page:', homeHeroSection.id);
+    } else {
+      console.log('✅ Home hero section already exists for home page:', existingHomeHeroSection.id);
+    }
   }
 
   console.log('🎉 Database seeding completed successfully!');

@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { industrySearchTraceability } from '@/lib/industrySearchTraceability';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,7 +16,14 @@ export async function POST(request: Request) {
       page = '1',
       // Add date filtering options
       maxAgeDays = 365, // Maximum age in days (default: 1 year)
-      requireDateFiltering = true // Whether to enforce date filtering
+      requireDateFiltering = true, // Whether to enforce date filtering
+      // Add traceability options
+      enableTraceability = true, // Enable full traceability
+      industry, // Industry context for traceability
+      location, // Location context for traceability
+      city, // City context for traceability
+      stateProvince, // State/Province context for traceability
+      country, // Country context for traceability
     } = body;
 
     // Support both single query and multiple queries
@@ -47,8 +55,43 @@ export async function POST(request: Request) {
       resultsLimit: limit,
       page: pageNumber,
       maxAgeDays,
-      requireDateFiltering
+      requireDateFiltering,
+      enableTraceability,
+      industry,
+      location,
+      city,
+      stateProvince,
+      country
     });
+
+    // Create traceability session if enabled
+    let searchSessionId: string | null = null;
+    if (enableTraceability) {
+      try {
+        console.log(`🔍 Creating search session for queries:`, searchQueries);
+        console.log(`🔍 Traceability enabled: ${enableTraceability}`);
+        console.log(`🔍 Page number: ${pageNumber}`);
+        
+        const session = await industrySearchTraceability.createSearchSession({
+          searchQueries,
+          industry,
+          location,
+          city,
+          stateProvince,
+          country,
+          apiKey,
+          searchEngineId,
+          resultsLimit: limit,
+          filters,
+        });
+        searchSessionId = session.id;
+        console.log(`🔍 Created traceability session: ${searchSessionId} for page ${pageNumber}`);
+      } catch (error) {
+        console.error('⚠️ Failed to create traceability session, continuing without it:', error);
+      }
+    } else {
+      console.log(`🔍 Traceability disabled for this request`);
+    }
 
     // Process multiple queries in parallel for better performance
     const allResults: Array<{
@@ -68,6 +111,8 @@ export async function POST(request: Request) {
       searchTime?: number;
       error?: string;
     }> = {};
+
+    const startTime = Date.now();
 
     // Helper function to process a single query
     const processQuery = async (query: string, queryIndex: number) => {
@@ -140,6 +185,11 @@ export async function POST(request: Request) {
           excludeNewsSites: filters.excludeNewsSites || false,
           excludeBlogs: filters.excludeBlogs || false
         };
+        
+        // Debug: Track filtering stats
+        let filteredOutCount = 0;
+        const rejectionReasons: Record<string, number> = {};
+        const originalCount = (data.items || []).length;
 
         const filteredResults = (data.items || [])
           .filter((result: any) => {
@@ -172,6 +222,9 @@ export async function POST(request: Request) {
                     hostname.includes('google.com') ||
                     hostname.includes('bing.com') ||
                     hostname.includes('yahoo.com')) {
+                  filteredOutCount++;
+                  rejectionReasons['Directory/Social Media'] = (rejectionReasons['Directory/Social Media'] || 0) + 1;
+                  console.log(`   ❌ FILTERED OUT: ${hostname} - Directory/Social Media`);
                   return false;
                 }
               }
@@ -187,6 +240,9 @@ export async function POST(request: Request) {
                     pathname.includes('/forums/') ||
                     pathname.includes('/community/') ||
                     pathname.includes('/discussion/')) {
+                  filteredOutCount++;
+                  rejectionReasons['Forum/Community'] = (rejectionReasons['Forum/Community'] || 0) + 1;
+                  console.log(`   ❌ FILTERED OUT: ${hostname} - Forum/Community`);
                   return false;
                 }
               }
@@ -262,6 +318,17 @@ export async function POST(request: Request) {
             };
           });
 
+        // Debug: Log filtering results
+        console.log(`\n🔍 FILTERING RESULTS for query "${currentQuery}":`);
+        console.log(`   Original results: ${originalCount}`);
+        console.log(`   After filtering: ${filteredResults.length}`);
+        console.log(`   Filtered out: ${filteredOutCount}`);
+        console.log(`   Filtering rate: ${((filteredOutCount / originalCount) * 100).toFixed(1)}%`);
+        console.log(`   Rejection reasons:`);
+        Object.entries(rejectionReasons).forEach(([reason, count]) => {
+          console.log(`     ${reason}: ${count}`);
+        });
+        
         return {
           success: true,
           results: filteredResults,
@@ -301,7 +368,11 @@ export async function POST(request: Request) {
         for (const searchResult of result.results) {
           if (!urlSet.has(searchResult.url)) {
             urlSet.add(searchResult.url);
-            allResults.push(searchResult);
+            // IMPORTANT: Add query attribution to each result
+            allResults.push({
+              ...searchResult,
+              query: query // Track which query this result came from
+            });
           }
         }
       }
@@ -323,12 +394,83 @@ export async function POST(request: Request) {
       hasPreviousPage: pageNumber > 1
     };
 
+    // Store search results in traceability system if enabled
+    if (enableTraceability && searchSessionId) {
+      try {
+        // Prepare search results for storage
+        const searchResultsForStorage = allResults.map((result, index) => ({
+          searchSessionId: searchSessionId!,
+          position: result.position,
+          title: result.title,
+          url: result.url,
+          displayUrl: result.displayUrl,
+          description: result.description,
+          snippet: result.description, // Use description as snippet
+          cacheId: result.cacheId,
+          query: result.query, // This now properly tracks which query the result came from
+        }));
+
+        console.log(`📊 Storing ${searchResultsForStorage.length} search results with query attribution:`);
+        // Log query distribution
+        const queryDistribution = searchResultsForStorage.reduce((acc, result) => {
+          acc[result.query] = (acc[result.query] || 0) + 1;
+          return acc;
+        }, {} as Record<string, number>);
+        
+        Object.entries(queryDistribution).forEach(([query, count]) => {
+          console.log(`   Query "${query}": ${count} results`);
+        });
+
+        // Add search results to the session
+        await industrySearchTraceability.addSearchResults(searchSessionId, searchResultsForStorage);
+
+        // Complete the search session
+        const searchTime = (Date.now() - startTime) / 1000;
+        const successfulQueries = Object.values(queryResults).filter((q: any) => q.success).length;
+        
+        await industrySearchTraceability.completeSearchSession(
+          searchSessionId,
+          totalResults,
+          successfulQueries,
+          searchTime
+        );
+
+        console.log(`📊 Traceability: Stored ${totalResults} search results in session ${searchSessionId}`);
+      } catch (error) {
+        console.error('⚠️ Failed to store search results in traceability system:', error);
+      }
+    }
+
     console.log('Search completed successfully:', {
       totalQueries: searchQueries.length,
       successfulQueries: Object.values(queryResults).filter((q: any) => q.success).length,
       totalResults,
-      combinedResults: allResults.length
+      combinedResults: allResults.length,
+      traceabilitySessionId: searchSessionId
     });
+    
+    // Final debug summary
+    console.log(`\n🔍 FINAL SEARCH DEBUG SUMMARY:`);
+    console.log(`   Total queries processed: ${searchQueries.length}`);
+    console.log(`   Successful queries: ${Object.values(queryResults).filter((q: any) => q.success).length}`);
+    console.log(`   Total results before deduplication: ${totalResults}`);
+    console.log(`   Final unique results: ${allResults.length}`);
+    console.log(`   Deduplication rate: ${((totalResults - allResults.length) / totalResults * 100).toFixed(1)}%`);
+    
+    // Show query distribution
+    const queryDistribution = allResults.reduce((acc, result) => {
+      acc[result.query] = (acc[result.query] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    console.log(`   Query distribution:`);
+    Object.entries(queryDistribution).forEach(([query, count]) => {
+      console.log(`     "${query}": ${count} results`);
+    });
+    
+    if (searchSessionId) {
+      console.log(`   🔍 Traceability Session ID: ${searchSessionId}`);
+    }
 
     return NextResponse.json({
       success: true,
@@ -348,6 +490,15 @@ export async function POST(request: Request) {
         description: requireDateFiltering && maxAgeDays > 0 
           ? `Results limited to content published within the last ${maxAgeDays} days`
           : 'No date filtering applied'
+      },
+      // Add traceability information
+      traceability: enableTraceability ? {
+        enabled: true,
+        sessionId: searchSessionId,
+        resultsStored: totalResults,
+        queriesStored: searchQueries.length
+      } : {
+        enabled: false
       }
     });
 

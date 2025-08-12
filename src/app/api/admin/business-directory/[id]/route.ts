@@ -20,7 +20,7 @@ export async function GET(
     const business = await prisma.businessDirectory.findUnique({
       where: { id: businessId },
       include: {
-        contactPerson: {
+        contact_persons: {
           select: {
             id: true,
             firstName: true,
@@ -125,7 +125,7 @@ export async function PUT(
         isActive
       },
       include: {
-        contactPerson: {
+        contact_persons: {
           select: {
             id: true,
             firstName: true,

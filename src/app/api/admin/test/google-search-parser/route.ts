@@ -19,7 +19,8 @@ export async function POST(request: NextRequest) {
     const result = await googleSearchParser.run({
       searchResults,
       industry,
-      location: location || 'United States'
+      location: location || 'United States',
+      enableTraceability: false
     });
 
     console.log('✅ Google Search Parser Chain result:', result);

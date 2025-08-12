@@ -392,6 +392,10 @@ export async function processAndSaveSearchResults(
     categories?: string[]; // Changed from industry to categories
     minConfidence?: number;
     dryRun?: boolean;
+    enableTraceability?: boolean;
+    llmProcessingSessionId?: string;
+    searchSessionId?: string; // Add search session ID for traceability
+    searchResultIds?: string[]; // Add search result IDs for traceability
   } = {}
 ): Promise<SaveResult> {
   const { 
@@ -413,7 +417,11 @@ export async function processAndSaveSearchResults(
     // Process search results through the chain
     const parsedResults = await googleSearchParser.run({
       searchResults,
-      location
+      location,
+      enableTraceability: options.enableTraceability || false,
+      llmProcessingSessionId: options.llmProcessingSessionId,
+      searchSessionId: options.searchSessionId, // Pass search session ID for traceability
+      searchResultIds: options.searchResultIds // Pass search result IDs for traceability
     });
 
     console.log(`✅ Chain processed ${parsedResults.businesses.length} businesses`);
@@ -652,7 +660,7 @@ export async function searchBusinesses(query: string, options: {
       prisma.businessDirectory.findMany({
         where: finalWhere,
         include: {
-          contactPerson: {
+          contact_persons: {
             select: {
               id: true,
               firstName: true,

@@ -38,7 +38,7 @@ export async function GET(request: NextRequest) {
       include: {
         _count: {
           select: {
-            businesses: true
+            business_directory: true
           }
         }
       },

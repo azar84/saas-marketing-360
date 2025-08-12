@@ -1,0 +1,2278 @@
+
+
+=== 2025-08-11T21:55:33.526Z ===
+{
+  "timestamp": "2025-08-11T21:55:33.523Z",
+  "totalSearchResults": 30,
+  "llmResponse": {
+    "businesses": [
+      {
+        "website": "beckerdesign.ca",
+        "companyName": "Becker Design",
+        "isCompanyWebsite": true,
+        "confidence": 0.95,
+        "extractedFrom": "title",
+        "city": "Saskatoon",
+        "stateProvince": "SK",
+        "country": "Canada",
+        "categories": [
+          "Web Design",
+          "Digital Marketing"
+        ],
+        "rawData": {
+          "title": "Becker Design: Top Saskatoon Web Design Agency",
+          "link": "https://beckerdesign.ca/",
+          "snippet": "Becker Design & Media has been designing and developing custom websites and digital marketing strategies for 15+ years. In that time we've helped hundreds of ..."
+        }
+      },
+      {
+        "website": "zealmedia.ca",
+        "companyName": "Zeal Media Inc",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "city": "Saskatoon",
+        "stateProvince": "SK",
+        "country": "Canada",
+        "categories": [
+          "Web Design",
+          "SEO",
+          "Digital Marketing"
+        ],
+        "rawData": {
+          "title": "Saskatoon Web Design | SEO | Digital Marketing Agency | Zeal ...",
+          "link": "https://zealmedia.ca/city/saskatoon-web-design/",
+          "snippet": "Why Choose to Work with Zeal Media?"
+        }
+      },
+      {
+        "website": "yastech.ca",
+        "companyName": "YasTech",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "city": "Saskatoon",
+        "stateProvince": "SK",
+        "country": "Canada",
+        "categories": [
+          "Web Design",
+          "Software Development",
+          "Campground Booking System"
+        ],
+        "rawData": {
+          "title": "YasTech: Golf & Campground Web Design | Software Development",
+          "link": "https://www.yastech.ca/",
+          "snippet": "Let's Camp is Canada's top online campground booking system. Our trusted team also provides campground with effective websites to help market their business."
+        }
+      },
+      {
+        "website": "techbudgie.ca",
+        "companyName": "Tech Budgie",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "city": "Saskatchewan",
+        "stateProvince": "SK",
+        "country": "Canada",
+        "categories": [
+          "Web Design"
+        ],
+        "rawData": {
+          "title": "Best Web Design Company in Saskatchewan, Canada",
+          "link": "https://techbudgie.ca/best-web-design-company-in-saskatchewan-canada/",
+          "snippet": "Aug 10, 2024 ... Tech Budgie is the Best Web Design Company in Saskatchewan. We have 10 years of experience. 10+ Team members. Leader in web design in ..."
+        }
+      },
+      {
+        "website": "weareisland.com",
+        "companyName": "Island",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "city": "Saskatoon",
+        "stateProvince": "SK",
+        "country": "Canada",
+        "categories": [
+          "Website Design",
+          "Branding",
+          "Digital Marketing"
+        ],
+        "rawData": {
+          "title": "Website Design, Branding + Digital Marketing · Island - Saskatoon",
+          "link": "https://www.weareisland.com/",
+          "snippet": "Website design, branding, and digital marketing, with a focus on strategy and design. We're proudly 100% owned and located in Saskatoon, SK."
+        }
+      },
+      {
+        "website": "swantechnologies.ca",
+        "companyName": "Swan Technologies",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "city": "Prince Albert",
+        "stateProvince": "SK",
+        "country": "Canada",
+        "categories": [
+          "Website Design",
+          "Digital Marketing"
+        ],
+        "rawData": {
+          "title": "Website Design And Development Services | Prince Albert, SK",
+          "link": "https://www.swantechnologies.ca/website-design-development-services-prince-albert/",
+          "snippet": "Saskatchewan Digital Marketing Expertise. At Swan Technologies, we understand that even the best business owners may not always have the time or expertise to ..."
+        }
+      },
+      {
+        "website": "bluedotmarketing.ca",
+        "companyName": "Blue Dot Marketing",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "city": "Saskatoon",
+        "stateProvince": "SK",
+        "country": "Canada",
+        "categories": [
+          "Web Design"
+        ],
+        "rawData": {
+          "title": "Web Design Services in Canada | Canadian Web Design Agency",
+          "link": "https://bluedotmarketing.ca/web-design/",
+          "snippet": "Our expert web design team ensures that your brand is not only represented ... Saskatoon, SK S7P 0B6. info@bluedotmarketing.ca. 306-808-2587. British ..."
+        }
+      },
+      {
+        "website": "layerthree.ca",
+        "companyName": "Layer Three",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "city": "Saskatoon",
+        "stateProvince": "SK",
+        "country": "Canada",
+        "categories": [
+          "Web Design",
+          "SEO"
+        ],
+        "rawData": {
+          "title": "Web Design Saskatoon | Website Design Company Saskatoon",
+          "link": "https://layerthree.ca/web-design-and-development-in-saskatoon/",
+          "snippet": "Our affordable web design solutions are designed to deliver results. We'll create a website that's optimized for search engines, engaging for visitors, and ..."
+        }
+      },
+      {
+        "website": "brandrocket.ca",
+        "companyName": "Brandrocket",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "city": "Canada",
+        "stateProvince": "",
+        "country": "Canada",
+        "categories": [
+          "Web Design",
+          "Small Business Online Marketing"
+        ],
+        "rawData": {
+          "title": "Brandrocket Web Design Agency | SMB Online Marketing Experts",
+          "link": "https://brandrocket.ca/",
+          "snippet": "Affordable Web Design Services at your fingertips. Get what you need all in ... Brandrocket Web Design Agency is a Canada wide Small Business web design and ..."
+        }
+      },
+      {
+        "website": "mltscanada.ca",
+        "companyName": "MLTS Canada",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "city": "Saskatoon",
+        "stateProvince": "SK",
+        "country": "Canada",
+        "categories": [
+          "Website Development",
+          "SEO"
+        ],
+        "rawData": {
+          "title": "Website Development in Saskatoon | MLTS Canada",
+          "link": "https://www.mltscanada.ca/saskatoon-website-development-affordable-seo/",
+          "snippet": "Jun 3, 2025 ... We offer budget-friendly website development services in Saskatoon tailored for local businesses. Whether you're starting fresh, revamping an outdated site,"
+        }
+      },
+      {
+        "website": "canwebsteryeg.ca",
+        "companyName": "CanWebster",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "city": "Edmonton",
+        "stateProvince": "AB",
+        "country": "Canada",
+        "categories": [
+          "Web Design",
+          "Digital Solutions"
+        ],
+        "rawData": {
+          "title": "About – YEG CanWebster | Edmonton Web Design Services",
+          "link": "https://canwebsteryeg.ca/about/",
+          "snippet": "CanWebster is a proudly Canadian digital agency headquartered in Edmonton, Alberta, offering cutting-edge web design and digital solutions tailored for ..."
+        }
+      }
+    ],
+    "summary": {
+      "totalResults": 30,
+      "companyWebsites": 11,
+      "directories": 3,
+      "forms": 0,
+      "extractionQuality": 0.9
+    }
+  },
+  "individualProcessing": [
+    {
+      "businessIndex": 1,
+      "originalUrl": "https://beckerdesign.ca/",
+      "normalizedUrl": "beckerdesign.ca",
+      "title": "Becker Design: Top Saskatoon Web Design Agency",
+      "snippet": "Becker Design & Media has been designing and developing custom websites and digital marketing strategies for 15+ years. In that time we've helped hundreds of ...",
+      "llmExtraction": {
+        "companyName": "Becker Design",
+        "isCompanyWebsite": true,
+        "confidence": 0.95,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design",
+          "Digital Marketing"
+        ],
+        "city": "Saskatoon",
+        "stateProvince": "SK",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 2,
+      "originalUrl": "https://zealmedia.ca/city/saskatoon-web-design/",
+      "normalizedUrl": "zealmedia.ca",
+      "title": "Saskatoon Web Design | SEO | Digital Marketing Agency | Zeal ...",
+      "snippet": "Why Choose to Work with Zeal Media?",
+      "llmExtraction": {
+        "companyName": "Zeal Media Inc",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design",
+          "SEO",
+          "Digital Marketing"
+        ],
+        "city": "Saskatoon",
+        "stateProvince": "SK",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 3,
+      "originalUrl": "https://www.yastech.ca/",
+      "normalizedUrl": "yastech.ca",
+      "title": "YasTech: Golf & Campground Web Design | Software Development",
+      "snippet": "Let's Camp is Canada's top online campground booking system. Our trusted team also provides campground with effective websites to help market their business.",
+      "llmExtraction": {
+        "companyName": "YasTech",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design",
+          "Software Development",
+          "Campground Booking System"
+        ],
+        "city": "Saskatoon",
+        "stateProvince": "SK",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 4,
+      "originalUrl": "https://techbudgie.ca/best-web-design-company-in-saskatchewan-canada/",
+      "normalizedUrl": "techbudgie.ca",
+      "title": "Best Web Design Company in Saskatchewan, Canada",
+      "snippet": "Aug 10, 2024 ... Tech Budgie is the Best Web Design Company in Saskatchewan. We have 10 years of experience. 10+ Team members. Leader in web design in ...",
+      "llmExtraction": {
+        "companyName": "Tech Budgie",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design"
+        ],
+        "city": "Saskatchewan",
+        "stateProvince": "SK",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 5,
+      "originalUrl": "https://www.weareisland.com/",
+      "normalizedUrl": "weareisland.com",
+      "title": "Website Design, Branding + Digital Marketing · Island - Saskatoon",
+      "snippet": "Website design, branding, and digital marketing, with a focus on strategy and design. We're proudly 100% owned and located in Saskatoon, SK.",
+      "llmExtraction": {
+        "companyName": "Island",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "categories": [
+          "Website Design",
+          "Branding",
+          "Digital Marketing"
+        ],
+        "city": "Saskatoon",
+        "stateProvince": "SK",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 6,
+      "originalUrl": "https://www.swantechnologies.ca/website-design-development-services-prince-albert/",
+      "normalizedUrl": "swantechnologies.ca",
+      "title": "Website Design And Development Services | Prince Albert, SK",
+      "snippet": "Saskatchewan Digital Marketing Expertise. At Swan Technologies, we understand that even the best business owners may not always have the time or expertise to ...",
+      "llmExtraction": {
+        "companyName": "Swan Technologies",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "categories": [
+          "Website Design",
+          "Digital Marketing"
+        ],
+        "city": "Prince Albert",
+        "stateProvince": "SK",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 7,
+      "originalUrl": "https://bluedotmarketing.ca/web-design/",
+      "normalizedUrl": "bluedotmarketing.ca",
+      "title": "Web Design Services in Canada | Canadian Web Design Agency",
+      "snippet": "Our expert web design team ensures that your brand is not only represented ... Saskatoon, SK S7P 0B6. info@bluedotmarketing.ca. 306-808-2587. British ...",
+      "llmExtraction": {
+        "companyName": "Blue Dot Marketing",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design"
+        ],
+        "city": "Saskatoon",
+        "stateProvince": "SK",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 8,
+      "originalUrl": "https://layerthree.ca/web-design-and-development-in-saskatoon/",
+      "normalizedUrl": "layerthree.ca",
+      "title": "Web Design Saskatoon | Website Design Company Saskatoon",
+      "snippet": "Our affordable web design solutions are designed to deliver results. We'll create a website that's optimized for search engines, engaging for visitors, and ...",
+      "llmExtraction": {
+        "companyName": "Layer Three",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design",
+          "SEO"
+        ],
+        "city": "Saskatoon",
+        "stateProvince": "SK",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 9,
+      "originalUrl": "https://brandrocket.ca/",
+      "normalizedUrl": "brandrocket.ca",
+      "title": "Brandrocket Web Design Agency | SMB Online Marketing Experts",
+      "snippet": "Affordable Web Design Services at your fingertips. Get what you need all in ... Brandrocket Web Design Agency is a Canada wide Small Business web design and ...",
+      "llmExtraction": {
+        "companyName": "Brandrocket",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design",
+          "Small Business Online Marketing"
+        ],
+        "city": "Canada",
+        "stateProvince": "N/A",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 10,
+      "originalUrl": "https://www.mltscanada.ca/saskatoon-website-development-affordable-seo/",
+      "normalizedUrl": "mltscanada.ca",
+      "title": "Website Development in Saskatoon | MLTS Canada",
+      "snippet": "Jun 3, 2025 ... We offer budget-friendly website development services in Saskatoon tailored for local businesses. Whether you're starting fresh, revamping an outdated site,",
+      "llmExtraction": {
+        "companyName": "MLTS Canada",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "categories": [
+          "Website Development",
+          "SEO"
+        ],
+        "city": "Saskatoon",
+        "stateProvince": "SK",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 11,
+      "originalUrl": "https://canwebsteryeg.ca/about/",
+      "normalizedUrl": "canwebsteryeg.ca",
+      "title": "About – YEG CanWebster | Edmonton Web Design Services",
+      "snippet": "CanWebster is a proudly Canadian digital agency headquartered in Edmonton, Alberta, offering cutting-edge web design and digital solutions tailored for ...",
+      "llmExtraction": {
+        "companyName": "CanWebster",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design",
+          "Digital Solutions"
+        ],
+        "city": "Edmonton",
+        "stateProvince": "AB",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    }
+  ]
+}
+
+
+=== 2025-08-11T21:56:33.398Z ===
+{
+  "timestamp": "2025-08-11T21:56:33.397Z",
+  "totalSearchResults": 30,
+  "llmResponse": {
+    "businesses": [
+      {
+        "website": "beckerdesign.ca",
+        "companyName": "Becker Design",
+        "isCompanyWebsite": true,
+        "confidence": 0.95,
+        "extractedFrom": "title",
+        "city": "Saskatoon",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada",
+        "categories": [
+          "Web Design",
+          "Digital Marketing"
+        ],
+        "rawData": {
+          "title": "Becker Design: Top Saskatoon Web Design Agency",
+          "link": "https://beckerdesign.ca/",
+          "snippet": "Becker Design & Media has been designing and developing custom websites and digital marketing strategies for 15+ years. In that time we've helped hundreds of ..."
+        }
+      },
+      {
+        "website": "zealmedia.ca",
+        "companyName": "Zeal Media",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "city": "Saskatoon",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada",
+        "categories": [
+          "Web Design",
+          "SEO",
+          "Digital Marketing"
+        ],
+        "rawData": {
+          "title": "Saskatoon Web Design | SEO | Digital Marketing Agency | Zeal ...",
+          "link": "https://zealmedia.ca/city/saskatoon-web-design/",
+          "snippet": "Why Choose to Work with Zeal Media?"
+        }
+      },
+      {
+        "website": "yastech.ca",
+        "companyName": "YasTech",
+        "isCompanyWebsite": true,
+        "confidence": 0.85,
+        "extractedFrom": "title",
+        "city": "Saskatoon",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada",
+        "categories": [
+          "Web Design",
+          "Software Development"
+        ],
+        "rawData": {
+          "title": "YasTech: Golf & Campground Web Design | Software Development",
+          "link": "https://www.yastech.ca/",
+          "snippet": "Let's Camp is Canada's top online campground booking system. Our trusted team also provides campground with effective websites to help market their business."
+        }
+      },
+      {
+        "website": "techbudgie.ca",
+        "companyName": "Tech Budgie",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "city": "Saskatchewan",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada",
+        "categories": [
+          "Web Design"
+        ],
+        "rawData": {
+          "title": "Best Web Design Company in Saskatchewan, Canada",
+          "link": "https://techbudgie.ca/best-web-design-company-in-saskatchewan-canada/",
+          "snippet": "Aug 10, 2024 ... Tech Budgie is the Best Web Design Company in Saskatchewan. We have 10 years of experience. 10+ Team members. Leader in web design in ..."
+        }
+      },
+      {
+        "website": "weareisland.com",
+        "companyName": "Island",
+        "isCompanyWebsite": true,
+        "confidence": 0.95,
+        "extractedFrom": "title",
+        "city": "Saskatoon",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada",
+        "categories": [
+          "Web Design",
+          "Branding",
+          "Digital Marketing"
+        ],
+        "rawData": {
+          "title": "Website Design, Branding + Digital Marketing · Island - Saskatoon",
+          "link": "https://www.weareisland.com/",
+          "snippet": "Website design, branding, and digital marketing, with a focus on strategy and design. We're proudly 100% owned and located in Saskatoon, SK."
+        }
+      },
+      {
+        "website": "swantechnologies.ca",
+        "companyName": "Swan Technologies",
+        "isCompanyWebsite": true,
+        "confidence": 0.85,
+        "extractedFrom": "title",
+        "city": "Prince Albert",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada",
+        "categories": [
+          "Web Design",
+          "Digital Marketing"
+        ],
+        "rawData": {
+          "title": "Website Design And Development Services | Prince Albert, SK",
+          "link": "https://www.swantechnologies.ca/website-design-development-services-prince-albert/",
+          "snippet": "Saskatchewan Digital Marketing Expertise. At Swan Technologies, we understand that even the best business owners may not always have the time or expertise to ..."
+        }
+      },
+      {
+        "website": "bluedotmarketing.ca",
+        "companyName": "Blue Dot Marketing",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "city": "Saskatoon",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada",
+        "categories": [
+          "Web Design"
+        ],
+        "rawData": {
+          "title": "Web Design Services in Canada | Canadian Web Design Agency",
+          "link": "https://bluedotmarketing.ca/web-design/",
+          "snippet": "Our expert web design team ensures that your brand is not only represented ... Saskatoon, SK S7P 0B6. info@bluedotmarketing.ca. 306-808-2587. British ..."
+        }
+      },
+      {
+        "website": "layerthree.ca",
+        "companyName": "Layer Three",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "city": "Saskatoon",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada",
+        "categories": [
+          "Web Design",
+          "SEO"
+        ],
+        "rawData": {
+          "title": "Web Design Saskatoon | Website Design Company Saskatoon",
+          "link": "https://layerthree.ca/web-design-and-development-in-saskatoon/",
+          "snippet": "Our affordable web design solutions are designed to deliver results. We'll create a website that's optimized for search engines, engaging for visitors, and ..."
+        }
+      },
+      {
+        "website": "brandrocket.ca",
+        "companyName": "Brandrocket",
+        "isCompanyWebsite": true,
+        "confidence": 0.85,
+        "extractedFrom": "title",
+        "city": "Canada",
+        "stateProvince": "",
+        "country": "Canada",
+        "categories": [
+          "Web Design",
+          "Online Marketing"
+        ],
+        "rawData": {
+          "title": "Brandrocket Web Design Agency | SMB Online Marketing Experts",
+          "link": "https://brandrocket.ca/",
+          "snippet": "Affordable Web Design Services at your fingertips. Get what you need all in ... Brandrocket Web Design Agency is a Canada wide Small Business web design and ..."
+        }
+      },
+      {
+        "website": "mltscanada.ca",
+        "companyName": "MLTS Canada",
+        "isCompanyWebsite": true,
+        "confidence": 0.85,
+        "extractedFrom": "title",
+        "city": "Saskatoon",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada",
+        "categories": [
+          "Web Design",
+          "SEO"
+        ],
+        "rawData": {
+          "title": "Website Development in Saskatoon | MLTS Canada",
+          "link": "https://www.mltscanada.ca/saskatoon-website-development-affordable-seo/",
+          "snippet": "Jun 3, 2025 ... We offer budget-friendly website development services in Saskatoon tailored for local businesses. Whether you're starting fresh, revamping an outdated site,"
+        }
+      }
+    ],
+    "summary": {
+      "totalResults": 30,
+      "companyWebsites": 10,
+      "directories": 3,
+      "forms": 0,
+      "extractionQuality": 0.9
+    }
+  },
+  "individualProcessing": [
+    {
+      "businessIndex": 1,
+      "originalUrl": "https://beckerdesign.ca/",
+      "normalizedUrl": "beckerdesign.ca",
+      "title": "Becker Design: Top Saskatoon Web Design Agency",
+      "snippet": "Becker Design & Media has been designing and developing custom websites and digital marketing strategies for 15+ years. In that time we've helped hundreds of ...",
+      "llmExtraction": {
+        "companyName": "Becker Design",
+        "isCompanyWebsite": true,
+        "confidence": 0.95,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design",
+          "Digital Marketing"
+        ],
+        "city": "Saskatoon",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 2,
+      "originalUrl": "https://zealmedia.ca/city/saskatoon-web-design/",
+      "normalizedUrl": "zealmedia.ca",
+      "title": "Saskatoon Web Design | SEO | Digital Marketing Agency | Zeal ...",
+      "snippet": "Why Choose to Work with Zeal Media?",
+      "llmExtraction": {
+        "companyName": "Zeal Media",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design",
+          "SEO",
+          "Digital Marketing"
+        ],
+        "city": "Saskatoon",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 3,
+      "originalUrl": "https://www.yastech.ca/",
+      "normalizedUrl": "yastech.ca",
+      "title": "YasTech: Golf & Campground Web Design | Software Development",
+      "snippet": "Let's Camp is Canada's top online campground booking system. Our trusted team also provides campground with effective websites to help market their business.",
+      "llmExtraction": {
+        "companyName": "YasTech",
+        "isCompanyWebsite": true,
+        "confidence": 0.85,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design",
+          "Software Development"
+        ],
+        "city": "Saskatoon",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 4,
+      "originalUrl": "https://techbudgie.ca/best-web-design-company-in-saskatchewan-canada/",
+      "normalizedUrl": "techbudgie.ca",
+      "title": "Best Web Design Company in Saskatchewan, Canada",
+      "snippet": "Aug 10, 2024 ... Tech Budgie is the Best Web Design Company in Saskatchewan. We have 10 years of experience. 10+ Team members. Leader in web design in ...",
+      "llmExtraction": {
+        "companyName": "Tech Budgie",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design"
+        ],
+        "city": "Saskatchewan",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 5,
+      "originalUrl": "https://www.weareisland.com/",
+      "normalizedUrl": "weareisland.com",
+      "title": "Website Design, Branding + Digital Marketing · Island - Saskatoon",
+      "snippet": "Website design, branding, and digital marketing, with a focus on strategy and design. We're proudly 100% owned and located in Saskatoon, SK.",
+      "llmExtraction": {
+        "companyName": "Island",
+        "isCompanyWebsite": true,
+        "confidence": 0.95,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design",
+          "Branding",
+          "Digital Marketing"
+        ],
+        "city": "Saskatoon",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 6,
+      "originalUrl": "https://www.swantechnologies.ca/website-design-development-services-prince-albert/",
+      "normalizedUrl": "swantechnologies.ca",
+      "title": "Website Design And Development Services | Prince Albert, SK",
+      "snippet": "Saskatchewan Digital Marketing Expertise. At Swan Technologies, we understand that even the best business owners may not always have the time or expertise to ...",
+      "llmExtraction": {
+        "companyName": "Swan Technologies",
+        "isCompanyWebsite": true,
+        "confidence": 0.85,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design",
+          "Digital Marketing"
+        ],
+        "city": "Prince Albert",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 7,
+      "originalUrl": "https://bluedotmarketing.ca/web-design/",
+      "normalizedUrl": "bluedotmarketing.ca",
+      "title": "Web Design Services in Canada | Canadian Web Design Agency",
+      "snippet": "Our expert web design team ensures that your brand is not only represented ... Saskatoon, SK S7P 0B6. info@bluedotmarketing.ca. 306-808-2587. British ...",
+      "llmExtraction": {
+        "companyName": "Blue Dot Marketing",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design"
+        ],
+        "city": "Saskatoon",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 8,
+      "originalUrl": "https://layerthree.ca/web-design-and-development-in-saskatoon/",
+      "normalizedUrl": "layerthree.ca",
+      "title": "Web Design Saskatoon | Website Design Company Saskatoon",
+      "snippet": "Our affordable web design solutions are designed to deliver results. We'll create a website that's optimized for search engines, engaging for visitors, and ...",
+      "llmExtraction": {
+        "companyName": "Layer Three",
+        "isCompanyWebsite": true,
+        "confidence": 0.9,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design",
+          "SEO"
+        ],
+        "city": "Saskatoon",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 9,
+      "originalUrl": "https://brandrocket.ca/",
+      "normalizedUrl": "brandrocket.ca",
+      "title": "Brandrocket Web Design Agency | SMB Online Marketing Experts",
+      "snippet": "Affordable Web Design Services at your fingertips. Get what you need all in ... Brandrocket Web Design Agency is a Canada wide Small Business web design and ...",
+      "llmExtraction": {
+        "companyName": "Brandrocket",
+        "isCompanyWebsite": true,
+        "confidence": 0.85,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design",
+          "Online Marketing"
+        ],
+        "city": "Canada",
+        "stateProvince": "N/A",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    },
+    {
+      "businessIndex": 10,
+      "originalUrl": "https://www.mltscanada.ca/saskatoon-website-development-affordable-seo/",
+      "normalizedUrl": "mltscanada.ca",
+      "title": "Website Development in Saskatoon | MLTS Canada",
+      "snippet": "Jun 3, 2025 ... We offer budget-friendly website development services in Saskatoon tailored for local businesses. Whether you're starting fresh, revamping an outdated site,",
+      "llmExtraction": {
+        "companyName": "MLTS Canada",
+        "isCompanyWebsite": true,
+        "confidence": 0.85,
+        "extractedFrom": "title",
+        "categories": [
+          "Web Design",
+          "SEO"
+        ],
+        "city": "Saskatoon",
+        "stateProvince": "Saskatchewan",
+        "country": "Canada"
+      },
+      "processing": {
+        "status": "accepted",
+        "reason": "High confidence company website",
+        "confidenceThreshold": 0.5
+      }
+    }
+  ]
+}
+
+
+=== 2025-08-12T04:36:26.622Z ===
+{
+  "timestamp": "2025-08-12T04:36:26.622Z",
+  "totalSearchResults": 9,
+  "location": "Toronto",
+  "processingDetails": [
+    {
+      "url": "https://www.acclaimedfurnace.com/",
+      "processingTime": 13.102,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.romaniukheatingac.com/",
+      "processingTime": 12.175,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.prosolutionsinc.ca/edmonton/cooling/ac-repair/",
+      "processingTime": 12.338,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.johnsoncontrols.com/",
+      "processingTime": 12.352,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.goodmanmfg.com/",
+      "processingTime": 12.658,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://reliancehomecomfort.com/edmonton/",
+      "processingTime": 12.831,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://friesens.ca/services/air-conditioning/emergency-ac-repair/",
+      "processingTime": 12.742,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://reliancehomecomfort.com/edmonton/air-conditioning/air-conditioner-repair/",
+      "processingTime": 12.274,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.lennox.com/residential/locate/",
+      "processingTime": 12.157,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 9,
+    "accepted": 9,
+    "rejected": 0,
+    "uniqueBusinesses": 8,
+    "companyWebsites": 8,
+    "directories": 0,
+    "extractionQuality": 1
+  }
+}
+
+
+=== 2025-08-12T04:37:04.046Z ===
+{
+  "timestamp": "2025-08-12T04:37:04.046Z",
+  "totalSearchResults": 9,
+  "location": "Toronto",
+  "processingDetails": [
+    {
+      "url": "https://www.acclaimedfurnace.com/",
+      "processingTime": 12.697,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.romaniukheatingac.com/",
+      "processingTime": 12.182,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.prosolutionsinc.ca/edmonton/cooling/ac-repair/",
+      "processingTime": 11.758,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.johnsoncontrols.com/",
+      "processingTime": 12.768,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.goodmanmfg.com/",
+      "processingTime": 12.265,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://reliancehomecomfort.com/edmonton/",
+      "processingTime": 11.839,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://friesens.ca/services/air-conditioning/emergency-ac-repair/",
+      "processingTime": 11.847,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://reliancehomecomfort.com/edmonton/air-conditioning/air-conditioner-repair/",
+      "processingTime": 12.157,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.lennox.com/residential/locate/",
+      "processingTime": 11.649,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 9,
+    "accepted": 9,
+    "rejected": 0,
+    "uniqueBusinesses": 8,
+    "companyWebsites": 8,
+    "directories": 0,
+    "extractionQuality": 1
+  }
+}
+
+
+=== 2025-08-12T04:39:24.825Z ===
+{
+  "timestamp": "2025-08-12T04:39:24.825Z",
+  "totalSearchResults": 9,
+  "location": "Toronto",
+  "processingDetails": [
+    {
+      "url": "https://www.acclaimedfurnace.com/",
+      "processingTime": 12.384,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.romaniukheatingac.com/",
+      "processingTime": 12.183,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.prosolutionsinc.ca/edmonton/cooling/ac-repair/",
+      "processingTime": 12.651,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.johnsoncontrols.com/",
+      "processingTime": 13.018,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.goodmanmfg.com/",
+      "processingTime": 12.493,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://reliancehomecomfort.com/edmonton/",
+      "processingTime": 13.818,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://friesens.ca/services/air-conditioning/emergency-ac-repair/",
+      "processingTime": 12.486,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://reliancehomecomfort.com/edmonton/air-conditioning/air-conditioner-repair/",
+      "processingTime": 12.282,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.lennox.com/residential/locate/",
+      "processingTime": 12.636,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 9,
+    "accepted": 9,
+    "rejected": 0,
+    "uniqueBusinesses": 8,
+    "companyWebsites": 8,
+    "directories": 0,
+    "extractionQuality": 1
+  }
+}
+
+
+=== 2025-08-12T04:39:41.972Z ===
+{
+  "timestamp": "2025-08-12T04:39:41.972Z",
+  "totalSearchResults": 8,
+  "location": "Saskatoon",
+  "processingDetails": [
+    {
+      "url": "https://www.gibbonheating.com/",
+      "processingTime": 15.931,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://reliancehomecomfort.com/saskatoon/",
+      "processingTime": 14.864,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.furnaceguys.com/",
+      "processingTime": 14.731,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.goodmanmfg.com/",
+      "processingTime": 20.376,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.aircanada.com/home/us/en/aco/flights",
+      "processingTime": 11.058,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.aircanada.com/cargo/",
+      "processingTime": 11.68,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.excelsiormechanical.com/air-conditioning-maintenance",
+      "processingTime": 12.589,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.johnsoncontrols.com/",
+      "processingTime": 12.287,
+      "status": "accepted",
+      "confidence": 1
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 8,
+    "accepted": 8,
+    "rejected": 0,
+    "uniqueBusinesses": 7,
+    "companyWebsites": 7,
+    "directories": 0,
+    "extractionQuality": 1
+  }
+}
+
+
+=== 2025-08-12T04:40:01.386Z ===
+{
+  "timestamp": "2025-08-12T04:40:01.386Z",
+  "totalSearchResults": 9,
+  "location": "Toronto",
+  "processingDetails": [
+    {
+      "url": "https://www.acclaimedfurnace.com/",
+      "processingTime": 12.836,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.romaniukheatingac.com/",
+      "processingTime": 12.281,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.prosolutionsinc.ca/edmonton/cooling/ac-repair/",
+      "processingTime": 13.067,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.johnsoncontrols.com/",
+      "processingTime": 12.789,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.goodmanmfg.com/",
+      "processingTime": 12.28,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://reliancehomecomfort.com/edmonton/",
+      "processingTime": 12.693,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://friesens.ca/services/air-conditioning/emergency-ac-repair/",
+      "processingTime": 12.487,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://reliancehomecomfort.com/edmonton/air-conditioning/air-conditioner-repair/",
+      "processingTime": 11.858,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.lennox.com/residential/locate/",
+      "processingTime": 11.821,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 9,
+    "accepted": 9,
+    "rejected": 0,
+    "uniqueBusinesses": 8,
+    "companyWebsites": 8,
+    "directories": 0,
+    "extractionQuality": 1
+  }
+}
+
+
+=== 2025-08-12T04:42:25.021Z ===
+{
+  "timestamp": "2025-08-12T04:42:25.020Z",
+  "totalSearchResults": 8,
+  "industry": "AC Maintenance",
+  "location": "Saskatoon",
+  "processingDetails": [
+    {
+      "url": "https://www.gibbonheating.com/",
+      "processingTime": 13.17,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://reliancehomecomfort.com/saskatoon/",
+      "processingTime": 13.575,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.furnaceguys.com/",
+      "processingTime": 16.917,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.goodmanmfg.com/",
+      "processingTime": 11.694,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.aircanada.com/home/us/en/aco/flights",
+      "processingTime": 11.674,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.aircanada.com/cargo/",
+      "processingTime": 11.118,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.excelsiormechanical.com/air-conditioning-maintenance",
+      "processingTime": 12.64,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.johnsoncontrols.com/",
+      "processingTime": 13.131,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 8,
+    "accepted": 8,
+    "rejected": 0,
+    "uniqueBusinesses": 7,
+    "companyWebsites": 7,
+    "directories": 0,
+    "extractionQuality": 1
+  }
+}
+
+
+=== 2025-08-12T05:05:19.365Z ===
+{
+  "timestamp": "2025-08-12T05:05:19.365Z",
+  "totalSearchResults": 16,
+  "location": "Vancouver",
+  "processingDetails": [
+    {
+      "url": "https://reliancehomecomfort.com/vancouver/",
+      "processingTime": 14.273,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://atmosphereac.ca/",
+      "processingTime": 11.988,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.fluor.com/",
+      "processingTime": 12.29,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.aircanada.com/home/us/en/aco/flights",
+      "processingTime": 12.288,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.goodmanmfg.com/",
+      "processingTime": 12.288,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.aircanada.com/ca/en/aco/home/fly/onboard/cabin-features/signature-service.html",
+      "processingTime": 13.422,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.callashton.com/air-conditioning-repair/",
+      "processingTime": 13.506,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.johnsoncontrols.com/",
+      "processingTime": 13.722,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.callashton.com/hvac-services/air-conditioning-maintenance/",
+      "processingTime": 12.287,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://pawlikautomotive.com/2014-bmw-i3-ac-repair/",
+      "processingTime": 13.058,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://westernpacifichvac.com/ac-maintenance-vancouver-bc/",
+      "processingTime": 12.952,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.goodmanmfg.com/",
+      "processingTime": 12.623,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.callrevival.com/ac-repair-vancouver-wa/",
+      "processingTime": 12.483,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.aircanada.com/home/us/en/aco/flights",
+      "processingTime": 11.942,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://parisservicegroup.com/service/ac-maintenance-north-vancouver-bc/",
+      "processingTime": 13.527,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://papaplumbing.ca/ac-repair-vancouver/",
+      "processingTime": 15.311,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 16,
+    "accepted": 16,
+    "rejected": 0,
+    "uniqueBusinesses": 12,
+    "companyWebsites": 12,
+    "directories": 0,
+    "extractionQuality": 1
+  }
+}
+
+
+=== 2025-08-12T05:28:40.186Z ===
+{
+  "timestamp": "2025-08-12T05:28:40.186Z",
+  "totalSearchResults": 18,
+  "location": "New York",
+  "processingDetails": [
+    {
+      "url": "https://figliasons.com/",
+      "processingTime": 12.356,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://donnellymech.com/",
+      "processingTime": 10.289,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.yelp.com/search?find_desc=Hvac+Maintenance&find_loc=New+York%2C+NY",
+      "processingTime": 11.641,
+      "status": "rejected",
+      "confidence": 1
+    },
+    {
+      "url": "https://otda.ny.gov/programs/heap/",
+      "processingTime": 10.444,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://portal.311.nyc.gov/article/?kanumber=KA-01074",
+      "processingTime": 11.197,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.americareappliance.com/hvac-services/ac-repair-maintenance/",
+      "processingTime": 11.057,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://dos.ny.gov/form-corporation-or-business",
+      "processingTime": 9.434,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.nyserda.ny.gov/PutEnergyToWork/Energy-Program-and-Incentives/Heating-Cooling-Ventilation-Programs-and-Incentives",
+      "processingTime": 11.996,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://aristair.com/",
+      "processingTime": 11.644,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.mta.info/",
+      "processingTime": 11.577,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.isaacheating.com/",
+      "processingTime": 12.596,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://locations.abm.com/ny/newyork/hvac-services-newyork-ny-1411.html",
+      "processingTime": 11.519,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.afgo.com/",
+      "processingTime": 11.887,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://weberandgrahn.com/air-conditioning-repair-ac-repair-southhampton-ny/",
+      "processingTime": 12.572,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://portal.311.nyc.gov/",
+      "processingTime": 10.708,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.nyserda.ny.gov/PutEnergyToWork/Energy-Program-and-Incentives/Heating-Cooling-Ventilation-Programs-and-Incentives",
+      "processingTime": 12.702,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://emcorservicesnynj.com/",
+      "processingTime": 10.7,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://opwdd.ny.gov/procurement-opportunities",
+      "processingTime": 11.522,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 18,
+    "accepted": 15,
+    "rejected": 3,
+    "uniqueBusinesses": 16,
+    "companyWebsites": 13,
+    "directories": 3,
+    "extractionQuality": 0.8333333333333334
+  }
+}
+
+
+=== 2025-08-12T05:36:19.887Z ===
+{
+  "timestamp": "2025-08-12T05:36:19.887Z",
+  "totalSearchResults": 16,
+  "location": "Burwash",
+  "processingDetails": [
+    {
+      "url": "https://iskconnews.org/eternal-gratitude-for-peter-burwash-1946-2022/",
+      "processingTime": 10.536,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://wildlife.onlinelibrary.wiley.com/doi/10.1002/jwmg.22184",
+      "processingTime": 10.439,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://iskconnews.org/peter-burwash-tennis-star-entrepreneur-and-friend-of-iskcon-passes-on/",
+      "processingTime": 10.967,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.jtcvstechniques.org/article/S2666-2507(23)00412-1/fulltext",
+      "processingTime": 11.368,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7792268/",
+      "processingTime": 10.936,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.vic.utoronto.ca/current-students/campus-life/residence-life",
+      "processingTime": 10.44,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC12272441/",
+      "processingTime": 10.194,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.amazon.com/Peter-Burwashs-Tennis-Life-Burwash/dp/0812909526",
+      "processingTime": 9.932,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.valleywatertreatment.ca/",
+      "processingTime": 10.64,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.ecrjournal.com/articles/echocardiographic-evaluation-aortic-stenosis-normal-flow-and-low-flow-scenarios?language_content_entity=en",
+      "processingTime": 10.907,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.horsejournals.com/popular/rescue-welfare/brooke-usa-honours-world-war-one-horse-heroes-helping-todays-working-equines",
+      "processingTime": 11.092,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://echo.biomedcentral.com/articles/10.1530/ERP-19-0041",
+      "processingTime": 11.026,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.ahajournals.org/doi/10.1161/CIR.0000000000000923",
+      "processingTime": 9.887,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.sciencedirect.com/science/article/pii/S2666250723004121",
+      "processingTime": 9.776,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://publications.gc.ca/collections/collection_2015/bcp-pco/CP32-31-1977-eng.pdf",
+      "processingTime": 10.253,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.ksvadvisory.com/docs/default-source/insolvency-case-documents/alphabow/noi-proceedings/notices/alpha---list-of-creditors-as-at-march-27-2024.pdf?sfvrsn=89d5b9dd_5",
+      "processingTime": 12.216,
+      "status": "rejected",
+      "confidence": 0.7
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 16,
+    "accepted": 3,
+    "rejected": 13,
+    "uniqueBusinesses": 15,
+    "companyWebsites": 3,
+    "directories": 12,
+    "extractionQuality": 0.1875
+  }
+}
+
+
+=== 2025-08-12T05:51:43.668Z ===
+{
+  "timestamp": "2025-08-12T05:51:43.667Z",
+  "totalSearchResults": 15,
+  "location": "Hampton",
+  "processingDetails": [
+    {
+      "url": "https://www.abm.com/",
+      "processingTime": 13.063,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://kearneyandsons.com/",
+      "processingTime": 11.925,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.homedepot.com/c/ab/hampton-bay-customer-service/9ba683603be9fa5395fab9013e2f681f",
+      "processingTime": 13.815,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.serviceexperts.com/",
+      "processingTime": 15.676,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.homedepot.com/services/l/va/hampton/heating-air-conditioning-repair/673dcc2c8",
+      "processingTime": 13.121,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "http://www.dominionenergy.com/en/",
+      "processingTime": 11.557,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.aireserv.com/long-island-east-end/",
+      "processingTime": 14.201,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.marriott.com/default.mi",
+      "processingTime": 13.257,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.midas.com/",
+      "processingTime": 14.534,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.aireserv.com/huntsville/geo/hampton-cove/",
+      "processingTime": 12.902,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.yelp.com/search?cflt=homeappliancerepair&find_loc=Hampton+Bays%2C+NY",
+      "processingTime": 13.46,
+      "status": "rejected",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.pepboys.com/",
+      "processingTime": 12.146,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.emc-co.com/",
+      "processingTime": 11.893,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://blinkcharging.com/",
+      "processingTime": 12.598,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://acmasters.com/space-heater-safety/",
+      "processingTime": 13.803,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 15,
+    "accepted": 14,
+    "rejected": 1,
+    "uniqueBusinesses": 13,
+    "companyWebsites": 12,
+    "directories": 1,
+    "extractionQuality": 0.9333333333333333
+  }
+}
+
+
+=== 2025-08-12T06:01:56.643Z ===
+{
+  "timestamp": "2025-08-12T06:01:56.643Z",
+  "totalSearchResults": 13,
+  "location": "Hampton, Canada",
+  "processingDetails": [
+    {
+      "url": "https://www.abm.com/",
+      "processingTime": 9.628,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://kearneyandsons.com/",
+      "processingTime": 9.379,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.homedepot.com/c/ab/hampton-bay-customer-service/9ba683603be9fa5395fab9013e2f681f",
+      "processingTime": 10.177,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.aireserv.com/huntsville/geo/hampton-cove/",
+      "processingTime": 9.634,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.serviceexperts.com/",
+      "processingTime": 9.107,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.hamptonsquality.com/apply-for-employment/",
+      "processingTime": 10.011,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.homedepot.com/services/l/va/hampton/heating-air-conditioning-repair/673dcc2c8",
+      "processingTime": 9.83,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "http://www.dominionenergy.com/en/",
+      "processingTime": 9.215,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.aireserv.com/long-island-east-end/",
+      "processingTime": 10.536,
+      "status": "accepted",
+      "confidence": 0.9
+    },
+    {
+      "url": "https://www.marriott.com/default.mi",
+      "processingTime": 9.81,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.trane.com/residential/en/find-a-dealer/virginia/hampton/",
+      "processingTime": 9.91,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.midas.com/",
+      "processingTime": 11.108,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.americanstandardair.com/find-a-dealer/virginia/hampton/",
+      "processingTime": 9.741,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 13,
+    "accepted": 13,
+    "rejected": 0,
+    "uniqueBusinesses": 11,
+    "companyWebsites": 11,
+    "directories": 0,
+    "extractionQuality": 1
+  }
+}
+
+
+=== 2025-08-12T06:31:29.547Z ===
+{
+  "timestamp": "2025-08-12T06:31:29.547Z",
+  "totalSearchResults": 8,
+  "location": "Oakville",
+  "processingDetails": [
+    {
+      "url": "https://reliancehomecomfort.com/oakville/",
+      "processingTime": 13.074,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.enercare.ca/locations/oakville",
+      "processingTime": 11.328,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://lghomecomfort.ca/locations/oakville/",
+      "processingTime": 11.556,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.applebysystems.ca/",
+      "processingTime": 12.356,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://canadaenergysolution.ca/best-air-conditioner-installation-oakville/",
+      "processingTime": 12.088,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.evamcanada.com/blog/diy-air-conditioning/what-you-need-to-know-about-air-conditioning-repair-services/",
+      "processingTime": 12.681,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://a1air.ca/",
+      "processingTime": 12.693,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://naylorbp.com/",
+      "processingTime": 11.149,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 8,
+    "accepted": 8,
+    "rejected": 0,
+    "uniqueBusinesses": 8,
+    "companyWebsites": 8,
+    "directories": 0,
+    "extractionQuality": 1
+  }
+}
+
+
+=== 2025-08-12T06:48:43.628Z ===
+{
+  "timestamp": "2025-08-12T06:48:43.626Z",
+  "totalSearchResults": 15,
+  "location": "Iqaluit",
+  "processingDetails": [
+    {
+      "url": "https://www.aircanada.com/home/us/en/aco/flights",
+      "processingTime": 11.462,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.canada.ca/en/environment-climate-change/services/ice-forecasts-observations/latest-conditions.html",
+      "processingTime": 13.927,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.aircanada.com/cargo/",
+      "processingTime": 12.187,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.arcticcollege.com/",
+      "processingTime": 12.162,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://psacunion.ca/",
+      "processingTime": 11.101,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://tc.canada.ca/en/aviation/general-operating-flight-rules/flying-canada-what-you-need-know-tp-15048",
+      "processingTime": 14.393,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6467661/",
+      "processingTime": 11.066,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.northwest.ca/about-us/operations",
+      "processingTime": 12.823,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.nccig.ca/about-ncc-development/",
+      "processingTime": 11.835,
+      "status": "accepted",
+      "confidence": 0.9
+    },
+    {
+      "url": "https://www.tsb.gc.ca/eng/rapports-reports/aviation/2011/a11h0002/a11h0002.html",
+      "processingTime": 13.458,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://arcticreview.no/index.php/arctic/article/download/5455/8705?inline=1",
+      "processingTime": 12.536,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.merx.com/public/solicitations/produits-electriques-et-electroniques-10006?pageNumber=3",
+      "processingTime": 13.086,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://flyeia.com/flights/arrivals/",
+      "processingTime": 14.228,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.northwest.ca/careers",
+      "processingTime": 13.401,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.rec-cer.gc.ca/en/data-analysis/energy-commodities/electricity/report/archive/solar-power-economics/economics-solar-power-in-canada-appendix-methods.html",
+      "processingTime": 15.149,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 15,
+    "accepted": 11,
+    "rejected": 4,
+    "uniqueBusinesses": 13,
+    "companyWebsites": 9,
+    "directories": 4,
+    "extractionQuality": 0.7333333333333333
+  }
+}
+
+
+=== 2025-08-12T06:54:37.026Z ===
+{
+  "timestamp": "2025-08-12T06:54:37.025Z",
+  "totalSearchResults": 8,
+  "location": "Saskatoon",
+  "processingDetails": [
+    {
+      "url": "https://www.gibbonheating.com/",
+      "processingTime": 14.19,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://reliancehomecomfort.com/saskatoon/",
+      "processingTime": 14.402,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.furnaceguys.com/",
+      "processingTime": 14.751,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.goodmanmfg.com/",
+      "processingTime": 12.112,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.aircanada.com/home/us/en/aco/flights",
+      "processingTime": 11.78,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.johnsoncontrols.com/",
+      "processingTime": 13.413,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.excelsiormechanical.com/air-conditioning-maintenance",
+      "processingTime": 13.24,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.efficiencyheating.com/air-conditioner-repair-saskatoon-sk/",
+      "processingTime": 13.687,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 8,
+    "accepted": 8,
+    "rejected": 0,
+    "uniqueBusinesses": 8,
+    "companyWebsites": 8,
+    "directories": 0,
+    "extractionQuality": 1
+  }
+}
+
+
+=== 2025-08-12T07:02:39.847Z ===
+{
+  "timestamp": "2025-08-12T07:02:39.847Z",
+  "totalSearchResults": 10,
+  "location": "Banff Trail",
+  "processingDetails": [
+    {
+      "url": "https://parks.canada.ca/pn-np/ab/banff",
+      "processingTime": 11.977,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://horseback.com/jobs/",
+      "processingTime": 12.331,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.aircanada.com/home/us/en/aco/flights",
+      "processingTime": 11.838,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://horseback.com/tours/spray-river-ride/",
+      "processingTime": 13.929,
+      "status": "accepted",
+      "confidence": 0.9
+    },
+    {
+      "url": "https://www.rimrockresort.com/faqs/",
+      "processingTime": 13.524,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.banffjaspercollection.com/hotels/mount-royal-hotel/",
+      "processingTime": 13.817,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://iaac-aeic.gc.ca/050/evaluations/proj/80101",
+      "processingTime": 13.107,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://parks.canada.ca/pn-np/ab/banff/activ",
+      "processingTime": 14.233,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.banff.ca/Bids.aspx?CatID=17&txtSort=Date&showAllBids=on&Status=",
+      "processingTime": 14.539,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.banffjaspercollection.com/attractions/banff-gondola/faqs/",
+      "processingTime": 12.889,
+      "status": "accepted",
+      "confidence": 0.9
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 10,
+    "accepted": 9,
+    "rejected": 1,
+    "uniqueBusinesses": 7,
+    "companyWebsites": 6,
+    "directories": 1,
+    "extractionQuality": 0.9
+  }
+}

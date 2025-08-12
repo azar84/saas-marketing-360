@@ -868,6 +868,29 @@ export default function IndustrySearchManager() {
       }));
 
 
+      // Create progress notification
+      const progressNotificationId = addNotification({
+        type: 'progress',
+        title: 'Extracting Business Information',
+        message: `Processing ${transformedResults.length} search results...`,
+        progress: {
+          current: 0,
+          total: transformedResults.length,
+          percentage: 0,
+          status: 'Starting extraction...'
+        }
+      });
+
+      // Update progress to show we're making the API call
+      updateNotification(progressNotificationId, {
+        progress: {
+          current: 0,
+          total: transformedResults.length,
+          percentage: 25,
+          status: 'Making API call to LLM...'
+        }
+      });
+
       const response = await fetch('/api/admin/industry-search/process-results', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -879,7 +902,10 @@ export default function IndustrySearchManager() {
           stateProvince: selectedCity?.state?.name,
           country: selectedCity?.country?.name,
           minConfidence: 0.7,
-          dryRun: !saveToDirectory // Use the saveToDirectory state
+          dryRun: !saveToDirectory, // Use the saveToDirectory state
+          enableTraceability: true,
+          searchSessionId: undefined,
+          searchResultIds: searchResults.map((_, index) => `result_${index}`)
         })
       });
 
@@ -890,6 +916,19 @@ export default function IndustrySearchManager() {
       const data = await response.json();
       
       if (data.success && data.data) {
+        
+        // Update progress to show completion
+        updateNotification(progressNotificationId, {
+          type: 'success',
+          title: 'Extraction Complete',
+          message: `Successfully processed ${data.data.businesses?.length || 0} businesses`,
+          progress: {
+            current: transformedResults.length,
+            total: transformedResults.length,
+            percentage: 100,
+            status: 'Extraction completed successfully!'
+          }
+        });
         
         // Check if we have business data from the chain
         if (!data.data.businesses || !Array.isArray(data.data.businesses)) {
@@ -956,6 +995,19 @@ export default function IndustrySearchManager() {
       } else {
         console.error('❌ Extraction failed:', data);
         setError(data.error || 'Failed to extract business information');
+        
+        // Update notification to show error
+        updateNotification(progressNotificationId, {
+          type: 'error',
+          title: 'Extraction Failed',
+          message: data.error || 'Failed to extract business information',
+          progress: {
+            current: transformedResults.length,
+            total: transformedResults.length,
+            percentage: 100,
+            status: 'Extraction failed'
+          }
+        });
       }
     } catch (error) {
       console.error('❌ Failed to extract all businesses:', error);

@@ -20,7 +20,7 @@ export async function GET(
     const contactPerson = await prisma.contactPerson.findUnique({
       where: { id: contactId },
       include: {
-        businesses: {
+        business_directory: {
           select: {
             id: true,
             website: true,
@@ -142,7 +142,7 @@ export async function DELETE(
       include: {
         _count: {
           select: {
-            businesses: true
+            business_directory: true
           }
         }
       }
@@ -156,7 +156,7 @@ export async function DELETE(
     }
 
     // Check if contact person is associated with any businesses
-    if (existingContactPerson._count.businesses > 0) {
+    if (existingContactPerson._count.business_directory > 0) {
       return NextResponse.json(
         { 
           success: false, 
