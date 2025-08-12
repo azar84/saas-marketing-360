@@ -2276,3 +2276,112 @@
     "extractionQuality": 0.9
   }
 }
+
+
+=== 2025-08-12T07:12:02.477Z ===
+{
+  "timestamp": "2025-08-12T07:12:02.475Z",
+  "totalSearchResults": 15,
+  "location": "Jasper Park",
+  "processingDetails": [
+    {
+      "url": "https://parks.canada.ca/pn-np/ab/jasper/activ/passez-stay/camping",
+      "processingTime": 13.514,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.fairmont.com/en/hotels/jasper/fairmont-jasper-park-lodge.html",
+      "processingTime": 13.003,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://parks.canada.ca/",
+      "processingTime": 12.098,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.banffjaspercollection.com/hotels/forest-park-hotel/",
+      "processingTime": 12.787,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.abm.com/",
+      "processingTime": 12.593,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.tripadvisor.com/ShowUserReviews-g154918-d182311-r423622024-Fairmont_Jasper_Park_Lodge-Jasper_Jasper_National_Park_Alberta.html",
+      "processingTime": 14.852,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.jasper-park-lodge.com/",
+      "processingTime": 13.259,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.tripadvisor.com/Hotel_Review-g154918-d182311-Reviews-Fairmont_Jasper_Park_Lodge-Jasper_Jasper_National_Park_Alberta.html",
+      "processingTime": 14.655,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.jasper-park-lodge.com/stay/guestrooms/",
+      "processingTime": 13.959,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.lennox.com/residential/locate/",
+      "processingTime": 12.16,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.midas.com/",
+      "processingTime": 12.805,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://reliableair.com/",
+      "processingTime": 14.163,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.york.com/residential-equipment/find-a-dealer",
+      "processingTime": 12.39,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://jasper-alberta.ca/p/re-entry-information",
+      "processingTime": 13.557,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.meineke.com/",
+      "processingTime": 12.557,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 15,
+    "accepted": 13,
+    "rejected": 2,
+    "uniqueBusinesses": 12,
+    "companyWebsites": 11,
+    "directories": 1,
+    "extractionQuality": 0.8666666666666667
+  }
+}
