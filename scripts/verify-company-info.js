@@ -42,7 +42,6 @@ async function verifyCompanyInfo() {
         console.log(`      Footer Copyright Message: ${settings.footerCopyrightMessage || 'No copyright'}`);
         console.log(`      Base URL: ${settings.baseUrl || 'No base URL'}`);
         console.log(`      GA Measurement ID: ${settings.gaMeasurementId || 'No GA ID'}`);
-        console.log(`      GTM Container ID: ${settings.gtmContainerId || 'No GTM ID'}`);
         console.log(`      Created At: ${settings.createdAt}`);
         console.log(`      Updated At: ${settings.updatedAt}`);
       });
@@ -114,7 +113,8 @@ async function verifyCompanyInfo() {
         console.log(`   Company Phone: ${s.companyPhone || '❌ Not set'}`);
         console.log(`   Company Address: ${s.companyAddress || '❌ Not set'}`);
         console.log(`   Social Media: ${(s.socialFacebook || s.socialTwitter || s.socialLinkedin) ? '✅ Configured' : '❌ Not set'}`);
-        console.log(`   Analytics: ${s.gaMeasurementId || s.gtmContainerId ? '✅ Configured' : '❌ Not set'}`);
+        // GTM removed
+        console.log(`   Analytics: ${s.gaMeasurementId ? '✅ Configured' : '❌ Not set'}`);
       }
     } else {
       console.log('\n⚠️  No company information found in local database.');

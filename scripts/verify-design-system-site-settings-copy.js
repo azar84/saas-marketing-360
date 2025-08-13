@@ -65,8 +65,7 @@ async function verifyDesignSystemSiteSettingsCopy() {
         console.log(`      Company Address: ${settings.companyAddress || 'No address'}`);
         console.log(`      Base URL: ${settings.baseUrl || 'No base URL'}`);
         console.log(`      GA Measurement ID: ${settings.gaMeasurementId || 'No GA ID'}`);
-        console.log(`      GTM Container ID: ${settings.gtmContainerId || 'No GTM ID'}`);
-        console.log(`      GTM Enabled: ${settings.gtmEnabled}`);
+        // GTM removed
         console.log(`      Cloudinary Enabled: ${settings.cloudinaryEnabled}`);
         console.log(`      Created At: ${settings.createdAt}`);
         console.log(`      Updated At: ${settings.updatedAt}`);

@@ -60,7 +60,7 @@ import { useNotificationContext } from '@/components/providers/NotificationProvi
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'tech-discovery' | 'geographic-manager' | 'naics-manager' | 'search-engine' | 'industry-search' | 'business-directory' | 'enrichment' | 'keywords-manager' | 'traceability';
+type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'tech-discovery' | 'geographic-manager' | 'naics-manager' | 'search-engine' | 'industry-search' | 'business-directory' | 'enrichment' | 'traceability';
 
 // Navigation items with design system colors
 const getNavigationItems = (designSystem: any) => {
@@ -71,8 +71,7 @@ const getNavigationItems = (designSystem: any) => {
     { id: 'industry-search', name: 'Industry Search', icon: Search, color: colors.success },
     { id: 'business-directory', name: 'Business Directory', icon: Building, color: colors.warning },
     { id: 'enrichment', name: 'Data Enrichment', icon: Zap, color: colors.info },
-    { id: 'naics-manager', name: 'NAICS Industries', icon: BarChart3, color: colors.accent },
-    { id: 'keywords-manager', name: 'Keywords Manager', icon: FileText, color: colors.warning },
+    { id: 'naics-manager', name: 'Industry Manager', icon: BarChart3, color: colors.accent },
     { id: 'traceability', name: 'Traceability', icon: Database, color: colors.accent },
     { id: 'search-engine', name: 'Search Engine', icon: Search, color: colors.info },
     { id: 'tech-discovery', name: 'Tech Discovery', icon: Search, color: colors.accent },
@@ -373,15 +372,6 @@ export default function AdminPanel() {
                 }
               }} />
             )}
-          </div>
-        );
-      case 'keywords-manager':
-        return (
-          <div 
-            className="p-8 space-y-8"
-            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
-          >
-            <KeywordsManager />
           </div>
         );
       case 'traceability':

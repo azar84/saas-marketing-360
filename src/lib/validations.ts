@@ -80,14 +80,7 @@ export const SiteSettingsSchema = z.object({
     if (val === null || val === undefined) return true;
     return /^G-[A-Z0-9]{10}$/.test(val);
   }, { message: 'Invalid GA4 Measurement ID format. Must be G-XXXXXXXXXX' }),
-  gtmContainerId: z.string().optional().nullable().transform(val => {
-    if (val === 'NULL' || val === '' || val === null || val === undefined) return null;
-    return val;
-  }).refine(val => {
-    if (val === null || val === undefined) return true;
-    return /^GTM-[A-Z0-9]{5,8}$/.test(val);
-  }, { message: 'Invalid GTM Container ID format. Must be GTM-XXXXX to GTM-XXXXXXXX' }),
-  gtmEnabled: z.boolean().optional(),
+  // GTM removed: gtmContainerId, gtmEnabled
   baseUrl: optionalUrl,
   
   // Cloudinary Configuration

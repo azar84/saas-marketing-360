@@ -20,7 +20,8 @@ export async function POST(request: NextRequest) {
       searchResults,
       industry,
       location: location || 'United States',
-      enableTraceability: false
+      enableTraceability: false,
+      concurrency: 4
     });
 
     console.log('✅ Google Search Parser Chain result:', result);

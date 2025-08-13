@@ -478,6 +478,7 @@ export async function processAndSaveSearchResults(
     const parsedResults = await googleSearchParser.run({
       searchResults,
       location,
+      concurrency: 4,
       enableTraceability: options.enableTraceability || false,
       llmProcessingSessionId: options.llmProcessingSessionId,
       searchSessionId: options.searchSessionId, // Pass search session ID for traceability

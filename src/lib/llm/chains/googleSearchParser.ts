@@ -113,6 +113,7 @@ Analysis Rules:
   * Separate multiple categories as individual items in the array
 - Return base URLs without protocols (e.g., "example.com" not "https://example.com")
 - Assign confidence scores based on clarity of business identification
+- If you were unable to find location from the search results , just use the location from the input
 
 Return ONLY valid JSON with this exact structure:
 {

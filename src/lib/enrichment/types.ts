@@ -6,34 +6,25 @@ export interface EnrichmentRequest {
 }
 
 export interface EnrichmentResult {
+  jobId: string;
   domain: string;
+  normalizedDomain: string;
   status: 'pending' | 'in_progress' | 'completed' | 'failed';
   progress: number; // 0-100
-  startedAt: Date;
+  startedAt?: Date;
   completedAt?: Date;
+  failedAt?: Date;
   error?: string;
-  
-  // Data sources
-  sources: {
-    website: boolean;
-    googleSearch: boolean;
-    builtWith: boolean;
-    clearbit: boolean;
-    hunter: boolean;
-    linkedin: boolean;
-  };
+  duration?: number; // milliseconds
   
   // Enriched data
-  data: EnrichedCompanyData;
+  data?: EnrichedCompanyData;
   
-  // Metadata
-  metadata: {
-    totalSources: number;
-    successfulSources: number;
-    confidence: number; // 0-1
-    lastUpdated: Date;
-    version: string;
-  };
+  // Marketing data
+  marketingData?: any;
+  
+  // Database result
+  databaseResult?: any;
 }
 
 export interface LLMProcessedData {
@@ -48,6 +39,7 @@ export interface LLMProcessedData {
     funding: string[];
     revenue: string;
     founded: string;
+    categories?: string[]; // Additional industry/category labels for upserting relationships
   };
   people: {
     executives: Array<{
@@ -178,7 +170,38 @@ export interface WebsiteScrapeData {
   lastScraped: Date;
   status: 'success' | 'failed';
   error?: string;
+  // New tracking properties for page discovery and scraping
+  discoveredPages?: string[];
+  categorizedPages?: Record<string, string[]>;
+  prioritizedPages?: string[];
+  pageResults?: Array<{
+    url: string;
+    status: 'success' | 'failed';
+    duration: number;
+    title?: string;
+    description?: string;
+    content?: string;
+    contactInfo?: any;
+    technologies?: string[];
+    socialLinks?: Record<string, string>;
+    keywords?: string[];
+    error?: string;
+    httpInfo?: {
+      status: number;
+      statusText: string;
+      headers: Record<string, string>;
+    };
+  }>;
 }
+
+// Common subtypes used in scraping traces
+export interface ContactInfo {
+  emails?: string[];
+  phones?: string[];
+  addresses?: string[];
+}
+
+export type CategorizedPages = Record<string, string[]>;
 
 export interface GoogleSearchData {
   searchResults: Array<{
@@ -315,9 +338,11 @@ export interface EnrichmentSource {
 export interface EnrichmentJob {
   id: string;
   domain: string;
+  normalizedDomain: string;
   status: 'pending' | 'in_progress' | 'completed' | 'failed';
-  priority: number;
+  priority: 'low' | 'medium' | 'high';
   createdAt: Date;
+  updatedAt: Date;
   startedAt?: Date;
   completedAt?: Date;
   progress: number;
@@ -357,4 +382,224 @@ export interface EnrichmentConfig {
     requireMultipleSources: boolean;
     sourceWeights: Record<string, number>; // confidence weighting
   };
+}
+
+export interface EnrichmentTrace {
+  id: string;
+  domain: string;
+  normalizedDomain: string;
+  startedAt: Date;
+  completedAt?: Date;
+  status: 'in_progress' | 'completed' | 'failed';
+  
+  // Step-by-step data tracking
+  steps: {
+    domainValidation: StepTrace;
+    websiteScraping: StepTrace;
+    googleEnrichment: StepTrace;
+    llmProcessing: StepTrace;
+    dataConsolidation: StepTrace;
+    databaseUpsert: StepTrace;
+    marketingTools: StepTrace;
+  };
+  
+  // Final consolidated data
+  finalData?: EnrichedCompanyData;
+  
+  // Quality metrics
+  qualityMetrics: {
+    confidenceScore: number;
+    dataCompleteness: number;
+    validationErrors: string[];
+    accuracyIssues: string[];
+  };
+  
+  // Performance metrics
+  performance: {
+    totalDuration: number;
+    stepDurations: Record<string, number>;
+    memoryUsage?: number;
+  };
+}
+
+export interface StepTrace {
+  stepName: string;
+  startedAt: Date;
+  completedAt?: Date;
+  duration?: number;
+  status: 'pending' | 'in_progress' | 'completed' | 'failed';
+  
+  // Input data for this step
+  inputData?: any;
+  
+  // Output data from this step
+  outputData?: any;
+  
+  // Raw data captured
+  rawData?: any;
+  
+  // Errors or warnings
+  errors?: string[];
+  warnings?: string[];
+  
+  // Validation results
+  validation?: {
+    isValid: boolean;
+    issues: string[];
+    suggestions: string[];
+  };
+  
+  // Metadata
+  metadata?: Record<string, any>;
+}
+
+// Enhanced LLM processing tracking
+export interface LLMProcessingTrace extends StepTrace {
+  stepName: 'llmProcessing';
+  
+  // Input data sent to LLM
+  inputData: {
+    scrapedData: WebsiteScrapeData;
+    googleData?: GoogleSearchData;
+    prompt: string;
+    promptLength: number;
+    modelUsed: string;
+  };
+  
+  // LLM response
+  outputData: {
+    rawResponse: string;
+    responseLength: number;
+    parsedData?: LLMProcessedData;
+    parsingSuccess: boolean;
+    parsingErrors?: string[];
+  };
+  
+  // Prompt engineering data
+  promptEngineering: {
+    promptTemplate: string;
+    variables: Record<string, any>;
+    promptVersion: string;
+  };
+  
+  // Model performance
+  modelPerformance: {
+    responseTime: number;
+    tokenUsage?: {
+      input: number;
+      output: number;
+      total: number;
+    };
+    modelConfidence?: number;
+  };
+}
+
+// Enhanced website scraping tracking
+export interface WebsiteScrapingTrace extends StepTrace {
+  stepName: 'websiteScraping';
+  
+  // Discovery results
+  discovery: {
+    baseUrl: string;
+    discoveredPages: string[];
+    categorizedPages: CategorizedPages;
+    prioritizedPages: string[];
+    totalPagesFound: number;
+    pagesScraped: number;
+    pagesFailed: number;
+  };
+  
+  // Individual page results
+  pageResults: PageScrapingResult[];
+  
+  // Consolidated data
+  consolidatedData: WebsiteScrapeData;
+  
+  // Quality assessment
+  qualityAssessment: {
+    contactInfoFound: {
+      emails: number;
+      phones: number;
+      addresses: number;
+    };
+    technologiesDetected: number;
+    socialLinksFound: number;
+    contentQuality: 'low' | 'medium' | 'high';
+  };
+}
+
+export interface PageScrapingResult {
+  url: string;
+  status: 'success' | 'failed';
+  duration: number;
+  
+  // Extracted data
+  data?: {
+    title: string;
+    description: string;
+    content: string;
+    contactInfo: ContactInfo;
+    technologies: string[];
+    socialLinks: Record<string, string>;
+    keywords: string[];
+  };
+  
+  // Raw HTML (for debugging)
+  rawHtml?: string;
+  
+  // Errors if failed
+  error?: string;
+  
+  // HTTP response info
+  httpInfo?: {
+    status: number;
+    statusText: string;
+    headers: Record<string, string>;
+  };
+}
+
+// Data validation interfaces
+export interface DataValidationResult {
+  isValid: boolean;
+  score: number; // 0-100
+  issues: ValidationIssue[];
+  suggestions: string[];
+  confidence: 'low' | 'medium' | 'high';
+}
+
+export interface ValidationIssue {
+  field: string;
+  issue: string;
+  severity: 'error' | 'warning' | 'info';
+  suggestion: string;
+  data?: any;
+}
+
+// Enhanced enrichment result with full trace
+export interface EnrichmentResultWithTrace extends EnrichmentResult {
+  trace: EnrichmentTrace;
+  validationResults: DataValidationResult;
+  qualityReport: QualityReport;
+}
+
+export interface QualityReport {
+  overallScore: number;
+  dataCompleteness: number;
+  accuracyScore: number;
+  freshnessScore: number;
+  
+  // Detailed breakdown
+  breakdown: {
+    companyInfo: number;
+    contactInfo: number;
+    businessDetails: number;
+    technologyStack: number;
+    marketInfo: number;
+  };
+  
+  // Issues found
+  issues: ValidationIssue[];
+  
+  // Recommendations
+  recommendations: string[];
 }

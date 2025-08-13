@@ -15,12 +15,59 @@ export class GoogleSearchEnricher {
   }
 
   /**
-   * Enrich company data using Google search
+   * Normalize domain/URL to ensure consistent format
+   * Handles: example.com, http://example.com, https://example.com, www.example.com
+   */
+  private normalizeDomain(input: string): string {
+    try {
+      // Remove leading/trailing whitespace
+      let domain = input.trim();
+      
+      // If no protocol specified, default to https://
+      if (!domain.startsWith('http://') && !domain.startsWith('https://')) {
+        domain = `https://${domain}`;
+      }
+      
+      // Create URL object to parse and normalize
+      const url = new URL(domain);
+      
+      // Remove www. prefix if present
+      let hostname = url.hostname;
+      if (hostname.startsWith('www.')) {
+        hostname = hostname.substring(4);
+      }
+      
+      // Return clean domain without protocol
+      return hostname;
+    } catch (error) {
+      console.warn(`⚠️ URL normalization failed for "${input}", using as-is:`, error);
+      // Fallback: remove common prefixes and return cleaned input
+      let cleaned = input.trim();
+      if (cleaned.startsWith('http://')) cleaned = cleaned.substring(7);
+      if (cleaned.startsWith('https://')) cleaned = cleaned.substring(8);
+      if (cleaned.startsWith('www.')) cleaned = cleaned.substring(4);
+      return cleaned;
+    }
+  }
+
+  /**
+   * Enrich company data using Google Custom Search
    */
   async enrich(domain: string): Promise<GoogleSearchData | null> {
     try {
       if (!this.apiKey || !this.searchEngineId) {
-        throw new Error('Google Custom Search API not configured');
+        console.warn(`⚠️ Google Custom Search API not configured for ${domain}. Skipping Google enrichment.`);
+        // Return a minimal result instead of throwing an error
+        return {
+          searchResults: [],
+          extractedInfo: {
+            employeeCount: undefined,
+            funding: undefined,
+            news: [],
+            reviews: []
+          },
+          lastSearched: new Date()
+        };
       }
 
       console.log(`🔍 Starting Google search enrichment for ${domain}`);
@@ -48,7 +95,17 @@ export class GoogleSearchEnricher {
       }
 
       if (searchResults.length === 0) {
-        throw new Error('No search results found');
+        console.warn(`⚠️ No Google search results found for ${domain}`);
+        return {
+          searchResults: [],
+          extractedInfo: {
+            employeeCount: undefined,
+            funding: undefined,
+            news: [],
+            reviews: []
+          },
+          lastSearched: new Date()
+        };
       }
 
       // Process and categorize search results
@@ -66,7 +123,17 @@ export class GoogleSearchEnricher {
       
     } catch (error) {
       console.error(`❌ Google search enrichment failed for ${domain}:`, error);
-      return null;
+      // Return minimal result instead of null to prevent workflow failure
+      return {
+        searchResults: [],
+        extractedInfo: {
+          employeeCount: undefined,
+          funding: undefined,
+          news: [],
+          reviews: []
+        },
+        lastSearched: new Date()
+      };
     }
   }
 
