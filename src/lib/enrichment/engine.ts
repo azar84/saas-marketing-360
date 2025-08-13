@@ -73,40 +73,52 @@ export class EnrichmentEngine {
   }
 
   /**
-   * Verify a list of emails using SMTP verification. Returns only verified emails.
-   * Uses per-email timeout to avoid blocking the pipeline.
+   * Verify emails using deep-email-validator.
+   * Policy: keep emails that are valid OR inconclusive due to SMTP timeout; drop only definitively invalid ones.
    */
-  private async verifyEmailsBeforeLLM(emails: string[], timeoutMs: number = 8000, maxToCheck: number = 10): Promise<string[]> {
+  private async verifyEmailsBeforeLLM(
+    emails: string[],
+    timeoutMs: number = 10000,
+    maxToCheck: number = 10
+  ): Promise<{ verifiedEmails: string[]; results: Array<{ email: string; success: boolean; info?: any }>; method: 'deep' } > {
     try {
-      if (!emails || emails.length === 0) return [];
+      if (!emails || emails.length === 0) return { verifiedEmails: [], results: [], method: 'deep' };
       const unique = Array.from(new Set(emails.map(e => e.trim().toLowerCase()).filter(Boolean))).slice(0, maxToCheck);
-      const verifier = require('email-verify');
+      const { validate } = require('deep-email-validator');
       const fromEmail = process.env.EMAIL_VERIFY_FROM || 'no-reply@verification.local';
 
-      const verifyOne = (email: string): Promise<boolean> => {
-        return new Promise<boolean>((resolve) => {
-          let settled = false;
-          const timer = setTimeout(() => { if (!settled) { settled = true; resolve(false); } }, timeoutMs);
-          try {
-            verifier.verify(email, { sender: fromEmail, timeout: timeoutMs - 500 }, (err: any, info: any) => {
-              if (settled) return;
-              settled = true;
-              clearTimeout(timer);
-              // Accept only explicit success; treat catch-all/unknown/temporary as failed to avoid hallucinations
-              resolve(!!(info && info.success === true));
-            });
-          } catch {
-            if (!settled) { settled = true; clearTimeout(timer); resolve(false); }
-          }
-        });
-      };
+      const results: Array<{ email: string; success: boolean; info?: any }> = [];
+      const verifiedSet = new Set<string>();
 
-      const results = await Promise.all(unique.map(verifyOne));
-      const verified = unique.filter((_, idx) => results[idx]);
-      return verified;
+      for (const email of unique) {
+        try {
+          const res = await validate(email, {
+            validateRegex: true,
+            validateMx: true,
+            validateTypo: true,
+            validateDisposable: true,
+            validateSMTP: true,
+            sender: fromEmail
+          });
+
+          // Determine keep/drop decision
+          const smtp = res?.validators?.smtp;
+          const isTimeout = !!(smtp && smtp.valid === false && /timeout/i.test(String(smtp.reason || '')));
+          const keep = !!res?.valid || isTimeout;
+          if (keep) verifiedSet.add(email);
+
+          results.push({ email, success: !!res?.valid, info: res });
+        } catch (err) {
+          // Treat validator exceptions as inconclusive; keep email but mark success false and log error
+          verifiedSet.add(email);
+          results.push({ email, success: false, info: { error: String(err) } });
+        }
+      }
+
+      return { verifiedEmails: Array.from(verifiedSet), results, method: 'deep' };
     } catch (e) {
-      console.warn('⚠️ SMTP email verification failed pre-LLM:', e);
-      return [];
+      console.warn('⚠️ Email verification (deep) failed pre-LLM:', e);
+      return { verifiedEmails: emails.map(e => (e || '').trim().toLowerCase()).filter(Boolean).slice(0, maxToCheck), results: [], method: 'deep' };
     }
   }
 
@@ -289,7 +301,9 @@ export class EnrichmentEngine {
       
       // Pre-LLM: Verify emails and remove unverified before sending to LLM
       if (scrapedData.contactInfo?.emails && scrapedData.contactInfo.emails.length > 0) {
-        const verifiedEmails = await this.verifyEmailsBeforeLLM(scrapedData.contactInfo.emails);
+        const t0 = Date.now();
+        const candidates = scrapedData.contactInfo.emails.slice();
+        const { verifiedEmails, results, method } = await this.verifyEmailsBeforeLLM(candidates);
         scrapedData.contactInfo.emails = verifiedEmails;
         // Optionally filter per-page emails as well for consistency in logs downstream
         if (scrapedData.pageResults && scrapedData.pageResults.length > 0) {
@@ -302,6 +316,14 @@ export class EnrichmentEngine {
             }
           });
         }
+        // Track email verification details
+        this.tracker.trackEmailVerification(traceId, {
+          candidates,
+          method,
+          durationMs: Date.now() - t0,
+          results,
+          verified: verifiedEmails
+        });
       }
 
       // Step 4: LLM Processing
@@ -576,23 +598,6 @@ export class EnrichmentEngine {
   private async upsertToDatabase(data: EnrichedCompanyData): Promise<any> {
     try {
       console.log(`💾 Upserting company data to database: ${data.companyName}`);
-      // Verify email if present before saving
-      if (data.contact?.email) {
-        try {
-          const verifier = require('email-verify');
-          await new Promise<void>((resolve) => {
-            verifier.verify(data.contact!.email!, (err: any, info: any) => {
-              if (err || !info?.success) {
-                console.warn(`⚠️ Email verification failed for ${data.contact!.email}:`, err || info);
-                data.contact!.email = '';
-              }
-              resolve();
-            });
-          });
-        } catch (e) {
-          console.warn('⚠️ Email verification module error, skipping verification:', e);
-        }
-      }
       
       // Check if company already exists
       const existingCompany = await prisma.businessDirectory.findFirst({

@@ -432,6 +432,43 @@ export class EnrichmentTracker {
   }
 
   /**
+   * Track email verification step
+   */
+  trackEmailVerification(traceId: string, data: {
+    candidates: string[];
+    method: 'smtp' | 'mx' | 'mixed' | string;
+    durationMs: number;
+    results: Array<{ email: string; success: boolean; info?: any }>;
+    verified: string[];
+  }): void {
+    const trace = this.traces.get(traceId);
+    if (!trace) return;
+
+    const jobDir = this.jobDirs.get(traceId) || this.getJobDir(trace.normalizedDomain);
+    const stepData = {
+      stepName: 'Email Verification',
+      timestamp: new Date(),
+      data: {
+        candidates: data.candidates,
+        method: data.method,
+        durationMs: data.durationMs,
+        results: data.results,
+        verified: data.verified
+      },
+      metadata: {
+        stepType: 'verification',
+        totalCandidates: data.candidates.length,
+        verifiedCount: data.verified.length
+      }
+    };
+
+    this.trackStep(traceId, 'websiteScraping', stepData);
+    // Write to file
+    this.writeToFile(jobDir, '06_email_verification.json', stepData);
+    console.log(`✉️ Email verification tracked: ${data.verified.length}/${data.candidates.length} verified in ${data.durationMs}ms`);
+  }
+
+  /**
    * Track LLM processing with detailed input/output data
    */
   trackLLMProcessing(traceId: string, data: LLMInteractionData): void {
