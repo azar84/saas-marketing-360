@@ -1,0 +1,38 @@
+{
+  "stepName": "Page Scraping",
+  "timestamp": "2025-08-13T03:13:53.512Z",
+  "data": {
+    "url": "https://hiqsense.com/",
+    "status": "success",
+    "duration": 0,
+    "extractedData": {
+      "title": "HiQSense | AI & Automation for Small Businesses | HiQSense Smart Systems LTD",
+      "description": "From web design to AI implementation",
+      "content": "Empowering Small Businesses with AI and Smart AutomationFrom web design to AI implementation Book free consultationContact UsWeb DesignWeb DevelopmentMVP DevelopmentMobile AppsAI AssistantsProcess AutomationLoading animated content...Empowering Small Businesses About HiQSenseAt HiQSense, we empower small and medium-sized businesses with advanced, AI-driven automation designed to simplify operations, reduce costs, and accelerate growth. Our mission is to transform how businesses operate by eliminating technical barriers and providing seamless access to intelligent systems that handle everyday tasks. The name HiQSense reflects our vision and values: “Hi” stands for high standards; “Q” represents both IQ (intelligence) and Quality; and “Sense” highlights our belief in AI systems that continue to evolve—developing perceptive, context-aware capabilities that emulate human senses. As technology advances, so will our systems—growing smarter, more intuitive, and more valuable to the businesses we serve. Proudly based in Saskatchewan, Canada, we are committed to supporting local entrepreneurs and contributing to the province’s growing innovation economy. As a Canadian company, we aim to lead in responsible AI adoption—creating tools that are not only effective and scalable but also built with integrity, inclusivity, and a deep understanding of the challenges faced by businesses across the country.Book free consultationIntroducing Saski AI — Our Flagship PlatformSaski AI is a no-code platform that empowers small and medium-sized businesses to automate customer support across SMS, WhatsApp, voice, social media, and websites. By enabling users to build AI assistants in under 10 minutes—without any technical skills—Saski AI helps businesses reduce operational costs, respond instantly to inquiries, and deliver consistent, multilingual service.Visit Saski AIFrequently Asked Questions Schedule a Call with HiQSense",
+      "contactInfo": {
+        "emails": [
+          "hiqsense@hiqsense.ca"
+        ],
+        "phones": [],
+        "addresses": [],
+        "phoneDetails": []
+      },
+      "technologies": [
+        "React"
+      ],
+      "socialLinks": {},
+      "keywords": [
+        "Empowering Small Businesses with AI and Smart Automation",
+        "About HiQSense",
+        "Introducing Saski AI — Our Flagship Platform",
+        "Frequently Asked Questions",
+        "Schedule a Call with HiQSense"
+      ]
+    }
+  },
+  "metadata": {
+    "stepType": "scraping",
+    "success": true,
+    "dataExtracted": 7
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "stepName": "Domain Validation",
+  "timestamp": "2025-08-13T03:13:28.847Z",
+  "data": {
+    "domain": "hiqsense.com",
+    "validationResult": true,
+    "httpStatus": 200,
+    "responseTime": 0
+  },
+  "metadata": {
+    "stepType": "validation",
+    "success": true
+  }
+}

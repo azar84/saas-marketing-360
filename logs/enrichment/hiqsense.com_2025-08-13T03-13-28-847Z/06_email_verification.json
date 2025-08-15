@@ -1,0 +1,75 @@
+{
+  "stepName": "Email Verification",
+  "timestamp": "2025-08-13T03:14:25.807Z",
+  "data": {
+    "candidates": [
+      "hiqsense@hiqsense.ca",
+      "info@hiqsense.ca"
+    ],
+    "method": "deep",
+    "durationMs": 20123,
+    "results": [
+      {
+        "email": "hiqsense@hiqsense.ca",
+        "success": false,
+        "info": {
+          "valid": false,
+          "validators": {
+            "regex": {
+              "valid": true
+            },
+            "typo": {
+              "valid": true
+            },
+            "disposable": {
+              "valid": true
+            },
+            "mx": {
+              "valid": true
+            },
+            "smtp": {
+              "valid": false,
+              "reason": "Timeout"
+            }
+          },
+          "reason": "smtp"
+        }
+      },
+      {
+        "email": "info@hiqsense.ca",
+        "success": false,
+        "info": {
+          "valid": false,
+          "validators": {
+            "regex": {
+              "valid": true
+            },
+            "typo": {
+              "valid": true
+            },
+            "disposable": {
+              "valid": true
+            },
+            "mx": {
+              "valid": true
+            },
+            "smtp": {
+              "valid": false,
+              "reason": "Timeout"
+            }
+          },
+          "reason": "smtp"
+        }
+      }
+    ],
+    "verified": [
+      "hiqsense@hiqsense.ca",
+      "info@hiqsense.ca"
+    ]
+  },
+  "metadata": {
+    "stepType": "verification",
+    "totalCandidates": 2,
+    "verifiedCount": 2
+  }
+}

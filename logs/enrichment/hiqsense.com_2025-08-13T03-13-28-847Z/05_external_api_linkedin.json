@@ -1,0 +1,18 @@
+{
+  "stepName": "External API Search - linkedin",
+  "timestamp": "2025-08-13T03:14:05.682Z",
+  "data": {
+    "source": "linkedin",
+    "query": "hiqsense.com",
+    "results": [],
+    "searchTime": 0,
+    "success": false,
+    "error": "LinkedIn integration not implemented yet"
+  },
+  "metadata": {
+    "stepType": "external_api",
+    "source": "linkedin",
+    "resultsCount": 0,
+    "success": false
+  }
+}

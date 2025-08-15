@@ -1,0 +1,55 @@
+{
+  "stepName": "Page Scraping",
+  "timestamp": "2025-08-13T03:13:53.513Z",
+  "data": {
+    "url": "https://hiqsense.com/terms-of-service",
+    "status": "success",
+    "duration": 0,
+    "extractedData": {
+      "title": "Terms of Service | HiQSense in Saskatoon | HiQSense Smart Systems LTD",
+      "description": "Effective Date: March 28, 2025",
+      "content": "HomeAbout UsFAQContactBook free consultation Terms of Service Effective Date: March 28, 2025 This Terms of Service agreement (\"Agreement\") is entered into by and between HiQSense Smart Systems LTD (\"HiQSense\", \"we\", \"us\", or \"our\"), a Canadian-registered corporation, and any person or entity (\"you\" or \"your\") accessing or using our website, digital products, or custom software and automation services. By accessing our website or engaging our services, you acknowledge that you have read, understood, and agree to be bound by these terms. If you do not agree, please discontinue use of our website and services. 1. Use of Services Our services are intended for lawful business use. You agree not to use our website, platforms, or delivered systems for any unlawful activity or to violate any local, provincial, national, or international regulations. 2. Project Engagement and Scope All services begin with a discovery or consultation phase. Based on your business needs, we prepare a custom scope of work and formal quote. No project will commence until both parties agree in writing to the proposal, deliverables, and payment structure. 3. Pricing and Payment Terms HiQSense does not offer flat-rate pricing. All costs are project-specific and depend on the scope, complexity, and duration of the engagement. Payment terms, including deposits, installment schedules, and final payments, will be detailed in the proposal or service agreement. Late payments may delay delivery or incur additional charges. 4. Ownership and Licensing Unless otherwise agreed in writing, all custom-built code, workflows, or software solutions developed under a paid contract become the property of the client upon final payment. HiQSense retains the right to reuse general frameworks or non-client-specific utilities developed independently. 5. Confidentiality We maintain strict confidentiality over all materials, communications, and proprietary business or technical information shared with us. We will not disclose your data, ideas, designs, or internal systems to any third party without prior consent. 6. Hosting and Maintenance Hosting, updates, and technical support are not included by default. These services may be added under an Annual Maintenance Contract (AMC), which covers hosting management, software updates, minor modifications, and troubleshooting. 7. Limitations of Liability HiQSense makes every effort to build secure, reliable systems. However, we do not guarantee uninterrupted or error-free operation and are not liable for losses resulting from downtime, third-party service interruptions, or client-side misuse. Our liability is limited to the total fees paid under the specific service agreement. 8. Termination Either party may terminate an agreement with written notice. In the event of early termination by the client, any work completed to date will be invoiced and due. HiQSense reserves the right to suspend service or access in case of non-payment or violation of these terms. 9. Governing Law This Agreement is governed by the laws of the Province of Saskatchewan and applicable federal laws of Canada. Any disputes arising out of this Agreement shall be resolved through mediation or the courts of Saskatchewan. 10. Contact If you have questions about these terms, please contact us:HiQSense Smart Systems LTD400 – 111 2nd Ave S, Saskatoon, SK, S7K 1K6Email: info@hiqsense.caPhone: +1 306 261 8582 Schedule a Call with HiQSense info@hiqsense.ca+1 306 261 8582400-111 2nd Ave S, Saskatoon , SK CA, S7K 1K6Legal PagesPrivacy PolicyTerms of ServiceMain PagesHomeAbout UsFAQContact©2025 All rights reserved for HiQSense Smart Systems LTD",
+      "contactInfo": {
+        "emails": [
+          "info@hiqsense.ca",
+          "hiqsense@hiqsense.ca"
+        ],
+        "phones": [
+          "+13062618582"
+        ],
+        "addresses": [],
+        "phoneDetails": [
+          {
+            "number": "+13062618582",
+            "source": "tel",
+            "snippet": "+1 306 261 8582"
+          }
+        ]
+      },
+      "technologies": [],
+      "socialLinks": {
+        "facebook": "https://www.facebook.com/hiqsense/",
+        "linkedin": "https://www.linkedin.com/company/hiqsense"
+      },
+      "keywords": [
+        "Terms of Service",
+        "1. Use of Services",
+        "2. Project Engagement and Scope",
+        "3. Pricing and Payment Terms",
+        "4. Ownership and Licensing",
+        "5. Confidentiality",
+        "6. Hosting and Maintenance",
+        "7. Limitations of Liability",
+        "8. Termination",
+        "9. Governing Law",
+        "10. Contact",
+        "Schedule a Call with HiQSense"
+      ]
+    }
+  },
+  "metadata": {
+    "stepType": "scraping",
+    "success": true,
+    "dataExtracted": 7
+  }
+}

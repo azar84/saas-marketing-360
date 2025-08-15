@@ -1,0 +1,56 @@
+{
+  "stepName": "Page Scraping",
+  "timestamp": "2025-08-13T03:13:53.513Z",
+  "data": {
+    "url": "https://hiqsense.com/faq",
+    "status": "success",
+    "duration": 0,
+    "extractedData": {
+      "title": "FAQs | HiQSense Services & AI Development in Saskatoon | HiQSense Smart Systems LTD",
+      "description": "",
+      "content": "HomeAbout UsFAQContactBook free consultationFrequently Asked QuestionsQuick NavigationGot Questions ? Let's Find an Answer Schedule a Call with HiQSense info@hiqsense.ca+1 306 261 8582400-111 2nd Ave S, Saskatoon , SK CA, S7K 1K6Legal PagesPrivacy PolicyTerms of ServiceMain PagesHomeAbout UsFAQContact©2025 All rights reserved for HiQSense Smart Systems LTD",
+      "contactInfo": {
+        "emails": [
+          "info@hiqsense.ca",
+          "hiqsense@hiqsense.ca"
+        ],
+        "phones": [
+          "+13062618582"
+        ],
+        "addresses": [],
+        "phoneDetails": [
+          {
+            "number": "+13062618582",
+            "source": "tel",
+            "snippet": "+1 306 261 8582"
+          }
+        ]
+      },
+      "technologies": [
+        "Shopify",
+        "WooCommerce",
+        "React",
+        "Tailwind",
+        "AWS",
+        "Google Cloud",
+        "Stripe",
+        "HubSpot"
+      ],
+      "socialLinks": {
+        "facebook": "https://www.facebook.com/hiqsense/",
+        "linkedin": "https://www.linkedin.com/company/hiqsense"
+      },
+      "keywords": [
+        "Frequently Asked Questions",
+        "Quick Navigation",
+        "Got Questions ? Let's Find an Answer",
+        "Schedule a Call with HiQSense"
+      ]
+    }
+  },
+  "metadata": {
+    "stepType": "scraping",
+    "success": true,
+    "dataExtracted": 7
+  }
+}

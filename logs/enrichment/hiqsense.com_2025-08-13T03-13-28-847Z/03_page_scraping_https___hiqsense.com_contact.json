@@ -1,0 +1,48 @@
+{
+  "stepName": "Page Scraping",
+  "timestamp": "2025-08-13T03:13:53.513Z",
+  "data": {
+    "url": "https://hiqsense.com/contact",
+    "status": "success",
+    "duration": 0,
+    "extractedData": {
+      "title": "Contact HiQSense | Web & AI Solutions in Saskatoon | HiQSense Smart Systems LTD",
+      "description": "We’d love to learn more about your business. Reach out to explore how we can help.",
+      "content": "HomeAbout UsFAQContactBook free consultationGet in TouchWe’d love to learn more about your business. Reach out to explore how we can help. Send Us a MessageConnect With UsHave a question or ready to get started? You can reach us by phone, email, or by visiting our Saskatoon office.Phone+1 306 261 8582Emailinfo@hiqsense.caAddress400-111 2nd Ave S , Saskatoon, SK, CA S7K 1K6Follow UsFirst Name *Last Name Email Address *Phone Number Company Message *I agree to the terms and conditions * Solve the math problemVerify you're human8 - 3 = ? Schedule a Call with HiQSense info@hiqsense.ca+1 306 261 8582400-111 2nd Ave S, Saskatoon , SK CA, S7K 1K6Legal PagesPrivacy PolicyTerms of ServiceMain PagesHomeAbout UsFAQContact©2025 All rights reserved for HiQSense Smart Systems LTD",
+      "contactInfo": {
+        "emails": [
+          "info@hiqsense.ca",
+          "hiqsense@hiqsense.ca"
+        ],
+        "phones": [
+          "+13062618582"
+        ],
+        "addresses": [],
+        "phoneDetails": [
+          {
+            "number": "+13062618582",
+            "source": "tel",
+            "snippet": "+1 306 261 8582"
+          }
+        ]
+      },
+      "technologies": [],
+      "socialLinks": {
+        "facebook": "https://www.facebook.com/hiqsense/",
+        "linkedin": "https://www.linkedin.com/company/hiqsense"
+      },
+      "keywords": [
+        "Get in Touch",
+        "Send Us a Message",
+        "Connect With Us",
+        "Solve the math problem",
+        "Schedule a Call with HiQSense"
+      ]
+    }
+  },
+  "metadata": {
+    "stepType": "scraping",
+    "success": true,
+    "dataExtracted": 7
+  }
+}

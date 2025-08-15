@@ -1,0 +1,28 @@
+{
+  "stepName": "Page Scraping",
+  "timestamp": "2025-08-13T03:13:53.513Z",
+  "data": {
+    "url": "https://hiqsense.com/sitemap.xml",
+    "status": "success",
+    "duration": 0,
+    "extractedData": {
+      "title": "",
+      "description": "",
+      "content": "https://hiqsense.com/sitemap-pages.xml 2025-08-13T02:35:56.429Z https://hiqsense.com/sitemap-faq-categories.xml 2025-08-13T02:35:56.429Z https://hiqsense.com/sitemap-faq-questions.xml 2025-08-13T02:35:56.429Z https://hiqsense.com/sitemap-images.xml 2025-08-13T02:35:56.429Z This XML file does not appear to have any style information associated with it. The document tree is shown below.<sitemapindex xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\"> <sitemap> <loc>https://hiqsense.com/sitemap-pages.xml</loc> <lastmod>2025-08-13T02:35:56.429Z</lastmod> ...</sitemap> <sitemap> <loc>https://hiqsense.com/sitemap-faq-categories.xml</loc> <lastmod>2025-08-13T02:35:56.429Z</lastmod> ...</sitemap> <sitemap> <loc>https://hiqsense.com/sitemap-faq-questions.xml</loc> <lastmod>2025-08-13T02:35:56.429Z</lastmod> ...</sitemap> <sitemap> <loc>https://hiqsense.com/sitemap-images.xml</loc> <lastmod>2025-08-13T02:35:56.429Z</lastmod> ...</sitemap> ...</sitemapindex>",
+      "contactInfo": {
+        "emails": [],
+        "phones": [],
+        "addresses": [],
+        "phoneDetails": []
+      },
+      "technologies": [],
+      "socialLinks": {},
+      "keywords": []
+    }
+  },
+  "metadata": {
+    "stepType": "scraping",
+    "success": true,
+    "dataExtracted": 7
+  }
+}

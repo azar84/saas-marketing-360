@@ -1,0 +1,18 @@
+{
+  "stepName": "External API Search - crunchbase",
+  "timestamp": "2025-08-13T03:14:05.683Z",
+  "data": {
+    "source": "crunchbase",
+    "query": "hiqsense.com",
+    "results": [],
+    "searchTime": 0,
+    "success": false,
+    "error": "Crunchbase integration not implemented yet"
+  },
+  "metadata": {
+    "stepType": "external_api",
+    "source": "crunchbase",
+    "resultsCount": 0,
+    "success": false
+  }
+}

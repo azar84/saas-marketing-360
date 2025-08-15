@@ -433,9 +433,66 @@ class AppScheduler {
    * Generate keywords for a specific industry using LLM
    */
   private async generateKeywordsForIndustry(industryName: string): Promise<string[]> {
+    // First: try external API
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 60000);
+      const baseUrl = process.env.MARKETING_MCP_API_URL || 'https://marketing-mcp-beta.vercel.app';
+      const externalUrl = new URL('/api/keywords', baseUrl).toString();
+      const bypassToken = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+      if (!bypassToken) throw new Error('VERCEL_AUTOMATION_BYPASS_SECRET is not set');
+      this.logTask('industries-keywords', 'info', 'Calling external keywords API', { externalUrl, productOrMarket: industryName });
+
+      const res = await fetch(externalUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-vercel-protection-bypass': bypassToken },
+        body: JSON.stringify({ productOrMarket: industryName }),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
+      if (!res.ok) {
+        const text = await res.text().catch(() => '');
+        throw new Error(`External API error: ${res.status} ${res.statusText} ${text}`);
+      }
+
+      const json: any = await res.json().catch(() => ({}));
+
+      const extractTerms = (obj: any): string[] => {
+        if (!obj) return [];
+        if (Array.isArray(obj)) return obj;
+        if (Array.isArray(obj.search_terms)) return obj.search_terms;
+        if (Array.isArray(obj.keywords)) return obj.keywords;
+        if (obj.data) return extractTerms(obj.data);
+        if (obj.result) return extractTerms(obj.result);
+        if (obj.payload) return extractTerms(obj.payload);
+        return [];
+      };
+
+      let terms = extractTerms(json)
+        .filter((t: any) => typeof t === 'string')
+        .map((t: string) => t.trim())
+        .filter(Boolean);
+
+      // Dedupe and enforce basic length (2–8 words)
+      terms = Array.from(new Set(terms)).filter((t: string) => {
+        const w = t.split(/\s+/).filter(Boolean).length;
+        return w >= 2 && w <= 8;
+      });
+
+      if (terms.length > 0) {
+        this.logTask('industries-keywords', 'success', 'External keywords API returned terms', { industryName, count: terms.length });
+        return terms as string[];
+      }
+
+      this.logTask('industries-keywords', 'warn', 'External API returned no terms; will try fallback', { industryName });
+    } catch (externalError) {
+      this.logTask('industries-keywords', 'warn', 'External keywords API failed; will try fallback', { industryName, error: String(externalError) });
+    }
+
+    // Fallback: try LLM chain if available
     try {
       const { KeywordsChain } = await import('@/lib/llm/chains');
-      // Basic retries around the LLM call
       const maxAttempts = 2;
       let lastError: any = null;
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -445,12 +502,10 @@ class AppScheduler {
           if (terms.length > 0) return terms as string[];
         } catch (err) {
           lastError = err;
-          // brief delay between retries
           await new Promise((r) => setTimeout(r, 1000 * attempt));
         }
       }
-      // Fallback: return empty list; upstream handles empty => no save
-      this.logTask('industries-keywords', 'warn', 'LLM keyword generation returned empty, falling back to none', { industryName, error: String(lastError) });
+      this.logTask('industries-keywords', 'warn', 'LLM keyword generation returned empty', { industryName, error: String(lastError) });
       return [];
     } catch (error) {
       this.logTask('industries-keywords', 'error', 'Failed to import or run KeywordsChain', { industryName, error: String(error) });

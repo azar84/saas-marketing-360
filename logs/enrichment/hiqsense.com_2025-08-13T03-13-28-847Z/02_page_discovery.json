@@ -1,0 +1,72 @@
+{
+  "stepName": "Page Discovery",
+  "timestamp": "2025-08-13T03:13:53.512Z",
+  "data": {
+    "baseUrl": "https://hiqsense.com",
+    "discoveredPages": [
+      "https://hiqsense.com/",
+      "https://hiqsense.com/contact",
+      "https://hiqsense.com/home",
+      "https://hiqsense.com/index",
+      "https://hiqsense.com/about-us",
+      "https://hiqsense.com/sitemap-pages.xml",
+      "https://hiqsense.com/sitemap.xml",
+      "https://hiqsense.com/faq",
+      "https://hiqsense.com/privacy-policy",
+      "https://hiqsense.com/terms-of-service"
+    ],
+    "categorizedPages": {
+      "home": [
+        "https://hiqsense.com/",
+        "https://hiqsense.com/home",
+        "https://hiqsense.com/index"
+      ],
+      "about": [
+        "https://hiqsense.com/about-us"
+      ],
+      "contact": [
+        "https://hiqsense.com/contact"
+      ],
+      "services": [
+        "https://hiqsense.com/terms-of-service"
+      ],
+      "products": [],
+      "team": [],
+      "blog": [],
+      "other": [
+        "https://hiqsense.com/sitemap-pages.xml",
+        "https://hiqsense.com/sitemap.xml",
+        "https://hiqsense.com/faq",
+        "https://hiqsense.com/privacy-policy"
+      ]
+    },
+    "prioritizedPages": [
+      "https://hiqsense.com/",
+      "https://hiqsense.com/home",
+      "https://hiqsense.com/index",
+      "https://hiqsense.com/about-us",
+      "https://hiqsense.com/contact",
+      "https://hiqsense.com/terms-of-service",
+      "https://hiqsense.com/sitemap-pages.xml",
+      "https://hiqsense.com/sitemap.xml",
+      "https://hiqsense.com/faq",
+      "https://hiqsense.com/privacy-policy"
+    ],
+    "discoveryTime": 24665,
+    "totalPagesFound": 10
+  },
+  "metadata": {
+    "stepType": "discovery",
+    "pagesFound": 10,
+    "categories": [
+      "home",
+      "about",
+      "contact",
+      "services",
+      "products",
+      "team",
+      "blog",
+      "other"
+    ]
+  }
+}

@@ -64,6 +64,10 @@ A comprehensive SaaS marketing platform built with Next.js, React, TypeScript, a
    ```env
    DATABASE_URL="postgresql://username:password@localhost:5432/saas_marketing"
    JWT_SECRET="your-secret-key"
+   # External API protection token (required for keyword generation)
+   VERCEL_AUTOMATION_BYPASS_SECRET=""
+   # Marketing MCP base URL (default points to beta)
+   MARKETING_MCP_API_URL="https://marketing-mcp-beta.vercel.app"
    ```
 
 4. **Set up the database**

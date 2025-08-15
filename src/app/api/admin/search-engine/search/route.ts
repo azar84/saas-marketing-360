@@ -38,12 +38,7 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!apiKey || !searchEngineId) {
-      return NextResponse.json(
-        { success: false, error: 'Missing API key or search engine ID' },
-        { status: 400 }
-      );
-    }
+    // Google API credentials no longer required; using external protected API
 
     // Validate results limit - Google CSE only supports up to 10 results per request
     const limit = Math.min(Math.max(parseInt(resultsLimit) || 10, 1), 10);
@@ -138,50 +133,55 @@ export async function POST(request: Request) {
       try {
         console.log(`Processing query ${queryIndex + 1}/${searchQueries.length}: "${currentQuery}"`);
         
-        // Build Google API request URL
-        const requestUrl = new URL('https://www.googleapis.com/customsearch/v1');
-        requestUrl.searchParams.append('q', currentQuery);
-        requestUrl.searchParams.append('key', apiKey);
-        requestUrl.searchParams.append('cx', searchEngineId);
-        requestUrl.searchParams.append('num', limit.toString());
-        
-        // Add date filtering if enabled
-        if (requireDateFiltering && maxAgeDays > 0) {
-          // Google CSE dateRestrict parameter supports various formats
-          // For maxAgeDays, we use the "d" suffix for days
-          const dateRestrict = `${maxAgeDays}d`;
-          requestUrl.searchParams.append('dateRestrict', dateRestrict);
-          console.log(`📅 Adding date restriction: ${dateRestrict} (max ${maxAgeDays} days old)`);
-        }
-        
-        if (pageNumber > 1) {
-          const startIndex = ((pageNumber - 1) * limit) + 1;
-          requestUrl.searchParams.append('start', startIndex.toString());
-        }
-
-        console.log(`Making request to Google API for query: "${currentQuery}"`);
-        const response = await fetch(requestUrl.toString());
-        
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => ({}));
-          console.error(`Google API error for query "${currentQuery}":`, {
-            status: response.status,
-            statusText: response.statusText,
-            error: errorData
-          });
-          
+        // Call external protected search API instead of Google CSE
+        const baseUrl = process.env.MARKETING_MCP_API_URL || 'https://marketing-mcp-beta.vercel.app';
+        const protection = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
+        if (!protection) {
           return {
             success: false,
-            error: `Google API error: ${response.status} ${response.statusText}`,
+            error: 'Missing VERCEL_AUTOMATION_BYPASS_SECRET',
             results: [],
             totalResults: 0
           };
         }
 
-        const data = await response.json();
-        console.log(`Google API response for query "${currentQuery}":`, {
-          totalResults: data.searchInformation?.totalResults,
-          itemsCount: data.items?.length || 0
+        const requestUrl = new URL('/api/search', baseUrl).toString();
+        const reqBody = {
+          keywords: [currentQuery],
+          location: location || ''
+        } as any;
+
+        const startedAt = Date.now();
+        console.log(`Making request to external search API for query: "${currentQuery}" ->`, requestUrl);
+        const response = await fetch(requestUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-vercel-protection-bypass': protection,
+          },
+          body: JSON.stringify(reqBody),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text().catch(() => '');
+          console.error(`External search API error for query "${currentQuery}":`, {
+            status: response.status,
+            statusText: response.statusText,
+            error: errorText
+          });
+          return {
+            success: false,
+            error: `External search API error: ${response.status} ${response.statusText}`,
+            results: [],
+            totalResults: 0
+          };
+        }
+
+        const data = await response.json().catch(() => ({ results: [], count: 0 }));
+        const itemsRaw: Array<{ title: string; url: string; snippet?: string }> = Array.isArray(data.results) ? data.results : [];
+        console.log(`External API response for query "${currentQuery}":`, {
+          totalResults: data.count,
+          itemsCount: itemsRaw.length
         });
 
         // Apply filters to results
@@ -196,12 +196,33 @@ export async function POST(request: Request) {
         // Debug: Track filtering stats
         let filteredOutCount = 0;
         const rejectionReasons: Record<string, number> = {};
-        const originalCount = (data.items || []).length;
+        const originalCount = itemsRaw.length;
 
-        const filteredResults = (data.items || [])
+        // Map items to our internal shape first
+        const mappedItems = itemsRaw.map((r: any, index: number) => {
+          let baseUrl = '';
+          try {
+            const u = new URL(r.url || '');
+            baseUrl = u.hostname.replace('www.', '');
+          } catch (e) {
+            baseUrl = 'unknown-domain';
+          }
+          return {
+            position: index + 1,
+            title: r.title || 'No title',
+            url: r.url || '',
+            displayUrl: baseUrl,
+            fullUrl: r.url || '',
+            description: r.snippet || 'No description available',
+            cacheId: undefined,
+            query: currentQuery,
+          };
+        });
+
+        const filteredResults = mappedItems
           .filter((result: any) => {
             try {
-              const url = new URL(result.link || '');
+              const url = new URL(result.url || '');
               const hostname = url.hostname.toLowerCase();
               const pathname = url.pathname.toLowerCase();
 
@@ -298,32 +319,6 @@ export async function POST(request: Request) {
               return true; // If we can't parse the URL, include it
             }
           })
-          .map((result: any, index: number) => {
-            // Extract base URL from full URL
-            let baseUrl = '';
-            try {
-              const url = new URL(result.link || '');
-              baseUrl = url.hostname.replace('www.', '');
-            } catch (e) {
-              baseUrl = result.displayLink || 'Unknown domain';
-            }
-
-            return {
-              position: index + 1,
-              title: result.title || 'No title',
-              url: result.link || '',
-              displayUrl: baseUrl,
-              fullUrl: result.link || '',
-              description: result.snippet || 'No description available',
-              cacheId: result.cacheId || undefined,
-              query: currentQuery, // Add the query that generated this result
-              // Add date information if available from Google CSE
-              date: result.pagemap?.metatags?.[0]?.['article:published_time'] || 
-                    result.pagemap?.metatags?.[0]?.['date'] ||
-                    result.pagemap?.metatags?.[0]?.['og:updated_time'] ||
-                    undefined
-            };
-          });
 
         // Debug: Log filtering results
         console.log(`\n🔍 FILTERING RESULTS for query "${currentQuery}":`);
@@ -336,11 +331,12 @@ export async function POST(request: Request) {
           console.log(`     ${reason}: ${count}`);
         });
         
-        return {
+          const elapsed = (Date.now() - startedAt) / 1000;
+          return {
           success: true,
           results: filteredResults,
-          totalResults: parseInt(data.searchInformation?.totalResults) || filteredResults.length,
-          searchTime: data.searchInformation?.searchTime || 0
+            totalResults: typeof data.count === 'number' ? data.count : filteredResults.length,
+            searchTime: elapsed
         };
 
       } catch (error: any) {

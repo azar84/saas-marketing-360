@@ -15,7 +15,13 @@ export function getChatModel(opts: LangChainModelOptions = {}) {
   const deepseekApiKey = opts.apiKey || process.env.DEEPSEEK_API_KEY;
   
   if (!deepseekApiKey) {
-    throw new Error("DEEPSEEK_API_KEY not configured");
+    // Return a stub that throws only when actually used, to avoid crashing on import
+    const error = new Error("DEEPSEEK_API_KEY not configured");
+    const stub = {
+      async invoke() { throw error; },
+      async call() { throw error; },
+    } as any;
+    return stub;
   }
 
   // Create DeepSeek chat model with fallback models

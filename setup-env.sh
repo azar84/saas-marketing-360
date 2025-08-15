@@ -15,6 +15,12 @@ BUILTWITH_API_KEY="test"
 
 # Debug Mode
 DEBUG=true
+ 
+# External API Protection (required for keyword generation)
+VERCEL_AUTOMATION_BYPASS_SECRET=""
+
+# Marketing MCP base URL
+MARKETING_MCP_API_URL="https://marketing-mcp-beta.vercel.app"
 EOF
 
 echo "✅ .env file created successfully!"

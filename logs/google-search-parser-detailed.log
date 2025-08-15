@@ -2615,3 +2615,1550 @@
     "extractionQuality": 0.9333333333333333
   }
 }
+
+
+=== 2025-08-12T15:12:37.275Z ===
+{
+  "timestamp": "2025-08-12T15:12:37.275Z",
+  "totalSearchResults": 17,
+  "location": "Alsask",
+  "processingDetails": [
+    {
+      "url": "https://www.alaskacommunications.com/",
+      "processingTime": 11.931,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.alaskaair.com/",
+      "processingTime": 11.899,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.lennox.com/residential/locate/",
+      "processingTime": 13.446,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.uaa.alaska.edu/",
+      "processingTime": 13.027,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://alaskacommercial.com/",
+      "processingTime": 12.02,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://infrastructurereportcard.org/state-item/alaska/",
+      "processingTime": 12.791,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.uaf.edu/",
+      "processingTime": 23.75,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.jfkairport.com/flight/airlines",
+      "processingTime": 13.018,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.johnsoncontrols.com/",
+      "processingTime": 12.893,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.aphis.usda.gov/",
+      "processingTime": 12.256,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.conocophillips.com/",
+      "processingTime": 11.52,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.alaskarefrigeration.net/",
+      "processingTime": 12.497,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://northerndynastyminerals.com/",
+      "processingTime": 11.085,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.flylax.com/lax-airline-list",
+      "processingTime": 13.716,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.nationalguard.mil/News/Article-View/Article/4060947/alaska-air-guard-rescues-8-people-in-4-missions/",
+      "processingTime": 13.923,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.cbsa-asfc.gc.ca/menu-eng.html",
+      "processingTime": 12.618,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://gonorth-alaska.com/rv-service-repair/rv-service-repair-anchorage/",
+      "processingTime": 14.467,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 17,
+    "accepted": 16,
+    "rejected": 1,
+    "uniqueBusinesses": 17,
+    "companyWebsites": 16,
+    "directories": 1,
+    "extractionQuality": 0.9411764705882353
+  }
+}
+
+
+=== 2025-08-12T15:40:15.786Z ===
+{
+  "timestamp": "2025-08-12T15:40:15.785Z",
+  "totalSearchResults": 45,
+  "location": "Aleza Lake",
+  "processingDetails": [
+    {
+      "url": "https://www.biorxiv.org/content/10.1101/2022.04.10.487783.full",
+      "processingTime": 12.169,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://forestry.sites.olt.ubc.ca/files/2012/06/ar2006.pdf",
+      "processingTime": 13.022,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://forestry.sites.olt.ubc.ca/files/2012/06/ar2006.pdf",
+      "processingTime": 13.449,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://www.rdffg.ca/media/file/electoral-area-f-ocp-schedule-documents",
+      "processingTime": 13.686,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://apirs.plants.ifas.ufl.edu/site/assets/files/367478/367478.pdf",
+      "processingTime": 13.725,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://catalogue.data.gov.bc.ca/dataset/f6bad1d5-d1dc-4fdd-a076-650f55cc3fbc/resource/24ec8890-5d43-4115-998d-46481dec3971/download/fye24-other-suppliers.csv",
+      "processingTime": 15.563,
+      "status": "rejected",
+      "confidence": 0.1
+    },
+    {
+      "url": "https://apirs.plants.ifas.ufl.edu/site/assets/files/367478/367478.pdf",
+      "processingTime": 14.201,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://free.bcpublications.ca/civix/document/id/corpreg/corpreg/crpn0515fin1225",
+      "processingTime": 14.703,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://free.bcpublications.ca/civix/document/id/corpreg/corpreg/crpn0515fin1225",
+      "processingTime": 13.867,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://www2.gov.bc.ca/assets/gov/environment/waste-management/waste-discharge-authorization/datamart/all_ams_authorizations.xlsx",
+      "processingTime": 13.56,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www2.gov.bc.ca/assets/gov/environment/waste-management/waste-discharge-authorization/datamart/all_ams_authorizations.xlsx",
+      "processingTime": 13.771,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.statefunding.ca/wp-content/uploads/Archive/BC/1973_BC_PA.pdf",
+      "processingTime": 13.942,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://www.sciencedirect.com/science/article/pii/S1754504824000679",
+      "processingTime": 12.899,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.loopnet.ca/Listing/5155-Domano-Blvd-Prince-George-BC/29952571/",
+      "processingTime": 13.44,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/forestry/timber-pricing/interior-timber-pricing/interior-appraisal-manual/iam_2023_master_amend_1.pdf",
+      "processingTime": 15.634,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.loopnet.ca/Listing/5155-Domano-Blvd-Prince-George-BC/29952571/",
+      "processingTime": 13.176,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://cosewic.ca/images/cosewic/pdf/Lake_Whitefish_Special_Report_2008_e.pdf",
+      "processingTime": 12.195,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/forestry/timber-pricing/interior-timber-pricing/interior-appraisal-manual/iam_2023_master_amend_1.pdf",
+      "processingTime": 16.042,
+      "status": "rejected",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.patriciamcconnell.com/theotherendoftheleash/when-is-it-time-to-put-down-a-dog-who-is-aggressive-to-people",
+      "processingTime": 13.848,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://onlinelibrary.wiley.com/doi/10.1111/gcbb.12928",
+      "processingTime": 20.476,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://onlinelibrary.wiley.com/doi/10.1111/gcbb.12928",
+      "processingTime": 14.39,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.patriciamcconnell.com/theotherendoftheleash/when-is-it-time-to-put-down-a-dog-who-is-aggressive-to-people",
+      "processingTime": 13.987,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.patriciamcconnell.com/theotherendoftheleash/when-is-it-time-to-put-down-a-dog-who-is-aggressive-to-people",
+      "processingTime": 14.758,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Ferndale,_British_Columbia",
+      "processingTime": 12.141,
+      "status": "rejected",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.canadianflyinfishing.com/2022/10/another-one-all-wrapped-up/",
+      "processingTime": 14.945,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://projects.eao.gov.bc.ca/api/public/document/65c26334a869470022226e7e/download/angus_Vitreo_DPD_forEAO_20240205_fin_rev.pdf",
+      "processingTime": 16.188,
+      "status": "rejected",
+      "confidence": 0.1
+    },
+    {
+      "url": "https://free.bcpublications.ca/civix/document/id/corpreg/corpreg/crpn0515fin1225",
+      "processingTime": 13.93,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://projects.eao.gov.bc.ca/api/public/document/65c26334a869470022226e7e/download/angus_Vitreo_DPD_forEAO_20240205_fin_rev.pdf",
+      "processingTime": 13.897,
+      "status": "rejected",
+      "confidence": 0.1
+    },
+    {
+      "url": "https://www.rdffg.ca/media/file/lakeshore-guidelines",
+      "processingTime": 12.46,
+      "status": "rejected",
+      "confidence": 0.2
+    },
+    {
+      "url": "https://www.canadianflyinfishing.com/2022/10/another-one-all-wrapped-up/",
+      "processingTime": 15.174,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.unbc.ca/sites/default/files/sections/nres-institute/morganandwright.pdf",
+      "processingTime": 13.745,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/rangelands/bc_rl_seeding_manual_web_single_150dpi0904.pdf",
+      "processingTime": 14.448,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/rangelands/bc_rl_seeding_manual_web_single_150dpi0904.pdf",
+      "processingTime": 14.014,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.facetsjournal.com/doi/10.1139/facets-2023-0195",
+      "processingTime": 13.466,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://www.facetsjournal.com/doi/10.1139/facets-2023-0195",
+      "processingTime": 13.42,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "http://www.multimodalways.org/docs/railroads/companies/CN/CN%20ETTs/CN%20Western%20Alberta%20BC%20ETT%20%2311%201-1-2005.pdf",
+      "processingTime": 15.865,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://www.rdffg.ca/media/file/lakeshore-guidelines",
+      "processingTime": 11.47,
+      "status": "rejected",
+      "confidence": 0.2
+    },
+    {
+      "url": "https://www.statefunding.ca/wp-content/uploads/Archive/BC/1974_BC_PA.pdf",
+      "processingTime": 13.712,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://www.rdffg.ca/media/file/lakeshore-guidelines",
+      "processingTime": 13.084,
+      "status": "rejected",
+      "confidence": 0.2
+    },
+    {
+      "url": "https://issuu.com/railwaytrackstructures/docs/rts_track_buyers_guide_2025",
+      "processingTime": 13.422,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://www.statefunding.ca/wp-content/uploads/Archive/BC/1974_BC_PA.pdf",
+      "processingTime": 13.062,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Willow_River,_British_Columbia",
+      "processingTime": 12.221,
+      "status": "rejected",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.congress.gov/118/crec/2024/09/10/170/140/CREC-2024-09-10-senate.pdf",
+      "processingTime": 13.045,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.statefunding.ca/wp-content/uploads/Archive/BC/1974_BC_PA.pdf",
+      "processingTime": 13.635,
+      "status": "rejected",
+      "confidence": 0.1
+    },
+    {
+      "url": "https://arcabc.ca/islandora/object/unbc%3A59255/datastream/PDF/download/citation.pdf",
+      "processingTime": 13.748,
+      "status": "rejected",
+      "confidence": 0.7
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 45,
+    "accepted": 12,
+    "rejected": 33,
+    "uniqueBusinesses": 23,
+    "companyWebsites": 6,
+    "directories": 17,
+    "extractionQuality": 0.26666666666666666
+  }
+}
+
+
+=== 2025-08-12T15:45:22.402Z ===
+{
+  "timestamp": "2025-08-12T15:45:22.402Z",
+  "totalSearchResults": 44,
+  "location": "Alba",
+  "processingDetails": [
+    {
+      "url": "https://www.albeebaby.com/",
+      "processingTime": 12.792,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.bbb.org/",
+      "processingTime": 12.793,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "http://inspection.canada.ca/en/plant-varieties/plants-novel-traits/applicants/directive-94-08/biology-documents/sinapis-alba",
+      "processingTime": 14.714,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://power.mhi.com/",
+      "processingTime": 10.767,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://albaoptics.cc/",
+      "processingTime": 24.079,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://albaoptics.cc/",
+      "processingTime": 24.11,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://verilux.com/products/happylight-luxe-replacement-adaptor",
+      "processingTime": 24.471,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.bbb.org/",
+      "processingTime": 12.387,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://edwebprofiles.ed.ac.uk/profile/rob-dunbar",
+      "processingTime": 13.027,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.ssactivewear.com/",
+      "processingTime": 13.052,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.canada.ca/en/environment-climate-change/services/species-risk-public-registry/recovery-strategies/barn-owl-eastern-population-2016.html",
+      "processingTime": 13.634,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://edwebprofiles.ed.ac.uk/profile/rob-dunbar",
+      "processingTime": 12.923,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.cbp.gov/about/contact/brokers-listing",
+      "processingTime": 14.685,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.cbp.gov/about/contact/brokers-listing",
+      "processingTime": 14.516,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39607940/",
+      "processingTime": 13.248,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.conocophillips.com/",
+      "processingTime": 11.643,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.conocophillips.com/",
+      "processingTime": 12.328,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://pubmed.ncbi.nlm.nih.gov/39607940/",
+      "processingTime": 13.176,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.cbp.gov/document/report/filer-code-list",
+      "processingTime": 14.13,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.faa.gov/air_traffic/publications/atpubs/cnt_html/chap3_section_3.html",
+      "processingTime": 15.349,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://ca.olaplex.com/products/4-in-1-moisture-mask",
+      "processingTime": 13.157,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.loc.gov/collections/edison-company-motion-pictures-and-sound-recordings/articles-and-essays/biography/life-of-thomas-alva-edison/",
+      "processingTime": 12.605,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://ca.olaplex.com/products/4-in-1-moisture-mask",
+      "processingTime": 12.734,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.assaabloy.com/group/en",
+      "processingTime": 13.414,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.assaabloy.com/group/en",
+      "processingTime": 13.442,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "http://www.azcc.gov/",
+      "processingTime": 13.921,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.illumina.com/",
+      "processingTime": 15.561,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11232441/",
+      "processingTime": 12.467,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.illumina.com/",
+      "processingTime": 12.842,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11232441/",
+      "processingTime": 11.672,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.stussy.com/blogs/features/pool-service",
+      "processingTime": 11.939,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.canada.ca/en/environment-climate-change/services/species-risk-public-registry/recovery-strategies/barn-owl-2022.html",
+      "processingTime": 13.857,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.canada.ca/en/environment-climate-change/services/species-risk-public-registry/recovery-strategies/barn-owl-2022.html",
+      "processingTime": 14.16,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.ftaiaviation.com/",
+      "processingTime": 11.772,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.akamai.com/",
+      "processingTime": 11.761,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://edwebprofiles.ed.ac.uk/profile/rob-dunbar",
+      "processingTime": 12.79,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.etsy.com/ca/listing/1889276577/armored-core-6-elcano-el-px-00-alba-ac",
+      "processingTime": 13.805,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.akamai.com/",
+      "processingTime": 11.935,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.atu.org/",
+      "processingTime": 11.222,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.canada.ca/en/environment-climate-change/services/species-risk-public-registry/recovery-strategies/barn-owl-eastern-population-2016.html",
+      "processingTime": 13.747,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.canada.ca/en/environment-climate-change/services/species-risk-public-registry/recovery-strategies/barn-owl-eastern-population-2016.html",
+      "processingTime": 13.347,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK459312/",
+      "processingTime": 12.914,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Thomas_Edison",
+      "processingTime": 11.423,
+      "status": "rejected",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.alfalaval.us/",
+      "processingTime": 13.947,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 44,
+    "accepted": 31,
+    "rejected": 13,
+    "uniqueBusinesses": 27,
+    "companyWebsites": 19,
+    "directories": 8,
+    "extractionQuality": 0.7045454545454546
+  }
+}
+
+
+=== 2025-08-12T17:27:07.930Z ===
+{
+  "timestamp": "2025-08-12T17:27:07.930Z",
+  "totalSearchResults": 12,
+  "location": null,
+  "processingDetails": [
+    {
+      "url": "https://www.johnsoncontrols.com/",
+      "processingTime": 11.964,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.aircanada.com/cargo/",
+      "processingTime": 11.965,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.trane.com/residential/en/dealer-locator/",
+      "processingTime": 12.325,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.aircanada.com/ca/en/aco/home/fly/premium-services/maple-leaf-lounges.html",
+      "processingTime": 13.091,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.goodmanmfg.com/",
+      "processingTime": 13.092,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://reliancehomecomfort.com/saskatoon/",
+      "processingTime": 14.652,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.colemanac.com/residential-equipment/find-a-dealer",
+      "processingTime": 12.843,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.lennox.com/residential/locate/dealer-list",
+      "processingTime": 13.21,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://trane.com/",
+      "processingTime": 13.969,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.cn.ca/",
+      "processingTime": 13.373,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.york.com/",
+      "processingTime": 12.59,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.midas.com/",
+      "processingTime": 16.495,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 12,
+    "accepted": 12,
+    "rejected": 0,
+    "uniqueBusinesses": 10,
+    "companyWebsites": 10,
+    "directories": 0,
+    "extractionQuality": 1
+  }
+}
+
+
+=== 2025-08-12T17:31:39.916Z ===
+{
+  "timestamp": "2025-08-12T17:31:39.916Z",
+  "totalSearchResults": 14,
+  "location": null,
+  "processingDetails": [
+    {
+      "url": "https://forestry.sites.olt.ubc.ca/files/2012/06/ar2006.pdf",
+      "processingTime": 12.596,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://www.loopnet.ca/Listing/5155-Domano-Blvd-Prince-George-BC/29952571/",
+      "processingTime": 15.77,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www2.gov.bc.ca/assets/gov/environment/waste-management/waste-discharge-authorization/datamart/all_ams_authorizations.xlsx",
+      "processingTime": 15.77,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://apirs.plants.ifas.ufl.edu/site/assets/files/367478/367478.pdf",
+      "processingTime": 15.773,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/forestry/timber-pricing/interior-timber-pricing/interior-appraisal-manual/iam_2023_master_amend_1.pdf",
+      "processingTime": 15.771,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://free.bcpublications.ca/civix/document/id/corpreg/corpreg/crpn0515fin1225",
+      "processingTime": 15.771,
+      "status": "rejected",
+      "confidence": 0.2
+    },
+    {
+      "url": "https://www.patriciamcconnell.com/theotherendoftheleash/when-is-it-time-to-put-down-a-dog-who-is-aggressive-to-people",
+      "processingTime": 14.196,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.facetsjournal.com/doi/10.1139/facets-2023-0195",
+      "processingTime": 13.283,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://onlinelibrary.wiley.com/doi/10.1111/gcbb.12928",
+      "processingTime": 13.417,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://projects.eao.gov.bc.ca/api/public/document/65c26334a869470022226e7e/download/angus_Vitreo_DPD_forEAO_20240205_fin_rev.pdf",
+      "processingTime": 13.416,
+      "status": "rejected",
+      "confidence": 0.1
+    },
+    {
+      "url": "https://www2.gov.bc.ca/assets/gov/farming-natural-resources-and-industry/rangelands/bc_rl_seeding_manual_web_single_150dpi0904.pdf",
+      "processingTime": 13.554,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.canadianflyinfishing.com/2022/10/another-one-all-wrapped-up/",
+      "processingTime": 14.21,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.statefunding.ca/wp-content/uploads/Archive/BC/1974_BC_PA.pdf",
+      "processingTime": 12.454,
+      "status": "rejected",
+      "confidence": 0.1
+    },
+    {
+      "url": "https://www.rdffg.ca/media/file/lakeshore-guidelines",
+      "processingTime": 12.726,
+      "status": "rejected",
+      "confidence": 0.2
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 14,
+    "accepted": 5,
+    "rejected": 9,
+    "uniqueBusinesses": 13,
+    "companyWebsites": 4,
+    "directories": 9,
+    "extractionQuality": 0.35714285714285715
+  }
+}
+
+
+=== 2025-08-12T17:37:21.148Z ===
+{
+  "timestamp": "2025-08-12T17:37:21.148Z",
+  "totalSearchResults": 12,
+  "location": null,
+  "processingDetails": [
+    {
+      "url": "https://www.johnsoncontrols.com/",
+      "processingTime": 11.672,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.aircanada.com/cargo/",
+      "processingTime": 11.857,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.trane.com/residential/en/dealer-locator/",
+      "processingTime": 12.656,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.aircanada.com/ca/en/aco/home/fly/premium-services/maple-leaf-lounges.html",
+      "processingTime": 13.225,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://reliancehomecomfort.com/saskatoon/",
+      "processingTime": 15.262,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.goodmanmfg.com/",
+      "processingTime": 21.904,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.colemanac.com/residential-equipment/find-a-dealer",
+      "processingTime": 13.062,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.midas.com/",
+      "processingTime": 14.027,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://trane.com/",
+      "processingTime": 13.324,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.lennox.com/residential/locate/dealer-list",
+      "processingTime": 13.921,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.york.com/",
+      "processingTime": 13.342,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.cn.ca/",
+      "processingTime": 11.627,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 12,
+    "accepted": 12,
+    "rejected": 0,
+    "uniqueBusinesses": 10,
+    "companyWebsites": 10,
+    "directories": 0,
+    "extractionQuality": 1
+  }
+}
+
+
+=== 2025-08-12T17:40:42.911Z ===
+{
+  "timestamp": "2025-08-12T17:40:42.911Z",
+  "totalSearchResults": 21,
+  "location": null,
+  "processingDetails": [
+    {
+      "url": "https://pubsaskdev.blob.core.windows.net/pubsask-prod/128294/G1202131.pdf",
+      "processingTime": 13.308,
+      "status": "rejected",
+      "confidence": 0.1
+    },
+    {
+      "url": "https://grants.nih.gov/grants/olaw/guide-for-the-care-and-use-of-laboratory-animals.pdf",
+      "processingTime": 13.511,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://pubsaskdev.blob.core.windows.net/pubsask-prod/114793/G1201949.pdf",
+      "processingTime": 15.356,
+      "status": "rejected",
+      "confidence": 0.1
+    },
+    {
+      "url": "https://www.dnb.com/business-directory/company-information.beer_wine_and_distilled_alcoholic_beverage_merchant_wholesalers.ca.html",
+      "processingTime": 20.275,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.dnb.com/business-directory/company-information.wholesale_trade.ca.saskatchewan.html",
+      "processingTime": 25.599,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://pubsaskdev.blob.core.windows.net/pubsask-prod/131878/G1202202.pdf",
+      "processingTime": 25.599,
+      "status": "rejected",
+      "confidence": 0.1
+    },
+    {
+      "url": "https://www.accuzip.com/products/purchase-mailing-lists/naics-codes/",
+      "processingTime": 14.696,
+      "status": "accepted",
+      "confidence": 0.9
+    },
+    {
+      "url": "https://www.uscis.gov/sites/default/files/document/data/2-L1Report_Excel.pdf",
+      "processingTime": 16.062,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/Loblaw_Companies",
+      "processingTime": 11.752,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.sifma.org/wp-content/uploads/2017/08/Securitized-Products_CDO-Data-File-Format_Appendix.xlsx",
+      "processingTime": 17.047,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://publications.gc.ca/collections/collection_2024/statcan/12-501-x-2022001-eng.pdf",
+      "processingTime": 13.095,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://itif.org/publications/2024/09/16/china-is-rapidly-becoming-a-leading-innovator-in-advanced-industries/",
+      "processingTime": 13.742,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "http://www.wedodocumenttranslation.com/translating-wholesalers-documentation-wholesale-trade-markets-distributors-sales-agents.htm",
+      "processingTime": 15.539,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.navsea.navy.mil/Portals/103/LRAF_RFPs_FY2020%20Q3_thru_FY22Q2.xlsx",
+      "processingTime": 15.186,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.fvrd.ca/assets/About~the~FVRD/Documents/Popkum~History/Family%20Stories.pdf",
+      "processingTime": 13.648,
+      "status": "rejected",
+      "confidence": 0.1
+    },
+    {
+      "url": "https://www.pacodeandbulletin.gov/Display/pabull?file=/secure/pabulletin/data/vol53/53-30/1026.html",
+      "processingTime": 14.036,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.cag.edu.tr/uploads/site/lecturer-files/mary-guffey-essentials-of-business-communication-2016-yzss.pdf",
+      "processingTime": 13.493,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://www.usitc.gov/documents/337Info_PRE2008.xlsx",
+      "processingTime": 13.103,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://sos.ks.gov/publications/Register/Volume-41/PDF/Vol-41-No-34-August-25-2022-July-2022-Forfeitures.pdf",
+      "processingTime": 13.565,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.papier.com/us/store-locator/",
+      "processingTime": 14.323,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://data.lacity.org/api/views/5ey4-7ygp/rows.csv?accessType=DOWNLOAD&api_foundry=true",
+      "processingTime": 15.143,
+      "status": "rejected",
+      "confidence": 0.7
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 21,
+    "accepted": 7,
+    "rejected": 14,
+    "uniqueBusinesses": 18,
+    "companyWebsites": 7,
+    "directories": 11,
+    "extractionQuality": 0.3333333333333333
+  }
+}
+
+
+=== 2025-08-12T17:43:49.494Z ===
+{
+  "timestamp": "2025-08-12T17:43:49.493Z",
+  "totalSearchResults": 13,
+  "location": null,
+  "processingDetails": [
+    {
+      "url": "https://ahmicair.com/",
+      "processingTime": 11.987,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://archives.lib.state.ma.us/bitstreams/c648568c-4ad6-45da-9b57-efd9de12e31f/download",
+      "processingTime": 14.344,
+      "status": "rejected",
+      "confidence": 0.1
+    },
+    {
+      "url": "https://www.expedia.com/Magnetawan-Hotels-Ahmic-Lake-Resort.h91594624.Hotel-Information",
+      "processingTime": 14.347,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.cottagesincanada.com/36839",
+      "processingTime": 14.346,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.tripadvisor.com/Restaurant_Review-g499272-d982088-Reviews-or90-The_Swiss_Country_House_Restaurant-Magnetawan_Northeastern_Ontario_Ontario.html",
+      "processingTime": 16.043,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://dodsoco.ogc.osd.mil/Portals/102/Documents/Conflicts/2024%2025K%20FY2023.pdf?ver=kYv9PxVeAiA3Uam2Etu7HA%3D%3D",
+      "processingTime": 16.114,
+      "status": "rejected",
+      "confidence": 0.1
+    },
+    {
+      "url": "https://magnetawan.com/events",
+      "processingTime": 14.532,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://resortsofontario.com/resorts/",
+      "processingTime": 12.793,
+      "status": "accepted",
+      "confidence": 0.85
+    },
+    {
+      "url": "https://www.baaa-acro.com/zone/ontario?page=7",
+      "processingTime": 12.785,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.whitestone.ca/p/business-directory-",
+      "processingTime": 11.852,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://dchr.dc.gov/sites/default/files/dc/sites/dchr/publication/attachments/public_body_employee_information_jun16_0.pdf",
+      "processingTime": 14.629,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://whitestone.ca/Home/DownloadDocument?docId=d02ae87e-b164-45dc-8acc-32b653d60dc3",
+      "processingTime": 14.506,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://realmuskoka.com/muskoka-steamships/",
+      "processingTime": 14.328,
+      "status": "accepted",
+      "confidence": 0.9
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 13,
+    "accepted": 8,
+    "rejected": 5,
+    "uniqueBusinesses": 12,
+    "companyWebsites": 7,
+    "directories": 5,
+    "extractionQuality": 0.6153846153846154
+  }
+}
+
+
+=== 2025-08-12T17:48:23.351Z ===
+{
+  "timestamp": "2025-08-12T17:48:23.350Z",
+  "totalSearchResults": 12,
+  "location": null,
+  "processingDetails": [
+    {
+      "url": "https://en.wikipedia.org/wiki/LaRouche_movement",
+      "processingTime": 11.33,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10036309/",
+      "processingTime": 12.325,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0308926",
+      "processingTime": 12.423,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.sciencedirect.com/science/article/abs/pii/S1871101411000537",
+      "processingTime": 13.498,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6935133/",
+      "processingTime": 14.03,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.laroche-posay.us/",
+      "processingTime": 14.088,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.laroche-posay.ca/en_CA/lipikar-baume-apm/3337875696548.html",
+      "processingTime": 13.488,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://ascopubs.org/doi/10.1200/JCO.2016.66.6552",
+      "processingTime": 12.681,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.jogc.com/article/S1701-2163(24)00542-5/fulltext",
+      "processingTime": 13.396,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://cardiacvet.com/about/",
+      "processingTime": 13.691,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://aacrjournals.org/cancerdiscovery/article/14/2/258/734063/Combined-Immunotherapy-Improves-Outcome-for",
+      "processingTime": 13.356,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://aricjournal.biomedcentral.com/articles/10.1186/s13756-021-01000-y",
+      "processingTime": 15.34,
+      "status": "rejected",
+      "confidence": 0.7
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 12,
+    "accepted": 5,
+    "rejected": 7,
+    "uniqueBusinesses": 11,
+    "companyWebsites": 5,
+    "directories": 6,
+    "extractionQuality": 0.4166666666666667
+  }
+}
+
+
+=== 2025-08-12T17:54:06.974Z ===
+{
+  "timestamp": "2025-08-12T17:54:06.974Z",
+  "totalSearchResults": 13,
+  "location": null,
+  "processingDetails": [
+    {
+      "url": "https://www.johnsoncontrols.com/",
+      "processingTime": 10.984,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.abm.com/",
+      "processingTime": 12.285,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.goodmanmfg.com/",
+      "processingTime": 13.262,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.nps.gov/yell/index.htm",
+      "processingTime": 13.263,
+      "status": "accepted",
+      "confidence": 1
+    },
+    {
+      "url": "https://www.lennox.com/residential/locate/",
+      "processingTime": 15.357,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.fleetwellusa.com/ac-repair-oak-park/",
+      "processingTime": 15.359,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.servicelogic.com/locations",
+      "processingTime": 13.68,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.firstenergycorp.com/",
+      "processingTime": 11.41,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.serviceexperts.com/",
+      "processingTime": 13.178,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.fluor.com/",
+      "processingTime": 12.201,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://daikincomfort.com/",
+      "processingTime": 13.302,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.homeserve.com/en-us/services/hvac/maintenance/staten-island/?gm-vt=1",
+      "processingTime": 13.454,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.fleetwellusa.com/air-conditioner-repair-canoga-park/",
+      "processingTime": 13.206,
+      "status": "accepted",
+      "confidence": 0.95
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 13,
+    "accepted": 13,
+    "rejected": 0,
+    "uniqueBusinesses": 12,
+    "companyWebsites": 12,
+    "directories": 0,
+    "extractionQuality": 1
+  }
+}
+
+
+=== 2025-08-12T18:00:17.583Z ===
+{
+  "timestamp": "2025-08-12T18:00:17.583Z",
+  "totalSearchResults": 20,
+  "location": null,
+  "processingDetails": [
+    {
+      "url": "https://www.algonquincollege.com/pembroke/program/forestry-technician/video-room/",
+      "processingTime": 12.469,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.whitecapsfc.com/club/staff/",
+      "processingTime": 15.333,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://weather.com/weather/tenday/l/Aylen+Lake+Canada+CAON0298",
+      "processingTime": 15.335,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.pacodeandbulletin.gov/Display/pabull?file=/secure/pabulletin/data/vol53/53-30/1026.html",
+      "processingTime": 15.848,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.pacodeandbulletin.gov/Display/pabull?file=/secure/pabulletin/data/vol52/52-34/1280.html",
+      "processingTime": 15.885,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.pacodeandbulletin.gov/Display/pabull?file=/secure/pabulletin/data/vol54/54-43/1566.html",
+      "processingTime": 16.564,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.theweathernetwork.com/en/city/ca/ontario/aylen-lake/alerts",
+      "processingTime": 13.196,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.mpac.ca/en",
+      "processingTime": 11.63,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "http://www.clarkcountycourts.us/res/rules-and-orders/AO%2017-05.pdf",
+      "processingTime": 12.365,
+      "status": "rejected",
+      "confidence": 0.1
+    },
+    {
+      "url": "https://www.southalgonquin.ca/wp-content/uploads/2024/05/June-5-Council-Meeting-Package.pdf",
+      "processingTime": 14.533,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://iucn.org/sites/default/files/import/downloads/natural_solutions.pdf",
+      "processingTime": 14.028,
+      "status": "accepted",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://ogc.altess.army.mil/EandF/Documentation/contractor_list.pdf",
+      "processingTime": 13.734,
+      "status": "rejected",
+      "confidence": 0.1
+    },
+    {
+      "url": "https://sos.ks.gov/publications/Register/Volume-40/PDF/Vol_40_No_34_August_26_2021_July_2021_Forfeitures.pdf",
+      "processingTime": 15.766,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://research.bangor.ac.uk/files/38669482/NbS_Report_Final_Designed.pdf",
+      "processingTime": 14.471,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://www.britishecologicalsociety.org/wp-content/uploads/2022/02/NbS-Report-Final-Updated-Feb-2022.pdf",
+      "processingTime": 14.206,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://onlinelibrary.wiley.com/doi/pdf/10.1111/radm.12014",
+      "processingTime": 12.877,
+      "status": "rejected",
+      "confidence": 0.8
+    },
+    {
+      "url": "https://esajournals.onlinelibrary.wiley.com/doi/10.1002/eap.2736",
+      "processingTime": 13.3,
+      "status": "rejected",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://archive-nwfsc.forestry.oregonstate.edu/sites/default/files/publications/Copes-Gerbitz%20et%20al%202022_Transforming%20fire%20governance%20in%20BC%2C%20Canda.pdf",
+      "processingTime": 16.064,
+      "status": "rejected",
+      "confidence": 0.7
+    },
+    {
+      "url": "https://digitallibrary.un.org/record/748526/files/A_C.5_L.1-EN.pdf",
+      "processingTime": 13.918,
+      "status": "accepted",
+      "confidence": 0.95
+    },
+    {
+      "url": "https://www.airbnb.com/papineau-lake-canada/stays",
+      "processingTime": 13.923,
+      "status": "accepted",
+      "confidence": 1
+    }
+  ],
+  "finalSummary": {
+    "totalProcessed": 20,
+    "accepted": 9,
+    "rejected": 11,
+    "uniqueBusinesses": 18,
+    "companyWebsites": 9,
+    "directories": 9,
+    "extractionQuality": 0.45
+  }
+}

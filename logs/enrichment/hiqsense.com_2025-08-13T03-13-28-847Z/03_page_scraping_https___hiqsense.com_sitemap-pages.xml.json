@@ -1,0 +1,45 @@
+{
+  "stepName": "Page Scraping",
+  "timestamp": "2025-08-13T03:13:53.513Z",
+  "data": {
+    "url": "https://hiqsense.com/sitemap-pages.xml",
+    "status": "success",
+    "duration": 0,
+    "extractedData": {
+      "title": "XML Sitemap - Pages",
+      "description": "This sitemap contains all the main pages of our website.",
+      "content": "XML Sitemap - Pages This sitemap contains all the main pages of our website. You can find more information about XML sitemaps on sitemaps.org. ← Back to Sitemap Index Pages Overview: This sitemap contains 6 pages, last updated on 2025-08-13 02:44:36 +00:00. Page URL Priority Change Frequency Last Modified https://hiqsense.com/about-us 0.7 monthly 2025-07-30 01:13:23 +00:00 https://hiqsense.com/contact 0.7 monthly 2025-07-30 01:14:13 +00:00 https://hiqsense.com/faq 0.8 weekly 2025-07-30 01:13:46 +00:00 https://hiqsense.com/home 1.0 weekly 2025-07-30 01:12:18 +00:00 https://hiqsense.com/privacy-policy 0.7 monthly 2025-07-30 01:15:11 +00:00 https://hiqsense.com/terms-of-service 0.7 monthly 2025-07-30 01:14:51 +00:00",
+      "contactInfo": {
+        "emails": [],
+        "phones": [
+          "2025081302",
+          "2025073001"
+        ],
+        "addresses": [],
+        "phoneDetails": [
+          {
+            "number": "2025081302",
+            "source": "text",
+            "snippet": "x Pages Overview: This sitemap contains 6 pages, last updated on 2025-08-13 02:44:36 +00:00. Page URL Priority Ch"
+          },
+          {
+            "number": "2025073001",
+            "source": "text",
+            "snippet": "ps://hiqsense.com/about-us 0.7 monthly 2025-07-30 01:13:23 +00:00 https://hiqsense.com/cont"
+          }
+        ]
+      },
+      "technologies": [],
+      "socialLinks": {},
+      "keywords": [
+        "XML Sitemap - Pages",
+        "Pages Overview:"
+      ]
+    }
+  },
+  "metadata": {
+    "stepType": "scraping",
+    "success": true,
+    "dataExtracted": 7
+  }
+}

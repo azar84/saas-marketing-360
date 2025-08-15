@@ -1,0 +1,42 @@
+{
+  "stepName": "Page Scraping",
+  "timestamp": "2025-08-13T03:13:53.513Z",
+  "data": {
+    "url": "https://hiqsense.com/about-us",
+    "status": "success",
+    "duration": 0,
+    "extractedData": {
+      "title": "About HiQSense | AI-Driven Digital Solutions | HiQSense Smart Systems LTD",
+      "description": "HiQSense is a Canadian technology company based in Saskatchewan.\nOur mission is to empower small businesses by making AI accessible, useful, and easy to implement.​",
+      "content": "About UsHiQSense is a Canadian technology company based in Saskatchewan. Our mission is to empower small businesses by making AI accessible, useful, and easy to implement.​About HiQSense Our Vision We envision a future where small businesses can harness the power of AI to operate efficiently, reduce costs, and grow sustainably—without needing technical expertise. At HiQSense, we’re committed to building smart, accessible tools that simplify complex tasks. Through innovations like Saski AI, we empower business owners to automate customer support, streamline operations, and focus on what truly matters—their customers and their growth. Our Values Accessibility – We make advanced AI simple and usable for everyone. Empowerment – We enable businesses to automate and grow on their own terms. Innovation – We continuously explore new ways to solve real-world problems. Simplicity – We design intuitive tools that work without complexity. Customer-Centricity – We listen closely and build solutions around real needs. Reliability – We deliver stable, dependable technology you can trust. Book free consultationOur TeamAt the heart of HiQSense is a multidisciplinary team of passionate innovators and builders.Azar ObeidatCo-Founder & CEO Drives HiQSense forward with a vision to make advanced AI accessible and impactful for small businesses. Crafts intuitive interfaces with a focus on user experienceMarwan KhanfarCTO & Co-FounderLeads technology innovation at HiQSense Crafts intuitive interfaces with a focus on user experienceMohammad MelhemCo-Founder - Business Development & StrategiesDrives strategic growth with deep market insight and relentless focus on impact. Schedule a Call with HiQSense",
+      "contactInfo": {
+        "emails": [
+          "hiqsense@hiqsense.ca"
+        ],
+        "phones": [],
+        "addresses": [],
+        "phoneDetails": []
+      },
+      "technologies": [],
+      "socialLinks": {
+        "linkedin": "https://linkedin.com/in/azarobeidat"
+      },
+      "keywords": [
+        "About Us",
+        "About HiQSense",
+        "Our Vision",
+        "Our Values",
+        "Our Team",
+        "Azar Obeidat",
+        "Marwan Khanfar",
+        "Mohammad Melhem",
+        "Schedule a Call with HiQSense"
+      ]
+    }
+  },
+  "metadata": {
+    "stepType": "scraping",
+    "success": true,
+    "dataExtracted": 7
+  }
+}

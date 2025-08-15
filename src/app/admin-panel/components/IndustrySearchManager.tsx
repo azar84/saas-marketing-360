@@ -198,9 +198,9 @@ export default function IndustrySearchManager() {
     searchEngineId: '',
     resultsLimit: 10
   });
-  const [showConfig, setShowConfig] = useState(true);
-  const [isLoadingConfig, setIsLoadingConfig] = useState(true);
-  const [configLoaded, setConfigLoaded] = useState(false);
+  const [showConfig, setShowConfig] = useState(false);
+  const [isLoadingConfig, setIsLoadingConfig] = useState(false);
+  const [configLoaded, setConfigLoaded] = useState(true);
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -596,8 +596,8 @@ export default function IndustrySearchManager() {
   };
 
   const performSearch = async (page: number = 1) => {
-    if (!configLoaded || !config.apiKey || !config.searchEngineId) {
-      setError('Search engine not configured. Please configure your Google Custom Search Engine first.');
+    if (!configLoaded) {
+      setError('Configuration not loaded yet.');
       return null;
     }
 
@@ -677,17 +677,18 @@ export default function IndustrySearchManager() {
     try {
       const requestBody = {
         queries: generatedQueries,
-        apiKey: config.apiKey,
-        searchEngineId: config.searchEngineId,
+        // apiKey/searchEngineId no longer required; backend calls external API
         resultsLimit: config.resultsLimit,
         filters: filters,
         page: page,
-        // Add date filtering parameters
+        // Add date filtering parameters (preserved for server-side paging/meta)
         maxAgeDays: dateFiltering.enabled ? dateFiltering.maxAgeDays : undefined,
         requireDateFiltering: dateFiltering.enabled,
         // Enable traceability for search session
         enableTraceability: true,
-        existingSearchSessionId: page > 1 || lastSearchQueries ? traceabilitySessionId || undefined : undefined
+        existingSearchSessionId: page > 1 || lastSearchQueries ? traceabilitySessionId || undefined : undefined,
+        // Provide location context so server can forward to external API
+        location: selectedCity?.name
       };
 
       const response = await fetch('/api/admin/search-engine/search', {
@@ -1629,88 +1630,12 @@ export default function IndustrySearchManager() {
                 Loading configuration...
               </span>
             </div>
-          ) : config.apiKey && config.searchEngineId ? (
-            <div className="flex items-center gap-2 mt-2">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-success)' }}></div>
-              <span className="text-sm" style={{ color: 'var(--color-success)' }}>
-                API credentials configured and ready
-              </span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 mt-2">
-              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-warning)' }}></div>
-              <span className="text-sm" style={{ color: 'var(--color-warning)' }}>
-                Please configure your API credentials
-              </span>
-            </div>
-          )}
+          ) : null}
         </div>
-        <Button
-          variant="outline"
-          onClick={() => setShowConfig(!showConfig)}
-          className="flex items-center gap-2"
-        >
-          {showConfig ? 'Hide Config' : 'Show Config'}
-        </Button>
+        {/* Config toggle removed */}
       </div>
 
-      {/* Configuration Panel */}
-      {showConfig && (
-        <div className="rounded-xl p-6 shadow-sm" style={{
-          backgroundColor: 'var(--color-bg-secondary)',
-          border: '1px solid var(--color-gray-light)'
-        }}>
-          <div className="mb-4">
-            <h3 className="text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
-              <Globe className="h-5 w-5" />
-              Google Custom Search Configuration
-            </h3>
-            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-              Configure your Google Custom Search API credentials
-            </p>
-          </div>
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
-                  API Key
-                </label>
-                <Input
-                  type="password"
-                  value={config.apiKey}
-                  onChange={(e) => updateConfig('apiKey', e.target.value)}
-                  placeholder="Enter your Google API key"
-                  className="font-mono text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
-                  Search Engine ID
-                </label>
-                <Input
-                  value={config.searchEngineId}
-                  onChange={(e) => updateConfig('searchEngineId', e.target.value)}
-                  placeholder="Enter your Custom Search Engine ID"
-                  className="font-mono text-sm"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-primary)' }}>
-                Results Limit
-              </label>
-              <Input
-                type="number"
-                value={config.resultsLimit}
-                onChange={(e) => updateConfig('resultsLimit', parseInt(e.target.value) || 10)}
-                min="1"
-                max="100"
-                className="w-32"
-              />
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Config panel removed */}
 
       {/* Industry and City Selection */}
       <div className="rounded-xl p-6 shadow-sm" style={{

@@ -1,0 +1,56 @@
+{
+  "stepName": "Page Scraping",
+  "timestamp": "2025-08-13T03:13:53.513Z",
+  "data": {
+    "url": "https://hiqsense.com/privacy-policy",
+    "status": "success",
+    "duration": 0,
+    "extractedData": {
+      "title": "Privacy Policy | HiQSense Smart Systems LTD | HiQSense Smart Systems LTD",
+      "description": "Effective Date: March 28, 2025",
+      "content": "HomeAbout UsFAQContactBook free consultation Privacy Policy Effective Date: March 28, 2025 HiQSense Smart Systems LTD (\"HiQSense\", \"we\", \"our\", or \"us\") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you interact with our website or services. 1. Information We Collect Personal Information: When you fill out forms, book consultations, or work with us, we may collect your name, email, phone number, and relevant business information. Technical Information: We may collect anonymized data such as IP address, browser type, device type, and browsing behavior using analytics tools like Google Analytics or Hotjar to improve user experience. Project Files & Data: If you provide documents, designs, APIs, databases, or content to complete your project, this information is treated as strictly confidential and is used only for the purpose of delivering the contracted services. 2. How We Use Your Information To communicate with you regarding your inquiry, consultation, or project To assess and deliver the services you request To improve our website and service offerings To manage billing and client accounts To comply with legal and regulatory obligations 3. Sharing of Information We do not sell, trade, or rent your personal information to third parties. We may share information with trusted partners only when necessary to operate our business—such as hosting providers (AWS, GCP, Heroku), payment processors (Stripe), or communication tools (Twilio, Calendly). These partners are required to protect your data in accordance with their own privacy policies and data protection laws. 4. Data Security We implement reasonable administrative, technical, and physical safeguards to protect your information from unauthorized access, use, or disclosure. This includes secure storage, access control, encryption, and regular security audits. 5. Data Retention We retain your information for as long as necessary to provide services and as required by law. You may request deletion of your personal data or project files at any time, unless retention is required for legal or operational reasons. 6. Your Rights You have the right to request access to your personal data, correct inaccuracies, or ask us to delete your information. To make such a request, please contact us using the details below. 7. Changes to This Policy We may update this Privacy Policy to reflect changes to our practices or legal obligations. Updates will be posted on this page with the revised effective date. 8. Contact If you have any questions or concerns about this policy, please contact us: HiQSense Smart Systems LTD 400 – 111 2nd Ave S, Saskatoon, SK, S7K 1K6 Email: info@hiqsense.ca Phone: +1 306 261 8582 Schedule a Call with HiQSense info@hiqsense.ca+1 306 261 8582400-111 2nd Ave S, Saskatoon , SK CA, S7K 1K6Legal PagesPrivacy PolicyTerms of ServiceMain PagesHomeAbout UsFAQContact©2025 All rights reserved for HiQSense Smart Systems LTD",
+      "contactInfo": {
+        "emails": [
+          "info@hiqsense.ca",
+          "hiqsense@hiqsense.ca"
+        ],
+        "phones": [
+          "+13062618582"
+        ],
+        "addresses": [],
+        "phoneDetails": [
+          {
+            "number": "+13062618582",
+            "source": "tel",
+            "snippet": "+1 306 261 8582"
+          }
+        ]
+      },
+      "technologies": [
+        "AWS",
+        "Stripe"
+      ],
+      "socialLinks": {
+        "facebook": "https://www.facebook.com/hiqsense/",
+        "linkedin": "https://www.linkedin.com/company/hiqsense"
+      },
+      "keywords": [
+        "Privacy Policy",
+        "1. Information We Collect",
+        "2. How We Use Your Information",
+        "3. Sharing of Information",
+        "4. Data Security",
+        "5. Data Retention",
+        "6. Your Rights",
+        "7. Changes to This Policy",
+        "8. Contact",
+        "Schedule a Call with HiQSense"
+      ]
+    }
+  },
+  "metadata": {
+    "stepType": "scraping",
+    "success": true,
+    "dataExtracted": 7
+  }
+}
