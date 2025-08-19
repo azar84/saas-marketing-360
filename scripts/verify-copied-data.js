@@ -34,8 +34,7 @@ async function verifyCopiedData() {
       { name: 'FormField', description: 'Form fields' },
       { name: 'HtmlSection', description: 'HTML sections' },
       { name: 'AdminUser', description: 'Admin users' },
-      { name: 'ServiceAccountCredentials', description: 'Service account credentials' },
-      { name: 'SitemapSubmissionLog', description: 'Sitemap logs' }
+
     ];
 
     let totalRecords = 0;

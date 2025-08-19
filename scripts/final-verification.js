@@ -34,8 +34,7 @@ async function finalVerification() {
       { name: 'FormSubmission', description: 'Form submissions' },
       { name: 'NewsletterSubscriber', description: 'Newsletter subscribers' },
       { name: 'AdminUser', description: 'Admin users' },
-      { name: 'ServiceAccountCredentials', description: 'Service account credentials' },
-      { name: 'SitemapSubmissionLog', description: 'Sitemap submission logs' },
+
       { name: 'PageSection', description: 'Page sections (page builder)' },
       { name: 'PageFeatureGroup', description: 'Page feature groups' },
       { name: 'HeroSection', description: 'Hero sections' },

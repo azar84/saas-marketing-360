@@ -10,8 +10,6 @@ export async function POST(request: Request) {
     const { 
       queries, // Array of search queries
       query, // Single query (for backward compatibility)
-      apiKey, 
-      searchEngineId, 
       resultsLimit = '10',
       filters = {},
       page = '1',
@@ -38,17 +36,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // Google API credentials no longer required; using external protected API
+    // Using external protected search API (no Google API credentials required)
 
-    // Validate results limit - Google CSE only supports up to 10 results per request
+    // Validate results limit - External API supports up to 10 results per request
     const limit = Math.min(Math.max(parseInt(resultsLimit) || 10, 1), 10);
     const pageNumber = Math.max(parseInt(page) || 1, 1);
 
     console.log('Search request received:', {
       queries: searchQueries,
       singleQuery: query,
-      apiKey: apiKey ? '***' : 'missing',
-      searchEngineId,
       resultsLimit: limit,
       page: pageNumber,
       maxAgeDays,
@@ -80,8 +76,6 @@ export async function POST(request: Request) {
             city,
             stateProvince,
             country,
-            apiKey,
-            searchEngineId,
             resultsLimit: limit,
             filters,
           });

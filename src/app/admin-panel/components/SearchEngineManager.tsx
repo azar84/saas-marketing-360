@@ -185,16 +185,12 @@ export default function SearchEngineManager() {
       const requestBody = isMultipleSearch 
         ? {
             queries: searchQueries,
-            apiKey: config.apiKey,
-            searchEngineId: config.searchEngineId,
             resultsLimit: config.resultsLimit,
             filters: filters,
             page: page
           }
         : {
             query: searchQuery,
-            apiKey: config.apiKey,
-            searchEngineId: config.searchEngineId,
             resultsLimit: config.resultsLimit,
             filters: filters,
             page: page

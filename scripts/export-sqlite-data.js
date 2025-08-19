@@ -17,8 +17,7 @@ async function exportAllData() {
     // Get all table names from Prisma schema
     const tables = [
       'SiteSettings',
-      'ServiceAccountCredentials', 
-      'SitemapSubmissionLog',
+
       'DesignSystem',
       'Page',
       'HeroSection',

@@ -63,42 +63,9 @@ model SiteSettings {
   @@map("site_settings")
 }
 
-model ServiceAccountCredentials {
-  id                      Int      @id @default(autoincrement())
-  projectId               String
-  clientEmail             String
-  privateKey              String
-  privateKeyId            String
-  clientId                String
-  authUri                 String
-  tokenUri                String
-  authProviderX509CertUrl String
-  clientX509CertUrl       String
-  universeDomain          String
-  isActive                Boolean  @default(true)
-  createdAt               DateTime @default(now())
-  updatedAt               DateTime @default(now()) @updatedAt
 
-  @@map("service_account_credentials")
-}
 
-model SitemapSubmissionLog {
-  id             String   @id @default(cuid())
-  sitemapUrl     String
-  siteUrl        String
-  submittedAt    DateTime @default(now())
-  status         String
-  searchEngine   String
-  googleResponse String?
-  errorMessage   String?
-  statusCode     Int?
-  submissionId   String?
-  warnings       String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @default(now()) @updatedAt
 
-  @@map("sitemap_submission_logs")
-}
 
 model DesignSystem {
   id                  Int      @id @default(autoincrement())
