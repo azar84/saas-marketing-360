@@ -15,6 +15,7 @@ import {
   Zap,
   Search
 } from 'lucide-react';
+import { useGlobalJobStore } from '@/lib/jobs/globalJobState';
 
 interface Job {
   id: string;
@@ -32,7 +33,7 @@ interface Job {
 }
 
 export default function JobsManager() {
-  const [jobs, setJobs] = useState<Job[]>([]);
+  const { jobs, setJobs, updateJob, loadJobsFromDatabase } = useGlobalJobStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   
@@ -60,13 +61,7 @@ export default function JobsManager() {
 
   const loadJobs = async () => {
     try {
-      const response = await fetch('/api/admin/jobs');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          setJobs(data.jobs || []);
-        }
-      }
+      await loadJobsFromDatabase();
     } catch (error) {
       console.error('Failed to load jobs:', error);
     }
@@ -194,8 +189,8 @@ export default function JobsManager() {
       });
       
       if (response.ok) {
-        // Refresh jobs list to show updates
-        await loadJobs();
+        // Update global state immediately
+        updateJob(jobId, updates);
       } else {
         const errorText = await response.text();
         console.error(`Failed to update job ${jobId}:`, errorText);
@@ -207,7 +202,7 @@ export default function JobsManager() {
 
   const refreshJobs = async () => {
     setIsRefreshing(true);
-    await loadJobs();
+    await loadJobsFromDatabase();
     setIsRefreshing(false);
   };
 
@@ -220,7 +215,7 @@ export default function JobsManager() {
       });
 
       if (response.ok) {
-        await loadJobs();
+        await loadJobsFromDatabase();
         console.log('Job deleted successfully');
       } else {
         alert('Failed to delete job');

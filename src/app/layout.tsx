@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import DesignSystemProvider from '../components/layout/DesignSystemProvider';
+import '@/lib/scheduler'; // Start the scheduler automatically
 
 const inter = Inter({ subsets: ['latin'] });
 

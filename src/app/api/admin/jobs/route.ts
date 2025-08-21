@@ -6,6 +6,9 @@ import {
   JobSubmissionRequest 
 } from '@/lib/jobs';
 import databaseJobStore from '@/lib/jobs/databaseJobStore';
+// Ensure scheduler auto-starts when jobs API is hit
+import '@/lib/scheduler';
+
 
 interface JobSubmission {
   id: string;

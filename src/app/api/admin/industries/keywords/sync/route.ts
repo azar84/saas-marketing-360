@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
         }
       } catch (error) {
         console.error(`Error processing keyword "${keyword}":`, error);
-        keywordResults.push({ keyword, action: 'error', error: error.message });
+        keywordResults.push({ keyword, action: 'error', error: error instanceof Error ? error.message : 'Unknown error' });
       }
     }
 

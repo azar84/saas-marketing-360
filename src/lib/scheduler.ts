@@ -37,7 +37,7 @@ class AppScheduler {
     this.addTask({
       id: 'industries-keywords',
       name: 'Generate Keywords for Industries',
-      cronExpression: '*/2 * * * *', // Every 2 minutes
+      cronExpression: '0 * * * *', // Hourly (re-enable when ready)
       task: async () => {
         try {
           this.logTask('industries-keywords', 'info', 'Starting industries keywords generation...');
@@ -45,6 +45,23 @@ class AppScheduler {
           this.logTask('industries-keywords', 'success', 'Keywords generation completed', result);
         } catch (error) {
           this.logTask('industries-keywords', 'error', 'Keywords generation failed', error);
+        }
+      },
+      enabled: false,
+      maxLogs: 100
+    });
+
+    // Job polling task - runs every 5 seconds
+    this.addTask({
+      id: 'poll-incomplete-jobs',
+      name: 'Poll Incomplete Jobs',
+      cronExpression: '*/5 * * * * *', // Every 5 seconds
+      task: async () => {
+        try {
+          const count = await this.pollIncompleteJobs();
+          this.logTask('poll-incomplete-jobs', 'info', `Start polling - ${count} incomplete jobs`);
+        } catch (error) {
+          this.logTask('poll-incomplete-jobs', 'error', 'Job polling failed', error);
         }
       },
       enabled: true,
@@ -191,8 +208,10 @@ class AppScheduler {
       // Update next run time
       task.nextRun = this.calculateNextRun(task.cronExpression);
       
-      // Log success
-      this.logTask(taskId, 'success', 'Task completed successfully');
+      // Log success (suppress for poll-incomplete-jobs to reduce noise)
+      if (taskId !== 'poll-incomplete-jobs') {
+        this.logTask(taskId, 'success', 'Task completed successfully');
+      }
 
       
     } catch (error) {
@@ -207,79 +226,109 @@ class AppScheduler {
   }
 
   /**
-   * Calculate next run time based on cron expression
+   * Calculate next run time based on cron expression (supports 5 or 6 fields).
+   * 6 fields: seconds minutes hours day month dayOfWeek (e.g., every 5 seconds)
+   * 5 fields: minutes hours day month dayOfWeek
    */
   private calculateNextRun(cronExpression: string): Date {
     try {
-      // Simple cron parsing for common patterns
-      const parts = cronExpression.split(' ');
-      if (parts.length !== 5) {
-
+      const parts = cronExpression.trim().split(/\s+/);
+      if (parts.length !== 5 && parts.length !== 6) {
         return this.getDefaultNextRun();
       }
 
-      const [minute, hour, day, month, dayOfWeek] = parts;
+      const hasSeconds = parts.length === 6;
+      const [secOrMin, minuteRaw, hourRaw, dayRaw, monthRaw, dowRaw] = hasSeconds
+        ? parts
+        : ['0', parts[0], parts[1], parts[2], parts[3], parts[4]];
+
       const now = new Date();
-      let nextRun = new Date(now);
+      const nextRun = new Date(now);
 
-      // Reset seconds and milliseconds
-      nextRun.setSeconds(0, 0);
+      // Helper to handle */N pattern
+      const parseStep = (token: string): number | null => {
+        const m = token.match(/^\*\/(\d+)$/);
+        return m ? parseInt(m[1], 10) : null;
+      };
 
-      // Handle minute
-      if (minute !== '*') {
-        const minuteValue = parseInt(minute);
-        if (!isNaN(minuteValue)) {
-          nextRun.setMinutes(minuteValue);
-          if (nextRun <= now) {
-            nextRun.setHours(nextRun.getHours() + 1);
-          }
+      // Seconds
+      const secStep = parseStep(secOrMin);
+      if (secStep && secStep > 0) {
+        const nextSec = (Math.floor(now.getSeconds() / secStep) + 1) * secStep;
+        const deltaSec = nextSec - now.getSeconds();
+        nextRun.setSeconds(now.getSeconds() + deltaSec, 0);
+      } else if (secOrMin !== '*') {
+        const secVal = parseInt(secOrMin, 10);
+        if (!isNaN(secVal)) {
+          nextRun.setSeconds(secVal, 0);
+          if (nextRun <= now) nextRun.setMinutes(nextRun.getMinutes() + 1);
+        } else {
+          nextRun.setSeconds(0, 0);
         }
       } else {
-        nextRun.setMinutes(now.getMinutes() + 1);
+        // default: next second
+        nextRun.setSeconds(now.getSeconds() + 1, 0);
       }
 
-      // Handle hour
-      if (hour !== '*') {
-        const hourValue = parseInt(hour);
-        if (!isNaN(hourValue)) {
-          nextRun.setHours(hourValue);
-          if (nextRun <= now) {
-            nextRun.setDate(nextRun.getDate() + 1);
-          }
+      // Minutes
+      const minuteStep = parseStep(minuteRaw);
+      if (minuteStep && minuteStep > 0) {
+        const nextMin = (Math.floor(nextRun.getMinutes() / minuteStep) + (nextRun <= now ? 1 : 0)) * minuteStep;
+        if (nextMin >= 60) {
+          nextRun.setHours(nextRun.getHours() + 1);
+          nextRun.setMinutes(nextMin % 60);
+        } else {
+          nextRun.setMinutes(nextMin);
+        }
+      } else if (minuteRaw !== '*') {
+        const minuteVal = parseInt(minuteRaw, 10);
+        if (!isNaN(minuteVal)) {
+          nextRun.setMinutes(minuteVal);
+          if (nextRun <= now) nextRun.setHours(nextRun.getHours() + 1);
+        }
+      } else {
+        // When using 5-field cron (no seconds), default to next minute
+        if (!hasSeconds) {
+          nextRun.setMinutes(now.getMinutes() + 1);
+          nextRun.setSeconds(0, 0);
         }
       }
 
-      // Handle day of month
-      if (day !== '*') {
-        const dayValue = parseInt(day);
-        if (!isNaN(dayValue)) {
-          nextRun.setDate(dayValue);
-          if (nextRun <= now) {
-            nextRun.setMonth(nextRun.getMonth() + 1);
-          }
+      // Hours
+      if (hourRaw !== '*') {
+        const hourVal = parseInt(hourRaw, 10);
+        if (!isNaN(hourVal)) {
+          nextRun.setHours(hourVal);
+          if (nextRun <= now) nextRun.setDate(nextRun.getDate() + 1);
         }
       }
 
-      // Handle month
-      if (month !== '*') {
-        const monthValue = parseInt(month);
-        if (!isNaN(monthValue)) {
-          nextRun.setMonth(monthValue - 1); // Month is 0-indexed
-          if (nextRun <= now) {
-            nextRun.setFullYear(nextRun.getFullYear() + 1);
-          }
+      // Day of month
+      if (dayRaw !== '*') {
+        const dayVal = parseInt(dayRaw, 10);
+        if (!isNaN(dayVal)) {
+          nextRun.setDate(dayVal);
+          if (nextRun <= now) nextRun.setMonth(nextRun.getMonth() + 1);
         }
       }
 
-      // Handle day of week
-      if (dayOfWeek !== '*') {
-        const dayOfWeekValue = parseInt(dayOfWeek);
-        if (!isNaN(dayOfWeekValue)) {
-          const currentDayOfWeek = nextRun.getDay();
-          const daysToAdd = (dayOfWeekValue - currentDayOfWeek + 7) % 7;
-          if (daysToAdd > 0) {
-            nextRun.setDate(nextRun.getDate() + daysToAdd);
-          }
+      // Month
+      if (monthRaw !== '*') {
+        const monthVal = parseInt(monthRaw, 10);
+        if (!isNaN(monthVal)) {
+          nextRun.setMonth(monthVal - 1);
+          if (nextRun <= now) nextRun.setFullYear(nextRun.getFullYear() + 1);
+        }
+      }
+
+      // Day of week (0-6, Sun-Sat)
+      if (dowRaw !== '*') {
+        const dowVal = parseInt(dowRaw, 10);
+        if (!isNaN(dowVal)) {
+          const currentDow = nextRun.getDay();
+          let daysToAdd = (dowVal - currentDow + 7) % 7;
+          if (daysToAdd === 0 && nextRun <= now) daysToAdd = 7;
+          if (daysToAdd > 0) nextRun.setDate(nextRun.getDate() + daysToAdd);
         }
       }
 
@@ -333,6 +382,18 @@ class AppScheduler {
         task.logs = task.logs.slice(-task.maxLogs);
       }
 
+      // Also print to server console so it's visible immediately
+      const ts = log.timestamp.toISOString();
+      const prefix = `⏱️ [Scheduler] [${taskId}]`;
+      if (details !== undefined) {
+        try {
+          console.log(`${prefix} ${level.toUpperCase()} ${ts} - ${message}`, details);
+        } catch {
+          console.log(`${prefix} ${level.toUpperCase()} ${ts} - ${message}`);
+        }
+      } else {
+        console.log(`${prefix} ${level.toUpperCase()} ${ts} - ${message}`);
+      }
 
     }
   }
@@ -378,55 +439,56 @@ class AppScheduler {
       const { PrismaClient } = await import('@prisma/client');
       const prisma = new PrismaClient();
 
-      // Get industries that need keywords
+      // Pick one industry with no keywords yet
       const industries = await prisma.industry.findMany({
         where: {
           keywords: {
-            none: {} // Industries with no keywords
+            none: {}
           }
         },
         take: 1
       });
 
       if (industries.length === 0) {
-
         return { message: 'No industries need keywords' };
       }
 
       const industry = industries[0];
-      
 
-      // Generate keywords using LLM
-      const keywords = await this.generateKeywordsForIndustry(industry.label);
-      
-      if (keywords && keywords.length > 0) {
-        // Save keywords to database
-        const keywordData = keywords.map(keyword => ({
-          searchTerm: keyword,
-          industryId: industry.id
-        }));
+      // Submit a job through our internal jobs API so it persists with pollUrl
+      const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 15000);
+      const res = await fetch(`${baseUrl}/api/admin/jobs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'keyword-generation',
+          data: { industry: industry.label }
+        }),
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
 
-        await prisma.keyword.createMany({
-          data: keywordData
-        });
-
-
-        return {
-          industry: industry.label,
-          keywordsGenerated: keywords.length,
-          keywords: keywords
-        };
-      } else {
-
-        return {
-          industry: industry.label,
-          keywordsGenerated: 0,
-          message: 'No keywords generated'
-        };
+      if (!res.ok) {
+        const txt = await res.text().catch(() => '');
+        throw new Error(`Jobs API error: ${res.status} ${res.statusText} ${txt}`);
       }
 
-    } catch (keywordError: any) {
+      const payload: any = await res.json().catch(() => ({}));
+      if (!payload.success || !payload.job) {
+        throw new Error('Jobs API returned invalid response');
+      }
 
+      // Return summary; polling task will pick it up
+      return {
+        message: 'Job submitted',
+        industry: industry.label,
+        jobId: payload.job.id
+      };
+
+    } catch (keywordError: any) {
+      this.logTask('industries-keywords', 'error', 'Failed to submit keywords job', String(keywordError));
       throw keywordError;
     }
   }
@@ -559,7 +621,7 @@ class AppScheduler {
       if (Array.isArray(obj.search_terms)) return obj.search_terms;
       if (Array.isArray(obj.keywords)) return obj.keywords;
       if (obj.data) return extractTerms(obj.data);
-      if (obj.result) return extractTerms(obj.result);
+      if (obj.result) extractTerms(obj.result);
       if (obj.payload) return extractTerms(obj.payload);
       return [];
     };
@@ -576,6 +638,146 @@ class AppScheduler {
     });
 
     return terms;
+  }
+
+  /**
+   * Poll all incomplete jobs and update their status
+   */
+  private async pollIncompleteJobs(): Promise<number> {
+    try {
+      // Import Prisma client dynamically to avoid circular dependencies
+      const { PrismaClient } = await import('@prisma/client');
+      const prisma = new PrismaClient();
+
+      // Get all jobs from the database
+      const allJobs = await prisma.job.findMany({
+        where: {
+          status: {
+            notIn: ['completed', 'failed']
+          }
+        }
+      });
+
+      const count = allJobs.length;
+      if (count === 0) {
+        return 0;
+      }
+      
+      // Poll each incomplete job
+      for (const job of allJobs) {
+        await this.pollJob(job);
+      }
+      return count;
+    } catch (error) {
+      console.error('❌ Error polling incomplete jobs:', error);
+      return 0;
+    }
+  }
+
+  /**
+   * Poll a specific job and update its status
+   */
+  private async pollJob(job: any): Promise<void> {
+    try {
+      if (!job.metadata?.pollUrl) {
+        console.log(`⚠️ Job ${job.id} has no pollUrl`);
+        return;
+      }
+
+      console.log(`🔄 Polling job ${job.id} (${job.metadata?.industry})`);
+
+      // Build absolute poll URL if relative
+      const rawPollUrl = String(job.metadata.pollUrl);
+      const baseUrl = process.env.MARKETING_MCP_API_URL || 'https://marketing-mcp-beta.vercel.app';
+      const fullPollUrl = rawPollUrl.startsWith('http') ? rawPollUrl : `${baseUrl}${rawPollUrl}`;
+
+      // Make the external API call
+      const response = await fetch(fullPollUrl, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+      
+      if (response.ok) {
+        const externalData = await response.json();
+        
+        if (externalData.success && (externalData.status === 'completed' || externalData.result)) {
+          console.log(`✅ Job ${job.id} completed!`);
+          
+          // Update job status in database
+          const { PrismaClient } = await import('@prisma/client');
+          const prisma = new PrismaClient();
+          await prisma.job.update({
+            where: { id: job.id },
+            data: {
+              status: 'completed',
+              progress: 100,
+              result: externalData.result,
+              completedAt: new Date()
+            }
+          });
+          
+          // Sync keywords to industry if this is a keyword generation job
+          if (job.type === 'keyword-generation' && externalData.result) {
+            await this.syncKeywordsToIndustry(job.metadata?.industry, externalData.result);
+          }
+        } else if (externalData.status && externalData.status !== job.status) {
+          console.log(`🔄 Job ${job.id} status changed from ${job.status} to ${externalData.status}`);
+          
+          // Update status and progress
+          const { PrismaClient } = await import('@prisma/client');
+          const prisma = new PrismaClient();
+          await prisma.job.update({
+            where: { id: job.id },
+            data: {
+              status: externalData.status,
+              progress: externalData.progress || job.progress
+            }
+          });
+        } else {
+          console.log(`📊 Job ${job.id} still ${job.status}, no change`);
+        }
+      } else {
+        console.error(`❌ Failed to poll job ${job.id}: ${response.status}`);
+      }
+    } catch (error) {
+      console.error(`❌ Error polling job ${job.id}:`, error);
+    }
+  }
+
+  /**
+   * Sync keywords to industry
+   */
+  private async syncKeywordsToIndustry(industryName: string, result: any): Promise<void> {
+    try {
+      const keywords = this.extractKeywordsFromResult(result);
+      if (keywords.length === 0) {
+        console.log('⚠️ No keywords found in result to sync');
+        return;
+      }
+
+      console.log(`🔄 Syncing ${keywords.length} keywords to industry: ${industryName}`);
+      
+      // Make the sync API call
+      const response = await fetch(`http://localhost:3000/api/admin/industries/keywords/sync`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          industryName,
+          keywords
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('✅ Keywords synced successfully:', data.message);
+      } else {
+        console.error('❌ Failed to sync keywords:', await response.text());
+      }
+    } catch (error) {
+      console.error('❌ Error syncing keywords:', error);
+    }
   }
 
   /**
@@ -628,5 +830,15 @@ class AppScheduler {
 // Create a true singleton instance across Next.js module reloads
 const globalForScheduler = globalThis as unknown as { _appScheduler?: AppScheduler };
 const scheduler = globalForScheduler._appScheduler ?? (globalForScheduler._appScheduler = new AppScheduler());
+
+// Auto-start the scheduler when this module is imported
+if (typeof window === 'undefined') {
+  console.log('🚀 SERVER: Auto-starting scheduler...');
+  // Start after a short delay to ensure everything is loaded
+  setTimeout(() => {
+    scheduler.start();
+    console.log('✅ Scheduler started successfully');
+  }, 2000);
+}
 
 export default scheduler;

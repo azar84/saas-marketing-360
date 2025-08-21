@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { RefreshCw, Eye, EyeOff, Trash2, Edit2, Save, X, Plus } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { useGlobalJobStore } from '@/lib/jobs/globalJobState';
 
 interface FlatItem {
   id: number;
@@ -60,14 +61,39 @@ type KeywordsPayload = {
 };
 
 export default function NAICSManager({ onResult }: { onResult?: (payload: KeywordsPayload) => void }) {
+  const { jobs, getJobsByType, loadJobsFromDatabase, addJob, removeJob } = useGlobalJobStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [items, setItems] = useState<FlatItem[]>([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [pages, setPages] = useState(0);
-  const [generatingId, setGeneratingId] = useState<number | null>(null);
-  const [generatingStatus, setGeneratingStatus] = useState<string>('');
+  const [successMessage, setSuccessMessage] = useState<string>('');
+  
+  // Computed values - derive UI state from global state
+  const isGeneratingForIndustry = (industryTitle: string) => {
+    const keywordJobs = getJobsByType('keyword-generation');
+    return keywordJobs.some(job => 
+      job.metadata?.industry === industryTitle && 
+      job.status !== 'completed' && 
+      job.status !== 'failed'
+    );
+  };
+  
+  const getGeneratingStatus = (industryTitle: string) => {
+    const keywordJobs = getJobsByType('keyword-generation');
+    const job = keywordJobs.find(job => job.metadata?.industry === industryTitle);
+    
+    if (!job) return null;
+    
+    switch (job.status) {
+      case 'queued': return 'Queued...';
+      case 'processing': return `Processing... ${job.progress || 0}%`;
+      case 'active': return `Active... ${job.progress || 0}%`;
+      default: return null;
+    }
+  };
   const [keywords, setKeywords] = useState<null | {
     search_terms: string[];
     subindustries: string[];
@@ -93,10 +119,29 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
   const [addingNewKeyword, setAddingNewKeyword] = useState(false);
   const [newKeywordText, setNewKeywordText] = useState('');
   
-  const resultRef = useRef<HTMLDivElement | null>(null);
 
-  const fetchList = async (q: string, p: number) => {
-    setIsLoading(true);
+
+  // Load jobs from database when component mounts
+  useEffect(() => {
+    console.log('🚀 NAICSManager mounting, loading jobs from database...');
+    loadJobsFromDatabase();
+  }, [loadJobsFromDatabase]);
+
+  // Simple approach: refresh list whenever jobs change
+  useEffect(() => {
+    if (jobs.length > 0) {
+      // Refresh the list to show updated keyword counts
+      fetchList(searchTerm, page, true);
+    }
+  }, [jobs, searchTerm, page]);
+
+  const fetchList = async (q: string, p: number, isRefresh = false) => {
+    if (isRefresh) {
+      setIsRefreshing(true);
+    } else {
+      setIsLoading(true);
+    }
+    
     try {
       const params = new URLSearchParams();
       if (q) params.set('search', q);
@@ -104,21 +149,35 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
       params.set('limit', '50');
       params.set('sortBy', sortBy);
       params.set('sortOrder', sortOrder);
+      
+      // Add timestamp to prevent caching
+      if (isRefresh) {
+        params.set('_t', Date.now().toString());
+      }
+      
       const res = await fetch(`/api/admin/industries/search?${params}`);
       const data: ListResponse = await res.json();
       if (data.success) {
-        setItems(data.data.map(d => ({ 
+        const mappedItems = data.data.map(d => ({ 
           id: d.id, 
           title: d.title, 
           keywordsCount: d.keywordsCount || 0 
-        })));
+        }));
+        
+        setItems(mappedItems);
         setTotal(data.pagination.total);
         setPages(data.pagination.pages);
+        
+
       }
     } catch (error) {
       console.error('Failed to fetch industries:', error);
     } finally {
-      setIsLoading(false);
+      if (isRefresh) {
+        setIsRefreshing(false);
+      } else {
+        setIsLoading(false);
+      }
     }
   };
 
@@ -164,11 +223,22 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
   };
 
   const generateFor = async (id: number, title: string) => {
-    setGeneratingId(id);
     setGenError(null);
     setKeywords(null);
+    setSuccessMessage(''); // Clear any previous success message
     
     try {
+      // Optimistically show spinner immediately
+      const tempJobId = `temp:${Date.now()}:${title}`;
+      addJob({
+        id: tempJobId,
+        type: 'keyword-generation' as any,
+        status: 'queued' as any,
+        progress: 0,
+        metadata: { industry: title },
+        submittedAt: new Date().toISOString()
+      } as any);
+
       // Submit job to the new job management system
       const res = await fetch('/api/admin/jobs', {
         method: 'POST',
@@ -185,76 +255,56 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
       if (data.success && data.job) {
         console.log(`✅ Job submitted successfully for "${title}"`, data.job);
         
-        // Start polling for job completion
-        await pollJobCompletion(data.job.id, title);
+        // Replace optimistic job with normalized real job
+        removeJob(tempJobId);
+        const j = data.job;
+        const normalizedJob = {
+          id: j.id,
+          type: j.type,
+          status: j.status,
+          progress: j.progress ?? 0,
+          metadata: {
+            industry: j.industry,
+            pollUrl: j.pollUrl,
+            position: j.position,
+            estimatedWaitTime: j.estimatedWaitTime
+          },
+          result: j.result,
+          error: j.error,
+          submittedAt: j.submittedAt,
+          completedAt: j.completedAt
+        } as any;
+        addJob(normalizedJob);
+        console.log('➕ Added job to global state');
+        
+        // Show success message
+        setSuccessMessage(`🚀 Job submitted for "${title}". Monitoring progress...`);
+        setTimeout(() => setSuccessMessage(''), 3000);
+        
       } else {
         throw new Error(data.error || 'Failed to submit job');
       }
     } catch (error) {
       console.error('Job submission failed:', error);
+      // Clean up optimistic job if present
+      try { removeJob(`temp:${title}` as any); } catch {}
       setGenError(error instanceof Error ? error.message : 'Unknown error occurred');
       if (onResult) onResult({ industry: title, error: error instanceof Error ? error.message : 'Unknown error occurred' });
-      setGeneratingId(null);
     }
   };
 
-  const pollJobCompletion = async (jobId: string, industryTitle: string) => {
-    const maxAttempts = 60; // 5 minutes max (5 seconds * 60)
-    let attempts = 0;
-    
-    const poll = async () => {
-      if (attempts >= maxAttempts) {
-        console.log(`Job ${jobId} polling timeout`);
-        setGeneratingId(null);
-        setGeneratingStatus('');
-        return;
-      }
-      
-      try {
-        const response = await fetch(`/api/admin/jobs?jobId=${jobId}`);
-        if (response.ok) {
-          const data = await response.json();
-          if (data.success && data.job) {
-            const job = data.job;
-            
-            if (job.status === 'completed') {
-              console.log(`Job ${jobId} completed for industry: ${industryTitle}`);
-              setGeneratingId(null);
-              setGeneratingStatus('');
-              
-              // Refresh the industries list to show updated keywords count
-              await fetchList(searchTerm, page);
-              return;
-            } else if (job.status === 'failed') {
-              console.log(`Job ${jobId} failed for industry: ${industryTitle}`);
-              setGenError(`Keyword generation failed for ${industryTitle}`);
-              setGeneratingId(null);
-              setGeneratingStatus('');
-              return;
-            }
-            
-            // Update status based on job status
-            if (job.status === 'queued') {
-              setGeneratingStatus('Queued...');
-            } else if (job.status === 'processing' || job.status === 'active') {
-              setGeneratingStatus(`Processing... ${job.progress || 0}%`);
-            }
-            
-            // Job still processing, continue polling
-            attempts++;
-            setTimeout(poll, 5000); // Poll every 5 seconds
-          }
-        }
-      } catch (error) {
-        console.error(`Error polling job ${jobId}:`, error);
-        attempts++;
-        setTimeout(poll, 5000);
-      }
-    };
-    
-    // Start polling
-    poll();
-  };
+  // No more manual polling needed - global state handles everything
+
+  // Background: while there are incomplete keyword-generation jobs in global state,
+  // refresh jobs from database every 3 seconds so UI reflects server-side progress
+  useEffect(() => {
+    const hasIncomplete = getJobsByType('keyword-generation').some(j => j.status !== 'completed' && j.status !== 'failed');
+    if (!hasIncomplete) return;
+    const interval = setInterval(() => {
+      loadJobsFromDatabase();
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [getJobsByType, loadJobsFromDatabase, jobs]);
 
   const viewKeywords = async (industry: FlatItem) => {
     setLoadingKeywords(true);
@@ -503,16 +553,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
     }
   };
 
-  // Auto scroll to the results card when we have output or an error
-  useEffect(() => {
-    if ((keywords || genError) && resultRef.current) {
-      // Give the card a tick to mount then scroll smoothly into view
-      const el = resultRef.current;
-      setTimeout(() => {
-        try { el.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch {}
-      }, 50);
-    }
-  }, [keywords, genError]);
+
 
   // Navigation breadcrumb
   const renderBreadcrumb = () => (
@@ -545,16 +586,42 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
             Search and generate keyword sets for your target industries
           </p>
         </div>
-        {isLoading && (
-          <div className="flex items-center gap-3 px-4 py-2 rounded-lg" style={{ 
-            backgroundColor: 'var(--color-bg-secondary)',
-            color: 'var(--color-text-secondary)' 
-          }}>
-            <RefreshCw className="h-5 w-5 animate-spin" />
-            <span className="font-medium">Loading industries...</span>
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => fetchList(searchTerm, page, true)}
+            disabled={isRefreshing}
+            className="flex items-center gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+            {isRefreshing ? 'Refreshing...' : 'Refresh'}
+          </Button>
+          {isLoading && (
+            <div className="flex items-center gap-3 px-4 py-2 rounded-lg" style={{ 
+              backgroundColor: 'var(--color-bg-secondary)',
+              color: 'var(--color-text-secondary)' 
+            }}>
+              <RefreshCw className="h-5 w-5 animate-spin" />
+              <span className="font-medium">Loading industries...</span>
+            </div>
+          )}
+        </div>
       </div>
+
+      {/* Success Message */}
+      {successMessage && (
+        <div className="p-4 rounded-lg border" style={{
+          backgroundColor: 'var(--color-success-light)',
+          borderColor: 'var(--color-success)',
+          color: 'var(--color-success-dark)'
+        }}>
+          <div className="flex items-center gap-2">
+            <span className="text-lg">✅</span>
+            <span className="font-medium">{successMessage}</span>
+          </div>
+        </div>
+      )}
 
       {/* Search */}
       <Card>
@@ -778,13 +845,18 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                     </td>
                     <td className="px-6 py-4 align-top">
                       <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                        {generatingId === item.id ? (
+                        {isGeneratingForIndustry(item.title) ? (
                           <span className="flex items-center gap-1">
                             <RefreshCw className="h-3 w-3 animate-spin" />
                             Generating...
                           </span>
                         ) : (
-                          item.keywordsCount || 0
+                          <span className="flex items-center gap-1">
+                            {item.keywordsCount || 0}
+                            {isRefreshing && (
+                              <RefreshCw className="h-3 w-3 animate-spin opacity-50" />
+                            )}
+                          </span>
                         )}
                       </span>
                     </td>
@@ -792,14 +864,14 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                       <div className="flex gap-2">
                         <Button
                           variant="secondary"
-                          disabled={!!generatingId}
+                          disabled={isGeneratingForIndustry(item.title)}
                           onClick={() => generateFor(item.id, item.title)}
                           size="sm"
                         >
-                          {generatingId === item.id ? (
+                          {isGeneratingForIndustry(item.title) ? (
                             <div className="flex items-center gap-2">
                               <RefreshCw className="h-4 w-4 animate-spin" />
-                              {generatingStatus || 'Generating...'}
+                              Generating
                             </div>
                           ) : (
                             'Generate Keywords'
@@ -1103,62 +1175,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
 
       {currentView === 'keywords' && renderKeywordsView()}
 
-      {(keywords || genError) && (
-        <Card ref={resultRef as any}>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle>
-                {genError ? 'Error' : `Keywords for: ${generatedFor}`}
-              </CardTitle>
-              <Button variant="ghost" onClick={() => { setKeywords(null); setGenError(null); setGeneratedFor(null); }}>
-                Clear
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            {genError && (
-              <div className="text-sm" style={{ color: 'var(--color-error-dark)' }}>
-                {genError}
-                <div className="mt-3">
-                  <a
-                    href="#keywords-result"
-                    className="text-xs underline"
-                    style={{ color: 'var(--color-primary)' }}
-                  >
-                    Open detailed result view
-                  </a>
-                </div>
-              </div>
-            )}
-            {keywords && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {([
-                  ['Search terms', keywords.search_terms],
-                  ['Subindustries', keywords.subindustries],
-                  ['Service queries', keywords.service_queries],
-                  ['Transactional modifiers', keywords.transactional_modifiers],
-                  ['Negative keywords', keywords.negative_keywords],
-                ] as const).map(([label, list]) => (
-                  <div key={label}>
-                    <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-secondary)' }}>{label}</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {list.length ? (
-                        list.map((k) => (
-                          <span key={k} className="text-xs px-2 py-1 rounded" style={{ backgroundColor: 'var(--color-bg-secondary)', color: 'var(--color-text-primary)' }}>
-                            {k}
-                          </span>
-                        ))
-                      ) : (
-                        <span className="text-xs" style={{ color: 'var(--color-text-muted, #9CA3AF)' }}>—</span>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      )}
+
     </div>
   );
 }
