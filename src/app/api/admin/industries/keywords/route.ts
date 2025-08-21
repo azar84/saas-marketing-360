@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/db';
+import { submitJobAndWaitForCompletion } from '@/lib/jobPoller';
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,36 +17,45 @@ export async function POST(request: NextRequest) {
 
     console.log('Industry keyword generation requested for:', resolvedIndustry);
 
-    // 1) Try external keywords API first
+    // 1) Try external keywords API with Redis/Bull queue
     try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 60000);
       const baseUrl = process.env.MARKETING_MCP_API_URL || 'https://marketing-mcp-beta.vercel.app';
-      const externalUrl = new URL('/api/keywords', baseUrl).toString();
       const bypassToken = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
 
       if (!bypassToken) {
         throw new Error('VERCEL_AUTOMATION_BYPASS_SECRET is not set');
       }
 
-      console.log('Calling external keywords API:', externalUrl);
-      const extRes = await fetch(externalUrl, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-vercel-protection-bypass': bypassToken,
-        },
-        body: JSON.stringify({ productOrMarket: resolvedIndustry }),
-        signal: controller.signal
-      });
-      clearTimeout(timeoutId);
+      console.log('Calling external keywords API with queue system:', baseUrl);
+      
+      // Submit job and wait for completion
+      const pollResult = await submitJobAndWaitForCompletion(
+        baseUrl,
+        '/api/keywords',
+        { productOrMarket: resolvedIndustry },
+        bypassToken,
+        {
+          maxPollingTime: 5 * 60 * 1000, // 5 minutes
+          pollInterval: 2000, // 2 seconds
+          onProgress: (status, progress) => {
+            console.log(`Job progress: ${status} - ${progress}%`);
+          },
+          onError: (error) => {
+            console.warn(`Job polling error: ${error}`);
+          }
+        }
+      );
 
-      if (!extRes.ok) {
-        const errorText = await extRes.text().catch(() => '');
-        throw new Error(`External API error: ${extRes.status} ${extRes.statusText} ${errorText}`);
+      if (!pollResult.success || !pollResult.result) {
+        console.error('External API job failed:', pollResult);
+        throw new Error(pollResult.error || 'External API job failed');
       }
 
-      const extJson: any = await extRes.json().catch(() => ({}));
+      console.log('External API job completed successfully:', {
+        success: pollResult.success,
+        hasResult: !!pollResult.result,
+        resultType: typeof pollResult.result
+      });
 
       // Extract search terms from various possible shapes
       const extractTerms = (obj: any): string[] => {
@@ -59,11 +69,15 @@ export async function POST(request: NextRequest) {
         return [];
       };
 
-      let terms = extractTerms(extJson).filter((t: any) => typeof t === 'string').map((t: string) => t.trim()).filter(Boolean);
-      // Deduplicate and basic length filter (2–6 words) to match our existing expectations
+      let terms = extractTerms(pollResult.result)
+        .filter((t: any) => typeof t === 'string')
+        .map((t: string) => t.trim())
+        .filter(Boolean);
+        
+      // Deduplicate and basic length filter (2–8 words)
       terms = Array.from(new Set(terms)).filter((t: string) => {
         const w = t.split(/\s+/).filter(Boolean).length;
-        return w >= 2 && w <= 8; // allow a bit more leniency here
+        return w >= 2 && w <= 8;
       });
 
       if (terms.length === 0) {

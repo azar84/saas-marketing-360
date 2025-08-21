@@ -1,5 +1,7 @@
 
 
+import { submitJobAndWaitForCompletion } from './jobPoller';
+
 interface TaskLog {
   timestamp: Date;
   level: 'info' | 'warn' | 'error' | 'success';
@@ -433,7 +435,7 @@ class AppScheduler {
    * Generate keywords for a specific industry using LLM
    */
   private async generateKeywordsForIndustry(industryName: string): Promise<string[]> {
-    // First: try external API
+    // First: try external API with Redis/Bull queue
     try {
       const controller = new AbortController();
       const timeoutId = setTimeout(() => controller.abort(), 60000);
@@ -441,8 +443,10 @@ class AppScheduler {
       const externalUrl = new URL('/api/keywords', baseUrl).toString();
       const bypassToken = process.env.VERCEL_AUTOMATION_BYPASS_SECRET;
       if (!bypassToken) throw new Error('VERCEL_AUTOMATION_BYPASS_SECRET is not set');
-      this.logTask('industries-keywords', 'info', 'Calling external keywords API', { externalUrl, productOrMarket: industryName });
+      
+      this.logTask('industries-keywords', 'info', 'Calling external keywords API with queue', { externalUrl, productOrMarket: industryName });
 
+      // Submit job to queue
       const res = await fetch(externalUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-vercel-protection-bypass': bypassToken },
@@ -456,33 +460,60 @@ class AppScheduler {
         throw new Error(`External API error: ${res.status} ${res.statusText} ${text}`);
       }
 
-      const json: any = await res.json().catch(() => ({}));
+      const queueResponse: any = await res.json().catch(() => ({}));
+      
+      if (!queueResponse.success || !queueResponse.jobId) {
+        throw new Error('Invalid queue response from external API');
+      }
 
-      const extractTerms = (obj: any): string[] => {
-        if (!obj) return [];
-        if (Array.isArray(obj)) return obj;
-        if (Array.isArray(obj.search_terms)) return obj.search_terms;
-        if (Array.isArray(obj.keywords)) return obj.keywords;
-        if (obj.data) return extractTerms(obj.data);
-        if (obj.result) return extractTerms(obj.result);
-        if (obj.payload) return extractTerms(obj.payload);
-        return [];
-      };
-
-      let terms = extractTerms(json)
-        .filter((t: any) => typeof t === 'string')
-        .map((t: string) => t.trim())
-        .filter(Boolean);
-
-      // Dedupe and enforce basic length (2–8 words)
-      terms = Array.from(new Set(terms)).filter((t: string) => {
-        const w = t.split(/\s+/).filter(Boolean).length;
-        return w >= 2 && w <= 8;
+      this.logTask('industries-keywords', 'info', 'Job queued successfully', { 
+        jobId: queueResponse.jobId, 
+        position: queueResponse.position,
+        estimatedWaitTime: queueResponse.estimatedWaitTime 
       });
 
-      if (terms.length > 0) {
-        this.logTask('industries-keywords', 'success', 'External keywords API returned terms', { industryName, count: terms.length });
-        return terms as string[];
+      // Poll for job completion using the utility
+      const pollResult = await submitJobAndWaitForCompletion(
+        baseUrl,
+        `/api/jobs/${queueResponse.jobId}`,
+        {},
+        bypassToken,
+        {
+          maxPollingTime: 5 * 60 * 1000, // 5 minutes
+          pollInterval: 2000, // 2 seconds
+          onProgress: (status, progress, position, estimatedWaitTime) => {
+            this.logTask('industries-keywords', 'info', 'Job progress update', { 
+              jobId: queueResponse.jobId,
+              status, 
+              progress, 
+              position, 
+              estimatedWaitTime 
+            });
+          },
+          onError: (error) => {
+            this.logTask('industries-keywords', 'warn', 'Job polling error', { 
+              jobId: queueResponse.jobId,
+              error 
+            });
+          }
+        }
+      );
+
+      if (pollResult.success && pollResult.result) {
+        const keywords = this.extractKeywordsFromResult(pollResult.result);
+        
+        if (keywords && keywords.length > 0) {
+          this.logTask('industries-keywords', 'success', 'External keywords API returned terms', { 
+            industryName, 
+            count: keywords.length 
+          });
+          return keywords as string[];
+        }
+      } else {
+        this.logTask('industries-keywords', 'warn', 'Job polling failed', { 
+          jobId: queueResponse.jobId,
+          error: pollResult.error 
+        });
       }
 
       this.logTask('industries-keywords', 'warn', 'External API returned no terms; will try fallback', { industryName });
@@ -511,6 +542,40 @@ class AppScheduler {
       this.logTask('industries-keywords', 'error', 'Failed to import or run KeywordsChain', { industryName, error: String(error) });
       return [];
     }
+  }
+
+
+
+  /**
+   * Extract keywords from job result
+   */
+  private extractKeywordsFromResult(result: any): string[] {
+    if (!result) return [];
+    
+    // Navigate through the result structure to find keywords
+    const extractTerms = (obj: any): string[] => {
+      if (!obj) return [];
+      if (Array.isArray(obj)) return obj;
+      if (Array.isArray(obj.search_terms)) return obj.search_terms;
+      if (Array.isArray(obj.keywords)) return obj.keywords;
+      if (obj.data) return extractTerms(obj.data);
+      if (obj.result) return extractTerms(obj.result);
+      if (obj.payload) return extractTerms(obj.payload);
+      return [];
+    };
+
+    let terms = extractTerms(result)
+      .filter((t: any) => typeof t === 'string')
+      .map((t: string) => t.trim())
+      .filter(Boolean);
+
+    // Dedupe and enforce basic length (2–8 words)
+    terms = Array.from(new Set(terms)).filter((t: string) => {
+      const w = t.split(/\s+/).filter(Boolean).length;
+      return w >= 2 && w <= 8;
+    });
+
+    return terms;
   }
 
   /**

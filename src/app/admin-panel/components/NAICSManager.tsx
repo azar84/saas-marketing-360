@@ -48,6 +48,7 @@ interface IndustryKeywords {
 
 type KeywordsPayload = {
   industry: string;
+  message?: string;
   keywords?: {
     search_terms: string[];
     subindustries: string[];
@@ -66,7 +67,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
   const [total, setTotal] = useState(0);
   const [pages, setPages] = useState(0);
   const [generatingId, setGeneratingId] = useState<number | null>(null);
-  const [generatedFor, setGeneratedFor] = useState<string | null>(null);
+  const [generatingStatus, setGeneratingStatus] = useState<string>('');
   const [keywords, setKeywords] = useState<null | {
     search_terms: string[];
     subindustries: string[];
@@ -75,7 +76,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
     negative_keywords: string[];
   }>(null);
   const [genError, setGenError] = useState<string | null>(null);
-  const [currentView, setCurrentView] = useState<'list' | 'generate' | 'keywords'>('list');
+  const [currentView, setCurrentView] = useState<'list' | 'keywords'>('list');
   const [selectedIndustry, setSelectedIndustry] = useState<FlatItem | null>(null);
   const [industryKeywords, setIndustryKeywords] = useState<IndustryKeywords | null>(null);
   const [loadingKeywords, setLoadingKeywords] = useState(false);
@@ -166,39 +167,93 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
     setGeneratingId(id);
     setGenError(null);
     setKeywords(null);
-    setGeneratedFor(title);
     
     try {
-      // Use the keywords API endpoint which handles saving to database with duplicate prevention
-      const res = await fetch('/api/admin/industries/keywords', {
+      // Submit job to the new job management system
+      const res = await fetch('/api/admin/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ industry: title })
+        body: JSON.stringify({ 
+          type: 'keyword-generation',
+          data: { industry: title }
+        })
       });
       
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       
       const data = await res.json();
-      if (data.success && data.keywords) {
-        setKeywords(data.keywords);
-        if (onResult) onResult({ industry: title, keywords: data.keywords });
+      if (data.success && data.job) {
+        console.log(`✅ Job submitted successfully for "${title}"`, data.job);
         
-        // Show success message about keywords saved
-        if (data._database && data._database.keywordsSaved) {
-          console.log(`✅ Generated and saved ${data._database.keywordsSaved} unique keywords for "${title}"`);
-        } else if (data.keywords && data.keywords.search_terms) {
-          console.log(`✅ Generated ${data.keywords.search_terms.length} keywords for "${title}"`);
-        }
+        // Start polling for job completion
+        await pollJobCompletion(data.job.id, title);
       } else {
-        throw new Error(data.error || 'Failed to generate keywords');
+        throw new Error(data.error || 'Failed to submit job');
       }
     } catch (error) {
-      console.error('Generation failed:', error);
+      console.error('Job submission failed:', error);
       setGenError(error instanceof Error ? error.message : 'Unknown error occurred');
       if (onResult) onResult({ industry: title, error: error instanceof Error ? error.message : 'Unknown error occurred' });
-    } finally {
       setGeneratingId(null);
     }
+  };
+
+  const pollJobCompletion = async (jobId: string, industryTitle: string) => {
+    const maxAttempts = 60; // 5 minutes max (5 seconds * 60)
+    let attempts = 0;
+    
+    const poll = async () => {
+      if (attempts >= maxAttempts) {
+        console.log(`Job ${jobId} polling timeout`);
+        setGeneratingId(null);
+        setGeneratingStatus('');
+        return;
+      }
+      
+      try {
+        const response = await fetch(`/api/admin/jobs?jobId=${jobId}`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.success && data.job) {
+            const job = data.job;
+            
+            if (job.status === 'completed') {
+              console.log(`Job ${jobId} completed for industry: ${industryTitle}`);
+              setGeneratingId(null);
+              setGeneratingStatus('');
+              
+              // Refresh the industries list to show updated keywords count
+              await fetchList(searchTerm, page);
+              return;
+            } else if (job.status === 'failed') {
+              console.log(`Job ${jobId} failed for industry: ${industryTitle}`);
+              setGenError(`Keyword generation failed for ${industryTitle}`);
+              setGeneratingId(null);
+              setGeneratingStatus('');
+              return;
+            }
+            
+            // Update status based on job status
+            if (job.status === 'queued') {
+              setGeneratingStatus('Queued...');
+            } else if (job.status === 'processing' || job.status === 'active') {
+              setGeneratingStatus(`Processing... ${job.progress || 0}%`);
+            }
+            
+            // Job still processing, continue polling
+            attempts++;
+            setTimeout(poll, 5000); // Poll every 5 seconds
+          }
+        }
+      } catch (error) {
+        console.error(`Error polling job ${jobId}:`, error);
+        attempts++;
+        setTimeout(poll, 5000);
+      }
+    };
+    
+    // Start polling
+    poll();
   };
 
   const viewKeywords = async (industry: FlatItem) => {
@@ -247,10 +302,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
     }
   };
 
-  const openGenerateView = (industry: FlatItem) => {
-    setSelectedIndustry(industry);
-    setCurrentView('generate');
-  };
+
 
   // Keyword editing functions
   const startEditingKeyword = (keyword: Keyword) => {
@@ -476,7 +528,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
         <>
           <span>/</span>
           <span style={{ color: 'var(--color-text-primary)' }}>{selectedIndustry.title}</span>
-          {currentView === 'generate' && <span>/ Generate Keywords</span>}
+          
           {currentView === 'keywords' && <span>/ View Keywords</span>}
         </>
       )}
@@ -741,10 +793,17 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                         <Button
                           variant="secondary"
                           disabled={!!generatingId}
-                          onClick={() => openGenerateView(item)}
+                          onClick={() => generateFor(item.id, item.title)}
                           size="sm"
                         >
-                          {generatingId === item.id ? 'Generating…' : 'Generate Keywords'}
+                          {generatingId === item.id ? (
+                            <div className="flex items-center gap-2">
+                              <RefreshCw className="h-4 w-4 animate-spin" />
+                              {generatingStatus || 'Generating...'}
+                            </div>
+                          ) : (
+                            'Generate Keywords'
+                          )}
                         </Button>
                         <Button
                           variant="outline"
@@ -829,50 +888,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
     </>
   );
 
-  // Generate view
-  const renderGenerateView = () => (
-    <>
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold mb-2" style={{ color: 'var(--color-text-primary)' }}>Generate Keywords</h1>
-          <p className="text-base" style={{ color: 'var(--color-text-secondary)' }}>
-            Generate keyword sets for {selectedIndustry?.title}
-          </p>
-        </div>
-        <Button variant="outline" onClick={() => setCurrentView('list')}>
-          Back to Industries
-        </Button>
-      </div>
 
-      <Card>
-        <CardContent className="space-y-4">
-          <div>
-            <h3 className="text-lg font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>
-              Industry: {selectedIndustry?.title}
-            </h3>
-            <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-              This will generate a comprehensive set of keywords for your target industry.
-            </p>
-          </div>
-          
-          <Button
-            onClick={() => selectedIndustry && generateFor(selectedIndustry.id, selectedIndustry.title)}
-            disabled={!!generatingId}
-            fullWidth
-          >
-            {generatingId === selectedIndustry?.id ? (
-              <>
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                Generating Keywords...
-              </>
-            ) : (
-              'Generate Keywords'
-            )}
-          </Button>
-        </CardContent>
-      </Card>
-    </>
-  );
 
   // Keywords view
   const renderKeywordsView = () => (
@@ -1084,7 +1100,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
       {renderBreadcrumb()}
       
       {currentView === 'list' && renderListView()}
-      {currentView === 'generate' && renderGenerateView()}
+
       {currentView === 'keywords' && renderKeywordsView()}
 
       {(keywords || genError) && (

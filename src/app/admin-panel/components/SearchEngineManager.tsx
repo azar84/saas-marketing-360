@@ -196,11 +196,7 @@ export default function SearchEngineManager() {
             page: page
           };
 
-      console.log('Sending request to API:', {
-        ...requestBody,
-        apiKey: requestBody.apiKey ? '***' : 'missing',
-        searchEngineId: requestBody.searchEngineId ? '***' : 'missing'
-      });
+      console.log('Sending request to API:', requestBody);
 
       // For multiple queries, simulate progress updates
       if (isMultipleSearch) {

@@ -49,6 +49,7 @@ import GeographicManager from './components/GeographicManager';
 import NAICSManager from './components/NAICSManager';
 import KeywordsManager from './components/KeywordsManager';
 import KeywordsResult from './components/KeywordsResult';
+import JobsManager from './components/KeywordJobManager';
 import SearchEngineManager from './components/SearchEngineManager';
 import IndustrySearchManager from './components/IndustrySearchManager';
 import BusinessDirectoryManager from './components/BusinessDirectoryManager';
@@ -60,7 +61,7 @@ import { useNotificationContext } from '@/components/providers/NotificationProvi
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'tech-discovery' | 'geographic-manager' | 'naics-manager' | 'search-engine' | 'industry-search' | 'business-directory' | 'enrichment' | 'traceability';
+type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'tech-discovery' | 'geographic-manager' | 'naics-manager' | 'keyword-jobs' | 'search-engine' | 'industry-search' | 'business-directory' | 'enrichment' | 'traceability';
 
 // Navigation items with design system colors
 const getNavigationItems = (designSystem: any) => {
@@ -72,6 +73,7 @@ const getNavigationItems = (designSystem: any) => {
     { id: 'business-directory', name: 'Business Directory', icon: Building, color: colors.warning },
     { id: 'enrichment', name: 'Data Enrichment', icon: Zap, color: colors.info },
     { id: 'naics-manager', name: 'Industry Manager', icon: BarChart3, color: colors.accent },
+    { id: 'keyword-jobs', name: 'Jobs', icon: Clock, color: colors.warning },
     { id: 'traceability', name: 'Traceability', icon: Database, color: colors.accent },
     { id: 'search-engine', name: 'Search Engine', icon: Search, color: colors.info },
     { id: 'tech-discovery', name: 'Tech Discovery', icon: Search, color: colors.accent },
@@ -372,6 +374,15 @@ export default function AdminPanel() {
                 }
               }} />
             )}
+          </div>
+        );
+      case 'keyword-jobs':
+        return (
+          <div 
+            className="p-8 space-y-8"
+            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
+          >
+            <JobsManager />
           </div>
         );
       case 'traceability':
