@@ -759,6 +759,11 @@ class AppScheduler {
           if (job.type === 'keyword-generation' && externalData.result) {
             await this.syncKeywordsToIndustry(job.metadata?.industry, externalData.result);
           }
+          
+          // Process enrichment result and save to business directory if this is a basic enrichment job
+          if (job.type === 'basic-enrichment' && externalData.result) {
+            await this.processEnrichmentResult(externalData.result, job.id);
+          }
         } else if (externalData.status && externalData.status !== job.status) {
           console.log(`🔄 Job ${job.id} status changed from ${job.status} to ${externalData.status}`);
           

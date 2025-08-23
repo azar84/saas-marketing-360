@@ -147,7 +147,8 @@ export class BusinessDirectoryUpdater {
           data: {
             name: businessData.name,
             description: businessData.description,
-            baseUrl: businessData.baseUrl,
+            website: businessData.website || websiteUrl, // Use extracted website if available
+            baseUrl: businessData.baseUrl || websiteUrl,
             isActive: businessData.isActive,
             updatedAt: new Date()
           }
@@ -157,10 +158,10 @@ export class BusinessDirectoryUpdater {
         // Create new business
         business = await prisma.company.create({
           data: {
-            website: websiteUrl,
+            website: businessData.website || websiteUrl, // Use extracted website if available
             name: businessData.name,
             description: businessData.description,
-            baseUrl: businessData.baseUrl,
+            baseUrl: businessData.baseUrl || websiteUrl,
             isActive: businessData.isActive
           }
         });
@@ -170,6 +171,11 @@ export class BusinessDirectoryUpdater {
       // Process contact persons from finalResult only
       if (finalResult.contact?.departments && finalResult.contact.departments.length > 0) {
         await this.processContactPersons(business.id, finalResult.contact.departments);
+      }
+
+      // Process primary contact information (emails, phones)
+      if (finalResult.contact?.primary) {
+        await this.processPrimaryContacts(business.id, finalResult.contact.primary);
       }
 
       // Process services
@@ -192,9 +198,9 @@ export class BusinessDirectoryUpdater {
         await this.processIndustries(business.id, finalResult.company.categories);
       }
 
-      // Process addresses
+      // Process addresses - use both locations and addresses arrays for complete data
       if (finalResult.contact?.locations && finalResult.contact.locations.length > 0) {
-        await this.processAddresses(business.id, finalResult.contact.locations);
+        await this.processAddresses(business.id, finalResult.contact.locations, finalResult.contact.addresses);
       }
 
       // Create enrichment record
@@ -249,9 +255,73 @@ export class BusinessDirectoryUpdater {
     return {
       name: company?.name || analysis?.companyName || 'Unknown Company',
       description: company?.description || analysis?.description || null,
+      website: company?.website || null,
       baseUrl: company?.website || null,
       isActive: true
     };
+  }
+
+  /**
+   * Process primary contact information (emails, phones) from enrichment result
+   */
+  private static async processPrimaryContacts(companyId: number, primary: any) {
+    try {
+      // Process primary emails
+      if (primary.emails && primary.emails.length > 0) {
+        for (const email of primary.emails) {
+          // Check if contact already exists
+          const existing = await prisma.companyContact.findFirst({
+            where: {
+              companyId: companyId,
+              type: 'email',
+              value: email
+            }
+          });
+
+          if (!existing) {
+            await prisma.companyContact.create({
+              data: {
+                companyId: companyId,
+                type: 'email',
+                value: email,
+                label: 'Primary Email',
+                description: 'Primary company email address',
+                isPrimary: true
+              }
+            });
+          }
+        }
+      }
+
+      // Process primary phones
+      if (primary.phones && primary.phones.length > 0) {
+        for (const phone of primary.phones) {
+          // Check if contact already exists
+          const existing = await prisma.companyContact.findFirst({
+            where: {
+              companyId: companyId,
+              type: 'phone',
+              value: phone.number || phone
+            }
+          });
+
+          if (!existing) {
+            await prisma.companyContact.create({
+              data: {
+                companyId: companyId,
+                type: 'phone',
+                value: phone.number || phone,
+                label: phone.label || 'Primary Phone',
+                description: phone.type || 'Primary company phone number',
+                isPrimary: true
+              }
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error processing primary contacts:', error);
+    }
   }
 
   /**
@@ -502,32 +572,42 @@ export class BusinessDirectoryUpdater {
   /**
    * Process company addresses
    */
-  private static async processAddresses(companyId: number, locations: any[]) {
+  private static async processAddresses(companyId: number, locations: any[], addresses?: any[]) {
     try {
-      for (const location of locations) {
-        // Check if address already exists
-        const existing = await prisma.companyAddress.findFirst({
-          where: {
-            companyId: companyId,
-            type: location.type || 'HQ'
-          }
-        });
-
-        if (!existing) {
-          await prisma.companyAddress.create({
-            data: {
+      // Only process addresses from the addresses array (most detailed and complete)
+      if (addresses && addresses.length > 0) {
+        for (const address of addresses) {
+          // Check if address already exists by matching key fields
+          const existing = await prisma.companyAddress.findFirst({
+            where: {
               companyId: companyId,
-              type: location.type || 'HQ',
-              fullAddress: null,
-              streetAddress: null,
-              city: location.city || null,
-              stateProvince: location.state || null,
-              country: location.country || null,
-              isPrimary: location.type === 'corporate office'
+              city: address.city,
+              stateProvince: address.stateProvince,
+              country: address.country
             }
           });
+
+          if (!existing) {
+            await prisma.companyAddress.create({
+              data: {
+                companyId: companyId,
+                type: address.type || 'HQ',
+                fullAddress: address.fullAddress || null,
+                streetAddress: address.streetAddress || null,
+                addressLine2: address.addressLine2 || null,
+                city: address.city || null,
+                stateProvince: address.stateProvince || null,
+                country: address.country || null,
+                zipPostalCode: address.zipPostalCode || null,
+                isPrimary: address.type === 'headquarters' || address.type === 'corporate office'
+              }
+            });
+          }
         }
       }
+      
+      // Note: locations array is ignored to prevent data duplication
+      // The addresses array contains all the necessary information
     } catch (error) {
       console.error('Error processing addresses:', error);
     }

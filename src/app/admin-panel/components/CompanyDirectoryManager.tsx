@@ -54,9 +54,14 @@ interface CompanyAddress {
   id: number;
   type: string;
   fullAddress?: string;
+  streetAddress?: string;
+  addressLine2?: string;
   city?: string;
   stateProvince?: string;
   country?: string;
+  zipPostalCode?: string;
+  latitude?: number;
+  longitude?: number;
   isPrimary: boolean;
 }
 
@@ -65,6 +70,8 @@ interface CompanyContact {
   type: string;
   label?: string;
   value: string;
+  contactPage?: string;
+  description?: string;
   isPrimary: boolean;
   isActive: boolean;
 }
@@ -626,9 +633,13 @@ export default function CompanyDirectoryManager() {
                           <div className="flex items-center gap-2 text-sm">
                             <MapPin className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                             <span style={{ color: 'var(--color-text-secondary)' }}>
-                              {company.addresses[0].city && company.addresses[0].country 
+                              {company.addresses[0].city && company.addresses[0].stateProvince && company.addresses[0].country
+                                ? `${company.addresses[0].city}, ${company.addresses[0].stateProvince}, ${company.addresses[0].country}`
+                                : company.addresses[0].city && company.addresses[0].stateProvince
+                                ? `${company.addresses[0].city}, ${company.addresses[0].stateProvince}`
+                                : company.addresses[0].city && company.addresses[0].country
                                 ? `${company.addresses[0].city}, ${company.addresses[0].country}`
-                                : company.addresses[0].fullAddress || 'Address available'
+                                : company.addresses[0].city || company.addresses[0].country || 'Address available'
                               }
                             </span>
                           </div>
@@ -636,6 +647,7 @@ export default function CompanyDirectoryManager() {
                       </div>
                       
                       <div className="space-y-2">
+                        {/* Show primary email if available */}
                         {company.contacts.filter(c => c.type === 'email' && c.isPrimary)[0] && (
                           <div className="flex items-center gap-2 text-sm">
                             <Mail className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
@@ -645,6 +657,7 @@ export default function CompanyDirectoryManager() {
                           </div>
                         )}
                         
+                        {/* Show primary phone if available */}
                         {company.contacts.filter(c => c.type === 'phone' && c.isPrimary)[0] && (
                           <div className="flex items-center gap-2 text-sm">
                             <Phone className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
@@ -654,6 +667,13 @@ export default function CompanyDirectoryManager() {
                                 ` (${company.contacts.filter(c => c.type === 'phone' && c.isPrimary)[0].label})`
                               }
                             </span>
+                          </div>
+                        )}
+                        
+                        {/* Show contact count if multiple contacts */}
+                        {(company.contacts.filter(c => c.type === 'email').length > 1 || company.contacts.filter(c => c.type === 'phone').length > 1) && (
+                          <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                            {company.contacts.filter(c => c.type === 'email').length + company.contacts.filter(c => c.type === 'phone').length} total contacts
                           </div>
                         )}
                       </div>
@@ -780,6 +800,128 @@ export default function CompanyDirectoryManager() {
                                   {relation.isPrimary && ' (Primary)'}
                                 </Badge>
                               ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Addresses */}
+                        {company.addresses.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Addresses</h4>
+                            <div className="space-y-3">
+                              {company.addresses.map((address) => (
+                                <div key={address.id} className="p-3 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <MapPin className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                                    <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                                      {address.type === 'headquarters' ? 'Headquarters' : 
+                                       address.type === 'corporate office' ? 'Corporate Office' : 
+                                       address.type === 'HQ' ? 'Main Office' :
+                                       address.type || 'Location'}
+                                    </span>
+                                    {address.isPrimary && (
+                                      <Badge variant="success" size="sm" className="text-xs">Primary</Badge>
+                                    )}
+                                  </div>
+                                  
+                                  {address.fullAddress ? (
+                                    <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                                      {address.fullAddress}
+                                    </div>
+                                  ) : (
+                                    <div className="text-sm space-y-1" style={{ color: 'var(--color-text-secondary)' }}>
+                                      {address.streetAddress && (
+                                        <div>{address.streetAddress}</div>
+                                      )}
+                                      {address.addressLine2 && (
+                                        <div>{address.addressLine2}</div>
+                                      )}
+                                      <div>
+                                        {address.city && address.stateProvince && address.zipPostalCode
+                                          ? `${address.city}, ${address.stateProvince} ${address.zipPostalCode}`
+                                          : address.city && address.stateProvince
+                                          ? `${address.city}, ${address.stateProvince}`
+                                          : address.city && address.country
+                                          ? `${address.city}, ${address.country}`
+                                          : address.city || address.country || 'Address available'
+                                        }
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Contact Information */}
+                        {company.contacts.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Contact Information</h4>
+                            <div className="space-y-3">
+                              {/* Phone Numbers */}
+                              {company.contacts.filter(c => c.type === 'phone').length > 0 && (
+                                <div>
+                                  <h5 className="text-xs font-medium mb-2" style={{ color: 'var(--color-text-muted)' }}>Phone Numbers</h5>
+                                  <div className="space-y-2">
+                                    {company.contacts.filter(c => c.type === 'phone').map((contact) => (
+                                      <div key={contact.id} className="flex items-center gap-3 text-sm p-2 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+                                        <Phone className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                                        <div className="flex-1">
+                                          <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                                            {contact.value}
+                                          </div>
+                                          {contact.label && (
+                                            <div className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                                              {contact.label}
+                                            </div>
+                                          )}
+                                          {contact.description && (
+                                            <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                                              {contact.description}
+                                            </div>
+                                          )}
+                                        </div>
+                                        {contact.isPrimary && (
+                                          <Badge variant="success" size="sm" className="text-xs">Primary</Badge>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
+                              
+                              {/* Email Addresses */}
+                              {company.contacts.filter(c => c.type === 'email').length > 0 && (
+                                <div>
+                                  <h5 className="text-xs font-medium mb-2" style={{ color: 'var(--color-text-muted)' }}>Email Addresses</h5>
+                                  <div className="space-y-2">
+                                    {company.contacts.filter(c => c.type === 'email').map((contact) => (
+                                      <div key={contact.id} className="flex items-center gap-3 text-sm p-2 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+                                        <Mail className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                                        <div className="flex-1">
+                                          <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                                            {contact.value}
+                                          </div>
+                                          {contact.label && (
+                                            <div className="text-xs" style={{ color: 'var(--color-text-secondary)' }}>
+                                              {contact.label}
+                                            </div>
+                                          )}
+                                          {contact.description && (
+                                            <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                                              {contact.description}
+                                            </div>
+                                          )}
+                                        </div>
+                                        {contact.isPrimary && (
+                                          <Badge variant="success" size="sm" className="text-xs">Primary</Badge>
+                                        )}
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </div>
                         )}

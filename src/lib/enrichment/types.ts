@@ -131,7 +131,7 @@ export interface EnrichedCompanyData {
   rawData: {
     website?: WebsiteScrapeData;
     googleSearch?: GoogleSearchData;
-    builtWith?: BuiltWithData;
+    // builtWith field removed
     clearbit?: ClearbitData;
     hunter?: HunterData;
     linkedin?: LinkedInData;
@@ -219,26 +219,7 @@ export interface GoogleSearchData {
   lastSearched: Date;
 }
 
-export interface BuiltWithData {
-  technologies: Array<{
-    name: string;
-    category: string;
-    firstDetected?: string;
-    lastDetected?: string;
-  }>;
-  meta: {
-    companyName?: string;
-    emails?: string[];
-    phones?: string[];
-    country?: string;
-    city?: string;
-    state?: string;
-    vertical?: string;
-    employeeCount?: number;
-    trafficRank?: number;
-  };
-  lastEnriched: Date;
-}
+// BuiltWithData interface removed
 
 export interface ClearbitData {
   company: {

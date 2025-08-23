@@ -1,9 +1,35 @@
-import { BuiltWithCompany } from './builtwith';
-
 /**
- * Convert BuiltWith company data to CSV format
+ * Convert company data to CSV format
  */
-export function exportToCSV(companies: BuiltWithCompany[], filename: string = 'tech-discovery-results.csv'): void {
+
+interface Company {
+  domain?: string;
+  organization?: string;
+  email?: string;
+  phone?: string;
+  country?: string;
+  city?: string;
+  state?: string;
+  postcode?: string;
+  vertical?: string;
+  employeeCount?: number;
+  trafficRank?: number;
+  qualityRank?: number;
+  uniqueVisitors?: number;
+  monthlyVisits?: number;
+  firstIndexed?: string;
+  lastIndexed?: string;
+  firstDetected?: string;
+  lastDetected?: string;
+  emails?: string[];
+  telephones?: string[];
+  socialLinks?: string[];
+  titles?: string[];
+  techStack?: string[];
+  enriched?: boolean;
+}
+
+export function exportToCSV(companies: Company[], filename: string = 'company-results.csv'): void {
   if (companies.length === 0) {
     console.warn('No companies to export');
     return;
@@ -67,16 +93,7 @@ export function exportToCSV(companies: BuiltWithCompany[], filename: string = 't
 
   // Combine headers and rows
   const csvContent = [headers, ...csvRows]
-    .map(row => 
-      row.map(field => {
-        // Escape quotes and wrap in quotes if contains comma, quote, or newline
-        const escaped = field.toString().replace(/"/g, '""');
-        if (escaped.includes(',') || escaped.includes('"') || escaped.includes('\n')) {
-          return `"${escaped}"`;
-        }
-        return escaped;
-      }).join(',')
-    )
+    .map(row => row.map(cell => `"${cell}"`).join(','))
     .join('\n');
 
   // Create and download the file
@@ -122,34 +139,34 @@ export function formatDate(dateString: string): string {
   }
 }
 
-/**
- * Validate CSV data before export
- */
-export function validateCSVData(companies: BuiltWithCompany[]): {
-  isValid: boolean;
-  errors: string[];
+export function validateCSVData(companies: Company[]): {
+  valid: Company[];
+  invalid: { company: Company; errors: string[] }[];
 } {
-  const errors: string[] = [];
+  const valid: Company[] = [];
+  const invalid: { company: Company; errors: string[] }[] = [];
 
-  if (!Array.isArray(companies)) {
-    errors.push('Data must be an array');
-    return { isValid: false, errors };
-  }
+  companies.forEach(company => {
+    const errors: string[] = [];
 
-  if (companies.length === 0) {
-    errors.push('No companies to export');
-    return { isValid: false, errors };
-  }
-
-  // Check for required fields
-  companies.forEach((company, index) => {
     if (!company.domain) {
-      errors.push(`Company at index ${index} is missing domain`);
+      errors.push('Missing domain');
+    }
+
+    if (company.domain && !company.domain.includes('.')) {
+      errors.push('Invalid domain format');
+    }
+
+    if (company.email && !company.email.includes('@')) {
+      errors.push('Invalid email format');
+    }
+
+    if (errors.length === 0) {
+      valid.push(company);
+    } else {
+      invalid.push({ company, errors });
     }
   });
 
-  return {
-    isValid: errors.length === 0,
-    errors
-  };
+  return { valid, invalid };
 }

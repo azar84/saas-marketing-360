@@ -136,7 +136,7 @@ const config: EnrichmentConfig = {
   sources: {
     website: true,        // Enable website scraping
     googleSearch: true,   // Enable Google search enrichment
-    builtWith: false,     // Disabled (not in current workflow)
+    // builtWith: false,     // Removed
     clearbit: false,      // Disabled (not in current workflow)
     hunter: false,        // Disabled (not in current workflow)
     linkedin: false       // Disabled (not in current workflow)

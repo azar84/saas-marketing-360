@@ -142,7 +142,7 @@ async function testDataConsolidation(scrapedData, googleData) {
       rawData: {
         website: scrapedData,
         googleSearch: googleData || undefined,
-        builtWith: undefined,
+        // builtWith: undefined, // Removed
         clearbit: undefined,
         hunter: undefined,
         linkedin: undefined

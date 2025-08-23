@@ -11,8 +11,8 @@ DATABASE_URL="postgresql://username:password@localhost:5432/saas_marketing"
 # JWT Configuration
 JWT_SECRET="your-secret-key-here"
 
-# BuiltWith API Configuration (Required for Tech Discovery)
-BUILTWITH_API_KEY="your_builtwith_api_key_here"
+# BuiltWith API Configuration (Removed - No longer used)
+# BUILTWITH_API_KEY="your_builtwith_api_key_here"
 
 # Cloudinary Configuration (Optional)
 CLOUDINARY_CLOUD_NAME="your_cloud_name"
@@ -29,12 +29,9 @@ SMTP_PASS="your_app_password"
 DEBUG=false
 ```
 
-## Getting Your BuiltWith API Key
+## BuiltWith API (Removed)
 
-1. Sign up at [BuiltWith.com](https://builtwith.com)
-2. Navigate to your account settings
-3. Generate an API key
-4. Note your API plan limits and rate limits
+BuiltWith API integration has been removed from this project.
 
 ## Development Setup
 
@@ -49,13 +46,8 @@ DEBUG=false
 3. Set `DEBUG=false` for production
 4. Use strong, unique values for `JWT_SECRET`
 
-## Tech Discovery Feature
+## Tech Discovery Feature (Removed)
 
-The Tech Discovery feature requires a valid BuiltWith API key to function. Without this key, the feature will show an error message.
-
-For testing purposes, you can:
-1. Get a free BuiltWith API key (limited usage)
-2. Use the feature with limited functionality
-3. Upgrade to a paid plan for full access
+The Tech Discovery feature has been removed from this project.
 
 See `docs/TECH_DISCOVERY_SETUP.md` for detailed setup instructions.

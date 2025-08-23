@@ -44,7 +44,7 @@ import ScriptSectionManager from './components/ScriptSectionManager';
 import NewsletterManager from './components/NewsletterManager';
 import UserManagement from './components/UserManagement';
 import SchedulerManager from './components/SchedulerManager';
-import TechDiscoveryManager from './components/TechDiscoveryManager';
+// TechDiscoveryManager removed
 import GeographicManager from './components/GeographicManager';
 import NAICSManager from './components/NAICSManager';
 import KeywordsManager from './components/KeywordsManager';
@@ -53,7 +53,7 @@ import JobsManager from './components/JobsManager';
 import SearchEngineManager from './components/SearchEngineManager';
 import IndustrySearchManager from './components/IndustrySearchManager';
 import CompanyDirectoryManager from './components/CompanyDirectoryManager';
-import { EnrichmentManager } from './components/EnrichmentManager';
+
 import TraceabilityViewer from './components/TraceabilityViewer';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
 import { useNotificationContext } from '@/components/providers/NotificationProvider';
@@ -61,7 +61,7 @@ import { useNotificationContext } from '@/components/providers/NotificationProvi
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'tech-discovery' | 'geographic-manager' | 'naics-manager' | 'keyword-jobs' | 'search-engine' | 'industry-search' | 'business-directory' | 'enrichment' | 'traceability';
+type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'geographic-manager' | 'naics-manager' | 'keyword-jobs' | 'search-engine' | 'industry-search' | 'business-directory' | 'enrichment' | 'traceability';
 
 // Navigation items with design system colors
 const getNavigationItems = (designSystem: any) => {
@@ -76,7 +76,7 @@ const getNavigationItems = (designSystem: any) => {
     { id: 'keyword-jobs', name: 'Jobs', icon: Clock, color: colors.warning },
     { id: 'traceability', name: 'Traceability', icon: Database, color: colors.accent },
     { id: 'search-engine', name: 'Search Engine', icon: Search, color: colors.info },
-    { id: 'tech-discovery', name: 'Tech Discovery', icon: Search, color: colors.accent },
+    // { id: 'tech-discovery', name: 'Tech Discovery', icon: Search, color: colors.accent }, // Removed
     { id: 'geographic-manager', name: 'Geographic Database', icon: Globe, color: colors.success },
     { id: 'media-library', name: 'Media Library', icon: FolderOpen, color: colors.primary },
     { id: 'pricing', name: 'Pricing Plans', icon: DollarSign, color: colors.success },
@@ -333,15 +333,7 @@ export default function AdminPanel() {
             <ScriptSectionManager />
           </div>
         );
-      case 'tech-discovery':
-        return (
-          <div 
-            className="p-8 space-y-8"
-            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
-          >
-            <TechDiscoveryManager />
-          </div>
-        );
+      // case 'tech-discovery': // Removed
       case 'geographic-manager':
         return (
           <div 
@@ -463,7 +455,39 @@ export default function AdminPanel() {
             className="p-8 space-y-8"
             style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
           >
-            <EnrichmentManager />
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold mb-4">Data Enrichment</h2>
+                <p className="text-gray-600 mb-4">
+                  Data enrichment is now handled through the Industry Search Manager. 
+                  Search for industries and select companies to enrich with the Marketing MCP API.
+                </p>
+              </div>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+                <h3 className="font-semibold text-blue-800 mb-4 text-lg">How to Enrich Companies:</h3>
+                <ol className="list-decimal list-inside text-blue-700 space-y-2 text-base">
+                  <li>Go to <strong>Industry Search</strong> section</li>
+                  <li>Search for industries or keywords</li>
+                  <li>Select companies from the results</li>
+                  <li>Click "Enrich Selected" to start enrichment jobs</li>
+                  <li>Monitor progress in the <strong>Jobs</strong> section</li>
+                </ol>
+              </div>
+              
+              <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+                <h3 className="font-semibold text-green-800 mb-2 text-lg">Current Enrichment System:</h3>
+                <p className="text-green-700 mb-2">
+                  We now use the <strong>Marketing MCP API</strong> for company enrichment, which provides:
+                </p>
+                <ul className="list-disc list-inside text-green-700 space-y-1">
+                  <li>Comprehensive company information</li>
+                  <li>Detailed contact data and addresses</li>
+                  <li>Technology stack detection</li>
+                  <li>Service and industry classification</li>
+                </ul>
+              </div>
+            </div>
           </div>
         );
       case 'dashboard':
