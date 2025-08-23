@@ -760,9 +760,10 @@ class AppScheduler {
             await this.syncKeywordsToIndustry(job.metadata?.industry, externalData.result);
           }
           
-          // Process enrichment result and save to business directory if this is a basic enrichment job
+          // Note: Enrichment results are now processed by the JobsManager component
+          // through the /api/admin/enrichment/process endpoint
           if (job.type === 'basic-enrichment' && externalData.result) {
-            await this.processEnrichmentResult(externalData.result, job.id);
+            console.log(`✅ Enrichment job ${job.id} completed with results - processing handled by JobsManager`);
           }
         } else if (externalData.status && externalData.status !== job.status) {
           console.log(`🔄 Job ${job.id} status changed from ${job.status} to ${externalData.status}`);
