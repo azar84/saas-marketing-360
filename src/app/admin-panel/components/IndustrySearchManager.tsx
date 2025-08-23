@@ -22,9 +22,11 @@ import {
   Users,
   X,
   Check,
+  CheckCircle,
   Play,
   Clock,
-  AlertCircle
+  AlertCircle,
+  Zap
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -178,10 +180,15 @@ export default function IndustrySearchManager() {
   const [industryKeywords, setIndustryKeywords] = useState<Keyword[]>([]);
   const [generatedQueries, setGeneratedQueries] = useState<string[]>([]);
   
+  // New flexible search state
+  const [searchMode, setSearchMode] = useState<'industry' | 'custom'>('industry');
+  const [customSearchTerms, setCustomSearchTerms] = useState<string>('');
+  
   // Search state
   const [searchResults, setSearchResults] = useState<EnhancedSearchResult[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [resultsFromDatabase, setResultsFromDatabase] = useState(false);
   
   // Business extraction state
   const [extractionInProgress, setExtractionInProgress] = useState(false);
@@ -245,7 +252,17 @@ export default function IndustrySearchManager() {
     endTime?: Date;
     error?: string;
   } | null>(null);
+  
+  // Selection state for enrichment
+  const [selectedResults, setSelectedResults] = useState<Set<string>>(new Set());
   const [backgroundExtractionInProgress, setBackgroundExtractionInProgress] = useState(false);
+  const [isSubmittingEnrichment, setIsSubmittingEnrichment] = useState(false);
+  const [recentlySubmittedCount, setRecentlySubmittedCount] = useState(0);
+
+  // Clear selected results when new search results load
+  useEffect(() => {
+    setSelectedResults(new Set());
+  }, [searchResults]);
   
   // Notification system
   const { notifications, addNotification, dismissNotification, clearAllNotifications, updateNotification } = useNotificationContext();
@@ -570,12 +587,19 @@ export default function IndustrySearchManager() {
     fetchKeywords();
   }, [selectedIndustry?.id]);
 
-  // Generate queries when industry keywords or city changes
+  // Generate queries when industry keywords or city changes (industry mode)
   useEffect(() => {
-    if (selectedIndustry && selectedCity && industryKeywords.length > 0) {
+    if (searchMode === 'industry' && selectedIndustry && selectedCity && industryKeywords.length > 0) {
       generateQueries(industryKeywords, selectedCity);
     }
-  }, [selectedIndustry?.id, selectedCity?.id, industryKeywords.length]);
+  }, [selectedIndustry?.id, selectedCity?.id, industryKeywords.length, searchMode]);
+
+  // Generate queries when custom search terms or city changes (custom mode)
+  useEffect(() => {
+    if (searchMode === 'custom' && selectedCity && customSearchTerms.trim()) {
+      generateCustomQueries(customSearchTerms.trim(), selectedCity);
+    }
+  }, [customSearchTerms, selectedCity?.id, searchMode]);
 
   const generateQueries = (keywords: Keyword[], city: City) => {
     const cityName = city.name;
@@ -595,14 +619,45 @@ export default function IndustrySearchManager() {
     setGeneratedQueries(queries);
   };
 
+  const generateCustomQueries = (searchTerms: string, city: City) => {
+    // Split custom search terms by comma, semicolon, or newline to allow multiple queries
+    const terms = searchTerms
+      .split(/[,;\n]+/)
+      .map(term => term.trim())
+      .filter(term => term.length > 0);
+    
+    // If only one term, create variations
+    if (terms.length === 1) {
+      const baseTerm = terms[0];
+      const queries = [
+        baseTerm, // Just the term (location will be passed separately to API)
+        `${baseTerm} services`,
+        `${baseTerm} companies`,
+        `best ${baseTerm}`,
+        `professional ${baseTerm}`
+      ];
+      setGeneratedQueries(queries);
+    } else {
+      // Multiple terms, use them as individual queries
+      setGeneratedQueries(terms);
+    }
+  };
+
   const performSearch = async (page: number = 1) => {
+    console.log(`🔍 performSearch called with page ${page}`);
+    
     if (!configLoaded) {
       setError('Configuration not loaded yet.');
       return null;
     }
 
-    if (!selectedIndustry || !selectedCity) {
+    if (searchMode === 'industry' && (!selectedIndustry || !selectedCity)) {
       setError('Please select both an industry and a city before searching.');
+      return null;
+    }
+    
+    if (searchMode === 'custom' && (!selectedCity || !customSearchTerms.trim())) {
+      setError('Please enter search terms and select a city before searching.');
       return null;
     }
 
@@ -613,6 +668,9 @@ export default function IndustrySearchManager() {
 
     // Create a unique identifier for this search
     const searchIdentifier = `${generatedQueries.join('|')}-${selectedCity?.id}-${page}`;
+    console.log(`🔍 Search identifier: ${searchIdentifier}`);
+    console.log(`🔍 Last search queries: ${lastSearchQueries}`);
+    console.log(`🔍 Current searchInFlightId: ${searchInFlightId}`);
     
     // Check if this is a duplicate search (no-op if same as last one already completed)
     if (lastSearchQueries === searchIdentifier && page === 1) {
@@ -655,13 +713,18 @@ export default function IndustrySearchManager() {
   };
 
   const executeSearch = async (page: number, searchIdentifier: string) => {
+    console.log(`🔍 executeSearch called for page ${page}`);
+    console.log(`🔍 Current searchInFlightId: "${searchInFlightId}"`);
+    console.log(`🔍 New searchIdentifier: "${searchIdentifier}"`);
+    console.log(`🔍 Are they equal? ${searchInFlightId === searchIdentifier}`);
+    
     // Guard against direct duplicate triggers (e.g., pagination double-clicks)
     if (searchInFlightId === searchIdentifier) {
       console.log('⏳ executeSearch skipped; same search in-flight:', searchIdentifier);
       return null;
     }
     setSearchInFlightId(searchIdentifier);
-    console.log(`🔍 Executing search for page ${page} with identifier: ${searchIdentifier}`);
+    console.log(`✅ executeSearch proceeding for page ${page} with identifier: ${searchIdentifier}`);
     
     // Clear previous date filtering info for new search
     setAppliedDateFiltering(null);
@@ -675,6 +738,72 @@ export default function IndustrySearchManager() {
     setAbortController(newAbortController);
 
     try {
+      // First, try to fetch existing results from database
+      console.log('🗄️ Attempting to fetch results from database first...');
+      
+      const dbRequestBody = {
+        queries: generatedQueries,
+        location: selectedCity?.name,
+        city: selectedCity?.name,
+        industry: searchMode === 'industry' ? selectedIndustry?.label : undefined,
+        page: page,
+        resultsLimit: config.resultsLimit
+      };
+
+      const dbResponse = await fetch('/api/admin/search-engine/search-from-db', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(dbRequestBody),
+        signal: newAbortController.signal
+      });
+
+      const dbData = await dbResponse.json();
+      
+      if (dbData.success && dbData.results && dbData.results.length > 0) {
+        console.log('✅ Found existing results in database, using cached data');
+        console.log(`📊 Database results: ${dbData.results.length} results from session ${dbData.sessionId}`);
+        
+        // Use database results
+        const data: EnhancedSearchResponse = {
+          success: true,
+          results: dbData.results,
+          totalResults: dbData.totalResults,
+          searchTime: dbData.searchTime,
+          filtersApplied: dbData.filtersApplied || {},
+          pagination: dbData.pagination,
+          queriesProcessed: dbData.queriesProcessed,
+          successfulQueries: dbData.successfulQueries,
+          fromDatabase: true,
+          traceability: dbData.traceability
+        };
+        
+        // Process the database results (same logic as live search)
+        const enhancedResults = data.results.map((result: SearchResult, index: number) => ({
+          ...result,
+          isExpanded: false,
+          isProcessing: false,
+          businessExtraction: undefined,
+          extractionError: undefined
+        }));
+        
+        setSearchResults(enhancedResults);
+        setPagination(data.pagination);
+        setTotalResults(parseInt(data.totalResults.toString()) || data.results.length || 0);
+        setSelectedResults(new Set());
+        setResultsFromDatabase(true); // Mark results as from database
+        
+        // Store traceability session ID for pagination
+        if (data.traceability?.searchSessionId) {
+          setTraceabilitySessionId(data.traceability.searchSessionId);
+        }
+        
+        console.log(`✅ Database search completed for page ${page} - ${enhancedResults.length} results`);
+        return { success: true, results: enhancedResults, fromDatabase: true };
+      }
+      
+      console.log('📡 No existing results found, performing live search...');
+      
+      // Fallback to live search if no database results found
       const requestBody = {
         queries: generatedQueries,
         // apiKey/searchEngineId no longer required; backend calls external API
@@ -688,7 +817,10 @@ export default function IndustrySearchManager() {
         enableTraceability: true,
         existingSearchSessionId: page > 1 || lastSearchQueries ? traceabilitySessionId || undefined : undefined,
         // Provide location context so server can forward to external API
-        location: selectedCity?.name
+        location: selectedCity?.name,
+        // Add context for better session matching
+        industry: searchMode === 'industry' ? selectedIndustry?.label : undefined,
+        city: selectedCity?.name
       };
 
       const response = await fetch('/api/admin/search-engine/search', {
@@ -699,6 +831,14 @@ export default function IndustrySearchManager() {
       });
 
       const data: EnhancedSearchResponse = await response.json();
+      
+      console.log(`🔍 API Response for page ${page}:`, {
+        success: data.success,
+        resultsCount: data.results?.length || 0,
+        totalResults: data.totalResults,
+        pagination: data.pagination,
+        hasResults: data.results && data.results.length > 0
+      });
 
       if (!response.ok) {
         throw new Error(data.error || data.message || 'Search failed');
@@ -726,10 +866,36 @@ export default function IndustrySearchManager() {
           }
         }));
         
+        console.log(`🔍 Setting search results:`, {
+          resultsCount: enhancedResults.length,
+          pagination: data.pagination,
+          totalResults: data.totalResults,
+          firstResult: enhancedResults[0]?.title || 'No results'
+        });
+        
+        console.log(`🔍 About to call setSearchResults with ${enhancedResults.length} results`);
         setSearchResults(enhancedResults);
+        console.log(`🔍 setSearchResults called`);
+        
+        console.log(`🔍 About to call setPagination with:`, data.pagination);
         setPagination(data.pagination);
+        console.log(`🔍 setPagination called`);
+        
         const results = parseInt(data.totalResults.toString()) || data.results.length || 0;
+        console.log(`🔍 About to call setTotalResults with: ${results}`);
         setTotalResults(results);
+        console.log(`🔍 setTotalResults called`);
+        
+        setSelectedResults(new Set()); // Clear previous selections
+        setResultsFromDatabase(false); // Mark results as from live search
+        
+        console.log(`✅ Search state updated successfully for page ${page}`);
+        console.log(`📊 Final state: ${enhancedResults.length} results, page ${data.pagination?.currentPage}/${data.pagination?.totalPages}`);
+        
+        // Add a small delay to check if state is actually updated
+        setTimeout(() => {
+          console.log(`🔍 State check after 100ms - searchResults.length should be ${enhancedResults.length}`);
+        }, 100);
         
         // Store date filtering information
         if (data.dateFiltering) {
@@ -782,18 +948,60 @@ export default function IndustrySearchManager() {
       setPagination(null);
       return null; // Return null on error
     } finally {
+      console.log(`🔄 executeSearch finally block: setting loading to false for page ${page}`);
+      console.log(`🔄 Current searchInFlightId before clear: "${searchInFlightId}"`);
+      console.log(`🔄 SearchIdentifier to clear: "${searchIdentifier}"`);
       setIsLoading(false);
       setAbortController(null);
-      setSearchInFlightId((current) => (current === searchIdentifier ? null : current));
+      setSearchInFlightId((current) => {
+        const shouldClear = current === searchIdentifier;
+        console.log(`🔄 Clearing searchInFlightId? ${shouldClear} (current: "${current}", target: "${searchIdentifier}")`);
+        return shouldClear ? null : current;
+      });
+      console.log(`✅ executeSearch completed for page ${page}`);
     }
   };
 
   const handlePageChange = (newPage: number) => {
+    console.log(`🔄 handlePageChange called with page ${newPage}, current pagination:`, pagination);
     if (newPage >= 1 && newPage <= (pagination?.totalPages || 1)) {
-      // For pagination, use executeSearch directly (no debouncing needed)
-      const searchIdentifier = `${generatedQueries.join('|')}-${selectedCity?.id}-${newPage}`;
-      executeSearch(newPage, searchIdentifier);
+      console.log(`✅ Page change valid, executing immediate search for page ${newPage}`);
+      // For pagination, execute search immediately without debouncing
+      performPaginationSearch(newPage);
+    } else {
+      console.log(`❌ Page change invalid: newPage=${newPage}, totalPages=${pagination?.totalPages}`);
     }
+  };
+
+  const performPaginationSearch = async (page: number) => {
+    console.log(`📄 performPaginationSearch called for page ${page}`);
+    console.log(`📄 Current searchInFlightId at start: "${searchInFlightId}"`);
+    
+    const hasValidSearch = (searchMode === 'industry' && selectedIndustry && selectedCity) || 
+                          (searchMode === 'custom' && selectedCity && customSearchTerms.trim());
+    
+    if (!configLoaded || !hasValidSearch || generatedQueries.length === 0) {
+      console.log(`❌ Prerequisites not met for pagination search`);
+      return;
+    }
+
+    const searchIdentifier = `${generatedQueries.join('|')}-${selectedCity?.id}-${page}`;
+    console.log(`📄 Pagination search identifier: "${searchIdentifier}"`);
+    console.log(`📄 Setting searchInFlightId to: "${searchIdentifier}"`);
+
+    // For pagination, execute immediately without timeout/debouncing
+    setIsLoading(true);
+    setError('');
+    setCurrentPage(page);
+    
+    try {
+      console.log(`📄 About to call executeSearch for page ${page}`);
+      await executeSearch(page, searchIdentifier);
+      console.log(`📄 executeSearch completed for page ${page}`);
+    } catch (error) {
+      console.error('📄 Pagination search execution failed:', error);
+    }
+    // Note: searchInFlightId cleanup is handled by executeSearch's finally block
   };
 
   const handleResultsPerPageChange = (newLimit: number) => {
@@ -877,6 +1085,133 @@ export default function IndustrySearchManager() {
         location: 'To be determined'
       } : undefined
     };
+  };
+
+  // Normalize any URL to its website origin (https://domain.tld)
+  const normalizeWebsite = (urlString: string): string => {
+    try {
+      const u = new URL(urlString);
+      return `${u.protocol}//${u.hostname}`;
+    } catch {
+      return urlString;
+    }
+  };
+
+  // Selection management functions
+  const toggleResultSelection = (resultUrl: string) => {
+    setSelectedResults(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(resultUrl)) {
+        newSet.delete(resultUrl);
+      } else {
+        newSet.add(resultUrl);
+      }
+      return newSet;
+    });
+  };
+
+  const selectCurrentPage = () => {
+    const currentPageUrls = new Set(searchResults.map(result => result.url));
+    setSelectedResults(prev => {
+      const newSet = new Set(prev);
+      currentPageUrls.forEach(url => newSet.add(url));
+      return newSet;
+    });
+  };
+
+  const selectAllPages = () => {
+    // This would select all results across all pages
+    // For now, we'll select current page and show a message about all pages
+    const currentPageUrls = new Set(searchResults.map(result => result.url));
+    setSelectedResults(prev => {
+      const newSet = new Set(prev);
+      currentPageUrls.forEach(url => newSet.add(url));
+      return newSet;
+    });
+    
+    addNotification({
+      type: 'info',
+      title: 'Current Page Selected',
+      message: 'Selected all results on current page. Navigate through pages to select more results.',
+    });
+  };
+
+  const deselectAllResults = () => {
+    setSelectedResults(new Set());
+  };
+
+  const getSelectedResultsForEnrichment = (): string[] => {
+    return Array.from(selectedResults)
+      .filter(url => searchResults.some(result => result.url === url))
+      .map(url => normalizeWebsite(url));
+  };
+
+  // Submit basic enrichment jobs for a list of website URLs
+  const submitEnrichmentJobsForUrls = async (websiteUrls: string[]) => {
+    if (!websiteUrls || websiteUrls.length === 0) {
+      console.log('🔍 No URLs to submit for enrichment');
+      return;
+    }
+    
+    console.log('🚀 Starting enrichment job submission for URLs:', websiteUrls);
+    
+    try {
+      const unique = Array.from(new Set(websiteUrls.filter(Boolean)));
+      console.log('🔗 Unique URLs for enrichment:', unique);
+      
+      const results = await Promise.all(
+        unique.map(async (websiteUrl) => {
+          console.log(`📤 Submitting enrichment job for: ${websiteUrl}`);
+          
+          try {
+            const response = await fetch('/api/admin/jobs', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                type: 'basic-enrichment',
+                data: {
+                  websiteUrl,
+                  options: {
+                    includeStaffEnrichment: false,
+                    includeExternalEnrichment: false,
+                    includeIntelligence: false,
+                    includeTechnologyExtraction: false,
+                    basicMode: true,
+                    maxHtmlLength: 50000
+                  }
+                }
+              })
+            });
+            
+            const result = await response.json();
+            console.log(`📥 Response for ${websiteUrl}:`, result);
+            
+            if (!response.ok) {
+              console.error(`❌ Failed to submit job for ${websiteUrl}:`, result);
+              return { error: result, websiteUrl };
+            } else {
+              console.log(`✅ Successfully submitted job for ${websiteUrl}:`, result.job?.id);
+              return { success: result, websiteUrl };
+            }
+          } catch (error) {
+            console.error(`❌ Network error for ${websiteUrl}:`, error);
+            return { error, websiteUrl };
+          }
+        })
+      );
+
+      addNotification({
+        type: 'success',
+        title: 'Enrichment Jobs Submitted',
+        message: `Submitted ${unique.length} website${unique.length === 1 ? '' : 's'} for enrichment.`,
+      });
+    } catch (err) {
+      addNotification({
+        type: 'error',
+        title: 'Enrichment Submission Failed',
+        message: err instanceof Error ? err.message : 'Unknown error submitting enrichment jobs.'
+      });
+    }
   };
 
   const saveBusinessToDirectory = async (result: EnhancedSearchResult) => {
@@ -963,6 +1298,29 @@ export default function IndustrySearchManager() {
     setExtractionInProgress(true);
     setError(null); // Clear any previous errors
     setSuccessMessage(null); // Clear any previous success messages
+
+    // Submit selected website URLs to external enrichment API
+    try {
+      console.log('🔍 DEBUG: Selected results:', Array.from(selectedResults));
+      console.log('🔍 DEBUG: Search results:', searchResults.map(r => ({ url: r.url, title: r.title })));
+      
+      const websitesToEnrich = getSelectedResultsForEnrichment();
+      console.log('🔍 DEBUG: Websites to enrich:', websitesToEnrich);
+      
+      if (websitesToEnrich.length > 0) {
+        console.log(`🚀 Submitting ${websitesToEnrich.length} selected URLs for enrichment`);
+        void submitEnrichmentJobsForUrls(websitesToEnrich);
+      } else {
+        console.log('⚠️ No results selected for enrichment');
+        addNotification({
+          type: 'warning',
+          title: 'No Results Selected',
+          message: 'Please select some search results to submit for enrichment.',
+        });
+      }
+    } catch (error) {
+      console.error('❌ Error preparing enrichment jobs:', error);
+    }
 
     // Create progress notification
     const progressNotificationId = addNotification({
@@ -1130,6 +1488,16 @@ export default function IndustrySearchManager() {
             status: 'Extraction completed successfully!'
           }
         });
+
+        // Kick off enrichment jobs for detected company websites
+        const websitesToEnrich: string[] = (data.data.businesses || [])
+          .map((b: any) => b.website)
+          .filter((w: any) => typeof w === 'string' && w)
+          .map((w: string) => normalizeWebsite(w));
+        if (websitesToEnrich.length > 0) {
+          // Submit asynchronously; no need to block UI
+          void submitEnrichmentJobsForUrls(websitesToEnrich);
+        }
 
         // Show success message based on mode
         if (saveToDirectory) {
@@ -1594,6 +1962,22 @@ export default function IndustrySearchManager() {
     setGeneratedQueries([]);
   };
 
+  const handleSearchModeChange = (mode: 'industry' | 'custom') => {
+    setSearchMode(mode);
+    setGeneratedQueries([]);
+    setSearchResults([]);
+    setPagination(null);
+    setError('');
+    
+    if (mode === 'custom') {
+      setSelectedIndustry(null);
+      setIndustrySearch('');
+      setIndustryKeywords([]);
+    } else {
+      setCustomSearchTerms('');
+    }
+  };
+
   // Debug logging for notifications
   useEffect(() => {
   }, []);
@@ -1611,7 +1995,8 @@ export default function IndustrySearchManager() {
   }, [searchTimeout]);
 
   return (
-    <div className="space-y-6 p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+    <div className="space-y-6">
+      <div className="p-6 rounded-xl" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
       
       
       {/* Header */}
@@ -1642,20 +2027,124 @@ export default function IndustrySearchManager() {
         backgroundColor: 'var(--color-bg-primary)',
         border: '1px solid var(--color-gray-light)'
       }}>
-        <div className="mb-4">
+        <div className="mb-6">
           <h3 className="text-xl font-semibold flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
-            <Building className="h-5 w-5" />
-            Industry & Location Selection
+            <Search className="h-5 w-5" />
+            Business Discovery Search
           </h3>
           <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-            Select an industry and city to automatically generate search queries
+            Find businesses by industry categories or custom search terms in any city
           </p>
+          
+
         </div>
+
+        {/* Improved Search Method Selection */}
+        <div className="mb-6">
+          <h4 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>
+            What would you like to search for?
+          </h4>
+          
+          {/* Tab-style interface */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {/* Industry-Based Search Card */}
+            <div 
+              className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                searchMode === 'industry' ? 'ring-2' : ''
+              }`}
+              style={{
+                backgroundColor: searchMode === 'industry' ? 'var(--color-primary-light)' : 'var(--color-bg-primary)',
+                borderColor: searchMode === 'industry' ? 'var(--color-primary)' : 'var(--color-gray-light)'
+              }}
+              onClick={() => handleSearchModeChange('industry')}
+            >
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg" style={{
+                  backgroundColor: searchMode === 'industry' ? 'var(--color-white)' : 'var(--color-bg-secondary)'
+                }}>
+                  <Building className="h-5 w-5" style={{ 
+                    color: searchMode === 'industry' ? 'var(--color-primary)' : 'var(--color-text-muted)' 
+                  }} />
+                </div>
+                <div className="flex-1">
+                  <h5 className="font-semibold text-sm mb-1" style={{ 
+                    color: searchMode === 'industry' ? 'var(--color-white)' : 'var(--color-text-primary)' 
+                  }}>
+                    Industry Categories
+                  </h5>
+                  <p className="text-xs leading-relaxed" style={{ 
+                    color: searchMode === 'industry' ? 'var(--color-white)' : 'var(--color-text-muted)' 
+                  }}>
+                    Choose from 20 predefined business categories with optimized search keywords
+                  </p>
+                  <div className="mt-2 flex items-center gap-1 text-xs" style={{ 
+                    color: searchMode === 'industry' ? 'var(--color-white)' : 'var(--color-text-muted)' 
+                  }}>
+                    <CheckCircle className="h-3 w-3" />
+                    Best for targeted industry research
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Custom Search Card */}
+            <div 
+              className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                searchMode === 'custom' ? 'ring-2' : ''
+              }`}
+              style={{
+                backgroundColor: searchMode === 'custom' ? 'var(--color-primary-light)' : 'var(--color-bg-primary)',
+                borderColor: searchMode === 'custom' ? 'var(--color-primary)' : 'var(--color-gray-light)'
+              }}
+              onClick={() => handleSearchModeChange('custom')}
+            >
+              <div className="flex items-start gap-3">
+                <div className="p-2 rounded-lg" style={{
+                  backgroundColor: searchMode === 'custom' ? 'var(--color-white)' : 'var(--color-bg-secondary)'
+                }}>
+                  <Search className="h-5 w-5" style={{ 
+                    color: searchMode === 'custom' ? 'var(--color-primary)' : 'var(--color-text-muted)' 
+                  }} />
+                </div>
+                <div className="flex-1">
+                  <h5 className="font-semibold text-sm mb-1" style={{ 
+                    color: searchMode === 'custom' ? 'var(--color-white)' : 'var(--color-text-primary)' 
+                  }}>
+                    Custom Keywords
+                  </h5>
+                  <p className="text-xs leading-relaxed" style={{ 
+                    color: searchMode === 'custom' ? 'var(--color-white)' : 'var(--color-text-muted)' 
+                  }}>
+                    Enter your own search terms and keywords for flexible business discovery
+                  </p>
+                  <div className="mt-2 flex items-center gap-1 text-xs" style={{ 
+                    color: searchMode === 'custom' ? 'var(--color-white)' : 'var(--color-text-muted)' 
+                  }}>
+                    <Zap className="h-3 w-3" />
+                    Best for specific or niche searches
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Search Configuration Section */}
         <div className="space-y-6">
-          {/* Industry Selection */}
-          <div className="space-y-2">
+          {/* Industry Selection - Only show in industry mode */}
+          {searchMode === 'industry' && (
+            <div className="space-y-4 p-4 rounded-lg" style={{
+              backgroundColor: 'var(--color-bg-secondary)',
+              border: '1px solid var(--color-primary-light)'
+            }}>
+              <div className="flex items-center gap-2 mb-3">
+                <Building className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
+                <h5 className="font-semibold text-sm" style={{ color: 'var(--color-primary)' }}>
+                  Select Industry Category
+                </h5>
+              </div>
             <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
-              Industry
+              Choose from {industries.length} available industries
             </label>
             
             {/* Enhanced Industry Search */}
@@ -1681,7 +2170,7 @@ export default function IndustrySearchManager() {
             {/* Industry Results Dropdown */}
             {showIndustryDropdown && (
               <div className="absolute z-10 w-full mt-1 border rounded-md shadow-lg max-h-60 overflow-auto" style={{
-                backgroundColor: 'var(--color-bg-secondary)',
+                backgroundColor: 'var(--color-bg-primary)',
                 borderColor: 'var(--color-gray-light)'
               }}>
                 {isLoadingIndustries ? (
@@ -1696,9 +2185,9 @@ export default function IndustrySearchManager() {
                         color: 'var(--color-text-primary)',
                         backgroundColor: 'transparent'
                       }}
-                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)'}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-gray-light)'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                      onFocus={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)'}
+                      onFocus={(e) => e.currentTarget.style.backgroundColor = 'var(--color-gray-light)'}
                       onBlur={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     >
                       <div className="font-medium">{industry.title}</div>
@@ -1716,8 +2205,8 @@ export default function IndustrySearchManager() {
             {/* Selected Industry Display */}
             {selectedIndustry && (
               <div className="mt-2 p-3 rounded-lg border" style={{ 
-                backgroundColor: 'var(--color-bg-secondary)',
-                borderColor: 'var(--color-gray-light)'
+                backgroundColor: 'var(--color-bg-primary)',
+                borderColor: 'var(--color-primary)'
               }}>
                 <div className="flex items-center justify-between">
                   <div>
@@ -1740,11 +2229,78 @@ export default function IndustrySearchManager() {
               </div>
             )}
           </div>
+          )}
 
-          {/* City Selection */}
-          <div className="space-y-2">
+          {/* Custom Search Input - Only show in custom mode */}
+          {searchMode === 'custom' && (
+            <div className="space-y-4 p-4 rounded-lg" style={{
+              backgroundColor: 'var(--color-bg-secondary)',
+              border: '1px solid var(--color-accent-light)'
+            }}>
+              <div className="flex items-center gap-2 mb-3">
+                <Search className="h-4 w-4" style={{ color: 'var(--color-accent)' }} />
+                <h5 className="font-semibold text-sm" style={{ color: 'var(--color-accent)' }}>
+                  Enter Custom Search Terms
+                </h5>
+              </div>
+              <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                What businesses are you looking for?
+              </label>
+              <textarea
+                value={customSearchTerms}
+                onChange={(e) => setCustomSearchTerms(e.target.value)}
+                placeholder="Enter what you're looking for...&#10;&#10;Examples:&#10;• web design companies&#10;• marketing agencies&#10;• accounting services&#10;• plumbing contractors&#10;• restaurants&#10;• software developers"
+                className="w-full px-3 py-3 rounded-md border text-sm min-h-[120px] resize-vertical"
+                style={{
+                  backgroundColor: 'var(--color-bg-primary)',
+                  borderColor: 'var(--color-accent-light)',
+                  color: 'var(--color-text-primary)'
+                }}
+              />
+              <div className="flex items-start gap-2">
+                <Info className="h-4 w-4 mt-0.5" style={{ color: 'var(--color-accent)' }} />
+                <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                  <p className="font-medium mb-1">Tips for better results:</p>
+                  <ul className="space-y-1">
+                    <li>• Use specific business types (e.g., "dental clinics" vs "healthcare")</li>
+                    <li>• Separate multiple terms with new lines or commas</li>
+                    <li>• Include service keywords (e.g., "web design services")</li>
+                  </ul>
+                </div>
+              </div>
+              {customSearchTerms.trim() && selectedCity && (
+                <div className="mt-2 p-3 rounded-lg border" style={{ 
+                  backgroundColor: 'var(--color-bg-secondary)',
+                  borderColor: 'var(--color-gray-light)'
+                }}>
+                  <div className="text-sm">
+                    <span style={{ color: 'var(--color-text-secondary)' }}>Generated queries: </span>
+                    <span style={{ color: 'var(--color-primary)' }}>{generatedQueries.length}</span>
+                  </div>
+                  {generatedQueries.length > 0 && (
+                    <div className="mt-2 text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                      Preview: {generatedQueries.slice(0, 3).join(', ')}
+                      {generatedQueries.length > 3 && ` +${generatedQueries.length - 3} more`}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* City Selection - Always visible */}
+          <div className="space-y-4 p-4 rounded-lg" style={{
+            backgroundColor: 'var(--color-bg-secondary)',
+            border: '1px solid var(--color-info-light)'
+          }}>
+            <div className="flex items-center gap-2 mb-3">
+              <MapPinIcon className="h-4 w-4" style={{ color: 'var(--color-info)' }} />
+              <h5 className="font-semibold text-sm" style={{ color: 'var(--color-info)' }}>
+                Select Target Location
+              </h5>
+            </div>
             <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
-              City
+              Choose a city to search in
             </label>
             <div className="relative">
               <Input
@@ -1772,7 +2328,7 @@ export default function IndustrySearchManager() {
               
               {showCityDropdown && (
                 <div className="absolute z-10 w-full mt-1 border rounded-md shadow-lg max-h-60 overflow-auto" style={{
-                  backgroundColor: 'var(--color-bg-secondary)',
+                  backgroundColor: 'var(--color-bg-primary)',
                   borderColor: 'var(--color-gray-light)'
                 }}>
                   {isLoadingCities ? (
@@ -1787,9 +2343,9 @@ export default function IndustrySearchManager() {
                           color: 'var(--color-text-primary)',
                           backgroundColor: 'transparent'
                         }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)'}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-gray-light)'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                        onFocus={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)'}
+                        onFocus={(e) => e.currentTarget.style.backgroundColor = 'var(--color-gray-light)'}
                         onBlur={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       >
                         <div className="font-medium">{city.name}</div>
@@ -1804,10 +2360,26 @@ export default function IndustrySearchManager() {
                 </div>
               )}
             </div>
+            
+            {/* Show selected city */}
+            {selectedCity && (
+              <div className="mt-3 p-3 rounded-lg" style={{ 
+                backgroundColor: 'var(--color-info-light)', 
+                border: '1px solid var(--color-info)' 
+              }}>
+                <div className="flex items-center gap-2">
+                  <CheckCircle className="h-4 w-4" style={{ color: 'var(--color-info)' }} />
+                  <span className="text-sm font-medium" style={{ color: 'var(--color-info-dark)' }}>
+                    Selected: {selectedCity.name}, {selectedCity.state?.name && `${selectedCity.state.name}, `}{selectedCity.country.name}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
           </div>
 
-          {/* Generated Queries Preview */}
-          {generatedQueries.length > 0 && (
+          {/* Generated Queries Preview - HIDDEN */}
+          {false && generatedQueries.length > 0 && (
             <div className="space-y-2">
               <label className="block text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
                 Generated Search Queries ({generatedQueries.length})
@@ -1830,6 +2402,7 @@ export default function IndustrySearchManager() {
           {/* Search and Cancel Buttons */}
           <div className="flex gap-2">
             <Button
+              variant="primary"
               onClick={() => {
                 performSearch();
               }}
@@ -2063,7 +2636,10 @@ export default function IndustrySearchManager() {
       )}
 
       {/* Search Results */}
-      {searchResults.length > 0 && (
+      {(() => {
+        console.log(`🖥️  Render: searchResults.length = ${searchResults.length}, isLoading = ${isLoading}`);
+        return searchResults.length > 0;
+      })() && (
         <div className="rounded-xl p-6 shadow-sm" style={{
           backgroundColor: 'var(--color-bg-primary)',
           border: '1px solid var(--color-gray-light)'
@@ -2074,12 +2650,28 @@ export default function IndustrySearchManager() {
                 <h3 className="text-xl font-semibold mb-2 flex items-center gap-2" style={{ color: 'var(--color-text-primary)' }}>
                   <Globe className="h-5 w-5" />
                   Search Results ({searchResults.length})
+                  {resultsFromDatabase && (
+                    <span className="text-xs px-2 py-1 rounded-full flex items-center gap-1" style={{ 
+                      backgroundColor: 'var(--color-success)', 
+                      color: 'white' 
+                    }}>
+                      <Clock className="h-3 w-3" />
+                      Cached
+                    </span>
+                  )}
                 </h3>
                 <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                  Found {searchResults.length} results for industry "{selectedIndustry?.title}" in {selectedCity?.name}
+                  Found {searchResults.length} results for {searchMode === 'industry' 
+                    ? `industry "${selectedIndustry?.title}"` 
+                    : 'custom search'} in {selectedCity?.name}
                   {pagination && (
                     <span className="block text-xs mt-1 opacity-75">
                       Page {pagination.currentPage} of {pagination.totalPages} • Total: {totalResults} results
+                      {resultsFromDatabase && (
+                        <span style={{ color: 'var(--color-success)' }}>
+                          {' • '}⚡ Instant (from database)
+                        </span>
+                      )}
                     </span>
                   )}
                 </p>
@@ -2129,51 +2721,73 @@ export default function IndustrySearchManager() {
               </div>
               
               <div className="flex gap-2">
-
-                
                 <Button
-                  variant="outline"
-                  onClick={processAllPages}
-                  disabled={processingAllPages || searchResults.length === 0 || !pagination}
+                  variant="primary"
+                  onClick={async () => {
+                    // Direct enrichment submission without extraction
+                    const websitesToEnrich = getSelectedResultsForEnrichment();
+                    if (websitesToEnrich.length > 0) {
+                      setIsSubmittingEnrichment(true);
+                      try {
+                        console.log(`🚀 Submitting ${websitesToEnrich.length} selected URLs for enrichment`);
+                        const submittedCount = websitesToEnrich.length;
+                        await submitEnrichmentJobsForUrls(websitesToEnrich);
+                        
+                        // Clear selected results and show submitted count temporarily
+                        setSelectedResults(new Set());
+                        setRecentlySubmittedCount(submittedCount);
+                        
+                        // Clear the submitted count after 5 seconds
+                        setTimeout(() => {
+                          setRecentlySubmittedCount(0);
+                        }, 5000);
+                        
+                        addNotification({
+                          type: 'success',
+                          title: 'Enrichment Jobs Submitted',
+                          message: `Submitted ${submittedCount} website${submittedCount === 1 ? '' : 's'} for enrichment. Check Jobs Manager to monitor progress.`,
+                        });
+                      } catch (error) {
+                        addNotification({
+                          type: 'error',
+                          title: 'Submission Failed',
+                          message: 'Failed to submit enrichment jobs. Please try again.',
+                        });
+                      } finally {
+                        setIsSubmittingEnrichment(false);
+                      }
+                    } else {
+                      addNotification({
+                        type: 'warning',
+                        title: 'No Results Selected',
+                        message: 'Please select some search results to submit for enrichment.',
+                      });
+                    }
+                  }}
+                  disabled={searchResults.length === 0 || selectedResults.size === 0 || isSubmittingEnrichment}
                   className="flex items-center gap-2"
                 >
-                  {processingAllPages ? (
+                  {isSubmittingEnrichment ? (
                     <>
                       <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                      Processing All Pages...
+                      Submitting Jobs...
+                    </>
+                  ) : recentlySubmittedCount > 0 ? (
+                    <>
+                      <CheckCircle className="h-4 w-4" />
+                      Submitted {recentlySubmittedCount} Job{recentlySubmittedCount === 1 ? '' : 's'}
+                    </>
+                  ) : selectedResults.size > 0 ? (
+                    <>
+                      <Zap className="h-4 w-4" />
+                      Submit for Enrichment ({selectedResults.size})
                     </>
                   ) : (
                     <>
-                      <Info className="h-4 w-4" />
-                      Process All Pages
+                      <Zap className="h-4 w-4" />
+                      Submit for Enrichment
+                      <span className="text-xs ml-1">(Select results first)</span>
                     </>
-                  )}
-                </Button>
-
-                <Button
-                  variant="outline"
-                  onClick={extractAllBusinesses}
-                  disabled={extractionInProgress || backgroundExtractionInProgress || searchResults.length === 0}
-                  className="flex items-center gap-2"
-                >
-                  {extractionInProgress ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                      Extracting...
-                    </>
-                  ) : backgroundExtractionInProgress ? (
-                    <>
-                      <Clock className="h-4 w-4" />
-                      Background Extraction Running
-                    </>
-                  ) : (
-                                      <>
-                    <Info className="h-4 w-4" />
-                    Extract All Businesses
-                    {pagination && pagination.totalPages > 1 && (
-                      <span className="text-xs ml-1">({pagination.totalPages} pages)</span>
-                    )}
-                  </>
                   )}
                 </Button>
               </div>
@@ -2288,6 +2902,102 @@ export default function IndustrySearchManager() {
             </div>
           </div>
           
+          {/* Selection & Pagination Controls */}
+          {searchResults.length > 0 && (
+            <div className="mb-4 p-4 rounded-lg border" style={{
+              backgroundColor: 'var(--color-bg-secondary)',
+              borderColor: 'var(--color-border-medium)'
+            }}>
+              {/* Selection Row */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-4">
+                  <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                    Selection:
+                  </span>
+                  <Button
+                    onClick={selectCurrentPage}
+                    size="sm"
+                    variant="outline"
+                    className="text-xs"
+                  >
+                    Select Page ({searchResults.length})
+                  </Button>
+                  <Button
+                    onClick={selectAllPages}
+                    size="sm"
+                    variant="outline"
+                    className="text-xs"
+                  >
+                    Select All Pages
+                  </Button>
+                  <Button
+                    onClick={deselectAllResults}
+                    size="sm"
+                    variant="outline"
+                    className="text-xs"
+                  >
+                    Clear Selection
+                  </Button>
+                </div>
+                <div className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                  {selectedResults.size} selected for enrichment
+                </div>
+              </div>
+
+              {/* Pagination Row */}
+              {pagination && pagination.totalPages > 1 && (
+                <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: 'var(--color-border-light)' }}>
+                  <div className="flex items-center gap-4">
+                    <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                      Navigation:
+                    </span>
+                    <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                      Page {pagination.currentPage} of {pagination.totalPages}
+                    </span>
+                    <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                      ({((pagination.currentPage - 1) * pagination.resultsPerPage) + 1}-{Math.min(pagination.currentPage * pagination.resultsPerPage, totalResults)} of {totalResults})
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePageChange(1)}
+                      disabled={!pagination.hasPreviousPage}
+                    >
+                      First
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePageChange(pagination.currentPage - 1)}
+                      disabled={!pagination.hasPreviousPage}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePageChange(pagination.currentPage + 1)}
+                      disabled={!pagination.hasNextPage}
+                    >
+                      Next
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePageChange(pagination.totalPages)}
+                      disabled={!pagination.hasNextPage}
+                    >
+                      Last
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* Results List */}
           <div className="space-y-4">
             {searchResults.map((result, index) => (
@@ -2302,6 +3012,34 @@ export default function IndustrySearchManager() {
               >
                   {/* Basic Result Info */}
                   <div className="p-4">
+                    {/* Selection Checkbox */}
+                    <div className="mb-3 flex items-center gap-3">
+                      <label className="flex items-center gap-2 cursor-pointer">
+                        <div className="relative">
+                          <input
+                            type="checkbox"
+                            checked={selectedResults.has(result.url)}
+                            onChange={() => toggleResultSelection(result.url)}
+                            className="sr-only"
+                          />
+                          <div
+                            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+                              selectedResults.has(result.url)
+                                ? 'border-blue-500 bg-blue-500'
+                                : 'border-gray-300 bg-white hover:border-gray-400'
+                            }`}
+                          >
+                            {selectedResults.has(result.url) && (
+                              <Check className="w-3 h-3 text-white" />
+                            )}
+                          </div>
+                        </div>
+                        <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                          {selectedResults.has(result.url) ? 'Selected for enrichment' : 'Select for enrichment'}
+                        </span>
+                      </label>
+                    </div>
+
                                         {/* Query Label with Enhanced Metadata */}
                     {result.query && (
                       <div className="mb-3 p-2 rounded-md" style={{
@@ -2404,25 +3142,7 @@ export default function IndustrySearchManager() {
                         )}
                       </Button>
 
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => extractBusinessInfo(result)}
-                        disabled={result.isProcessing}
-                        className="flex items-center gap-2"
-                      >
-                        {result.isProcessing ? (
-                          <>
-                            <div className="w-3 h-3 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
-                            Analyzing...
-                          </>
-                        ) : (
-                          <>
-                            <Building2 className="h-3 w-3" />
-                            Analyze Business
-                          </>
-                        )}
-                      </Button>
+
 
                       <Button
                         variant="outline"
@@ -2636,57 +3356,6 @@ export default function IndustrySearchManager() {
                 </div>
               </div>
             )}
-
-            {/* Pagination Controls */}
-            {pagination && pagination.totalPages > 1 && (
-              <div className="mt-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                      Page {pagination.currentPage} of {pagination.totalPages}
-                    </span>
-                    <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                      Showing {((pagination.currentPage - 1) * pagination.resultsPerPage) + 1} - {Math.min(pagination.currentPage * pagination.resultsPerPage, totalResults)} of {totalResults} results
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(1)}
-                      disabled={!pagination.hasPreviousPage}
-                    >
-                      First
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(pagination.currentPage - 1)}
-                      disabled={!pagination.hasPreviousPage}
-                    >
-                      Previous
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(pagination.currentPage + 1)}
-                      disabled={!pagination.hasNextPage}
-                    >
-                      Next
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handlePageChange(pagination.totalPages)}
-                      disabled={!pagination.hasNextPage}
-                    >
-                      Last
-                    </Button>
-                  </div>
-                </div>
-              </div>
-                        )}
           </div>
       )}
 
@@ -2705,7 +3374,10 @@ export default function IndustrySearchManager() {
             Ready to Search
           </h3>
           <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-            Select an industry and city above to generate search queries and get started
+            {searchMode === 'industry' 
+              ? 'Select an industry and city above to generate search queries and get started'
+              : 'Enter search terms and select a city above to generate search queries and get started'
+            }
           </p>
         </div>
       )}
@@ -2756,7 +3428,6 @@ export default function IndustrySearchManager() {
           </div>
         </div>
       )}
-
 
     </div>
   );
