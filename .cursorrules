@@ -14,8 +14,6 @@
 
 ## Deployment
 - Don't push to Heroku until explicitly asked
-- Use Docker Hub container for deployment instead of Render
-- Don't use containers during development
 
 ## GitHub Management
 - Use GitHub CLI for repository and workflow tasks

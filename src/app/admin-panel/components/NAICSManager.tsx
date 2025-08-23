@@ -249,6 +249,18 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
         })
       });
       
+      // Handle skip case (409 status)
+      if (res.status === 409) {
+        const skipData = await res.json();
+        if (skipData.skipped) {
+          // Clean up optimistic job
+          try { removeJob(tempJobId); } catch {}
+          setSuccessMessage(`✅ "${title}" already has ${skipData.keywordsCount} keywords. Generation skipped.`);
+          setTimeout(() => setSuccessMessage(''), 5000);
+          return; // Exit early, don't treat as error
+        }
+      }
+      
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
       
       const data = await res.json();
@@ -287,7 +299,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
     } catch (error) {
       console.error('Job submission failed:', error);
       // Clean up optimistic job if present
-      try { removeJob(`temp:${title}` as any); } catch {}
+      try { removeJob(tempJobId); } catch {}
       setGenError(error instanceof Error ? error.message : 'Unknown error occurred');
       if (onResult) onResult({ industry: title, error: error instanceof Error ? error.message : 'Unknown error occurred' });
     }

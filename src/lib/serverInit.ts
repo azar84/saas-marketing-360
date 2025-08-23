@@ -78,10 +78,14 @@ export async function initializeServerConfig() {
     //   console.log(`✅ Base URL set from database: ${settings.baseUrl}`);
     // }
     
-    // Start the built-in scheduler
+    // Start the built-in scheduler (only if not already running)
     try {
-      scheduler.start();
-      console.log('✅ Built-in scheduler started successfully');
+      if (!scheduler.isRunning()) {
+        scheduler.start();
+        console.log('✅ Built-in scheduler started successfully');
+      } else {
+        console.log('ℹ️ Built-in scheduler already running');
+      }
     } catch (error) {
       console.error('❌ Failed to start scheduler:', error);
     }

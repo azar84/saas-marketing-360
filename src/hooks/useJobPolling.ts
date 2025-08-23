@@ -40,6 +40,35 @@ export function useJobPolling() {
     }
   };
 
+  const processEnrichmentResult = async (enrichmentResult: any, jobId: string) => {
+    try {
+      console.log(`🔄 Processing enrichment result for job ${jobId}`);
+      
+      const response = await fetch('/api/admin/enrichment/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          enrichmentResult,
+          jobId
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`✅ Enrichment result processed successfully for job ${jobId}:`, {
+          businessId: data.businessId,
+          created: data.created,
+          updated: data.updated
+        });
+      } else {
+        const errorText = await response.text();
+        console.error(`❌ Failed to process enrichment result for job ${jobId}:`, errorText);
+      }
+    } catch (error) {
+      console.error(`❌ Error processing enrichment result for job ${jobId}:`, error);
+    }
+  };
+
   const extractKeywordsFromResult = (result: any): string[] => {
     if (!result) return [];
     
@@ -113,6 +142,11 @@ export function useJobPolling() {
                 // Sync keywords to industry if this is a keyword generation job
                 if (job.type === 'keyword-generation' && externalData.result) {
                   await syncKeywordsToIndustry(job.metadata?.industry, externalData.result);
+                }
+                
+                // Process enrichment result and save to business directory if this is a basic enrichment job
+                if (job.type === 'basic-enrichment' && externalData.result) {
+                  await processEnrichmentResult(externalData.result, job.id);
                 }
               } else if (externalData.status && externalData.status !== job.status) {
                 console.log(`🔄 Job ${job.id} status changed from ${job.status} to ${externalData.status}`);

@@ -18,9 +18,8 @@ export * from './keywordGeneration/processor';
 export * from './keywordGeneration/submitter';
 
 // Future job types can be added here:
-// export * from './companyEnrichment/types';
-// export * from './companyEnrichment/processor';
-// export * from './companyEnrichment/submitter';
+export * from './basicEnrichment/types';
+export * from './basicEnrichment/submitter';
 // export * from './completeEnrichment/types';
 // export * from './completeEnrichment/processor';
 // export * from './completeEnrichment/submitter';

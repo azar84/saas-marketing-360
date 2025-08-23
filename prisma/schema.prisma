@@ -63,10 +63,6 @@ model SiteSettings {
   @@map("site_settings")
 }
 
-
-
-
-
 model DesignSystem {
   id                  Int      @id @default(autoincrement())
   primaryColor        String   @default("#5243E9")
@@ -1265,6 +1261,10 @@ model City {
   isActive       Boolean             @default(true)
   createdAt      DateTime            @default(now())
   updatedAt      DateTime            @updatedAt
+  countryCode    String?
+  featureClass   String?
+  featureCode    String?
+  stateCode      String?
   country        Country             @relation(fields: [countryId], references: [id])
   county         County?             @relation(fields: [countyId], references: [id])
   state          State?              @relation(fields: [stateId], references: [id])
@@ -1276,6 +1276,9 @@ model City {
   @@index([countyId])
   @@index([population])
   @@index([type])
+  @@index([featureClass])
+  @@index([featureCode])
+  @@index([countryCode])
   @@map("cities")
 }
 
@@ -1362,13 +1365,16 @@ model CompanyNAICSClassification {
 }
 
 model Industry {
-  id         Int                @id @default(autoincrement())
-  label      String             @unique
-  isActive   Boolean            @default(true)
-  createdAt  DateTime           @default(now())
-  updatedAt  DateTime           @updatedAt
-  businesses BusinessIndustry[]
-  keywords   Keyword[]
+  id          Int                       @id @default(autoincrement())
+  label       String                    @unique
+  isActive    Boolean                   @default(true)
+  createdAt   DateTime                  @default(now())
+  updatedAt   DateTime                  @updatedAt
+  code        String                    @unique
+  description String?
+  businesses  BusinessIndustry[]
+  companies   CompanyIndustryRelation[]
+  keywords    Keyword[]
 
   @@map("industries")
 }
@@ -1403,21 +1409,19 @@ model BusinessDirectory {
   createdAt            DateTime              @default(now())
   updatedAt            DateTime              @updatedAt
   country              String?
-  // Enhanced fields for business data
+  address              String?
+  categories           String[]
+  confidence           Float?
   description          String?
+  extractedAt          DateTime?
   industry             String?
-  state               String?               // Alias for stateProvince for consistency
-  phone               String?               // Alias for phoneNumber for consistency
-  address             String?
-  categories          String[]              // Array of business categories
-  confidence          Float?                // Confidence score from LLM extraction
-  source              String                @default("manual") // manual, google_search_extraction, llm_processing
-  extractedAt         DateTime?
-  contact_persons      ContactPerson[]
+  phone                String?
+  source               String                @default("manual")
+  state                String?
   industries           BusinessIndustry[]
-  llmProcessingResults LLMProcessingResult[]
-  // New relation for enhanced contact management
   contactPersons       ContactPerson[]       @relation("ContactPersonBusiness")
+  llmProcessingResults LLMProcessingResult[]
+  contact_persons      ContactPerson[]       @relation("BusinessDirectoryToContactPerson")
 
   @@index([city])
   @@index([country])
@@ -1451,12 +1455,11 @@ model ContactPerson {
   isActive           Boolean             @default(true)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @default(now()) @updatedAt
-  // Enhanced fields for contact data
-  businessId         Int?                // Link to business directory
+  businessId         Int?
   department         String?
   isPrimary          Boolean             @default(false)
-  business_directory BusinessDirectory[]
   business           BusinessDirectory?  @relation("ContactPersonBusiness", fields: [businessId], references: [id])
+  business_directory BusinessDirectory[] @relation("BusinessDirectoryToContactPerson")
 
   @@index([firstName, lastName])
   @@index([isActive])
@@ -1465,7 +1468,6 @@ model ContactPerson {
 
 model SearchSession {
   id                String                 @id @default(cuid())
-  query             String?                // Primary search query
   searchQueries     String[]
   industry          String?
   location          String?
@@ -1483,6 +1485,7 @@ model SearchSession {
   errorMessage      String?
   createdAt         DateTime               @default(now())
   updatedAt         DateTime               @updatedAt
+  query             String?
   llmProcessing     LLMProcessingSession[]
   searchResults     SearchResult[]
 
@@ -1544,7 +1547,6 @@ model LLMProcessingResult {
   confidence             Float?
   isCompanyWebsite       Boolean?
   companyName            String?
-  website                String?              // Add the missing website field
   extractedFrom          String?
   city                   String?
   stateProvince          String?
@@ -1558,6 +1560,7 @@ model LLMProcessingResult {
   createdAt              DateTime             @default(now())
   updatedAt              DateTime             @updatedAt
   savedBusinessId        Int?
+  website                String?
   llmProcessingSession   LLMProcessingSession @relation(fields: [llmProcessingSessionId], references: [id], onDelete: Cascade)
   savedBusiness          BusinessDirectory?   @relation(fields: [savedBusinessId], references: [id])
   searchResult           SearchResult         @relation(fields: [searchResultId], references: [id], onDelete: Cascade)
@@ -1569,21 +1572,270 @@ model LLMProcessingResult {
 }
 
 model Job {
-  id                String    @id @default(cuid())
-  type              String    // keyword-generation, basic-enrichment, enhanced-enrichment
-  status            String    // queued, processing, active, completed, failed
-  progress          Int       @default(0)
-  error             String?
-  submittedAt       DateTime  @default(now())
-  completedAt       DateTime?
-  pollUrl           String?   // URL to poll for status updates
-  result            Json?     // Final result when completed
-  metadata          Json      // Job-specific data (industry, position, estimatedWaitTime, etc.)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
+  id          String    @id @default(cuid())
+  type        String
+  status      String
+  progress    Int       @default(0)
+  error       String?
+  submittedAt DateTime  @default(now())
+  completedAt DateTime?
+  pollUrl     String?
+  result      Json?
+  metadata    Json
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   @@index([type])
   @@index([status])
   @@index([submittedAt])
   @@map("jobs")
+}
+
+model Company {
+  id           Int                       @id @default(autoincrement())
+  name         String
+  website      String                    @unique
+  baseUrl      String?
+  description  String?
+  slug         String?                   @unique
+  isActive     Boolean                   @default(true)
+  createdAt    DateTime                  @default(now())
+  updatedAt    DateTime                  @updatedAt
+  addresses    CompanyAddress[]
+  contacts     CompanyContact[]
+  enrichments  CompanyEnrichment[]
+  financial    CompanyFinancial?
+  hiring       CompanyHiring?
+  industries   CompanyIndustryRelation[]
+  intelligence CompanyIntelligence?
+  services     CompanyService[]
+  socials      CompanySocial[]
+  staff        CompanyStaff[]
+  technologies CompanyTechnology[]
+  urls         CompanyUrl[]
+
+  @@index([name])
+  @@index([website])
+  @@index([isActive])
+  @@index([createdAt])
+  @@map("companies")
+}
+
+model CompanyAddress {
+  id            Int      @id @default(autoincrement())
+  companyId     Int
+  type          String   @default("HQ")
+  fullAddress   String?
+  streetAddress String?
+  addressLine2  String?
+  city          String?
+  stateProvince String?
+  country       String?
+  zipPostalCode String?
+  latitude      Float?
+  longitude     Float?
+  isPrimary     Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([type])
+  @@index([city])
+  @@index([country])
+  @@map("company_addresses")
+}
+
+model CompanyContact {
+  id          Int      @id @default(autoincrement())
+  companyId   Int
+  type        String
+  label       String?
+  value       String
+  contactPage String?
+  description String?
+  isPrimary   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([type])
+  @@index([isPrimary])
+  @@map("company_contacts")
+}
+
+model CompanySocial {
+  id         Int      @id @default(autoincrement())
+  companyId  Int
+  platform   String
+  url        String?
+  handle     String?
+  isVerified Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, platform])
+  @@index([companyId])
+  @@index([platform])
+  @@map("company_socials")
+}
+
+model CompanyTechnology {
+  id            Int       @id @default(autoincrement())
+  companyId     Int
+  category      String?
+  name          String
+  version       String?
+  firstDetected DateTime?
+  lastDetected  DateTime?
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([category])
+  @@index([name])
+  @@map("company_technologies")
+}
+
+model CompanyService {
+  id          Int      @id @default(autoincrement())
+  companyId   Int
+  name        String
+  description String?
+  category    String?
+  isPrimary   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([category])
+  @@map("company_services")
+}
+
+model CompanyStaff {
+  id          Int      @id @default(autoincrement())
+  companyId   Int
+  firstName   String?
+  lastName    String?
+  title       String?
+  department  String?
+  email       String?
+  phone       String?
+  linkedinUrl String?
+  isPrimary   Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  company     Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([email])
+  @@index([isPrimary])
+  @@map("company_staff")
+}
+
+model CompanyIndustryRelation {
+  id         Int      @id @default(autoincrement())
+  companyId  Int
+  industryId Int
+  isPrimary  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  company    Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  industry   Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, industryId])
+  @@index([companyId])
+  @@index([industryId])
+  @@map("company_industry_relations")
+}
+
+model CompanyFinancial {
+  id            Int      @id @default(autoincrement())
+  companyId     Int      @unique
+  fundingStatus String?
+  revenueModel  String?
+  profitability String?
+  fundingRounds Json?
+  investors     Json?
+  boardMembers  Json?
+  advisors      Json?
+  lastUpdated   DateTime @default(now())
+  company       Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("company_financials")
+}
+
+model CompanyHiring {
+  id             Int      @id @default(autoincrement())
+  companyId      Int      @unique
+  isHiring       Boolean  @default(false)
+  openPositions  Json?
+  hiringFocus    Json?
+  benefits       Json?
+  companyCulture String?
+  lastUpdated    DateTime @default(now())
+  company        Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("company_hiring")
+}
+
+model CompanyIntelligence {
+  id              Int      @id @default(autoincrement())
+  companyId       Int      @unique
+  businessModel   String?
+  growthStage     String?
+  marketPosition  String?
+  partnerships    Json?
+  certifications  Json?
+  confidenceScore Float?
+  analyzedAt      DateTime @default(now())
+  company         Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@map("company_intelligence")
+}
+
+model CompanyEnrichment {
+  id              Int       @id @default(autoincrement())
+  companyId       Int
+  source          String
+  mode            String?
+  pagesScraped    Int       @default(0)
+  totalPagesFound Int       @default(0)
+  rawData         Json?
+  scrapedAt       DateTime?
+  processedAt     DateTime  @default(now())
+  company         Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([source])
+  @@index([processedAt])
+  @@map("company_enrichments")
+}
+
+model CompanyUrl {
+  id            Int       @id @default(autoincrement())
+  companyId     Int
+  url           String
+  path          String?
+  title         String?
+  description   String?
+  status        String    @default("discovered")
+  statusCode    Int?
+  contentType   String?
+  contentLength Int?
+  lastScraped   DateTime?
+  scrapedCount  Int       @default(0)
+  isInternal    Boolean   @default(true)
+  depth         Int       @default(0)
+  discoveredAt  DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  company       Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, url])
+  @@index([companyId])
+  @@index([status])
+  @@index([isInternal])
+  @@index([depth])
+  @@index([discoveredAt])
+  @@map("company_urls")
 }

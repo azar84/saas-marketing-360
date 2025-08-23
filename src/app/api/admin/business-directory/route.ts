@@ -27,13 +27,13 @@ export async function GET(request: NextRequest) {
       ];
     }
 
-          if (city) {
-        where.city = { contains: city };
-      }
+    if (city) {
+      where.city = { contains: city };
+    }
 
-      if (stateProvince) {
-        where.stateProvince = { contains: stateProvince };
-      }
+    if (stateProvince) {
+      where.stateProvince = { contains: stateProvince };
+    }
 
     if (isActive !== null && isActive !== undefined) {
       where.isActive = isActive === 'true';
@@ -54,16 +54,6 @@ export async function GET(request: NextRequest) {
             title: true,
             email: true,
             phone: true
-          }
-        },
-        industries: {
-          include: {
-            industry: {
-              select: {
-                id: true,
-                label: true
-              }
-            }
           }
         }
       },

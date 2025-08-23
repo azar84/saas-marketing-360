@@ -49,10 +49,10 @@ import GeographicManager from './components/GeographicManager';
 import NAICSManager from './components/NAICSManager';
 import KeywordsManager from './components/KeywordsManager';
 import KeywordsResult from './components/KeywordsResult';
-import JobsManager from './components/KeywordJobManager';
+import JobsManager from './components/JobsManager';
 import SearchEngineManager from './components/SearchEngineManager';
 import IndustrySearchManager from './components/IndustrySearchManager';
-import BusinessDirectoryManager from './components/BusinessDirectoryManager';
+import CompanyDirectoryManager from './components/CompanyDirectoryManager';
 import { EnrichmentManager } from './components/EnrichmentManager';
 import TraceabilityViewer from './components/TraceabilityViewer';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
@@ -454,7 +454,7 @@ export default function AdminPanel() {
             className="p-8 space-y-8"
             style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
           >
-            <BusinessDirectoryManager />
+            <CompanyDirectoryManager />
           </div>
         );
       case 'enrichment':

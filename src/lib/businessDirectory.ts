@@ -50,6 +50,7 @@ async function createBusinessIndustryRelationship(businessId: number, industryLa
       update: {}, // No updates needed if exists
       create: { 
         label: industryLabel,
+        code: industryLabel.substring(0, 4).toUpperCase(), // Generate a simple code from label
         isActive: true
       }
     });
@@ -95,6 +96,7 @@ async function updateBusinessIndustryRelationship(businessId: number, industryLa
       update: {}, // No updates needed if exists
       create: { 
         label: industryLabel,
+        code: industryLabel.substring(0, 4).toUpperCase(), // Generate a simple code from label
         isActive: true
       }
     });
@@ -147,6 +149,7 @@ async function createBusinessIndustryRelationships(businessId: number, industryL
         update: {}, // No updates needed if exists
         create: { 
           label: trimmedLabel,
+          code: trimmedLabel.substring(0, 4).toUpperCase(), // Generate a simple code from label
           isActive: true
         }
       });
@@ -594,6 +597,7 @@ export async function searchBusinesses(query: string, options: {
   stateProvince?: string;
   country?: string;
   industry?: string;
+  services?: string;
   isActive?: boolean;
   minEmployees?: number;
   maxEmployees?: number;
@@ -613,6 +617,7 @@ export async function searchBusinesses(query: string, options: {
     stateProvince, 
     country, 
     industry, 
+    services,
     isActive = true,
     minEmployees,
     maxEmployees,
@@ -635,42 +640,34 @@ export async function searchBusinesses(query: string, options: {
     if (query && query.trim()) {
       where.OR = [
         { website: { contains: query, mode: 'insensitive' } },
-        { companyName: { contains: query, mode: 'insensitive' } },
-        { city: { contains: query, mode: 'insensitive' } },
-        { stateProvince: { contains: query, mode: 'insensitive' } },
-        { country: { contains: query, mode: 'insensitive' } },
-        { phoneNumber: { contains: query, mode: 'insensitive' } },
-        { email: { contains: query, mode: 'insensitive' } }
+        { name: { contains: query, mode: 'insensitive' } },
+        { description: { contains: query, mode: 'insensitive' } },
+        { addresses: { some: { city: { contains: query, mode: 'insensitive' } } } },
+        { addresses: { some: { stateProvince: { contains: query, mode: 'insensitive' } } } },
+        { addresses: { some: { country: { contains: query, mode: 'insensitive' } } } },
+        { contacts: { some: { value: { contains: query, mode: 'insensitive' } } } }
       ];
     }
 
     // Add geographic filters
     if (city) {
-      where.city = { contains: city, mode: 'insensitive' };
+      where.addresses = { some: { city: { contains: city, mode: 'insensitive' } } };
     }
 
     if (stateProvince) {
-      where.stateProvince = { contains: stateProvince, mode: 'insensitive' };
+      where.addresses = { some: { stateProvince: { contains: stateProvince, mode: 'insensitive' } } };
     }
 
     if (country) {
-      where.country = { contains: country, mode: 'insensitive' };
-    }
-
-    // Add employee count filters
-    if (minEmployees !== undefined) {
-      where.employeesCount = { ...where.employeesCount, gte: minEmployees };
-    }
-    if (maxEmployees !== undefined) {
-      where.employeesCount = { ...where.employeesCount, lte: maxEmployees };
+      where.addresses = { some: { country: { contains: country, mode: 'insensitive' } } };
     }
 
     // Add contact person filter
     if (hasContactPerson !== undefined) {
       if (hasContactPerson) {
-        where.contactPersonId = { not: null };
+        where.contacts = { some: {} };
       } else {
-        where.contactPersonId = null;
+        where.contacts = { none: {} };
       }
     }
 
@@ -717,64 +714,116 @@ export async function searchBusinesses(query: string, options: {
       };
     }
 
-    // Combine business filters with industry filters
-    const finalWhere = industryWhere 
-      ? { AND: [where, industryWhere] }
-      : where;
+    // Handle services filtering
+    let servicesWhere = undefined;
+    if (services) {
+      // Convert to lowercase for case-insensitive comparison
+      const servicesQuery = services.toLowerCase().trim();
+      
+      servicesWhere = {
+        services: {
+          some: {
+            name: { 
+              contains: servicesQuery
+              // Note: SQLite doesn't support mode: 'insensitive', but contains is case-sensitive
+            }
+          }
+        }
+      };
+    }
+
+    // Combine business filters with industry and services filters
+    let finalWhere = where;
+    if (industryWhere) {
+      finalWhere = { AND: [finalWhere, industryWhere] };
+    }
+    if (servicesWhere) {
+      finalWhere = { AND: [finalWhere, servicesWhere] };
+    }
 
     const [businesses, totalCount] = await Promise.all([
-      prisma.businessDirectory.findMany({
+      prisma.company.findMany({
         where: finalWhere,
         include: {
-          contact_persons: {
-            select: {
-              id: true,
-              firstName: true,
-              lastName: true,
-              title: true,
-              email: true,
-              phone: true
-            }
-          },
+          contacts: true,
+          staff: true,
+          addresses: true,
+          services: true,
+          technologies: true,
           industries: {
             include: {
-              industry: {
-                select: {
-                  id: true,
-                  label: true
-                }
-              }
-            },
-            orderBy: {
-              isPrimary: 'desc' // Primary industries first
+              industry: true
             }
           }
         },
-        orderBy: { [sortBy]: sortOrder },
-        skip,
-        take: limit
+        orderBy: {
+          [sortBy]: sortOrder
+        },
+        take: limit,
+        skip
       }),
-      prisma.businessDirectory.count({ where: finalWhere })
+      prisma.company.count({
+        where: finalWhere
+      })
     ]);
 
-    const totalPages = Math.ceil(totalCount / limit);
+    // Transform the data to match the expected interface
+    const transformedBusinesses = businesses.map(company => ({
+      id: company.id,
+      website: company.website,
+      companyName: company.name,
+      city: company.addresses?.[0]?.city || null,
+      stateProvince: company.addresses?.[0]?.stateProvince || null,
+      country: company.addresses?.[0]?.country || null,
+      phoneNumber: company.contacts?.find(c => c.type === 'phone')?.value || null,
+      email: company.contacts?.find(c => c.type === 'email')?.value || null,
+      employeesCount: null, // Not available in new schema
+      contactPersonId: company.contacts?.[0]?.id || null,
+      isActive: company.isActive,
+      createdAt: company.createdAt.toISOString(),
+      updatedAt: company.updatedAt.toISOString(),
+      contactPerson: company.contacts?.[0] ? {
+        id: company.contacts[0].id,
+        firstName: '',
+        lastName: '',
+        title: company.contacts[0].label || '',
+        email: company.contacts.find(c => c.type === 'email')?.value || '',
+        phone: company.contacts.find(c => c.type === 'phone')?.value || '',
+        isActive: true,
+        createdAt: company.contacts[0].createdAt.toISOString(),
+        updatedAt: company.contacts[0].createdAt.toISOString(),
+        businesses: []
+      } : undefined,
+      industries: company.industries?.map(rel => ({
+        id: rel.id,
+        businessId: company.id,
+        industryId: rel.industryId,
+        isPrimary: rel.isPrimary,
+        createdAt: rel.createdAt.toISOString(),
+        industry: {
+          id: rel.industry.id,
+          label: rel.industry.label
+        }
+      })) || []
+    }));
 
     return {
       success: true,
-      data: businesses,
+      data: transformedBusinesses,
       pagination: {
         currentPage: page,
-        totalPages,
+        totalPages: Math.ceil(totalCount / limit),
         totalCount,
-        hasNextPage: page < totalPages,
+        hasNextPage: page < Math.ceil(totalCount / limit),
         hasPreviousPage: page > 1
       }
     };
+
   } catch (error) {
-    console.error('Failed to search businesses:', error);
+    console.error('Error searching businesses:', error);
     return {
       success: false,
-      error: 'Failed to search businesses'
+      error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
 }

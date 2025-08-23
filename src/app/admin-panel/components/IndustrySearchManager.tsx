@@ -1175,7 +1175,7 @@ export default function IndustrySearchManager() {
                     includeStaffEnrichment: false,
                     includeExternalEnrichment: false,
                     includeIntelligence: false,
-                    includeTechnologyExtraction: false,
+                    includeTechnologyExtraction: true,
                     basicMode: true,
                     maxHtmlLength: 50000
                   }

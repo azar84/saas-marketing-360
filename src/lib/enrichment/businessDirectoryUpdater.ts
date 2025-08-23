@@ -1,0 +1,556 @@
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+export interface EnrichmentResult {
+  data: {
+    input: {
+      websiteUrl: string;
+      options: {
+        basicMode: boolean;
+        maxHtmlLength: number;
+        includeIntelligence: boolean;
+        includeStaffEnrichment: boolean;
+        includeExternalEnrichment: boolean;
+        includeTechnologyExtraction: boolean;
+      };
+    };
+    baseUrl: string;
+    finalResult: {
+      staff: {
+        staff: any[];
+        reasoning: string;
+        confidence: number;
+      };
+      company: {
+        name: string;
+        website: string;
+        services: string[];
+        categories: string[];
+        description: string;
+      };
+      contact: {
+        forms: Array<{
+          url: string;
+          type: string;
+          description: string;
+        }>;
+        hours: {
+          timezone: string | null;
+          supportHours: string | null;
+          businessHours: string | null;
+        };
+        social: {
+          github: string | null;
+          twitter: string | null;
+          youtube: string | null;
+          facebook: string | null;
+          linkedin: string | null;
+          instagram: string | null;
+          crunchbase: string | null;
+        };
+        primary: {
+          emails: string[];
+          phones: string[];
+          contactPage: string;
+        };
+        addresses: any[];
+        locations: Array<{
+          city: string;
+          type: string;
+          email: string | null;
+          phone: string | null;
+          state: string;
+          address: string;
+          country: string;
+          zipCode: string | null;
+        }>;
+        reasoning: string;
+        confidence: number;
+        departments: Array<{
+          name: string;
+          emails: string[];
+          phones: string[];
+          description: string;
+        }>;
+      };
+      analysis: {
+        services: string[];
+        reasoning: string;
+        confidence: number;
+        isBusiness: boolean;
+        companyName: string;
+        description: string;
+        businessType: string;
+      };
+      metadata: {
+        mode: string;
+        baseUrl: string;
+        scrapedAt: string;
+        confidence: number;
+        pagesScraped: number;
+        totalPagesFound: number;
+      };
+      intelligence: any;
+      technologies: any;
+    };
+    scrapedPages: any[];
+    staffEnrichment: any;
+    websiteAnalysis: any;
+    scrapingStrategy: any;
+    aggregatedContent: string;
+    contactInformation: any;
+  };
+  worker: string;
+  success: boolean;
+  metadata: {
+    mode: string;
+    type: string;
+    timestamp: string;
+  };
+  processingTime: number;
+}
+
+export class BusinessDirectoryUpdater {
+  /**
+   * Process an enrichment result and update the business directory
+   * Only uses data from finalResult section of the enrichment response
+   */
+  static async processEnrichmentResult(enrichmentResult: EnrichmentResult): Promise<{
+    success: boolean;
+    businessId?: number;
+    created?: boolean;
+    updated?: boolean;
+    error?: string;
+  }> {
+    try {
+      const { data } = enrichmentResult;
+      const { input, finalResult } = data;
+      const websiteUrl = input.websiteUrl;
+
+      // Extract business data from the enrichment result
+      const businessData = this.extractBusinessData(finalResult);
+
+      // Check if business already exists
+      const existingBusiness = await prisma.company.findUnique({
+        where: { website: websiteUrl }
+      });
+
+      let business;
+      let created = false;
+      let updated = false;
+
+      if (existingBusiness) {
+        // Update existing business
+        business = await prisma.company.update({
+          where: { website: websiteUrl },
+          data: {
+            name: businessData.name,
+            description: businessData.description,
+            baseUrl: businessData.baseUrl,
+            isActive: businessData.isActive,
+            updatedAt: new Date()
+          }
+        });
+        updated = true;
+      } else {
+        // Create new business
+        business = await prisma.company.create({
+          data: {
+            website: websiteUrl,
+            name: businessData.name,
+            description: businessData.description,
+            baseUrl: businessData.baseUrl,
+            isActive: businessData.isActive
+          }
+        });
+        created = true;
+      }
+
+      // Process contact persons from finalResult only
+      if (finalResult.contact?.departments && finalResult.contact.departments.length > 0) {
+        await this.processContactPersons(business.id, finalResult.contact.departments);
+      }
+
+      // Process services
+      if (finalResult.company?.services && finalResult.company.services.length > 0) {
+        await this.processServices(business.id, finalResult.company.services);
+      }
+
+      // Process technologies
+      if (finalResult.technologies?.technologies && Object.keys(finalResult.technologies.technologies).length > 0) {
+        await this.processTechnologies(business.id, finalResult.technologies.technologies);
+      }
+
+      // Process social media
+      if (finalResult.contact?.social && Object.keys(finalResult.contact.social).length > 0) {
+        await this.processSocialMedia(business.id, finalResult.contact.social);
+      }
+
+      // Process industries/categories
+      if (finalResult.company?.categories && finalResult.company.categories.length > 0) {
+        await this.processIndustries(business.id, finalResult.company.categories);
+      }
+
+      // Process addresses
+      if (finalResult.contact?.locations && finalResult.contact.locations.length > 0) {
+        await this.processAddresses(business.id, finalResult.contact.locations);
+      }
+
+      // Create enrichment record
+      await this.createEnrichmentRecord(business.id, finalResult);
+
+      return {
+        success: true,
+        businessId: business.id,
+        created,
+        updated
+      };
+
+    } catch (error) {
+      console.error('Error processing enrichment result:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      };
+    }
+  }
+
+  /**
+   * Extract business data from the enrichment final result only
+   */
+  private static extractBusinessData(finalResult: any) {
+    const { company, contact, analysis } = finalResult;
+
+    // Extract primary location from contact.locations only
+    let city = null;
+    let stateProvince = null;
+    let country = null;
+    let address = null;
+
+    if (contact?.locations && contact.locations.length > 0) {
+      const primaryLocation = contact.locations.find((loc: any) => loc.type === 'corporate office') || contact.locations[0];
+      city = primaryLocation?.city || null;
+      stateProvince = primaryLocation?.state || null;
+      country = primaryLocation?.country || null;
+      address = primaryLocation?.address || null;
+    }
+
+    // Extract primary contact info from contact.primary only
+    const primaryEmail = contact?.primary?.emails && contact.primary.emails.length > 0 
+      ? contact.primary.emails[0] 
+      : null;
+    
+    const primaryPhone = contact?.primary?.phones && contact.primary.phones.length > 0 
+      ? contact.primary.phones[0] 
+      : null;
+
+    // Use only finalResult data, prioritize company data over analysis
+    return {
+      name: company?.name || analysis?.companyName || 'Unknown Company',
+      description: company?.description || analysis?.description || null,
+      baseUrl: company?.website || null,
+      isActive: true
+    };
+  }
+
+  /**
+   * Process contact information from enrichment result
+   */
+  private static async processContactPersons(companyId: number, departments: any[]) {
+    try {
+      for (const department of departments) {
+        if (department.emails && department.emails.length > 0) {
+          for (const email of department.emails) {
+            // Check if contact already exists
+            const existing = await prisma.companyContact.findFirst({
+              where: {
+                companyId: companyId,
+                type: 'email',
+                value: email
+              }
+            });
+
+            if (!existing) {
+              await prisma.companyContact.create({
+                data: {
+                  companyId: companyId,
+                  type: 'email',
+                  value: email,
+                  label: department.name,
+                  description: department.description,
+                  isPrimary: false
+                }
+              });
+            }
+          }
+        }
+
+        if (department.phones && department.phones.length > 0) {
+          for (const phone of department.phones) {
+            // Check if contact already exists
+            const existing = await prisma.companyContact.findFirst({
+              where: {
+                companyId: companyId,
+                type: 'phone',
+                value: phone
+              }
+            });
+
+            if (!existing) {
+              await prisma.companyContact.create({
+                data: {
+                  companyId: companyId,
+                  type: 'phone',
+                  value: phone,
+                  label: department.name,
+                  description: department.description,
+                  isPrimary: false
+                }
+              });
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error processing contact persons:', error);
+    }
+  }
+
+  /**
+   * Get business directory entry by website
+   */
+  static async getBusinessByWebsite(website: string) {
+    return await prisma.company.findUnique({
+      where: { website },
+      include: {
+        contacts: true,
+        staff: true,
+        addresses: true,
+        services: true,
+        technologies: true,
+        industries: {
+          include: {
+            industry: true
+          }
+        }
+      }
+    });
+  }
+
+  /**
+   * Get all businesses with enrichment data
+   */
+  static async getEnrichedBusinesses(limit = 50, offset = 0) {
+    return await prisma.company.findMany({
+      include: {
+        contacts: true,
+        staff: true,
+        addresses: true,
+        services: true,
+        technologies: true,
+        enrichments: true,
+        industries: {
+          include: {
+            industry: true
+          }
+        }
+      },
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: limit,
+      skip: offset
+    });
+  }
+
+  /**
+   * Process company services
+   */
+  private static async processServices(companyId: number, services: string[]) {
+    try {
+      for (const serviceName of services) {
+        // Check if service already exists
+        const existing = await prisma.companyService.findFirst({
+          where: {
+            companyId: companyId,
+            name: serviceName
+          }
+        });
+
+        if (!existing) {
+          await prisma.companyService.create({
+            data: {
+              companyId: companyId,
+              name: serviceName,
+              isPrimary: false
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error processing services:', error);
+    }
+  }
+
+  /**
+   * Process company technologies
+   */
+  private static async processTechnologies(companyId: number, technologies: any) {
+    try {
+      // Process each technology category
+      for (const [category, techList] of Object.entries(technologies)) {
+        if (Array.isArray(techList)) {
+          for (const tech of techList) {
+            // Check if technology already exists
+            const existing = await prisma.companyTechnology.findFirst({
+              where: {
+                companyId: companyId,
+                name: tech
+              }
+            });
+
+            if (!existing) {
+              await prisma.companyTechnology.create({
+                data: {
+                  companyId: companyId,
+                  category: category,
+                  name: tech,
+                  isActive: true
+                }
+              });
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error processing technologies:', error);
+    }
+  }
+
+  /**
+   * Process social media links
+   */
+  private static async processSocialMedia(companyId: number, social: any) {
+    try {
+      for (const [platform, url] of Object.entries(social)) {
+        if (url && typeof url === 'string') {
+          await prisma.companySocial.upsert({
+            where: {
+              companyId_platform: {
+                companyId: companyId,
+                platform: platform
+              }
+            },
+            update: {
+              url: url
+            },
+            create: {
+              companyId: companyId,
+              platform: platform,
+              url: url,
+              isVerified: false
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error processing social media:', error);
+    }
+  }
+
+  /**
+   * Process company industries/categories
+   */
+  private static async processIndustries(companyId: number, categories: string[]) {
+    try {
+      for (const category of categories) {
+        // Extract industry name from category (e.g., "CONST - Construction & Building" -> "Construction & Building")
+        const industryName = category.includes(' - ') ? category.split(' - ')[1] : category;
+        
+        // Find or create industry
+        const industry = await prisma.industry.upsert({
+          where: { label: industryName },
+          update: {},
+          create: { 
+            label: industryName,
+            code: industryName.substring(0, 4).toUpperCase() // Generate a simple code from label
+          }
+        });
+
+        // Create company-industry relationship
+        await prisma.companyIndustryRelation.upsert({
+          where: {
+            companyId_industryId: {
+              companyId: companyId,
+              industryId: industry.id
+            }
+          },
+          update: {},
+          create: {
+            companyId: companyId,
+            industryId: industry.id,
+            isPrimary: false
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error processing industries:', error);
+    }
+  }
+
+  /**
+   * Process company addresses
+   */
+  private static async processAddresses(companyId: number, locations: any[]) {
+    try {
+      for (const location of locations) {
+        // Check if address already exists
+        const existing = await prisma.companyAddress.findFirst({
+          where: {
+            companyId: companyId,
+            type: location.type || 'HQ'
+          }
+        });
+
+        if (!existing) {
+          await prisma.companyAddress.create({
+            data: {
+              companyId: companyId,
+              type: location.type || 'HQ',
+              fullAddress: null,
+              streetAddress: null,
+              city: location.city || null,
+              stateProvince: location.state || null,
+              country: location.country || null,
+              isPrimary: location.type === 'corporate office'
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error processing addresses:', error);
+    }
+  }
+
+  /**
+   * Create enrichment record
+   */
+  private static async createEnrichmentRecord(companyId: number, finalResult: any) {
+    try {
+      await prisma.companyEnrichment.create({
+        data: {
+          companyId: companyId,
+          source: 'basic_enrichment',
+          mode: finalResult.metadata?.mode || 'basic',
+          pagesScraped: finalResult.metadata?.pagesScraped || 0,
+          totalPagesFound: finalResult.metadata?.totalPagesFound || 0,
+          rawData: finalResult,
+          scrapedAt: finalResult.metadata?.scrapedAt ? new Date(finalResult.metadata.scrapedAt) : null
+        }
+      });
+    } catch (error) {
+      console.error('Error creating enrichment record:', error);
+    }
+  }
+}

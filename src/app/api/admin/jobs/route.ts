@@ -3,10 +3,12 @@ import { prisma } from '@/lib/db';
 import { 
   submitKeywordGenerationJob, 
   createKeywordGenerationJob,
-  JobSubmissionRequest 
+  JobSubmissionRequest,
+  submitBasicEnrichmentJob,
+  createBasicEnrichmentJob
 } from '@/lib/jobs';
 import databaseJobStore from '@/lib/jobs/databaseJobStore';
-// Ensure scheduler auto-starts when jobs API is hit
+// Import scheduler for internal job management (will only start once)
 import '@/lib/scheduler';
 
 
@@ -30,65 +32,165 @@ export async function POST(request: NextRequest) {
   try {
     const { type, data } = await request.json() as JobSubmissionRequest;
 
-    if (!type || type !== 'keyword-generation') {
+    if (!type) {
       return NextResponse.json(
-        { success: false, error: 'Only keyword-generation jobs are supported currently' },
+        { success: false, error: 'Job type is required' },
         { status: 400 }
       );
     }
 
-    if (!data.industry || typeof data.industry !== 'string') {
-      return NextResponse.json(
-        { success: false, error: 'Industry parameter is required and must be a string' },
-        { status: 400 }
+    if (type === 'keyword-generation') {
+      if (!data.industry || typeof data.industry !== 'string') {
+        return NextResponse.json(
+          { success: false, error: 'Industry parameter is required and must be a string' },
+          { status: 400 }
+        );
+      }
+
+      console.log('Checking if industry already has keywords:', data.industry);
+
+      // Check if industry already has keywords
+      try {
+        const industryRecord = await prisma.industry.findFirst({
+          where: { 
+            OR: [
+              { label: data.industry },
+              { label: data.industry.toLowerCase() },
+              { label: data.industry.toUpperCase() },
+              { label: data.industry.charAt(0).toUpperCase() + data.industry.slice(1).toLowerCase() }
+            ]
+          },
+          include: {
+            keywords: {
+              where: { isActive: true }
+            }
+          }
+        });
+
+        if (industryRecord && industryRecord.keywords.length > 0) {
+          console.log(`Industry "${data.industry}" already has ${industryRecord.keywords.length} keywords, skipping job submission`);
+          return NextResponse.json({
+            success: false,
+            error: 'Industry already has keywords',
+            message: `Industry "${data.industry}" already has ${industryRecord.keywords.length} keywords. Keyword generation skipped.`,
+            keywordsCount: industryRecord.keywords.length,
+            skipped: true
+          }, { status: 409 }); // 409 Conflict status code
+        }
+
+        console.log(`Industry "${data.industry}" has no keywords, proceeding with job submission`);
+      } catch (dbError) {
+        console.error('Error checking existing keywords:', dbError);
+        // Continue with job submission if database check fails
+        console.log('Database check failed, proceeding with job submission anyway');
+      }
+
+      console.log('Submitting keyword generation job for industry:', data.industry);
+
+      // Submit job to external API
+      const submitResult = await submitKeywordGenerationJob({ industry: data.industry });
+
+      if (!submitResult.success || !submitResult.jobId) {
+        return NextResponse.json(
+          { success: false, error: submitResult.error || 'Failed to submit job' },
+          { status: 500 }
+        );
+      }
+
+      // Create job record
+      const job = createKeywordGenerationJob(
+        submitResult.jobId,
+        data.industry,
+        submitResult.pollUrl,
+        submitResult.position,
+        submitResult.estimatedWaitTime
       );
-    }
 
-    console.log('Submitting keyword generation job for industry:', data.industry);
+      await databaseJobStore.addJob(job);
 
-    // Submit job to external API
-    const submitResult = await submitKeywordGenerationJob({ industry: data.industry });
-
-    if (!submitResult.success || !submitResult.jobId) {
-      return NextResponse.json(
-        { success: false, error: submitResult.error || 'Failed to submit job' },
-        { status: 500 }
-      );
-    }
-
-    // Create job record using the new generic system
-    const job = createKeywordGenerationJob(
-      submitResult.jobId,
-      data.industry,
-      submitResult.pollUrl,
-      submitResult.position,
-      submitResult.estimatedWaitTime
-    );
-
-    // Store job in database
-    await databaseJobStore.addJob(job);
-
-    console.log('Job submitted successfully:', {
-      jobId: job.id,
-      type: job.type,
-      industry: job.metadata.industry,
-      status: job.status
-    });
-
-    return NextResponse.json({
-      success: true,
-      message: 'Job submitted successfully',
-      job: {
-        id: job.id,
+      console.log('Job submitted successfully:', {
+        jobId: job.id,
         type: job.type,
         industry: job.metadata.industry,
-        status: job.status,
-        submittedAt: job.submittedAt,
-        position: job.metadata.position,
-        estimatedWaitTime: job.metadata.estimatedWaitTime,
-        pollUrl: job.metadata.pollUrl
+        status: job.status
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: 'Job submitted successfully',
+        job: {
+          id: job.id,
+          type: job.type,
+          industry: job.metadata.industry,
+          status: job.status,
+          submittedAt: job.submittedAt,
+          position: job.metadata.position,
+          estimatedWaitTime: job.metadata.estimatedWaitTime,
+          pollUrl: job.metadata.pollUrl
+        }
+      });
+    }
+
+    if (type === 'basic-enrichment') {
+      if (!data.websiteUrl || typeof data.websiteUrl !== 'string') {
+        return NextResponse.json(
+          { success: false, error: 'websiteUrl is required and must be a string' },
+          { status: 400 }
+        );
       }
-    });
+
+      console.log('Submitting basic enrichment job for website:', data.websiteUrl);
+
+      const submitResult = await submitBasicEnrichmentJob({
+        websiteUrl: data.websiteUrl,
+        options: data.options
+      });
+
+      if (!submitResult.success || !submitResult.jobId) {
+        return NextResponse.json(
+          { success: false, error: submitResult.error || 'Failed to submit job' },
+          { status: 500 }
+        );
+      }
+
+      const job = createBasicEnrichmentJob(
+        submitResult.jobId,
+        data.websiteUrl,
+        submitResult.pollUrl,
+        submitResult.position,
+        submitResult.estimatedWaitTime,
+        data.options
+      );
+
+      await databaseJobStore.addJob(job);
+
+      console.log('Job submitted successfully:', {
+        jobId: job.id,
+        type: job.type,
+        websiteUrl: job.metadata.websiteUrl,
+        status: job.status
+      });
+
+      return NextResponse.json({
+        success: true,
+        message: 'Job submitted successfully',
+        job: {
+          id: job.id,
+          type: job.type,
+          websiteUrl: job.metadata.websiteUrl,
+          status: job.status,
+          submittedAt: job.submittedAt,
+          position: job.metadata.position,
+          estimatedWaitTime: job.metadata.estimatedWaitTime,
+          pollUrl: job.metadata.pollUrl
+        }
+      });
+    }
+
+    return NextResponse.json(
+      { success: false, error: 'Unsupported job type' },
+      { status: 400 }
+    );
 
   } catch (error) {
     console.error('Job submission error:', error);
@@ -220,7 +322,20 @@ export async function DELETE(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const jobId = searchParams.get('jobId');
+    const deleteAll = searchParams.get('deleteAll');
 
+    // Handle delete all jobs
+    if (deleteAll === 'true') {
+      await databaseJobStore.clearAllJobs();
+      console.log('All jobs deleted');
+
+      return NextResponse.json({
+        success: true,
+        message: 'All jobs deleted successfully'
+      });
+    }
+
+    // Handle single job deletion
     if (!jobId) {
       return NextResponse.json(
         { success: false, error: 'Job ID is required' },

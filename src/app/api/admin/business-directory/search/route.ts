@@ -16,6 +16,7 @@ export async function GET(request: NextRequest) {
     const stateProvince = searchParams.get('stateProvince') || undefined;
     const country = searchParams.get('country') || undefined;
     const industry = searchParams.get('industry') || undefined;
+    const services = searchParams.get('services') || undefined;
     const isActive = searchParams.get('isActive') !== 'false'; // Default to true
     
     // New advanced filters
@@ -37,6 +38,7 @@ export async function GET(request: NextRequest) {
       stateProvince,
       country,
       industry,
+      services,
       isActive,
       minEmployees,
       maxEmployees,

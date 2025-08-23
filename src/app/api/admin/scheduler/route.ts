@@ -4,14 +4,16 @@ import scheduler from '@/lib/scheduler';
 // GET - Get scheduler status and tasks
 export async function GET(request: NextRequest) {
   try {
-    // Auto-start scheduler if not running
+    // Get current status
     const status = scheduler.getStatus();
-    if (!status.isRunning) {
-      console.log('🚀 [Scheduler API] Auto-starting scheduler...');
+    
+    // Only start if not already running (prevents duplicates)
+    if (!scheduler.isRunning()) {
+      console.log('🚀 [Scheduler API] Starting scheduler...');
       scheduler.start();
+    } else {
+      console.log('ℹ️ [Scheduler API] Scheduler already running');
     }
-    // Ensure due tasks execute on each poll (helps in dev to progress schedules)
-    await scheduler.runDueTasksNow();
     
     const tasks = scheduler.getTasks();
 

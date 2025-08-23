@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
     switch (field) {
       case 'city':
-        const cityResults = await prisma.businessDirectory.findMany({
+        const cityResults = await prisma.companyAddress.findMany({
           where: {
             city: { contains: query, not: null }
           },
@@ -29,20 +29,8 @@ export async function GET(request: NextRequest) {
         results = cityResults.map(r => r.city!).filter(Boolean);
         break;
 
-      case 'stateProvince':
-        const stateResults = await prisma.businessDirectory.findMany({
-          where: {
-            stateProvince: { contains: query, not: null }
-          },
-          select: { stateProvince: true },
-          distinct: ['stateProvince'],
-          orderBy: { stateProvince: 'asc' }
-        });
-        results = stateResults.map(r => r.stateProvince!).filter(Boolean);
-        break;
-
       case 'country':
-        const countryResults = await prisma.businessDirectory.findMany({
+        const countryResults = await prisma.companyAddress.findMany({
           where: {
             country: { contains: query, not: null }
           },
@@ -58,7 +46,6 @@ export async function GET(request: NextRequest) {
           where: {
             label: { 
               contains: query.toLowerCase().trim()
-              // Note: SQLite doesn't support mode: 'insensitive', but contains is case-sensitive
             },
             isActive: true
           },
@@ -73,7 +60,6 @@ export async function GET(request: NextRequest) {
           where: {
             name: { 
               contains: query.toLowerCase().trim()
-              // Note: SQLite doesn't support mode: 'insensitive', but contains is case-sensitive
             }
           },
           select: { name: true },

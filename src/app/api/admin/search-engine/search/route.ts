@@ -142,7 +142,8 @@ export async function POST(request: Request) {
         const requestUrl = new URL('/api/search', baseUrl).toString();
         const reqBody = {
           keywords: [currentQuery],
-          location: location || ''
+          location: location || '',
+          page: pageNumber // Pass page parameter to external API
         } as any;
 
         const startedAt = Date.now();
@@ -377,17 +378,23 @@ export async function POST(request: Request) {
 
     totalResults = allResults.length;
 
-    // Apply pagination to deduplicated results
-    const startIndex = (pageNumber - 1) * limit;
-    const endIndex = startIndex + limit;
-    const paginatedResults = allResults.slice(startIndex, endIndex);
+    // Apply client-side pagination to limit results to requested amount
+    // Even though we're doing server-side pagination, the external API might return more results
+    const paginatedResults = allResults.slice(0, limit);
     
-    // Calculate combined pagination
+    // For server-side pagination, we need to estimate total pages
+    // The external API should provide this info, but for now we'll use a conservative estimate
+    const estimatedTotalResults = pageNumber === 1 ? 
+      (allResults.length >= limit ? limit * 10 : allResults.length) : // If page 1 is full, estimate 10 pages
+      (pageNumber - 1) * limit + allResults.length; // For other pages, calculate based on current position
+    
+    // Calculate combined pagination for server-side pagination
     const combinedPagination = {
       currentPage: pageNumber,
       resultsPerPage: limit,
-      totalPages: Math.ceil(totalResults / limit),
-      hasNextPage: endIndex < totalResults,
+      totalPages: Math.ceil(estimatedTotalResults / limit),
+      totalResults: estimatedTotalResults,
+      hasNextPage: allResults.length >= limit, // If we got a full page, assume there might be more
       hasPreviousPage: pageNumber > 1
     };
 
@@ -482,7 +489,7 @@ export async function POST(request: Request) {
       success: true,
       results: paginatedResults,
       queryResults, // Individual results for each query
-      totalResults,
+      totalResults: combinedPagination.totalResults, // Use estimated total results
       searchTime: Object.values(queryResults).reduce((total: number, q: any) => total + (q.searchTime || 0), 0),
       filtersApplied: filters,
       pagination: combinedPagination,

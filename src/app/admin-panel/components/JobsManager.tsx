@@ -13,9 +13,11 @@ import {
   Trash2,
   Eye,
   Zap,
-  Search
+  Search,
+  AlertTriangle
 } from 'lucide-react';
 import { useGlobalJobStore } from '@/lib/jobs/globalJobState';
+import { useDesignSystem } from '@/hooks/useDesignSystem';
 
 interface Job {
   id: string;
@@ -36,6 +38,7 @@ export default function JobsManager() {
   const { jobs, setJobs, updateJob, loadJobsFromDatabase } = useGlobalJobStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const { designSystem } = useDesignSystem();
   
   // Use ref to access current jobs state in polling
   const jobsRef = useRef<Job[]>([]);
@@ -226,6 +229,26 @@ export default function JobsManager() {
     }
   };
 
+  const deleteAllJobs = async () => {
+    if (!confirm('Are you sure you want to delete ALL jobs? This action cannot be undone.')) return;
+
+    try {
+      const response = await fetch('/api/admin/jobs?deleteAll=true', {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        await loadJobsFromDatabase();
+        console.log('All jobs deleted successfully');
+      } else {
+        alert('Failed to delete all jobs');
+      }
+    } catch (error) {
+      console.error('Error deleting all jobs:', error);
+      alert('Error deleting all jobs');
+    }
+  };
+
   const viewJobDetails = (job: Job) => {
     setSelectedJob(job);
   };
@@ -260,8 +283,69 @@ export default function JobsManager() {
     if (job.type === 'keyword-generation') {
       return job.metadata?.industry || 'Unknown Industry';
     }
+    if (job.type === 'basic-enrichment' || job.type === 'enhanced-enrichment') {
+      return job.metadata?.websiteUrl || 'Unknown Website';
+    }
     // Add other job type data extraction here
     return 'Job Data';
+  };
+
+  // Check if a completed job has errors in its result
+  const hasResultError = (job: Job): boolean => {
+    if (job.status !== 'completed' || !job.result) return false;
+    
+    // Check for errors in the result structure
+    const result = job.result;
+    
+    // Debug logging to see the structure
+    console.log('🔍 Checking job for errors:', job.id, result);
+    
+    // Direct error field
+    if (result.error) return true;
+    
+    // Check nested result data for errors (your actual structure)
+    if (result.result && result.result.data && result.result.data.error) return true;
+    
+    // Check direct data.error (your current example)
+    if (result.data && result.data.error) return true;
+    
+    // Check for success: false at various levels
+    if (result.success === false) return true;
+    if (result.result && result.result.success === false) return true;
+    if (result.result && result.result.data && result.result.data.success === false) return true;
+    
+    // Check if the error message contains failure indicators
+    const errorMessage = getResultErrorMessage(job);
+    if (errorMessage && (
+      errorMessage.includes('failed') || 
+      errorMessage.includes('Failed') ||
+      errorMessage.includes('error') ||
+      errorMessage.includes('Error')
+    )) return true;
+    
+    return false;
+  };
+
+  // Get error message from result
+  const getResultErrorMessage = (job: Job): string => {
+    if (job.status !== 'completed' || !job.result) return '';
+    
+    const result = job.result;
+    
+    // Direct error field
+    if (result.error) return result.error;
+    
+    // Check nested result data for errors
+    if (result.result && result.result.data && result.result.data.error) {
+      return result.result.data.error;
+    }
+    
+    // Check direct data.error (your current example)
+    if (result.data && result.data.error) {
+      return result.data.error;
+    }
+    
+    return '';
   };
 
   const extractKeywords = (result: any): string[] => {
@@ -303,6 +387,17 @@ export default function JobsManager() {
                 <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
                 Refresh
               </Button>
+              {jobs.length > 0 && (
+                <Button
+                  onClick={deleteAllJobs}
+                  variant="outline"
+                  size="sm"
+                  className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Delete All Jobs
+                </Button>
+              )}
             </div>
           </div>
         </CardHeader>
@@ -336,6 +431,11 @@ export default function JobsManager() {
                             Completed: {formatDate(job.completedAt)}
                           </p>
                         )}
+                        {job.metadata?.pollUrl && (
+                          <p className="text-xs text-blue-600 font-mono">
+                            Poll URL: {job.metadata.pollUrl}
+                          </p>
+                        )}
                       </div>
                     </div>
                   
@@ -357,15 +457,27 @@ export default function JobsManager() {
                         </div>
                       )}
                       
-                      {job.status === 'completed' && (
+                      {job.status === 'completed' && !hasResultError(job) && (
                         <Button
                           onClick={() => viewJobDetails(job)}
                           size="sm"
                           variant="outline"
                           className="bg-green-50 text-green-700 hover:bg-green-100 border-green-200"
                         >
-                          <Eye className="w-4 h-4 mr-2" />
-                          View Results
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Success
+                        </Button>
+                      )}
+
+                      {job.status === 'completed' && hasResultError(job) && (
+                        <Button
+                          onClick={() => viewJobDetails(job)}
+                          size="sm"
+                          variant="outline"
+                          className="bg-orange-50 text-orange-700 hover:bg-orange-100 border-orange-200"
+                        >
+                          <AlertTriangle className="w-4 h-4 mr-2" />
+                          Completed with Errors
                         </Button>
                       )}
                       
@@ -400,7 +512,20 @@ export default function JobsManager() {
                   
                   {job.error && (
                     <div className="mt-2 p-2 bg-red-50 border border-red-200 rounded text-sm text-red-700">
-                      Error: {job.error}
+                      <strong>Job Error:</strong> {job.error}
+                    </div>
+                  )}
+
+                  {hasResultError(job) && (
+                    <div 
+                      className="mt-2 p-2 border rounded text-sm"
+                      style={{ 
+                        backgroundColor: `${designSystem?.warningColor || '#F59E0B'}1A`,
+                        borderColor: `${designSystem?.warningColor || '#F59E0B'}40`,
+                        color: designSystem?.warningColor || '#F59E0B'
+                      }}
+                    >
+                      <strong>Completed with Errors:</strong> {getResultErrorMessage(job)}
                     </div>
                   )}
                 </div>
@@ -444,7 +569,7 @@ export default function JobsManager() {
                   )}
                 </div>
                 
-                {selectedJob.result && (
+                {selectedJob.type === 'keyword-generation' && selectedJob.result && (
                   <div>
                     <h3 className="text-lg font-semibold mb-3">Generated Keywords</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -459,12 +584,44 @@ export default function JobsManager() {
                     </div>
                   </div>
                 )}
+
+                {(selectedJob.type === 'basic-enrichment' || selectedJob.type === 'enhanced-enrichment') && selectedJob.result && (
+                  <div>
+                    <h3 className="text-lg font-semibold mb-3">Enrichment Result</h3>
+                    <div className="p-3 bg-gray-50 rounded-md">
+                      <pre className="text-sm overflow-auto max-h-96">
+                        {JSON.stringify(selectedJob.result, null, 2)}
+                      </pre>
+                    </div>
+                  </div>
+                )}
                 
                 {selectedJob.error && (
                   <div>
-                    <h3 className="text-lg font-semibold mb-3 text-red-600">Error</h3>
+                    <h3 className="text-lg font-semibold mb-3 text-red-600">Job Error</h3>
                     <div className="p-3 bg-red-50 border border-red-200 rounded text-red-700">
                       {selectedJob.error}
+                    </div>
+                  </div>
+                )}
+
+                {hasResultError(selectedJob) && (
+                  <div>
+                    <h3 
+                      className="text-lg font-semibold mb-3"
+                      style={{ color: designSystem?.warningColor || '#F59E0B' }}
+                    >
+                      Completed with Errors
+                    </h3>
+                    <div 
+                      className="p-3 border rounded"
+                      style={{ 
+                        backgroundColor: `${designSystem?.warningColor || '#F59E0B'}1A`,
+                        borderColor: `${designSystem?.warningColor || '#F59E0B'}40`,
+                        color: designSystem?.warningColor || '#F59E0B'
+                      }}
+                    >
+                      {getResultErrorMessage(selectedJob)}
                     </div>
                   </div>
                 )}

@@ -117,6 +117,11 @@ class BackgroundJobService {
           if (job.type === 'keyword-generation' && externalData.result) {
             await this.syncKeywordsToIndustry(job.metadata?.industry, externalData.result);
           }
+          
+          // Process enrichment result and save to business directory if this is a basic enrichment job
+          if (job.type === 'basic-enrichment' && externalData.result) {
+            await this.processEnrichmentResult(externalData.result, job.id);
+          }
         } else if (externalData.status && externalData.status !== job.status) {
           console.log(`🔄 Background service: Job ${job.id} status changed from ${job.status} to ${externalData.status}`);
           
@@ -181,6 +186,35 @@ class BackgroundJobService {
       }
     } catch (error) {
       console.error('❌ Background service: Error syncing keywords:', error);
+    }
+  }
+
+  private async processEnrichmentResult(enrichmentResult: any, jobId: string) {
+    try {
+      console.log(`🔄 Background service: Processing enrichment result for job ${jobId}`);
+      
+      const response = await fetch('/api/admin/enrichment/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          enrichmentResult,
+          jobId
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log(`✅ Background service: Enrichment result processed successfully for job ${jobId}:`, {
+          businessId: data.businessId,
+          created: data.created,
+          updated: data.updated
+        });
+      } else {
+        const errorText = await response.text();
+        console.error(`❌ Background service: Failed to process enrichment result for job ${jobId}:`, errorText);
+      }
+    } catch (error) {
+      console.error(`❌ Background service: Error processing enrichment result for job ${jobId}:`, error);
     }
   }
 

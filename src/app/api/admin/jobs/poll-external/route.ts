@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
     // Call external API (no bypass token needed)
     const response = await fetch(fullPollUrl);
 
+
     if (response.ok) {
       const data = await response.json();
       

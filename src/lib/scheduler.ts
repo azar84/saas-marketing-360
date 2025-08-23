@@ -47,7 +47,7 @@ class AppScheduler {
           this.logTask('industries-keywords', 'error', 'Keywords generation failed', error);
         }
       },
-      enabled: false,
+      enabled: false, // Disabled by default to prevent duplicate jobs
       maxLogs: 100
     });
 
@@ -102,9 +102,13 @@ class AppScheduler {
   setTaskEnabled(taskId: string, enabled: boolean): boolean {
     const task = this.tasks.get(taskId);
     if (task) {
+      const wasEnabled = task.enabled;
       task.enabled = enabled;
       if (enabled) {
         task.nextRun = this.calculateNextRun(task.cronExpression);
+        console.log(`✅ [Scheduler] Task "${taskId}" enabled, next run: ${task.nextRun.toISOString()}`);
+      } else {
+        console.log(`❌ [Scheduler] Task "${taskId}" disabled`);
       }
 
       return true;
@@ -118,8 +122,11 @@ class AppScheduler {
   updateTaskCron(taskId: string, cronExpression: string): boolean {
     const task = this.tasks.get(taskId);
     if (task) {
+      const oldExpression = task.cronExpression;
       task.cronExpression = cronExpression;
       task.nextRun = this.calculateNextRun(cronExpression);
+      
+      console.log(`📅 [Scheduler] Task "${taskId}" cron updated: ${oldExpression} → ${cronExpression}, next run: ${task.nextRun.toISOString()}`);
 
       return true;
     }
@@ -145,15 +152,17 @@ class AppScheduler {
    */
   start(): void {
     if (this.isInitialized) {
+      console.log('⚠️ [Scheduler] Scheduler already running, ignoring start request');
       return;
     }
 
+    console.log('🚀 [Scheduler] Starting scheduler...');
     this.isInitialized = true;
     this.interval = setInterval(() => {
       this.checkAndRunTasks();
     }, 1000); // Check every second
-
-
+    
+    console.log('✅ [Scheduler] Scheduler started successfully');
   }
 
   /**
@@ -176,7 +185,7 @@ class AppScheduler {
     
     for (const [taskId, task] of this.tasks) {
       if (task.enabled && !task.isRunning && task.nextRun && task.nextRun <= now) {
-
+        console.log(`⏰ [Scheduler] Task "${taskId}" is due to run at ${task.nextRun.toISOString()}, current time: ${now.toISOString()}`);
         await this.runTask(taskId, task);
       }
     }
@@ -228,12 +237,13 @@ class AppScheduler {
   /**
    * Calculate next run time based on cron expression (supports 5 or 6 fields).
    * 6 fields: seconds minutes hours day month dayOfWeek (e.g., every 5 seconds)
-   * 5 fields: minutes hours day month dayOfWeek
+   * 5 fields: minutes hours day month dayOfWeek (e.g., every 2 minutes)
    */
   private calculateNextRun(cronExpression: string): Date {
     try {
       const parts = cronExpression.trim().split(/\s+/);
       if (parts.length !== 5 && parts.length !== 6) {
+        console.warn(`📅 [Scheduler] Invalid cron expression: ${cronExpression} (expected 5 or 6 fields, got ${parts.length})`);
         return this.getDefaultNextRun();
       }
 
@@ -245,40 +255,60 @@ class AppScheduler {
       const now = new Date();
       const nextRun = new Date(now);
 
+      // For 5-field cron expressions, always set seconds to 0
+      if (!hasSeconds) {
+        nextRun.setSeconds(0, 0);
+      }
+
       // Helper to handle */N pattern
       const parseStep = (token: string): number | null => {
         const m = token.match(/^\*\/(\d+)$/);
         return m ? parseInt(m[1], 10) : null;
       };
 
-      // Seconds
-      const secStep = parseStep(secOrMin);
-      if (secStep && secStep > 0) {
-        const nextSec = (Math.floor(now.getSeconds() / secStep) + 1) * secStep;
-        const deltaSec = nextSec - now.getSeconds();
-        nextRun.setSeconds(now.getSeconds() + deltaSec, 0);
-      } else if (secOrMin !== '*') {
-        const secVal = parseInt(secOrMin, 10);
-        if (!isNaN(secVal)) {
-          nextRun.setSeconds(secVal, 0);
-          if (nextRun <= now) nextRun.setMinutes(nextRun.getMinutes() + 1);
+      // Seconds (only for 6-field cron)
+      if (hasSeconds) {
+        const secStep = parseStep(secOrMin);
+        if (secStep && secStep > 0) {
+          const nextSec = (Math.floor(now.getSeconds() / secStep) + 1) * secStep;
+          const deltaSec = nextSec - now.getSeconds();
+          nextRun.setSeconds(now.getSeconds() + deltaSec, 0);
+        } else if (secOrMin !== '*') {
+          const secVal = parseInt(secOrMin, 10);
+          if (!isNaN(secVal)) {
+            nextRun.setSeconds(secVal, 0);
+            if (nextRun <= now) nextRun.setMinutes(nextRun.getMinutes() + 1);
+          } else {
+            nextRun.setSeconds(0, 0);
+          }
         } else {
-          nextRun.setSeconds(0, 0);
+          // default: next second
+          nextRun.setSeconds(now.getSeconds() + 1, 0);
         }
-      } else {
-        // default: next second
-        nextRun.setSeconds(now.getSeconds() + 1, 0);
       }
 
       // Minutes
       const minuteStep = parseStep(minuteRaw);
       if (minuteStep && minuteStep > 0) {
-        const nextMin = (Math.floor(nextRun.getMinutes() / minuteStep) + (nextRun <= now ? 1 : 0)) * minuteStep;
-        if (nextMin >= 60) {
-          nextRun.setHours(nextRun.getHours() + 1);
-          nextRun.setMinutes(nextMin % 60);
+        // For 5-field cron, calculate next minute interval
+        if (!hasSeconds) {
+          const currentMinute = now.getMinutes();
+          const nextMin = Math.ceil((currentMinute + 1) / minuteStep) * minuteStep;
+          if (nextMin >= 60) {
+            nextRun.setHours(now.getHours() + 1);
+            nextRun.setMinutes(nextMin % 60);
+          } else {
+            nextRun.setMinutes(nextMin);
+          }
         } else {
-          nextRun.setMinutes(nextMin);
+          // For 6-field cron, use existing logic
+          const nextMin = (Math.floor(nextRun.getMinutes() / minuteStep) + (nextRun <= now ? 1 : 0)) * minuteStep;
+          if (nextMin >= 60) {
+            nextRun.setHours(nextRun.getHours() + 1);
+            nextRun.setMinutes(nextMin % 60);
+          } else {
+            nextRun.setMinutes(nextMin);
+          }
         }
       } else if (minuteRaw !== '*') {
         const minuteVal = parseInt(minuteRaw, 10);
@@ -382,6 +412,11 @@ class AppScheduler {
         task.logs = task.logs.slice(-task.maxLogs);
       }
 
+      // Suppress chatty logs for industries-keywords (only show errors)
+      if (taskId === 'industries-keywords' && level !== 'error') {
+        return;
+      }
+
       // Also print to server console so it's visible immediately
       const ts = log.timestamp.toISOString();
       const prefix = `⏱️ [Scheduler] [${taskId}]`;
@@ -450,10 +485,12 @@ class AppScheduler {
       });
 
       if (industries.length === 0) {
-        return { message: 'No industries need keywords' };
+        this.logTask('industries-keywords', 'info', 'All industries already have keywords - skipping generation');
+        return { message: 'All industries already have keywords' };
       }
 
       const industry = industries[0];
+      this.logTask('industries-keywords', 'info', `Found industry without keywords: "${industry.label}" - submitting job`);
 
       // Submit a job through our internal jobs API so it persists with pollUrl
       const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
@@ -825,6 +862,13 @@ class AppScheduler {
       } : undefined
     };
   }
+
+  /**
+   * Check if scheduler is already running
+   */
+  isRunning(): boolean {
+    return this.isInitialized;
+  }
 }
 
 // Create a true singleton instance across Next.js module reloads
@@ -833,12 +877,9 @@ const scheduler = globalForScheduler._appScheduler ?? (globalForScheduler._appSc
 
 // Auto-start the scheduler when this module is imported
 if (typeof window === 'undefined') {
-  console.log('🚀 SERVER: Auto-starting scheduler...');
-  // Start after a short delay to ensure everything is loaded
-  setTimeout(() => {
-    scheduler.start();
-    console.log('✅ Scheduler started successfully');
-  }, 2000);
+  console.log('🚀 SERVER: Scheduler module loaded (manual start required)');
+  // Scheduler will only start when manually triggered from admin panel
+  // This prevents duplicate instances while keeping internal control
 }
 
 export default scheduler;
