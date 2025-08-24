@@ -27,6 +27,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
+import { AutocompleteInput } from '@/components/ui/AutocompleteInput';
 import { useAdminApi } from '@/hooks/useApi';
 
 interface Company {
@@ -428,17 +429,12 @@ export default function CompanyDirectoryManager() {
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
                   Industry
                 </label>
-                <Input
-                  type="text"
-                  placeholder="Filter by industry..."
+                <AutocompleteInput
                   value={industryFilter}
-                  onChange={(e) => setIndustryFilter(e.target.value)}
-                  className="h-10"
-                  style={{ 
-                    backgroundColor: 'var(--color-bg-primary)',
-                    borderColor: 'var(--color-gray-light)',
-                    color: 'var(--color-text-primary)'
-                  }}
+                  onChange={setIndustryFilter}
+                  placeholder="Filter by industry..."
+                  field="industry"
+                  className="w-full"
                 />
               </div>
               
@@ -446,17 +442,12 @@ export default function CompanyDirectoryManager() {
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
                   Services
                 </label>
-                <Input
-                  type="text"
-                  placeholder="Filter by services..."
+                <AutocompleteInput
                   value={servicesFilter}
-                  onChange={(e) => setServicesFilter(e.target.value)}
-                  className="h-10"
-                  style={{ 
-                    backgroundColor: 'var(--color-bg-primary)',
-                    borderColor: 'var(--color-gray-light)',
-                    color: 'var(--color-text-primary)'
-                  }}
+                  onChange={setServicesFilter}
+                  placeholder="Filter by services..."
+                  field="services"
+                  className="w-full"
                 />
               </div>
               
@@ -464,17 +455,12 @@ export default function CompanyDirectoryManager() {
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
                   City
                 </label>
-                <Input
-                  type="text"
-                  placeholder="Filter by city..."
+                <AutocompleteInput
                   value={cityFilter}
-                  onChange={(e) => setCityFilter(e.target.value)}
-                  className="h-10"
-                  style={{ 
-                    backgroundColor: 'var(--color-bg-primary)',
-                    borderColor: 'var(--color-gray-light)',
-                    color: 'var(--color-text-primary)'
-                  }}
+                  onChange={setCityFilter}
+                  placeholder="Filter by city..."
+                  field="city"
+                  className="w-full"
                 />
               </div>
               
@@ -482,17 +468,12 @@ export default function CompanyDirectoryManager() {
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
                   Country
                 </label>
-                <Input
-                  type="text"
-                  placeholder="Filter by country..."
+                <AutocompleteInput
                   value={countryFilter}
-                  onChange={(e) => setCountryFilter(e.target.value)}
-                  className="h-10"
-                  style={{ 
-                    backgroundColor: 'var(--color-bg-primary)',
-                    borderColor: 'var(--color-gray-light)',
-                    color: 'var(--color-text-primary)'
-                  }}
+                  onChange={setCountryFilter}
+                  placeholder="Filter by country..."
+                  field="country"
+                  className="w-full"
                 />
               </div>
               
@@ -500,17 +481,12 @@ export default function CompanyDirectoryManager() {
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
                   State/Province
                 </label>
-                <Input
-                  type="text"
-                  placeholder="Filter by state/province..."
+                <AutocompleteInput
                   value={stateProvinceFilter}
-                  onChange={(e) => setStateProvinceFilter(e.target.value)}
-                  className="h-10"
-                  style={{ 
-                    backgroundColor: 'var(--color-bg-primary)',
-                    borderColor: 'var(--color-gray-light)',
-                    color: 'var(--color-text-primary)'
-                  }}
+                  onChange={setStateProvinceFilter}
+                  placeholder="Filter by state/province..."
+                  field="stateProvince"
+                  className="w-full"
                 />
               </div>
               
@@ -518,17 +494,12 @@ export default function CompanyDirectoryManager() {
                 <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
                   Technology
                 </label>
-                <Input
-                  type="text"
-                  placeholder="Filter by technology..."
+                <AutocompleteInput
                   value={technologyFilter}
-                  onChange={(e) => setTechnologyFilter(e.target.value)}
-                  className="h-10"
-                  style={{ 
-                    backgroundColor: 'var(--color-bg-primary)',
-                    borderColor: 'var(--color-gray-light)',
-                    color: 'var(--color-text-primary)'
-                  }}
+                  onChange={setTechnologyFilter}
+                  placeholder="Filter by technology..."
+                  field="technology"
+                  className="w-full"
                 />
               </div>
               

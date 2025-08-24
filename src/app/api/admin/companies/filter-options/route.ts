@@ -45,7 +45,8 @@ export async function GET(request: NextRequest) {
         const industryResults = await prisma.industry.findMany({
           where: {
             label: { 
-              contains: query.toLowerCase().trim()
+              contains: query,
+              mode: 'insensitive'
             },
             isActive: true
           },
@@ -59,7 +60,8 @@ export async function GET(request: NextRequest) {
         const serviceResults = await prisma.companyService.findMany({
           where: {
             name: { 
-              contains: query.toLowerCase().trim()
+              contains: query,
+              mode: 'insensitive'
             }
           },
           select: { name: true },
@@ -85,7 +87,8 @@ export async function GET(request: NextRequest) {
         const techResults = await prisma.companyTechnology.findMany({
           where: {
             name: { 
-              contains: query.toLowerCase().trim()
+              contains: query,
+              mode: 'insensitive'
             },
             isActive: true
           },
