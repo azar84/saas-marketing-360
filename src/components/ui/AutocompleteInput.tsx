@@ -29,9 +29,28 @@ export const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // Fetch suggestions when input changes
+  // Fetch suggestions when input changes or when industry field is focused
   useEffect(() => {
     const fetchSuggestions = async () => {
+      // For industry field, show all options if input is empty
+      if (field === 'industry' && (!inputValue.trim() || inputValue.length < 2)) {
+        setLoading(true);
+        try {
+          const response = await fetch(`/api/admin/companies/filter-options?field=${field}`);
+          if (response.ok) {
+            const data = await response.json();
+            setSuggestions(data.data || []);
+          }
+        } catch (error) {
+          console.error('Error fetching all industries:', error);
+          setSuggestions([]);
+        } finally {
+          setLoading(false);
+        }
+        return;
+      }
+
+      // For other fields or when searching, require at least 2 characters
       if (!inputValue.trim() || inputValue.length < 2) {
         setSuggestions([]);
         return;
@@ -62,6 +81,30 @@ export const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
     setInputValue(newValue);
     onChange(newValue);
     setIsOpen(true);
+    
+    // For industry field, fetch all options if input is cleared
+    if (field === 'industry' && !newValue.trim()) {
+      fetchAllIndustries();
+    }
+  };
+
+  // Fetch all industries for industry field
+  const fetchAllIndustries = async () => {
+    if (field !== 'industry') return;
+    
+    setLoading(true);
+    try {
+      const response = await fetch(`/api/admin/companies/filter-options?field=${field}`);
+      if (response.ok) {
+        const data = await response.json();
+        setSuggestions(data.data || []);
+      }
+    } catch (error) {
+      console.error('Error fetching all industries:', error);
+      setSuggestions([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Handle suggestion selection
@@ -113,7 +156,13 @@ export const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
           placeholder={placeholder}
           disabled={disabled}
           className="pl-10 pr-20"
-          onFocus={() => setIsOpen(true)}
+          onFocus={() => {
+            setIsOpen(true);
+            // For industry field, show all options when focused
+            if (field === 'industry' && !inputValue.trim()) {
+              fetchAllIndustries();
+            }
+          }}
         />
         <div className="absolute right-2 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
           {inputValue && (
@@ -147,6 +196,11 @@ export const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
             </div>
           ) : suggestions.length > 0 ? (
             <div>
+              {field === 'industry' && !inputValue.trim() && (
+                <div className="px-4 py-2 text-xs font-medium text-gray-500 border-b">
+                  All Available Industries
+                </div>
+              )}
               {suggestions.map((suggestion, index) => (
                 <button
                   key={index}
@@ -161,7 +215,7 @@ export const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
             <div className="px-4 py-2 text-sm text-gray-500">
               No suggestions found
             </div>
-          ) : recentSearches.length > 0 && !inputValue ? (
+          ) : recentSearches.length > 0 && !inputValue && field !== 'industry' ? (
             <div>
               <div className="px-4 py-2 text-xs font-medium text-gray-500 border-b">
                 Recent Searches

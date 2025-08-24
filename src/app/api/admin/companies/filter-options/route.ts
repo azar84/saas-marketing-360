@@ -43,11 +43,13 @@ export async function GET(request: NextRequest) {
 
       case 'industry':
         const industryResults = await prisma.industry.findMany({
-          where: {
+          where: query ? {
             label: { 
               contains: query,
               mode: 'insensitive'
             },
+            isActive: true
+          } : {
             isActive: true
           },
           select: { label: true },
