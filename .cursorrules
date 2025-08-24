@@ -18,3 +18,8 @@
 ## GitHub Management
 - Use GitHub CLI for repository and workflow tasks
 - Never push to GitHub without explicit user instructions 
+
+## UI Design 
+- Use the ADMIN_PANEL_DESIGN_SYSTEM.md in docs folder to understand the colors and design guidelines 
+- Never use hardcoded colors, all from our design system please 
+- Make sure to follow the design system religuosly  , if you have any doubt just ask 

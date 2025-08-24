@@ -453,7 +453,7 @@ export default function CompanyDirectoryManager() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
       {/* Header Section */}
-                      <div className="border-b" style={{ borderColor: 'var(--color-border)', backgroundColor: 'var(--color-bg-primary)' }}>
+                      <div className="border-b" style={{ borderColor: 'var(--color-gray-light)', backgroundColor: 'var(--color-bg-primary)' }}>
         <div className="px-8 py-10">
           <div className="flex items-center justify-between">
             <div>
@@ -487,7 +487,7 @@ export default function CompanyDirectoryManager() {
       </div>
 
       {/* Search and Filter Section */}
-                  <div className="px-8 py-6" style={{ backgroundColor: 'var(--color-bg-primary)', borderBottom: '1px solid var(--color-border)' }}>
+                  <div className="px-8 py-6" style={{ backgroundColor: 'var(--color-bg-primary)', borderBottom: '1px solid var(--color-gray-light)' }}>
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between gap-6">
             <div className="flex-1 max-w-lg">
@@ -502,7 +502,7 @@ export default function CompanyDirectoryManager() {
                   className="pl-12 h-12 text-base border-2 transition-all duration-200 focus:ring-2 focus:ring-opacity-50"
                   style={{ 
                     backgroundColor: 'var(--color-bg-primary)',
-                    borderColor: 'var(--color-border)',
+                    borderColor: 'var(--color-gray-light)',
                     color: 'var(--color-text-primary)',
                     '--tw-ring-color': 'var(--color-primary)'
                   } as any}
@@ -542,7 +542,7 @@ export default function CompanyDirectoryManager() {
       </div>
 
       {/* Advanced Filters Section */}
-                  <div className="px-8 py-4" style={{ backgroundColor: 'var(--color-bg-primary)', borderBottom: '1px solid var(--color-border)' }}>
+                  <div className="px-8 py-4" style={{ backgroundColor: 'var(--color-bg-primary)', borderBottom: '1px solid var(--color-gray-light)' }}>
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
             <Button
@@ -820,7 +820,7 @@ export default function CompanyDirectoryManager() {
 
       {/* Bulk Actions Toolbar */}
       {selectedCompanies.size > 0 && (
-        <div className="px-8 py-3" style={{ backgroundColor: 'var(--color-bg-accent)', borderTop: '1px solid var(--color-border)', borderBottom: '1px solid var(--color-border)' }}>
+        <div className="px-8 py-3" style={{ backgroundColor: 'var(--color-bg-secondary)', borderTop: '1px solid var(--color-gray-light)', borderBottom: '1px solid var(--color-gray-light)' }}>
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
@@ -844,7 +844,7 @@ export default function CompanyDirectoryManager() {
                   size="sm"
                   onClick={handleBulkExport}
                   className="flex items-center gap-2"
-                  style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-primary)' }}
+                  style={{ borderColor: 'var(--color-gray-light)', color: 'var(--color-text-primary)' }}
                 >
                   <Download className="h-4 w-4" />
                   Export Selected
@@ -897,7 +897,7 @@ export default function CompanyDirectoryManager() {
           ) : (
             <div className="space-y-6">
               {/* Select All and Pagination Controls */}
-              <div className="flex items-center justify-between p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
+              <div className="flex items-center justify-between p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
                 <div className="flex items-center space-x-4">
                   <div className="flex items-center space-x-2">
                     <input
@@ -906,7 +906,7 @@ export default function CompanyDirectoryManager() {
                       onChange={handleSelectAll}
                       className="w-4 h-4 rounded border-2 cursor-pointer"
                       style={{ 
-                        borderColor: 'var(--color-border)',
+                        borderColor: 'var(--color-gray-light)',
                         backgroundColor: selectAll ? 'var(--color-primary)' : 'transparent'
                       }}
                     />
@@ -978,7 +978,7 @@ export default function CompanyDirectoryManager() {
                         setCurrentPage(1);
                       }}
                       className="px-2 py-1 text-sm border rounded"
-                      style={{ borderColor: 'var(--color-border)' }}
+                      style={{ borderColor: 'var(--color-gray-light)' }}
                     >
                       <option value={5}>5</option>
                       <option value={10}>10</option>
@@ -1004,7 +1004,7 @@ export default function CompanyDirectoryManager() {
                           onChange={() => handleSelectCompany(company.id)}
                           className="w-4 h-4 rounded border-2 cursor-pointer"
                           style={{ 
-                            borderColor: 'var(--color-border)',
+                            borderColor: 'var(--color-gray-light)',
                             backgroundColor: selectedCompanies.has(company.id) ? 'var(--color-primary)' : 'transparent'
                           }}
                         />
@@ -1185,7 +1185,7 @@ export default function CompanyDirectoryManager() {
                         <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>Key Staff</h4>
                         <div className="space-y-2">
                           {company.staff && Array.isArray(company.staff) && company.staff.slice(0, 2).map((staff) => (
-                            <div key={staff.id} className="flex items-center gap-3 text-sm p-3 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
+                            <div key={staff.id} className="flex items-center gap-3 text-sm p-3 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
                               <Users className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                               <div className="flex-1">
                                 <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
@@ -1248,7 +1248,7 @@ export default function CompanyDirectoryManager() {
 
                     {/* Expanded Details */}
                     {expandedCompany === company.id && (
-                      <div className="border-t pt-6 mt-6 space-y-6" style={{ borderColor: 'var(--color-border)' }}>
+                      <div className="border-t pt-6 mt-6 space-y-6" style={{ borderColor: 'var(--color-gray-light)' }}>
                         
                         {/* Industries */}
                         {company.industries && Array.isArray(company.industries) && company.industries.length > 0 && (
@@ -1276,7 +1276,7 @@ export default function CompanyDirectoryManager() {
                             <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Addresses</h4>
                             <div className="space-y-3">
                               {company.addresses && Array.isArray(company.addresses) && company.addresses.map((address) => (
-                                <div key={address.id} className="p-3 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
+                                <div key={address.id} className="p-3 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
                                   <div className="flex items-center gap-2 mb-2">
                                     <MapPin className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                                     <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
@@ -1331,7 +1331,7 @@ export default function CompanyDirectoryManager() {
                                   <h5 className="text-xs font-medium mb-2" style={{ color: 'var(--color-text-muted)' }}>Phone Numbers</h5>
                                   <div className="space-y-2">
                                     {company.contacts && Array.isArray(company.contacts) && company.contacts.filter(c => c.type === 'phone').map((contact) => (
-                                      <div key={contact.id} className="flex items-center gap-3 text-sm p-2 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
+                                      <div key={contact.id} className="flex items-center gap-3 text-sm p-2 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
                                         <Phone className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                                         <div className="flex-1">
                                           <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
@@ -1363,7 +1363,7 @@ export default function CompanyDirectoryManager() {
                                   <h5 className="text-xs font-medium mb-2" style={{ color: 'var(--color-text-muted)' }}>Email Addresses</h5>
                                   <div className="space-y-2">
                                     {company.contacts && Array.isArray(company.contacts) && company.contacts.filter(c => c.type === 'email').map((contact) => (
-                                      <div key={contact.id} className="flex items-center gap-3 text-sm p-2 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
+                                      <div key={contact.id} className="flex items-center gap-3 text-sm p-2 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
                                         <Mail className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                                         <div className="flex-1">
                                           <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
@@ -1398,7 +1398,7 @@ export default function CompanyDirectoryManager() {
                             <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Technologies</h4>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                               {company.technologies && Array.isArray(company.technologies) && company.technologies.map((tech) => (
-                                <div key={tech.id} className="text-sm p-3 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
+                                <div key={tech.id} className="text-sm p-3 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
                                   <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
                                     {tech.name}
                                   </div>
@@ -1456,7 +1456,7 @@ export default function CompanyDirectoryManager() {
                                                           <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Discovered URLs ({company.urls && Array.isArray(company.urls) ? company.urls.length : 0})</h4>
                             <div className="space-y-1">
                               {company.urls && Array.isArray(company.urls) && company.urls.slice(0, 8).map((url) => (
-                                <div key={url.id} className="flex items-center gap-2 text-xs p-2 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-border)' }}>
+                                <div key={url.id} className="flex items-center gap-2 text-xs p-2 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
                                   <div 
                                     className="w-2 h-2 rounded-full flex-shrink-0"
                                     style={{ backgroundColor: getStatusColor(url.status) }}
