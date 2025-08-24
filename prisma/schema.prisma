@@ -1395,55 +1395,7 @@ model Keyword {
   @@map("keywords")
 }
 
-model BusinessDirectory {
-  id                   Int                   @id @default(autoincrement())
-  website              String                @unique
-  companyName          String?
-  city                 String?
-  stateProvince        String?
-  phoneNumber          String?
-  email                String?
-  employeesCount       Int?
-  contactPersonId      Int?
-  isActive             Boolean               @default(true)
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
-  country              String?
-  address              String?
-  categories           String[]
-  confidence           Float?
-  description          String?
-  extractedAt          DateTime?
-  industry             String?
-  phone                String?
-  source               String                @default("manual")
-  state                String?
-  industries           BusinessIndustry[]
-  contactPersons       ContactPerson[]       @relation("ContactPersonBusiness")
-  llmProcessingResults LLMProcessingResult[]
-  contact_persons      ContactPerson[]       @relation("BusinessDirectoryToContactPerson")
-
-  @@index([city])
-  @@index([country])
-  @@index([isActive])
-  @@index([stateProvince])
-  @@map("business_directory")
-}
-
-model BusinessIndustry {
-  id         Int               @id @default(autoincrement())
-  businessId Int
-  industryId Int
-  isPrimary  Boolean           @default(false)
-  createdAt  DateTime          @default(now())
-  business   BusinessDirectory @relation(fields: [businessId], references: [id], onDelete: Cascade)
-  industry   Industry          @relation(fields: [industryId], references: [id], onDelete: Cascade)
-
-  @@unique([businessId, industryId])
-  @@index([businessId])
-  @@index([industryId])
-  @@map("business_industries")
-}
+// BusinessDirectory model removed - now using Company table instead
 
 model ContactPerson {
   id                 Int                 @id @default(autoincrement())
@@ -1458,8 +1410,7 @@ model ContactPerson {
   businessId         Int?
   department         String?
   isPrimary          Boolean             @default(false)
-  business           BusinessDirectory?  @relation("ContactPersonBusiness", fields: [businessId], references: [id])
-  business_directory BusinessDirectory[] @relation("BusinessDirectoryToContactPerson")
+  // business relations removed - BusinessDirectory model deleted
 
   @@index([firstName, lastName])
   @@index([isActive])
@@ -1562,7 +1513,7 @@ model LLMProcessingResult {
   savedBusinessId        Int?
   website                String?
   llmProcessingSession   LLMProcessingSession @relation(fields: [llmProcessingSessionId], references: [id], onDelete: Cascade)
-  savedBusiness          BusinessDirectory?   @relation(fields: [savedBusinessId], references: [id])
+  // savedBusiness relation removed - BusinessDirectory model deleted
   searchResult           SearchResult         @relation(fields: [searchResultId], references: [id], onDelete: Cascade)
 
   @@index([llmProcessingSessionId], map: "llm_processing_results_llm_session_id_idx")

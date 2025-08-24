@@ -67,6 +67,24 @@ class AppScheduler {
       enabled: true,
       maxLogs: 100
     });
+
+    // Process completed enrichment jobs task - runs every 5 minutes
+    this.addTask({
+      id: 'process-completed-enrichment',
+      name: 'Process Completed Enrichment Jobs',
+      cronExpression: '*/5 * * * *', // Every 5 minutes
+      task: async () => {
+        try {
+          this.logTask('process-completed-enrichment', 'info', 'Starting to process completed enrichment jobs...');
+          await this.processCompletedEnrichmentJobs();
+          this.logTask('process-completed-enrichment', 'success', 'Completed enrichment jobs processed successfully');
+        } catch (error) {
+          this.logTask('process-completed-enrichment', 'error', 'Failed to process completed enrichment jobs', error);
+        }
+      },
+      enabled: true,
+      maxLogs: 100
+    });
   }
 
   /**
@@ -824,6 +842,114 @@ class AppScheduler {
   }
 
   /**
+   * Process completed enrichment jobs and save data to database
+   */
+  public async processCompletedEnrichmentJobs(): Promise<void> {
+    try {
+      // Import Prisma client dynamically to avoid circular dependencies
+      const { PrismaClient } = await import('@prisma/client');
+      const prisma = new PrismaClient();
+
+      // Get all completed enrichment jobs that haven't been processed yet
+      const completedEnrichmentJobs = await prisma.job.findMany({
+        where: {
+          type: 'basic-enrichment',
+          status: 'completed'
+        }
+      });
+
+      const unprocessedJobs = completedEnrichmentJobs.filter(job => {
+        if (!job.result || typeof job.result !== 'object') return false;
+        const result = job.result as any;
+        return !result.processed;
+      });
+
+      if (unprocessedJobs.length === 0) {
+        console.log('ℹ️ No unprocessed completed enrichment jobs found');
+        return;
+      }
+
+      console.log(`🔄 Processing ${unprocessedJobs.length} completed enrichment jobs`);
+
+      for (const job of unprocessedJobs) {
+        try {
+          if (!job.result || typeof job.result !== 'object') {
+            console.log(`⚠️ Job ${job.id} has invalid result format, skipping`);
+            continue;
+          }
+
+          const jobResult = job.result as any;
+          
+          // Call the enrichment process API to save data
+          const processResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/admin/enrichment/process`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              enrichmentResult: {
+                data: jobResult.data,
+                metadata: {
+                  websiteUrl: (job.metadata as any)?.websiteUrl || jobResult.data?.metadata?.baseUrl || 'unknown'
+                }
+              },
+              jobId: job.id
+            })
+          });
+
+          if (processResponse.ok) {
+            const result = await processResponse.json();
+            console.log(`✅ Successfully processed enrichment job ${job.id}:`, result.message);
+            
+            // Mark job as processed to avoid reprocessing
+            await this.updateJobAsProcessed(job.id);
+          } else {
+            const errorText = await processResponse.text();
+            console.error(`❌ Failed to process enrichment job ${job.id}:`, errorText);
+          }
+        } catch (error) {
+          console.error(`❌ Error processing enrichment job ${job.id}:`, error);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error processing completed enrichment jobs:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Mark a job as processed to avoid reprocessing
+   */
+  private async updateJobAsProcessed(jobId: string): Promise<void> {
+    try {
+      const { PrismaClient } = await import('@prisma/client');
+      const prisma = new PrismaClient();
+      
+      const existingJob = await prisma.job.findUnique({ where: { id: jobId } });
+      if (!existingJob || !existingJob.result || typeof existingJob.result !== 'object') {
+        console.log(`⚠️ Job ${jobId} has no valid result to update`);
+        return;
+      }
+
+      const existingResult = existingJob.result as any;
+      
+      await prisma.job.update({
+        where: { id: jobId },
+        data: {
+          result: {
+            ...existingResult,
+            processed: true
+          }
+        }
+      });
+
+      console.log(`✅ Job ${jobId} marked as processed`);
+    } catch (error) {
+      console.error(`❌ Error marking job ${jobId} as processed:`, error);
+    }
+  }
+
+  /**
    * Refresh all task schedules
    */
   refreshTaskSchedules(): void {
@@ -874,6 +1000,62 @@ class AppScheduler {
    */
   isRunning(): boolean {
     return this.isInitialized;
+  }
+
+  /**
+   * Force reinitialize default tasks (useful for development/testing)
+   */
+  forceReinitializeDefaultTasks(): void {
+    try {
+      console.log('🔄 Force reinitializing default tasks...');
+      
+      // Stop the scheduler first if it's running
+      if (this.isInitialized) {
+        this.stop();
+      }
+      
+      // Clear existing tasks
+      this.tasks.clear();
+      
+      // Reinitialize default tasks
+      this.initializeDefaultTasks();
+      
+      console.log(`✅ Reinitialized ${this.tasks.size} default tasks`);
+      
+      // Restart the scheduler if it was running before
+      if (this.isInitialized) {
+        this.start();
+      }
+    } catch (error) {
+      console.error('❌ Error reinitializing default tasks:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Add the enrichment processing task if it doesn't exist
+   */
+  ensureEnrichmentTaskExists(): void {
+    if (!this.tasks.has('process-completed-enrichment')) {
+      console.log('🔄 Adding missing enrichment processing task...');
+      this.addTask({
+        id: 'process-completed-enrichment',
+        name: 'Process Completed Enrichment Jobs',
+        cronExpression: '*/5 * * * *', // Every 5 minutes
+        task: async () => {
+          try {
+            this.logTask('process-completed-enrichment', 'info', 'Starting to process completed enrichment jobs...');
+            await this.processCompletedEnrichmentJobs();
+            this.logTask('process-completed-enrichment', 'success', 'Completed enrichment jobs processed successfully');
+          } catch (error) {
+            this.logTask('process-completed-enrichment', 'error', 'Failed to process completed enrichment jobs', error);
+          }
+        },
+        enabled: true,
+        maxLogs: 100
+      });
+      console.log('✅ Enrichment processing task added');
+    }
   }
 }
 

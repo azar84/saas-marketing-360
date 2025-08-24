@@ -22,22 +22,29 @@ async function handler(request: NextRequest) {
     }
 
     // Validate enrichment result structure
-    // Handle both formats: direct data or nested data structure
+    // The API response has data directly under 'data' with company, contact, analysis, etc.
     let processData;
-    if (enrichmentResult.data && enrichmentResult.data.input && enrichmentResult.data.finalResult) {
-      // Format 1: { data: { input: {...}, finalResult: {...} } }
-      processData = enrichmentResult;
-    } else if (enrichmentResult.data && enrichmentResult.data.staff && enrichmentResult.data.company) {
-      // Format 2: { data: { staff: {...}, company: {...}, contact: {...} } } - direct job result
+    if (enrichmentResult.data && enrichmentResult.data.company && enrichmentResult.data.contact) {
+      // This is the standard enrichment result format from the Marketing MCP API
       processData = {
         data: {
-          input: { websiteUrl: enrichmentResult.metadata?.websiteUrl || 'unknown' },
+          input: { 
+            websiteUrl: enrichmentResult.metadata?.websiteUrl || enrichmentResult.data.metadata?.baseUrl || 'unknown',
+            options: {
+              basicMode: true,
+              maxHtmlLength: 50000,
+              includeIntelligence: false,
+              includeStaffEnrichment: false,
+              includeExternalEnrichment: false,
+              includeTechnologyExtraction: true
+            }
+          },
           finalResult: enrichmentResult.data
         }
       };
     } else {
       return NextResponse.json(
-        { error: 'Invalid enrichment result structure' },
+        { error: 'Invalid enrichment result structure - missing company or contact data' },
         { status: 400 }
       );
     }

@@ -77,6 +77,22 @@ export async function POST(request: NextRequest) {
         scheduler.forceRefreshSchedules();
         return NextResponse.json({ success: true });
 
+      case 'reinitialize':
+        scheduler.forceReinitializeDefaultTasks();
+        return NextResponse.json({ success: true });
+
+      case 'ensure-enrichment-task':
+        try {
+          scheduler.ensureEnrichmentTaskExists();
+          return NextResponse.json({ success: true });
+        } catch (error) {
+          console.error('Failed to ensure enrichment task:', error);
+          return NextResponse.json(
+            { error: 'Failed to ensure enrichment task' },
+            { status: 500 }
+          );
+        }
+
       default:
         return NextResponse.json(
           { error: 'Invalid action' },

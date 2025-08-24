@@ -1,20 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
+import scheduler from '@/lib/scheduler';
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    console.log('🧪 Test enrichment endpoint called with:', body);
+    console.log('🧪 Testing enrichment processing...');
     
-    return NextResponse.json({
-      success: true,
-      message: 'Test endpoint received data',
-      received: body
-    });
+    // Test if the method exists and can be called
+    if (typeof scheduler.processCompletedEnrichmentJobs === 'function') {
+      console.log('✅ Method exists, calling it...');
+      await scheduler.processCompletedEnrichmentJobs();
+      return NextResponse.json({ success: true, message: 'Enrichment processing completed' });
+    } else {
+      console.log('❌ Method does not exist');
+      return NextResponse.json({ error: 'Method not found' }, { status: 404 });
+    }
   } catch (error) {
-    console.error('❌ Test enrichment endpoint error:', error);
-    return NextResponse.json({
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
-    }, { status: 500 });
+    console.error('❌ Error testing enrichment processing:', error);
+    return NextResponse.json(
+      { error: 'Failed to test enrichment processing', details: String(error) },
+      { status: 500 }
+    );
   }
 }

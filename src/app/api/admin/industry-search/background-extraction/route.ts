@@ -371,9 +371,10 @@ async function saveResultsToDirectory(results: any[], industry?: string, city?: 
       let savedCount = 0;
       for (const business of businessesToSave) {
         try {
-          await prisma.businessDirectory.create({
-            data: business
-          });
+          // TODO: Convert to Company table
+          // await prisma.businessDirectory.create({
+          //   data: business
+          // });
           savedCount++;
         } catch (error: any) {
           // Skip if it's a duplicate (unique constraint violation)
