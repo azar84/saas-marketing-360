@@ -19,8 +19,14 @@ export async function GET(request: NextRequest) {
     switch (field) {
       case 'city':
         const cityResults = await prisma.companyAddress.findMany({
-          where: {
-            city: { contains: query, not: null }
+          where: query ? {
+            city: { 
+              contains: query, 
+              mode: 'insensitive',
+              not: null 
+            }
+          } : {
+            city: { not: null }
           },
           select: { city: true },
           distinct: ['city'],
@@ -31,8 +37,14 @@ export async function GET(request: NextRequest) {
 
       case 'country':
         const countryResults = await prisma.companyAddress.findMany({
-          where: {
-            country: { contains: query, not: null }
+          where: query ? {
+            country: { 
+              contains: query, 
+              mode: 'insensitive',
+              not: null 
+            }
+          } : {
+            country: { not: null }
           },
           select: { country: true },
           distinct: ['country'],
@@ -75,8 +87,14 @@ export async function GET(request: NextRequest) {
 
       case 'stateProvince':
         const stateResults = await prisma.companyAddress.findMany({
-          where: {
-            stateProvince: { contains: query, not: null }
+          where: query ? {
+            stateProvince: { 
+              contains: query, 
+              mode: 'insensitive',
+              not: null 
+            }
+          } : {
+            stateProvince: { not: null }
           },
           select: { stateProvince: true },
           distinct: ['stateProvince'],

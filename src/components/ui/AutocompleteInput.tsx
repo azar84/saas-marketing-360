@@ -29,11 +29,11 @@ export const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
   const [recentSearches, setRecentSearches] = useState<string[]>([]);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-  // Fetch suggestions when input changes or when industry field is focused
+  // Fetch suggestions when input changes or when certain fields are focused
   useEffect(() => {
     const fetchSuggestions = async () => {
-      // For industry field, show all options if input is empty
-      if (field === 'industry' && (!inputValue.trim() || inputValue.length < 2)) {
+      // For industry, city, country fields, show all options if input is empty
+      if (['industry', 'city', 'country'].includes(field) && (!inputValue.trim() || inputValue.length < 2)) {
         setLoading(true);
         try {
           const response = await fetch(`/api/admin/companies/filter-options?field=${field}`);
@@ -42,7 +42,7 @@ export const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
             setSuggestions(data.data || []);
           }
         } catch (error) {
-          console.error('Error fetching all industries:', error);
+          console.error(`Error fetching all ${field}s:`, error);
           setSuggestions([]);
         } finally {
           setLoading(false);
@@ -82,15 +82,15 @@ export const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
     onChange(newValue);
     setIsOpen(true);
     
-    // For industry field, fetch all options if input is cleared
-    if (field === 'industry' && !newValue.trim()) {
-      fetchAllIndustries();
+    // For industry, city, country fields, fetch all options if input is cleared
+    if (['industry', 'city', 'country'].includes(field) && !newValue.trim()) {
+      fetchAllOptions();
     }
   };
 
-  // Fetch all industries for industry field
-  const fetchAllIndustries = async () => {
-    if (field !== 'industry') return;
+  // Fetch all options for industry, city, country fields
+  const fetchAllOptions = async () => {
+    if (!['industry', 'city', 'country'].includes(field)) return;
     
     setLoading(true);
     try {
@@ -100,7 +100,7 @@ export const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
         setSuggestions(data.data || []);
       }
     } catch (error) {
-      console.error('Error fetching all industries:', error);
+      console.error(`Error fetching all ${field}s:`, error);
       setSuggestions([]);
     } finally {
       setLoading(false);
@@ -158,9 +158,9 @@ export const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
           className="pl-10 pr-20"
           onFocus={() => {
             setIsOpen(true);
-            // For industry field, show all options when focused
-            if (field === 'industry' && !inputValue.trim()) {
-              fetchAllIndustries();
+            // For industry, city, country fields, show all options when focused
+            if (['industry', 'city', 'country'].includes(field) && !inputValue.trim()) {
+              fetchAllOptions();
             }
           }}
         />
@@ -196,9 +196,9 @@ export const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
             </div>
           ) : suggestions.length > 0 ? (
             <div>
-              {field === 'industry' && !inputValue.trim() && (
+              {['industry', 'city', 'country'].includes(field) && !inputValue.trim() && (
                 <div className="px-4 py-2 text-xs font-medium text-gray-500 border-b">
-                  All Available Industries
+                  All Available {field === 'industry' ? 'Industries' : field === 'city' ? 'Cities' : 'Countries'}
                 </div>
               )}
               {suggestions.map((suggestion, index) => (
@@ -215,7 +215,7 @@ export const AutocompleteInput: React.FC<AutocompleteInputProps> = ({
             <div className="px-4 py-2 text-sm text-gray-500">
               No suggestions found
             </div>
-          ) : recentSearches.length > 0 && !inputValue && field !== 'industry' ? (
+          ) : recentSearches.length > 0 && !inputValue && !['industry', 'city', 'country'].includes(field) ? (
             <div>
               <div className="px-4 py-2 text-xs font-medium text-gray-500 border-b">
                 Recent Searches
