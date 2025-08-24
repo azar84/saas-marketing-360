@@ -20,7 +20,14 @@ import {
   TrendingUp,
   Hash,
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  MoreHorizontal,
+  Download,
+  Upload,
+  Settings
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/Button';
@@ -163,6 +170,13 @@ export default function CompanyDirectoryManager() {
   const [hasContactsFilter, setHasContactsFilter] = useState(false);
   const [hasTechnologiesFilter, setHasTechnologiesFilter] = useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  
+  // Selection and pagination state
+  const [selectedCompanies, setSelectedCompanies] = useState<Set<number>>(new Set());
+  const [selectAll, setSelectAll] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [showBulkActions, setShowBulkActions] = useState(false);
 
   const loadCompanies = async () => {
     setLoading(true);
@@ -221,6 +235,12 @@ export default function CompanyDirectoryManager() {
       loadCompanies();
     }
   }, [industryFilter, servicesFilter, cityFilter, countryFilter, stateProvinceFilter, technologyFilter, hasAddressFilter, hasContactsFilter, hasTechnologiesFilter, filterActive]);
+
+  // Reset pagination and selection when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+    clearSelection();
+  }, [industryFilter, servicesFilter, cityFilter, countryFilter, stateProvinceFilter, technologyFilter, hasAddressFilter, hasContactsFilter, hasTechnologiesFilter, filterActive, searchTerm]);
 
   // Ensure companies is an array and never undefined
   const safeCompanies = companies && Array.isArray(companies) ? companies : [];
@@ -286,6 +306,139 @@ export default function CompanyDirectoryManager() {
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
+  };
+
+  // Selection and pagination functions
+  const handleSelectCompany = (companyId: number) => {
+    const newSelected = new Set(selectedCompanies);
+    if (newSelected.has(companyId)) {
+      newSelected.delete(companyId);
+    } else {
+      newSelected.add(companyId);
+    }
+    setSelectedCompanies(newSelected);
+    setSelectAll(newSelected.size === filteredCompanies.length);
+  };
+
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedCompanies(new Set());
+      setSelectAll(false);
+    } else {
+      setSelectedCompanies(new Set(filteredCompanies.map(c => c.id)));
+      setSelectAll(true);
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedCompanies(new Set());
+    setSelectAll(false);
+    setShowBulkActions(false);
+  };
+
+  // Pagination functions
+  const totalPages = Math.ceil(filteredCompanies.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedCompanies = filteredCompanies.slice(startIndex, endIndex);
+
+  const goToPage = (page: number) => {
+    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
+    }
+  };
+
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  // Bulk action functions
+  const handleBulkDelete = async () => {
+    if (!confirm(`Are you sure you want to delete ${selectedCompanies.size} companies? This action cannot be undone.`)) {
+      return;
+    }
+
+    try {
+      const deletePromises = Array.from(selectedCompanies).map(companyId =>
+        fetch(`/api/admin/companies/${companyId}`, { method: 'DELETE' })
+      );
+
+      const results = await Promise.all(deletePromises);
+      const successCount = results.filter(r => r.ok).length;
+
+      if (successCount > 0) {
+        setCompanies(Array.isArray(companies) ? companies.filter(c => !selectedCompanies.has(c.id)) : []);
+        setDeleteSuccess(`${successCount} companies deleted successfully`);
+        clearSelection();
+        
+        setTimeout(() => setDeleteSuccess(null), 3000);
+      }
+    } catch (error) {
+      console.error('Error during bulk delete:', error);
+    }
+  };
+
+  const handleBulkEnrich = async () => {
+    try {
+      const enrichPromises = Array.from(selectedCompanies).map(companyId => {
+        const company = Array.isArray(companies) ? companies.find(c => c.id === companyId) : null;
+        if (!company) return null;
+        
+        return fetch('/api/admin/enrichment/process', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            websiteUrl: company.website,
+            companyId: company.id
+          })
+        });
+      }).filter(Boolean);
+
+      const results = await Promise.all(enrichPromises);
+      const successCount = results.filter(r => r && r.ok).length;
+
+      if (successCount > 0) {
+        setDeleteSuccess(`${successCount} companies queued for enrichment`);
+        clearSelection();
+        
+        setTimeout(() => setDeleteSuccess(null), 3000);
+      }
+    } catch (error) {
+      console.error('Error during bulk enrich:', error);
+    }
+  };
+
+  const handleBulkExport = () => {
+    const selectedCompanyData = Array.isArray(companies) ? 
+      companies.filter(c => selectedCompanies.has(c.id)) : [];
+    
+    const csvData = [
+      ['Name', 'Website', 'City', 'State/Province', 'Country', 'Services', 'Industries'],
+      ...selectedCompanyData.map(company => [
+        company.name,
+        company.website,
+        company.addresses?.[0]?.city || '',
+        company.addresses?.[0]?.stateProvince || '',
+        company.addresses?.[0]?.country || '',
+        company.services?.map(s => s.name).join('; ') || '',
+        company.industries?.map(i => i.industry?.label).join('; ') || ''
+      ])
+    ];
+
+    const csvContent = csvData.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `companies-export-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
   };
 
   const getStatusColor = (status: string) => {
@@ -665,6 +818,64 @@ export default function CompanyDirectoryManager() {
         </div>
       )}
 
+      {/* Bulk Actions Toolbar */}
+      {selectedCompanies.size > 0 && (
+        <div className="px-8 py-3" style={{ backgroundColor: 'var(--color-warning-light)', borderTop: '1px solid var(--color-warning)', borderBottom: '1px solid var(--color-warning)' }}>
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <span className="text-sm font-medium" style={{ color: 'var(--color-warning-dark)' }}>
+                  {selectedCompanies.size} company{selectedCompanies.size !== 1 ? 'ies' : 'y'} selected
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={clearSelection}
+                  className="text-xs"
+                  style={{ color: 'var(--color-warning-dark)' }}
+                >
+                  Clear Selection
+                </Button>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleBulkExport}
+                  className="flex items-center gap-2"
+                  style={{ borderColor: 'var(--color-warning)', color: 'var(--color-warning-dark)' }}
+                >
+                  <Download className="h-4 w-4" />
+                  Export Selected
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleBulkEnrich}
+                  className="flex items-center gap-2"
+                  style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
+                >
+                  <Zap className="h-4 w-4" />
+                  Enrich Selected
+                </Button>
+                
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleBulkDelete}
+                  className="flex items-center gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Delete Selected
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Main Content */}
       <div className="px-8 py-8">
         <div className="max-w-7xl mx-auto">
@@ -685,12 +896,120 @@ export default function CompanyDirectoryManager() {
             </div>
           ) : (
             <div className="space-y-6">
-                              {Array.isArray(filteredCompanies) && filteredCompanies.map((company) => (
+              {/* Select All and Pagination Controls */}
+              <div className="flex items-center justify-between p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={selectAll}
+                      onChange={handleSelectAll}
+                      className="w-4 h-4 rounded border-2 cursor-pointer"
+                      style={{ 
+                        borderColor: 'var(--color-gray-light)',
+                        backgroundColor: selectAll ? 'var(--color-primary)' : 'transparent'
+                      }}
+                    />
+                    <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                      Select All
+                    </span>
+                  </div>
+                  
+                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                    {selectedCompanies.size} of {filteredCompanies.length} selected
+                  </span>
+                </div>
+                
+                {/* Pagination Controls */}
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  
+                  <div className="flex items-center space-x-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={goToPreviousPage}
+                      disabled={currentPage === 1}
+                      className="px-2 py-1"
+                    >
+                      <ChevronLeft className="h-3 w-3" />
+                    </Button>
+                    
+                    {/* Page Numbers */}
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
+                      if (pageNum > totalPages) return null;
+                      
+                      return (
+                        <Button
+                          key={pageNum}
+                          variant={pageNum === currentPage ? "primary" : "outline"}
+                          size="sm"
+                          onClick={() => goToPage(pageNum)}
+                          className="px-3 py-1 min-w-[2rem]"
+                        >
+                          {pageNum}
+                        </Button>
+                      );
+                    })}
+                    
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={goToNextPage}
+                      disabled={currentPage === totalPages}
+                      className="px-2 py-1"
+                    >
+                      <ChevronRight className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  
+                  {/* Items Per Page */}
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                      Show:
+                    </span>
+                    <select
+                      value={itemsPerPage}
+                      onChange={(e) => {
+                        setItemsPerPage(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      className="px-2 py-1 text-sm border rounded"
+                      style={{ borderColor: 'var(--color-gray-light)' }}
+                    >
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Company Cards */}
+              {paginatedCompanies.map((company) => (
                 <Card key={company.id} className="overflow-hidden" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
                   <div className="p-6">
                     {/* Company Header */}
                     <div className="flex items-start justify-between mb-4">
                       <div className="flex items-center gap-4">
+                        {/* Selection Checkbox */}
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedCompanies.has(company.id)}
+                            onChange={() => handleSelectCompany(company.id)}
+                            className="w-4 h-4 rounded border-2 cursor-pointer"
+                            style={{ 
+                              borderColor: 'var(--color-gray-light)',
+                              backgroundColor: selectedCompanies.has(company.id) ? 'var(--color-primary)' : 'transparent'
+                            }}
+                          />
+                        </div>
+                        
                         <div 
                           className="w-12 h-12 rounded-lg flex items-center justify-center"
                           style={{ backgroundColor: 'var(--color-primary)' }}
@@ -1172,6 +1491,35 @@ export default function CompanyDirectoryManager() {
                   </div>
                 </Card>
               ))}
+              
+              {/* Bottom Pagination */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-center space-x-2 pt-4">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToPreviousPage}
+                    disabled={currentPage === 1}
+                  >
+                    <ChevronLeft className="h-4 w-4 mr-1" />
+                    Previous
+                  </Button>
+                  
+                  <span className="text-sm px-4" style={{ color: 'var(--color-text-muted)' }}>
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={goToNextPage}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                    <ChevronRight className="h-4 w-4 ml-1" />
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </div>
