@@ -141,6 +141,7 @@ export default function CompanyDirectoryManager() {
   const { get } = useAdminApi();
   
   const [companies, setCompanies] = useState<Company[]>([]);
+  
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterActive, setFilterActive] = useState(true);
@@ -214,13 +215,13 @@ export default function CompanyDirectoryManager() {
 
   // Reload companies when filters change
   useEffect(() => {
-    if (Array.isArray(companies) && companies.length > 0) { // Only reload if we already have companies loaded
+    if (companies && Array.isArray(companies) && companies.length > 0) { // Only reload if we already have companies loaded
       loadCompanies();
     }
   }, [industryFilter, servicesFilter, cityFilter, countryFilter, stateProvinceFilter, technologyFilter, hasAddressFilter, hasContactsFilter, hasTechnologiesFilter, filterActive]);
 
-  // Ensure companies is an array
-  const safeCompanies = Array.isArray(companies) ? companies : [];
+  // Ensure companies is an array and never undefined
+  const safeCompanies = companies && Array.isArray(companies) ? companies : [];
   
   // Debug logging
   console.log('Companies state:', companies);
@@ -705,7 +706,7 @@ export default function CompanyDirectoryManager() {
             </div>
           ) : (
             <div className="space-y-6">
-              {filteredCompanies.map((company) => (
+                              {Array.isArray(filteredCompanies) && filteredCompanies.map((company) => (
                 <Card key={company.id} className="overflow-hidden" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
                   <div className="p-6">
                     {/* Company Header */}
@@ -796,7 +797,7 @@ export default function CompanyDirectoryManager() {
                           </a>
                         </div>
                         
-                        {company.addresses.length > 0 && (
+                        {company.addresses && Array.isArray(company.addresses) && company.addresses.length > 0 && (
                           <div className="flex items-center gap-2 text-sm">
                             <MapPin className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                             <span style={{ color: 'var(--color-text-secondary)' }}>
@@ -860,7 +861,7 @@ export default function CompanyDirectoryManager() {
                       <div className="mb-4">
                         <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>Services</h4>
                         <div className="flex flex-wrap gap-2">
-                          {company.services.slice(0, 3).map((service) => (
+                          {company.services && Array.isArray(company.services) && company.services.slice(0, 3).map((service) => (
                             <Badge
                               key={service.id}
                               variant={service.isPrimary ? "success" : "outline"}
@@ -871,7 +872,7 @@ export default function CompanyDirectoryManager() {
                               {service.isPrimary && ' (Primary)'}
                             </Badge>
                           ))}
-                          {company.services.length > 3 && (
+                          {company.services && Array.isArray(company.services) && company.services.length > 3 && (
                             <Badge variant="outline" size="sm" className="text-xs">
                               +{company.services.length - 3} more
                             </Badge>
@@ -885,7 +886,7 @@ export default function CompanyDirectoryManager() {
                       <div className="mb-4">
                         <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>Key Staff</h4>
                         <div className="space-y-2">
-                          {company.staff.slice(0, 2).map((staff) => (
+                          {company.staff && Array.isArray(company.staff) && company.staff.slice(0, 2).map((staff) => (
                             <div key={staff.id} className="flex items-center gap-3 text-sm p-3 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
                               <Users className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                               <div className="flex-1">
@@ -908,7 +909,7 @@ export default function CompanyDirectoryManager() {
                               </div>
                             </div>
                           ))}
-                          {company.staff.length > 2 && (
+                          {company.staff && Array.isArray(company.staff) && company.staff.length > 2 && (
                             <div className="text-xs text-center py-1" style={{ color: 'var(--color-text-muted)' }}>
                               +{company.staff.length - 2} more staff members
                             </div>
@@ -937,11 +938,11 @@ export default function CompanyDirectoryManager() {
                         </div>
                       )}
                       
-                      {company.urls.length > 0 && (
+                                              {company.urls && Array.isArray(company.urls) && company.urls.length > 0 && (
                         <div className="flex items-center gap-2">
                           <Globe className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                           <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
-                            {company.urls.length} URLs Discovered
+                            {company.urls && Array.isArray(company.urls) ? company.urls.length : 0} URLs Discovered
                           </span>
                         </div>
                       )}
@@ -956,7 +957,7 @@ export default function CompanyDirectoryManager() {
                           <div>
                             <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Industries</h4>
                             <div className="flex flex-wrap gap-2">
-                              {company.industries.map((relation) => (
+                              {company.industries && Array.isArray(company.industries) && company.industries.map((relation) => (
                                 <Badge
                                   key={relation.id}
                                   variant={relation.isPrimary ? "success" : "outline"}
@@ -976,7 +977,7 @@ export default function CompanyDirectoryManager() {
                           <div>
                             <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Addresses</h4>
                             <div className="space-y-3">
-                              {company.addresses.map((address) => (
+                              {company.addresses && Array.isArray(company.addresses) && company.addresses.map((address) => (
                                 <div key={address.id} className="p-3 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
                                   <div className="flex items-center gap-2 mb-2">
                                     <MapPin className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
@@ -1031,7 +1032,7 @@ export default function CompanyDirectoryManager() {
                                 <div>
                                   <h5 className="text-xs font-medium mb-2" style={{ color: 'var(--color-text-muted)' }}>Phone Numbers</h5>
                                   <div className="space-y-2">
-                                    {company.contacts.filter(c => c.type === 'phone').map((contact) => (
+                                    {company.contacts && Array.isArray(company.contacts) && company.contacts.filter(c => c.type === 'phone').map((contact) => (
                                       <div key={contact.id} className="flex items-center gap-3 text-sm p-2 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
                                         <Phone className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                                         <div className="flex-1">
@@ -1063,7 +1064,7 @@ export default function CompanyDirectoryManager() {
                                 <div>
                                   <h5 className="text-xs font-medium mb-2" style={{ color: 'var(--color-text-muted)' }}>Email Addresses</h5>
                                   <div className="space-y-2">
-                                    {company.contacts.filter(c => c.type === 'email').map((contact) => (
+                                    {company.contacts && Array.isArray(company.contacts) && company.contacts.filter(c => c.type === 'email').map((contact) => (
                                       <div key={contact.id} className="flex items-center gap-3 text-sm p-2 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
                                         <Mail className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                                         <div className="flex-1">
@@ -1098,7 +1099,7 @@ export default function CompanyDirectoryManager() {
                           <div>
                             <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Technologies</h4>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-                              {company.technologies.map((tech) => (
+                              {company.technologies && Array.isArray(company.technologies) && company.technologies.map((tech) => (
                                 <div key={tech.id} className="text-sm p-3 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
                                   <div className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
                                     {tech.name}
@@ -1124,7 +1125,7 @@ export default function CompanyDirectoryManager() {
                           <div>
                             <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Social Media</h4>
                             <div className="space-y-2">
-                              {company.socials.map((social) => (
+                              {company.socials && Array.isArray(company.socials) && company.socials.map((social) => (
                                 <div key={social.id} className="flex items-center gap-3 text-sm">
                                   <Badge variant="outline" size="sm" className="capitalize">
                                     {social.platform}
@@ -1152,11 +1153,11 @@ export default function CompanyDirectoryManager() {
                         )}
 
                         {/* URLs */}
-                        {company.urls.length > 0 && (
+                        {company.urls && Array.isArray(company.urls) && company.urls.length > 0 && (
                           <div>
-                            <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Discovered URLs ({company.urls.length})</h4>
+                                                          <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Discovered URLs ({company.urls && Array.isArray(company.urls) ? company.urls.length : 0})</h4>
                             <div className="space-y-1">
-                              {company.urls.slice(0, 8).map((url) => (
+                              {company.urls && Array.isArray(company.urls) && company.urls.slice(0, 8).map((url) => (
                                 <div key={url.id} className="flex items-center gap-2 text-xs p-2 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
                                   <div 
                                     className="w-2 h-2 rounded-full flex-shrink-0"
@@ -1177,7 +1178,7 @@ export default function CompanyDirectoryManager() {
                                   </Badge>
                                 </div>
                               ))}
-                              {company.urls.length > 8 && (
+                              {company.urls && Array.isArray(company.urls) && company.urls.length > 8 && (
                                 <div className="text-xs py-1" style={{ color: 'var(--color-text-muted)' }}>
                                   ... and {company.urls.length - 8} more URLs
                                 </div>
