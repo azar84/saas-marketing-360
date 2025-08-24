@@ -49,6 +49,13 @@ export default function JobsManager() {
     loadJobs();
   }, []);
 
+  // Process any existing completed enrichment jobs that haven't been processed yet
+  useEffect(() => {
+    if (jobs.length > 0) {
+      processExistingCompletedEnrichmentJobs();
+    }
+  }, [jobs]);
+
   // Poll incomplete jobs every 5 seconds
   useEffect(() => {
     const interval = setInterval(() => {
@@ -67,6 +74,47 @@ export default function JobsManager() {
       await loadJobsFromDatabase();
     } catch (error) {
       console.error('Failed to load jobs:', error);
+    }
+  };
+
+  const processExistingCompletedEnrichmentJobs = async () => {
+    try {
+      const completedEnrichmentJobs = jobs.filter(job => 
+        job.type === 'basic-enrichment' && 
+        job.status === 'completed' && 
+        job.result && 
+        !job.result.processed // Check if already processed
+      );
+      
+      if (completedEnrichmentJobs.length === 0) {
+        return;
+      }
+      
+      console.log(`🔄 Processing ${completedEnrichmentJobs.length} existing completed enrichment jobs`);
+      
+      for (const job of completedEnrichmentJobs) {
+        try {
+          // Pass the full enrichment result structure that the API expects
+          const fullEnrichmentResult = {
+            data: job.result,
+            metadata: {
+              websiteUrl: job.metadata?.websiteUrl || 'unknown'
+            }
+          };
+          
+          await processEnrichmentResult(fullEnrichmentResult, job.id);
+          
+          // Mark as processed to avoid reprocessing
+          await updateJobStatus(job.id, {
+            result: { ...job.result, processed: true }
+          });
+          
+        } catch (error) {
+          console.error(`❌ Failed to process existing enrichment job ${job.id}:`, error);
+        }
+      }
+    } catch (error) {
+      console.error('❌ Error processing existing completed enrichment jobs:', error);
     }
   };
 
@@ -114,7 +162,14 @@ export default function JobsManager() {
                 
                 // Process enrichment result and save to business directory if this is a basic enrichment job
                 if (job.type === 'basic-enrichment' && externalData.result) {
-                  await processEnrichmentResult(externalData.result, job.id);
+                  // Pass the full enrichment result structure that the API expects
+                  const fullEnrichmentResult = {
+                    data: externalData.result,
+                    metadata: {
+                      websiteUrl: job.metadata?.websiteUrl || 'unknown'
+                    }
+                  };
+                  await processEnrichmentResult(fullEnrichmentResult, job.id);
                 }
               } else if (externalData.status && externalData.status !== job.status) {
                 await updateJobStatus(job.id, {
