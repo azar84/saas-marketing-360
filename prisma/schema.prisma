@@ -1375,8 +1375,24 @@ model Industry {
   business_industries business_industries[]
   companies           CompanyIndustryRelation[]
   keywords            Keyword[]
+  subIndustries      SubIndustry[]
 
   @@map("industries")
+}
+
+model SubIndustry {
+  id          Int      @id @default(autoincrement())
+  name        String
+  industryId  Int
+  industry    Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([name, industryId])
+  @@index([industryId])
+  @@index([isActive])
+  @@map("sub_industries")
 }
 
 model Keyword {
