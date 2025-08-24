@@ -2,6 +2,24 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+/**
+ * Normalizes a URL to prevent duplicates with slight variations
+ * @param url The URL to normalize
+ * @returns Normalized URL string
+ */
+function normalizeWebsiteUrl(url: string): string {
+  if (!url) return '';
+  
+  return url
+    .toLowerCase()
+    .trim()
+    .replace(/^https?:\/\//, '') // Remove http:// or https://
+    .replace(/^www\./, '') // Remove www.
+    .replace(/\/$/, '') // Remove trailing slash
+    .split('?')[0] // Remove query parameters
+    .split('#')[0]; // Remove hash fragments
+}
+
 export interface EnrichmentResult {
   data: {
     input: {
@@ -131,9 +149,16 @@ export class BusinessDirectoryUpdater {
       // Extract business data from the enrichment result
       const businessData = this.extractBusinessData(finalResult);
 
-      // Check if business already exists
-      const existingBusiness = await prisma.company.findUnique({
-        where: { website: websiteUrl }
+      // Check if business already exists (using normalized URL to prevent duplicates)
+      const normalizedWebsite = normalizeWebsiteUrl(websiteUrl);
+      const existingBusiness = await prisma.company.findFirst({
+        where: {
+          OR: [
+            { website: websiteUrl }, // Exact match
+            { website: { contains: normalizedWebsite } }, // Contains normalized version
+            { baseUrl: { contains: normalizedWebsite } } // Check baseUrl as well
+          ]
+        }
       });
 
       let business;
@@ -143,7 +168,7 @@ export class BusinessDirectoryUpdater {
       if (existingBusiness) {
         // Update existing business
         business = await prisma.company.update({
-          where: { website: websiteUrl },
+          where: { id: existingBusiness.id }, // Use ID for more reliable updates
           data: {
             name: businessData.name,
             description: businessData.description,
@@ -154,6 +179,7 @@ export class BusinessDirectoryUpdater {
           }
         });
         updated = true;
+        console.log(`🔄 Updated existing company: ${business.name} (ID: ${business.id})`);
       } else {
         // Create new business
         business = await prisma.company.create({
@@ -166,6 +192,7 @@ export class BusinessDirectoryUpdater {
           }
         });
         created = true;
+        console.log(`✅ Created new company: ${business.name} (ID: ${business.id})`);
       }
 
       // Process contact persons from finalResult only

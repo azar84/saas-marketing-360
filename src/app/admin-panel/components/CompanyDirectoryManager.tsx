@@ -183,7 +183,10 @@ export default function CompanyDirectoryManager() {
       
       const response = await get(endpoint);
       if (response && typeof response === 'object' && 'success' in response && response.success) {
-        setCompanies((response as any).data || []);
+        const companiesData = (response as any).data;
+        setCompanies(Array.isArray(companiesData) ? companiesData : []);
+      } else {
+        setCompanies([]);
       }
     } catch (error) {
       console.error('Failed to load companies:', error);
@@ -192,6 +195,8 @@ export default function CompanyDirectoryManager() {
         const fallbackResponse = await get('/api/admin/companies/all');
         if (fallbackResponse) {
           setCompanies(Array.isArray(fallbackResponse) ? fallbackResponse : []);
+        } else {
+          setCompanies([]);
         }
       } catch (fallbackError) {
         console.error('Fallback failed:', fallbackError);
@@ -209,27 +214,36 @@ export default function CompanyDirectoryManager() {
 
   // Reload companies when filters change
   useEffect(() => {
-    if (companies.length > 0) { // Only reload if we already have companies loaded
+    if (Array.isArray(companies) && companies.length > 0) { // Only reload if we already have companies loaded
       loadCompanies();
     }
   }, [industryFilter, servicesFilter, cityFilter, countryFilter, stateProvinceFilter, technologyFilter, hasAddressFilter, hasContactsFilter, hasTechnologiesFilter, filterActive]);
 
+  // Ensure companies is an array
+  const safeCompanies = Array.isArray(companies) ? companies : [];
+  
+  // Debug logging
+  console.log('Companies state:', companies);
+  console.log('Safe companies:', safeCompanies);
+  
   // Filter companies based on search and active status
-  const filteredCompanies = companies.filter(company => {
+  const filteredCompanies = safeCompanies.filter(company => {
+    if (!company) return false;
+    
     const matchesSearch = !searchTerm || 
-      company.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      company.website.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      company.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      company.website?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       company.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      company.addresses.some(addr => 
-        addr.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        addr.country?.toLowerCase().includes(searchTerm.toLowerCase())
-      ) ||
-      company.industries.some(ind => 
-        ind.industry.label.toLowerCase().includes(searchTerm.toLowerCase())
-      ) ||
-      company.services.some(service => 
-        service.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+      (company.addresses && Array.isArray(company.addresses) && company.addresses.some(addr => 
+        addr?.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        addr?.country?.toLowerCase().includes(searchTerm.toLowerCase())
+      )) ||
+      (company.industries && Array.isArray(company.industries) && company.industries.some(ind => 
+        ind?.industry?.label?.toLowerCase().includes(searchTerm.toLowerCase())
+      )) ||
+      (company.services && Array.isArray(company.services) && company.services.some(service => 
+        service?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+      ));
     
     return matchesSearch;
   });
@@ -245,8 +259,8 @@ export default function CompanyDirectoryManager() {
       });
       
       if (response.ok) {
-        const companyName = companies.find(c => c.id === companyId)?.name || 'Company';
-        setCompanies(companies.filter(c => c.id !== companyId));
+        const companyName = Array.isArray(companies) ? companies.find(c => c.id === companyId)?.name || 'Company' : 'Company';
+        setCompanies(Array.isArray(companies) ? companies.filter(c => c.id !== companyId) : []);
         setDeleteConfirm(null);
         setDeleteSuccess(`${companyName} deleted successfully`);
         
@@ -624,7 +638,7 @@ export default function CompanyDirectoryManager() {
       </div>
 
       {/* Search Results Summary */}
-      {!loading && filteredCompanies.length > 0 && (
+      {!loading && Array.isArray(filteredCompanies) && filteredCompanies.length > 0 && (
         <div className="px-8 py-4" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-between">
@@ -634,7 +648,7 @@ export default function CompanyDirectoryManager() {
                 </span>
                 {(searchTerm || industryFilter || servicesFilter || cityFilter || countryFilter || stateProvinceFilter || technologyFilter || hasAddressFilter || hasContactsFilter || hasTechnologiesFilter) && (
                   <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                    (filtered from {companies.length} total)
+                    (filtered from {safeCompanies.length} total)
                   </span>
                 )}
               </div>
@@ -679,7 +693,7 @@ export default function CompanyDirectoryManager() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 mx-auto mb-4" style={{ borderColor: 'var(--color-primary)' }}></div>
               <p className="text-lg" style={{ color: 'var(--color-text-secondary)' }}>Loading companies...</p>
             </div>
-          ) : filteredCompanies.length === 0 ? (
+          ) : Array.isArray(filteredCompanies) && filteredCompanies.length === 0 ? (
             <div className="text-center py-16">
               <div className="w-24 h-24 mx-auto mb-6 rounded-full flex items-center justify-center" style={{ backgroundColor: 'var(--color-gray-light)' }}>
                 <Building className="h-12 w-12" style={{ color: 'var(--color-text-muted)' }} />
@@ -801,7 +815,7 @@ export default function CompanyDirectoryManager() {
                       
                       <div className="space-y-2">
                         {/* Show primary email if available */}
-                        {company.contacts.filter(c => c.type === 'email' && c.isPrimary)[0] && (
+                        {company.contacts && Array.isArray(company.contacts) && company.contacts.filter(c => c.type === 'email' && c.isPrimary)[0] && (
                           <div className="flex items-center gap-2 text-sm">
                             <Mail className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                             <span style={{ color: 'var(--color-text-secondary)' }}>
@@ -811,7 +825,7 @@ export default function CompanyDirectoryManager() {
                         )}
                         
                         {/* Show primary phone if available */}
-                        {company.contacts.filter(c => c.type === 'phone' && c.isPrimary)[0] && (
+                        {company.contacts && Array.isArray(company.contacts) && company.contacts.filter(c => c.type === 'phone' && c.isPrimary)[0] && (
                           <div className="flex items-center gap-2 text-sm">
                             <Phone className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                             <span style={{ color: 'var(--color-text-secondary)' }}>
@@ -824,7 +838,7 @@ export default function CompanyDirectoryManager() {
                         )}
                         
                         {/* Show contact count if multiple contacts */}
-                        {(company.contacts.filter(c => c.type === 'email').length > 1 || company.contacts.filter(c => c.type === 'phone').length > 1) && (
+                        {company.contacts && Array.isArray(company.contacts) && (company.contacts.filter(c => c.type === 'email').length > 1 || company.contacts.filter(c => c.type === 'phone').length > 1) && (
                           <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
                             {company.contacts.filter(c => c.type === 'email').length + company.contacts.filter(c => c.type === 'phone').length} total contacts
                           </div>
@@ -842,7 +856,7 @@ export default function CompanyDirectoryManager() {
                     )}
 
                     {/* Services */}
-                    {company.services.length > 0 && (
+                    {company.services && Array.isArray(company.services) && company.services.length > 0 && (
                       <div className="mb-4">
                         <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>Services</h4>
                         <div className="flex flex-wrap gap-2">
@@ -867,7 +881,7 @@ export default function CompanyDirectoryManager() {
                     )}
 
                     {/* Staff */}
-                    {company.staff.length > 0 && (
+                    {company.staff && Array.isArray(company.staff) && company.staff.length > 0 && (
                       <div className="mb-4">
                         <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>Key Staff</h4>
                         <div className="space-y-2">
@@ -905,7 +919,7 @@ export default function CompanyDirectoryManager() {
 
                     {/* Quick Stats */}
                     <div className="flex flex-wrap gap-4 mb-4">
-                      {company.industries.length > 0 && (
+                                              {company.industries && Array.isArray(company.industries) && company.industries.length > 0 && (
                         <div className="flex items-center gap-2">
                           <Hash className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                           <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
@@ -914,7 +928,7 @@ export default function CompanyDirectoryManager() {
                         </div>
                       )}
                       
-                      {company.technologies.length > 0 && (
+                                              {company.technologies && Array.isArray(company.technologies) && company.technologies.length > 0 && (
                         <div className="flex items-center gap-2">
                           <Zap className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                           <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
@@ -938,7 +952,7 @@ export default function CompanyDirectoryManager() {
                       <div className="border-t pt-6 mt-6 space-y-6" style={{ borderColor: 'var(--color-gray-light)' }}>
                         
                         {/* Industries */}
-                        {company.industries.length > 0 && (
+                        {company.industries && Array.isArray(company.industries) && company.industries.length > 0 && (
                           <div>
                             <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Industries</h4>
                             <div className="flex flex-wrap gap-2">
@@ -958,7 +972,7 @@ export default function CompanyDirectoryManager() {
                         )}
 
                         {/* Addresses */}
-                        {company.addresses.length > 0 && (
+                        {company.addresses && Array.isArray(company.addresses) && company.addresses.length > 0 && (
                           <div>
                             <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Addresses</h4>
                             <div className="space-y-3">
@@ -1008,12 +1022,12 @@ export default function CompanyDirectoryManager() {
                         )}
 
                         {/* Contact Information */}
-                        {company.contacts.length > 0 && (
+                        {company.contacts && Array.isArray(company.contacts) && company.contacts.length > 0 && (
                           <div>
                             <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Contact Information</h4>
                             <div className="space-y-3">
                               {/* Phone Numbers */}
-                              {company.contacts.filter(c => c.type === 'phone').length > 0 && (
+                              {company.contacts && Array.isArray(company.contacts) && company.contacts.filter(c => c.type === 'phone').length > 0 && (
                                 <div>
                                   <h5 className="text-xs font-medium mb-2" style={{ color: 'var(--color-text-muted)' }}>Phone Numbers</h5>
                                   <div className="space-y-2">
@@ -1045,7 +1059,7 @@ export default function CompanyDirectoryManager() {
                               )}
                               
                               {/* Email Addresses */}
-                              {company.contacts.filter(c => c.type === 'email').length > 0 && (
+                              {company.contacts && Array.isArray(company.contacts) && company.contacts.filter(c => c.type === 'email').length > 0 && (
                                 <div>
                                   <h5 className="text-xs font-medium mb-2" style={{ color: 'var(--color-text-muted)' }}>Email Addresses</h5>
                                   <div className="space-y-2">
@@ -1080,7 +1094,7 @@ export default function CompanyDirectoryManager() {
                         )}
 
                         {/* Technologies */}
-                        {company.technologies.length > 0 && (
+                        {company.technologies && Array.isArray(company.technologies) && company.technologies.length > 0 && (
                           <div>
                             <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Technologies</h4>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
@@ -1106,7 +1120,7 @@ export default function CompanyDirectoryManager() {
                         )}
 
                         {/* Social Media */}
-                        {company.socials.length > 0 && (
+                        {company.socials && Array.isArray(company.socials) && company.socials.length > 0 && (
                           <div>
                             <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Social Media</h4>
                             <div className="space-y-2">
