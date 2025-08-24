@@ -25,18 +25,28 @@ function verifyToken(token: string) {
 
 export function middleware(request: NextRequest) {
   console.log('🔒 Middleware executing for:', request.nextUrl.pathname);
+  console.log('🔒 Middleware URL:', request.url);
+  console.log('🔒 Middleware method:', request.method);
   
   // Handle admin panel authentication
   if (request.nextUrl.pathname.startsWith('/admin-panel')) {
+    console.log('🔒 Admin panel route detected:', request.nextUrl.pathname);
+    
     // Skip auth for login and reset password pages
     if (request.nextUrl.pathname === '/admin-panel/login' || 
         request.nextUrl.pathname === '/admin-panel/reset-password') {
+      console.log('🔒 Skipping auth for login/reset page');
       return NextResponse.next();
     }
 
     // Check for JWT token in cookies or headers
-    const token = request.cookies.get('adminToken')?.value || 
-                  request.headers.get('authorization')?.replace('Bearer ', '');
+    const cookieToken = request.cookies.get('adminToken')?.value;
+    const headerToken = request.headers.get('authorization')?.replace('Bearer ', '');
+    const token = cookieToken || headerToken;
+    
+    console.log('🔒 Token found in cookie:', !!cookieToken);
+    console.log('🔒 Token found in header:', !!headerToken);
+    console.log('🔒 Final token:', !!token);
 
     if (!token) {
       console.log('🔐 No token found - redirecting to login');
@@ -46,9 +56,13 @@ export function middleware(request: NextRequest) {
     const decoded = verifyToken(token);
     if (!decoded) {
       console.log('🔐 Invalid token - redirecting to login');
-      return NextResponse.redirect(new URL('/admin-panel/login', request.url));
+      // Clear invalid token cookie if present
+      const response = NextResponse.redirect(new URL('/admin-panel/login', request.url));
+      response.cookies.delete('adminToken');
+      return response;
     }
 
+    console.log('🔐 Valid token found for user:', decoded.username);
     // Add user info to request for API routes
     (request as AuthenticatedRequest).user = decoded;
   }
@@ -70,7 +84,7 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Match all request paths except for the ones starting with:
+     * Match admin panel routes and other page routes, but exclude:
      * - api (API routes)
      * - _next/static (static files)
      * - _next/image (image optimization files)
@@ -78,6 +92,7 @@ export const config = {
      * - robots.txt (robots file)
      * - sitemap.xml (sitemap files)
      */
+    '/admin-panel/:path*',
     '/((?!api|_next/static|_next/image|favicon.ico|robots.txt|sitemap|uploads).*)',
   ],
 }; 

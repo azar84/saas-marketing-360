@@ -36,23 +36,22 @@ export function useAuth() {
             setUser(fresh?.user || fresh);
             localStorage.setItem('adminUser', JSON.stringify(fresh?.user || fresh));
             return;
+          } else {
+            // Token is invalid, clear it
+            console.log('🔑 useAuth: Invalid token, clearing');
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('adminUser');
+            setUser(null);
           }
         }
-        // Fallback to localStorage if present
-        if (userData) {
+        // Fallback to localStorage if present and no token
+        if (userData && !token) {
           const parsedUser = JSON.parse(userData);
           setUser(parsedUser);
           return;
         }
-        // Final fallback: mock
-        const mockUser: User = {
-          id: 1,
-          username: 'admin',
-          email: 'admin@test.com',
-          role: 'admin',
-          name: 'Test Admin'
-        };
-        setUser(mockUser);
+        // No valid authentication found
+        setUser(null);
       } catch (error) {
         console.error('useAuth bootstrap error:', error);
         localStorage.removeItem('adminToken');
@@ -81,8 +80,13 @@ export function useAuth() {
       const data = await response.json();
 
       if (response.ok) {
+        // Store token in both localStorage and cookies for middleware access
         localStorage.setItem('adminToken', data.token);
         localStorage.setItem('adminUser', JSON.stringify(data.user));
+        
+        // Also set cookie for middleware authentication
+        document.cookie = `adminToken=${data.token}; path=/; max-age=${24 * 60 * 60}; secure; samesite=strict`;
+        
         setUser(data.user);
         return true;
       } else {
@@ -104,6 +108,8 @@ export function useAuth() {
     } finally {
       localStorage.removeItem('adminToken');
       localStorage.removeItem('adminUser');
+      // Also clear the cookie
+      document.cookie = 'adminToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
       setUser(null);
       router.push('/admin-panel/login');
     }

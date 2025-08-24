@@ -228,26 +228,33 @@ export default function CompanyDirectoryManager() {
   console.log('Safe companies:', safeCompanies);
   
   // Filter companies based on search and active status
-  const filteredCompanies = safeCompanies.filter(company => {
-    if (!company) return false;
-    
-    const matchesSearch = !searchTerm || 
-      company.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      company.website?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      company.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (company.addresses && Array.isArray(company.addresses) && company.addresses.some(addr => 
-        addr?.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        addr?.country?.toLowerCase().includes(searchTerm.toLowerCase())
-      )) ||
-      (company.industries && Array.isArray(company.industries) && company.industries.some(ind => 
-        ind?.industry?.label?.toLowerCase().includes(searchTerm.toLowerCase())
-      )) ||
-      (company.services && Array.isArray(company.services) && company.services.some(service => 
-        service?.name?.toLowerCase().includes(searchTerm.toLowerCase())
-      ));
-    
-    return matchesSearch;
-  });
+  let filteredCompanies: Company[] = [];
+  try {
+    filteredCompanies = safeCompanies.filter((company: Company) => {
+      if (!company) return false;
+      
+      const matchesSearch = !searchTerm || 
+        company.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        company.website?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        company.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (company.addresses && Array.isArray(company.addresses) && company.addresses.some(addr => 
+          addr?.city?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          addr?.country?.toLowerCase().includes(searchTerm.toLowerCase())
+        )) ||
+        (company.industries && Array.isArray(company.industries) && company.industries.some(ind => 
+          ind?.industry?.label?.toLowerCase().includes(searchTerm.toLowerCase())
+        )) ||
+        (company.services && Array.isArray(company.services) && company.services.some(service => 
+          service?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        ));
+      
+      return matchesSearch;
+    });
+  } catch (error) {
+    console.error('Error filtering companies:', error);
+    console.error('Companies data:', safeCompanies);
+    filteredCompanies = [];
+  }
 
   const handleToggleExpanded = (companyId: number) => {
     setExpandedCompany(expandedCompany === companyId ? null : companyId);
@@ -605,7 +612,7 @@ export default function CompanyDirectoryManager() {
                 <div>
                   <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Enriched</p>
                   <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
-                    {filteredCompanies.filter(c => c.enrichments.length > 0).length}
+                                            {filteredCompanies.filter(c => c.enrichments && Array.isArray(c.enrichments) && c.enrichments.length > 0).length}
                   </p>
                 </div>
               </div>
@@ -617,7 +624,7 @@ export default function CompanyDirectoryManager() {
                 <div>
                   <p className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>With Technologies</p>
                   <p className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
-                    {filteredCompanies.filter(c => c.technologies.length > 0).length}
+                                            {filteredCompanies.filter(c => c.technologies && Array.isArray(c.technologies) && c.technologies.length > 0).length}
                   </p>
                 </div>
               </div>
@@ -820,7 +827,7 @@ export default function CompanyDirectoryManager() {
                           <div className="flex items-center gap-2 text-sm">
                             <Mail className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                             <span style={{ color: 'var(--color-text-secondary)' }}>
-                              {company.contacts.filter(c => c.type === 'email' && c.isPrimary)[0].value}
+                              {company.contacts && Array.isArray(company.contacts) && company.contacts.filter(c => c.type === 'email' && c.isPrimary)[0]?.value}
                             </span>
                           </div>
                         )}
@@ -830,9 +837,9 @@ export default function CompanyDirectoryManager() {
                           <div className="flex items-center gap-2 text-sm">
                             <Phone className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                             <span style={{ color: 'var(--color-text-secondary)' }}>
-                              {company.contacts.filter(c => c.type === 'phone' && c.isPrimary)[0].value}
-                              {company.contacts.filter(c => c.type === 'phone' && c.isPrimary)[0].label && 
-                                ` (${company.contacts.filter(c => c.type === 'phone' && c.isPrimary)[0].label})`
+                                                            {company.contacts && Array.isArray(company.contacts) && company.contacts.filter(c => c.type === 'phone' && c.isPrimary)[0]?.value}
+                              {company.contacts && Array.isArray(company.contacts) && company.contacts.filter(c => c.type === 'phone' && c.isPrimary)[0]?.label &&
+                                ` (${company.contacts && Array.isArray(company.contacts) && company.contacts.filter(c => c.type === 'phone' && c.isPrimary)[0]?.label})`
                               }
                             </span>
                           </div>
@@ -841,7 +848,7 @@ export default function CompanyDirectoryManager() {
                         {/* Show contact count if multiple contacts */}
                         {company.contacts && Array.isArray(company.contacts) && (company.contacts.filter(c => c.type === 'email').length > 1 || company.contacts.filter(c => c.type === 'phone').length > 1) && (
                           <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
-                            {company.contacts.filter(c => c.type === 'email').length + company.contacts.filter(c => c.type === 'phone').length} total contacts
+                            {(company.contacts && Array.isArray(company.contacts) ? company.contacts.filter(c => c.type === 'email').length : 0) + (company.contacts && Array.isArray(company.contacts) ? company.contacts.filter(c => c.type === 'phone').length : 0)} total contacts
                           </div>
                         )}
                       </div>
@@ -1028,7 +1035,7 @@ export default function CompanyDirectoryManager() {
                             <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Contact Information</h4>
                             <div className="space-y-3">
                               {/* Phone Numbers */}
-                              {company.contacts && Array.isArray(company.contacts) && company.contacts.filter(c => c.type === 'phone').length > 0 && (
+                              {company.contacts && Array.isArray(company.contacts) && (company.contacts.filter(c => c.type === 'phone') || []).length > 0 && (
                                 <div>
                                   <h5 className="text-xs font-medium mb-2" style={{ color: 'var(--color-text-muted)' }}>Phone Numbers</h5>
                                   <div className="space-y-2">
@@ -1060,7 +1067,7 @@ export default function CompanyDirectoryManager() {
                               )}
                               
                               {/* Email Addresses */}
-                              {company.contacts && Array.isArray(company.contacts) && company.contacts.filter(c => c.type === 'email').length > 0 && (
+                              {company.contacts && Array.isArray(company.contacts) && (company.contacts.filter(c => c.type === 'email') || []).length > 0 && (
                                 <div>
                                   <h5 className="text-xs font-medium mb-2" style={{ color: 'var(--color-text-muted)' }}>Email Addresses</h5>
                                   <div className="space-y-2">
