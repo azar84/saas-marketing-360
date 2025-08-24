@@ -29,6 +29,7 @@ import { Badge } from '@/components/ui/Badge';
 import { Card } from '@/components/ui/Card';
 import { AutocompleteInput } from '@/components/ui/AutocompleteInput';
 import { useAdminApi } from '@/hooks/useApi';
+import { getCountryDisplayName, getStateProvinceDisplayName } from '@/lib/utils/locationNormalizer';
 
 interface Company {
   id: number;
@@ -780,12 +781,12 @@ export default function CompanyDirectoryManager() {
                             <MapPin className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                             <span style={{ color: 'var(--color-text-secondary)' }}>
                               {company.addresses[0].city && company.addresses[0].stateProvince && company.addresses[0].country
-                                ? `${company.addresses[0].city}, ${company.addresses[0].stateProvince}, ${company.addresses[0].country}`
+                                ? `${company.addresses[0].city}, ${getStateProvinceDisplayName(company.addresses[0].stateProvince || null, company.addresses[0].country || null)}, ${getCountryDisplayName(company.addresses[0].country || null)}`
                                 : company.addresses[0].city && company.addresses[0].stateProvince
-                                ? `${company.addresses[0].city}, ${company.addresses[0].stateProvince}`
+                                ? `${company.addresses[0].city}, ${getStateProvinceDisplayName(company.addresses[0].stateProvince || null, company.addresses[0].country || null)}`
                                 : company.addresses[0].city && company.addresses[0].country
-                                ? `${company.addresses[0].city}, ${company.addresses[0].country}`
-                                : company.addresses[0].city || company.addresses[0].country || 'Address available'
+                                ? `${company.addresses[0].city}, ${getCountryDisplayName(company.addresses[0].country || null)}`
+                                : company.addresses[0].city || getCountryDisplayName(company.addresses[0].country || null) || 'Address available'
                               }
                             </span>
                           </div>
@@ -984,12 +985,12 @@ export default function CompanyDirectoryManager() {
                                       )}
                                       <div>
                                         {address.city && address.stateProvince && address.zipPostalCode
-                                          ? `${address.city}, ${address.stateProvince} ${address.zipPostalCode}`
+                                          ? `${address.city}, ${getStateProvinceDisplayName(address.stateProvince || null, address.country || null)} ${address.zipPostalCode}`
                                           : address.city && address.stateProvince
-                                          ? `${address.city}, ${address.stateProvince}`
+                                          ? `${address.city}, ${getStateProvinceDisplayName(address.stateProvince || null, address.country || null)}`
                                           : address.city && address.country
-                                          ? `${address.city}, ${address.country}`
-                                          : address.city || address.country || 'Address available'
+                                          ? `${address.city}, ${getCountryDisplayName(address.country || null)}`
+                                          : address.city || getCountryDisplayName(address.country || null) || 'Address available'
                                         }
                                       </div>
                                     </div>

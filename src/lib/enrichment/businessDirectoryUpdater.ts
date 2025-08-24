@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import { getCountryStoredValue, getStateProvinceStoredValue } from '@/lib/utils/locationNormalizer';
 
 const prisma = new PrismaClient();
 
@@ -615,6 +616,10 @@ export class BusinessDirectoryUpdater {
           });
 
           if (!existing) {
+            // Normalize country and state/province to full names for consistency
+            const normalizedCountry = getCountryStoredValue(address.country);
+            const normalizedStateProvince = getStateProvinceStoredValue(address.stateProvince, normalizedCountry);
+            
             await prisma.companyAddress.create({
               data: {
                 companyId: companyId,
@@ -623,8 +628,8 @@ export class BusinessDirectoryUpdater {
                 streetAddress: address.streetAddress || null,
                 addressLine2: address.addressLine2 || null,
                 city: address.city || null,
-                stateProvince: address.stateProvince || null,
-                country: address.country || null,
+                stateProvince: normalizedStateProvince,
+                country: normalizedCountry,
                 zipPostalCode: address.zipPostalCode || null,
                 isPrimary: address.type === 'headquarters' || address.type === 'corporate office'
               }
