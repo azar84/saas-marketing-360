@@ -778,10 +778,15 @@ class AppScheduler {
             await this.syncKeywordsToIndustry(job.metadata?.industry, externalData.result);
           }
           
-          // Note: Enrichment results are now processed by the JobsManager component
-          // through the /api/admin/enrichment/process endpoint
+          // Process enrichment results automatically when they complete
           if (job.type === 'basic-enrichment' && externalData.result) {
-            console.log(`✅ Enrichment job ${job.id} completed with results - processing handled by JobsManager`);
+            console.log(`✅ Enrichment job ${job.id} completed with results - processing automatically`);
+            try {
+              await this.processEnrichmentResult(job.id, externalData.result);
+              console.log(`✅ Successfully processed enrichment result for job ${job.id}`);
+            } catch (error) {
+              console.error(`❌ Failed to process enrichment result for job ${job.id}:`, error);
+            }
           }
         } else if (externalData.status && externalData.status !== job.status) {
           console.log(`🔄 Job ${job.id} status changed from ${job.status} to ${externalData.status}`);
@@ -913,6 +918,56 @@ class AppScheduler {
       }
     } catch (error) {
       console.error('❌ Error processing completed enrichment jobs:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Process enrichment result and save to database
+   */
+  private async processEnrichmentResult(jobId: string, enrichmentResult: any): Promise<void> {
+    try {
+      console.log(`🔄 Processing enrichment result for job ${jobId}`);
+      
+      // Call the enrichment processing API
+      const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+      const response = await fetch(`${baseUrl}/api/admin/enrichment/process`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          enrichmentResult: {
+            data: enrichmentResult,
+            metadata: {
+              websiteUrl: enrichmentResult.metadata?.baseUrl || 'unknown'
+            }
+          }
+        })
+      });
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      const result = await response.json();
+      
+      if (result.success) {
+        console.log(`✅ Successfully processed enrichment result for job ${jobId}:`, {
+          businessId: result.businessId,
+          created: result.created,
+          updated: result.updated
+        });
+        
+        // Mark the job as processed
+        await this.updateJobAsProcessed(jobId);
+      } else {
+        throw new Error(result.error || 'Unknown error from enrichment processing API');
+      }
+      
+    } catch (error) {
+      console.error(`❌ Failed to process enrichment result for job ${jobId}:`, error);
       throw error;
     }
   }

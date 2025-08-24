@@ -96,7 +96,7 @@ export default function JobsManager() {
         try {
           // Pass the full enrichment result structure that the API expects
           const fullEnrichmentResult = {
-            data: job.result,
+            data: job.result.data, // Extract the actual enrichment data
             metadata: {
               websiteUrl: job.metadata?.websiteUrl || 'unknown'
             }

@@ -16,6 +16,11 @@ export async function GET(request: NextRequest) {
     const services = searchParams.get('services') || undefined;
     const city = searchParams.get('city') || undefined;
     const country = searchParams.get('country') || undefined;
+    const stateProvince = searchParams.get('stateProvince') || undefined;
+    const technology = searchParams.get('technology') || undefined;
+    const hasAddress = searchParams.get('hasAddress') === 'true';
+    const hasContacts = searchParams.get('hasContacts') === 'true';
+    const hasTechnologies = searchParams.get('hasTechnologies') === 'true';
     const isActive = searchParams.get('isActive') !== 'false'; // Default to true
     
     const skip = (page - 1) * limit;
@@ -70,6 +75,40 @@ export async function GET(request: NextRequest) {
         some: {
           country: { contains: country, mode: 'insensitive' }
         }
+      };
+    }
+
+    if (stateProvince) {
+      where.addresses = {
+        some: {
+          stateProvince: { contains: stateProvince, mode: 'insensitive' }
+        }
+      };
+    }
+
+    if (technology) {
+      where.technologies = {
+        some: {
+          name: { contains: technology, mode: 'insensitive' }
+        }
+      };
+    }
+
+    if (hasAddress) {
+      where.addresses = {
+        some: {}
+      };
+    }
+
+    if (hasContacts) {
+      where.contacts = {
+        some: { isActive: true }
+      };
+    }
+
+    if (hasTechnologies) {
+      where.technologies = {
+        some: { isActive: true }
       };
     }
 

@@ -69,6 +69,33 @@ export async function GET(request: NextRequest) {
         results = serviceResults.map(r => r.name);
         break;
 
+      case 'stateProvince':
+        const stateResults = await prisma.companyAddress.findMany({
+          where: {
+            stateProvince: { contains: query, not: null }
+          },
+          select: { stateProvince: true },
+          distinct: ['stateProvince'],
+          orderBy: { stateProvince: 'asc' }
+        });
+        results = stateResults.map(r => r.stateProvince!).filter(Boolean);
+        break;
+
+      case 'technology':
+        const techResults = await prisma.companyTechnology.findMany({
+          where: {
+            name: { 
+              contains: query.toLowerCase().trim()
+            },
+            isActive: true
+          },
+          select: { name: true },
+          distinct: ['name'],
+          orderBy: { name: 'asc' }
+        });
+        results = techResults.map(r => r.name);
+        break;
+
       default:
         return NextResponse.json(
           { error: 'Invalid field parameter' },

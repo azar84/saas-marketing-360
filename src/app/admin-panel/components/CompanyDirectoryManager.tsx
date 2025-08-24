@@ -154,6 +154,11 @@ export default function CompanyDirectoryManager() {
   const [servicesFilter, setServicesFilter] = useState('');
   const [cityFilter, setCityFilter] = useState('');
   const [countryFilter, setCountryFilter] = useState('');
+  const [stateProvinceFilter, setStateProvinceFilter] = useState('');
+  const [technologyFilter, setTechnologyFilter] = useState('');
+  const [hasAddressFilter, setHasAddressFilter] = useState(false);
+  const [hasContactsFilter, setHasContactsFilter] = useState(false);
+  const [hasTechnologiesFilter, setHasTechnologiesFilter] = useState(false);
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
 
   const loadCompanies = async () => {
@@ -166,6 +171,11 @@ export default function CompanyDirectoryManager() {
       if (servicesFilter) params.append('services', servicesFilter);
       if (cityFilter) params.append('city', cityFilter);
       if (countryFilter) params.append('country', countryFilter);
+      if (stateProvinceFilter) params.append('stateProvince', stateProvinceFilter);
+      if (technologyFilter) params.append('technology', technologyFilter);
+      if (hasAddressFilter) params.append('hasAddress', 'true');
+      if (hasContactsFilter) params.append('hasContacts', 'true');
+      if (hasTechnologiesFilter) params.append('hasTechnologies', 'true');
       if (!filterActive) params.append('isActive', 'false');
       
       const queryString = params.toString();
@@ -202,7 +212,7 @@ export default function CompanyDirectoryManager() {
     if (companies.length > 0) { // Only reload if we already have companies loaded
       loadCompanies();
     }
-  }, [industryFilter, servicesFilter, cityFilter, countryFilter, filterActive]);
+  }, [industryFilter, servicesFilter, cityFilter, countryFilter, stateProvinceFilter, technologyFilter, hasAddressFilter, hasContactsFilter, hasTechnologiesFilter, filterActive]);
 
   // Filter companies based on search and active status
   const filteredCompanies = companies.filter(company => {
@@ -368,7 +378,7 @@ export default function CompanyDirectoryManager() {
               {showAdvancedFilters ? 'Hide' : 'Show'} Advanced Filters
             </Button>
             
-            {(industryFilter || servicesFilter || cityFilter || countryFilter) && (
+            {(industryFilter || servicesFilter || cityFilter || countryFilter || stateProvinceFilter || technologyFilter || hasAddressFilter || hasContactsFilter || hasTechnologiesFilter) && (
               <Button
                 variant="outline"
                 size="sm"
@@ -377,6 +387,11 @@ export default function CompanyDirectoryManager() {
                   setServicesFilter('');
                   setCityFilter('');
                   setCountryFilter('');
+                  setStateProvinceFilter('');
+                  setTechnologyFilter('');
+                  setHasAddressFilter(false);
+                  setHasContactsFilter(false);
+                  setHasTechnologiesFilter(false);
                 }}
                 className="text-red-600 hover:text-red-700"
               >
@@ -458,6 +473,96 @@ export default function CompanyDirectoryManager() {
                   }}
                 />
               </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+                  State/Province
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Filter by state/province..."
+                  value={stateProvinceFilter}
+                  onChange={(e) => setStateProvinceFilter(e.target.value)}
+                  className="h-10"
+                  style={{ 
+                    backgroundColor: 'var(--color-bg-primary)',
+                    borderColor: 'var(--color-gray-light)',
+                    color: 'var(--color-text-primary)'
+                  }}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+                  Technology
+                </label>
+                <Input
+                  type="text"
+                  placeholder="Filter by technology..."
+                  value={technologyFilter}
+                  onChange={(e) => setTechnologyFilter(e.target.value)}
+                  className="h-10"
+                  style={{ 
+                    backgroundColor: 'var(--color-bg-primary)',
+                    borderColor: 'var(--color-gray-light)',
+                    color: 'var(--color-text-primary)'
+                  }}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+                  Has Address
+                </label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="hasAddress"
+                    checked={hasAddressFilter}
+                    onChange={(e) => setHasAddressFilter(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <label htmlFor="hasAddress" className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                    Companies with addresses
+                  </label>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+                  Has Contacts
+                </label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="hasContacts"
+                    checked={hasContactsFilter}
+                    onChange={(e) => setHasContactsFilter(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <label htmlFor="hasContacts" className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                    Companies with contact info
+                  </label>
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--color-text-secondary)' }}>
+                  Has Technologies
+                </label>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="hasTechnologies"
+                    checked={hasTechnologiesFilter}
+                    onChange={(e) => setHasTechnologiesFilter(e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <label htmlFor="hasTechnologies" className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                    Companies with tech stack
+                  </label>
+                </div>
+              </div>
             </div>
           )}
         </div>
@@ -517,6 +622,54 @@ export default function CompanyDirectoryManager() {
           </div>
         </div>
       </div>
+
+      {/* Search Results Summary */}
+      {!loading && filteredCompanies.length > 0 && (
+        <div className="px-8 py-4" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                  Showing <strong>{filteredCompanies.length}</strong> companies
+                </span>
+                {(searchTerm || industryFilter || servicesFilter || cityFilter || countryFilter || stateProvinceFilter || technologyFilter || hasAddressFilter || hasContactsFilter || hasTechnologiesFilter) && (
+                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                    (filtered from {companies.length} total)
+                  </span>
+                )}
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    // TODO: Implement CSV export
+                    console.log('Export CSV functionality to be implemented');
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Database className="h-4 w-4" />
+                  Export CSV
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    // TODO: Implement search history
+                    console.log('Search history functionality to be implemented');
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <Calendar className="h-4 w-4" />
+                  Search History
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Main Content */}
       <div className="px-8 py-8">
