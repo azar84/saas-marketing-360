@@ -159,6 +159,8 @@ interface EnhancedSearchResponse {
     resultsStored: number;
     queriesStored: number;
   };
+  // Add database flag
+  fromDatabase?: boolean;
 }
 
 interface SearchFilters {
@@ -745,7 +747,7 @@ export default function IndustrySearchManager() {
         queries: generatedQueries,
         location: selectedCity?.name,
         city: selectedCity?.name,
-        industry: searchMode === 'industry' ? selectedIndustry?.label : undefined,
+        industry: searchMode === 'industry' ? selectedIndustry?.title : undefined,
         page: page,
         resultsLimit: config.resultsLimit
       };
@@ -774,7 +776,8 @@ export default function IndustrySearchManager() {
           queriesProcessed: dbData.queriesProcessed,
           successfulQueries: dbData.successfulQueries,
           fromDatabase: true,
-          traceability: dbData.traceability
+          traceability: dbData.traceability,
+          queryResults: {} // Empty object for database results
         };
         
         // Process the database results (same logic as live search)
@@ -793,8 +796,8 @@ export default function IndustrySearchManager() {
         setResultsFromDatabase(true); // Mark results as from database
         
         // Store traceability session ID for pagination
-        if (data.traceability?.searchSessionId) {
-          setTraceabilitySessionId(data.traceability.searchSessionId);
+        if (data.traceability?.sessionId) {
+          setTraceabilitySessionId(data.traceability.sessionId);
         }
         
         console.log(`✅ Database search completed for page ${page} - ${enhancedResults.length} results`);
@@ -819,7 +822,7 @@ export default function IndustrySearchManager() {
         // Provide location context so server can forward to external API
         location: selectedCity?.name,
         // Add context for better session matching
-        industry: searchMode === 'industry' ? selectedIndustry?.label : undefined,
+        industry: searchMode === 'industry' ? selectedIndustry?.title : undefined,
         city: selectedCity?.name
       };
 
@@ -1119,21 +1122,59 @@ export default function IndustrySearchManager() {
     });
   };
 
-  const selectAllPages = () => {
-    // This would select all results across all pages
-    // For now, we'll select current page and show a message about all pages
-    const currentPageUrls = new Set(searchResults.map(result => result.url));
-    setSelectedResults(prev => {
-      const newSet = new Set(prev);
-      currentPageUrls.forEach(url => newSet.add(url));
-      return newSet;
-    });
-    
-    addNotification({
-      type: 'info',
-      title: 'Current Page Selected',
-      message: 'Selected all results on current page. Navigate through pages to select more results.',
-    });
+  const selectAllPages = async () => {
+    if (!traceabilitySessionId) {
+      addNotification({
+        type: 'error',
+        title: 'No Search Session',
+        message: 'Please perform a search first to select all pages.',
+      });
+      return;
+    }
+
+    try {
+      // Fetch all results from the current search session
+      const response = await fetch('/api/admin/search-engine/search-from-db', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          queries: generatedQueries,
+          location: selectedCity?.name,
+          city: selectedCity?.name,
+          industry: searchMode === 'industry' ? selectedIndustry?.title : undefined,
+          page: 1,
+          resultsLimit: 1000 // Large limit to get all results
+        })
+      });
+
+      const data = await response.json();
+      
+      if (data.success && data.results) {
+        // Get all URLs from all results
+        const allUrls = new Set<string>(data.results.map((result: any) => result.url as string));
+        
+        setSelectedResults(prev => {
+          const newSet = new Set(prev);
+          allUrls.forEach(url => newSet.add(url));
+          return newSet;
+        });
+        
+        addNotification({
+          type: 'success',
+          title: 'All Pages Selected',
+          message: `Selected ${allUrls.size} results from all pages in the current search session.`,
+        });
+      } else {
+        throw new Error(data.error || 'Failed to fetch all results');
+      }
+    } catch (error) {
+      console.error('Error selecting all pages:', error);
+      addNotification({
+        type: 'error',
+        title: 'Selection Failed',
+        message: 'Failed to select all pages. Please try again.',
+      });
+    }
   };
 
   const deselectAllResults = () => {

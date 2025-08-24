@@ -118,6 +118,17 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
   const [editingKeywordText, setEditingKeywordText] = useState('');
   const [addingNewKeyword, setAddingNewKeyword] = useState(false);
   const [newKeywordText, setNewKeywordText] = useState('');
+
+  // Detailed view state
+  const [expandedIndustryId, setExpandedIndustryId] = useState<number | null>(null);
+  const [industryDetails, setIndustryDetails] = useState<{
+    subIndustries: any[];
+    keywords: any[];
+    companies: any[];
+    totalKeywords: number;
+    totalCompanies: number;
+  } | null>(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
   
 
 
@@ -181,6 +192,83 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
     }
   };
 
+  const fetchIndustryDetails = async (industryId: number) => {
+    if (expandedIndustryId === industryId && industryDetails) {
+      // Already loaded, just toggle
+      setExpandedIndustryId(null);
+      setIndustryDetails(null);
+      return;
+    }
+
+    setLoadingDetails(true);
+    try {
+      // Get the industry title from the items array
+      const industry = items.find(item => item.id === industryId);
+      if (!industry) {
+        throw new Error('Industry not found');
+      }
+
+      console.log('🔍 Fetching details for industry:', industry.title);
+      console.log('🔍 Industry ID:', industryId);
+
+      // Use the existing API endpoints that work with industry names
+      // The API expects the industry label, which maps to the title field
+      const keywordsRes = await fetch(`/api/admin/industries/${encodeURIComponent(industry.title)}/keywords`);
+      
+      if (!keywordsRes.ok) {
+        throw new Error(`API request failed: ${keywordsRes.status}`);
+      }
+      
+      const keywordsData = await keywordsRes.json();
+      console.log('🔑 Keywords API response:', keywordsData);
+      
+      // Debug: Let's also check what the actual industry data looks like
+      console.log('🏢 Industry item from state:', industry);
+      console.log('🔑 Keywords data structure:', keywordsData);
+      
+      // Now fetch sub-industries from the new API
+      console.log('🏭 Fetching sub-industries...');
+      const subIndustriesRes = await fetch(`/api/admin/industries/${encodeURIComponent(industry.title)}/sub-industries`);
+      let subIndustriesData = { success: false, data: [] };
+      
+      if (subIndustriesRes.ok) {
+        subIndustriesData = await subIndustriesRes.json();
+        console.log('🏭 Sub-industries API response:', subIndustriesData);
+      } else {
+        console.log('🏭 Sub-industries API failed:', subIndustriesRes.status);
+      }
+      
+      // Now fetch businesses from the new API
+      console.log('🏢 Fetching businesses...');
+      const businessesRes = await fetch(`/api/admin/industries/${encodeURIComponent(industry.title)}/businesses`);
+      let businessesData: { success: boolean; data: any[]; total?: number } = { success: false, data: [] };
+      
+      if (businessesRes.ok) {
+        businessesData = await businessesRes.json();
+        console.log('🏢 Businesses API response:', businessesData);
+      } else {
+        console.log('🏢 Businesses API failed:', businessesRes.status);
+      }
+      
+      // Set the industry details with actual data
+      setIndustryDetails({
+        subIndustries: subIndustriesData.success ? subIndustriesData.data : [],
+        keywords: keywordsData.success ? keywordsData.keywords : [],
+        companies: businessesData.success ? businessesData.data : [],
+        totalKeywords: keywordsData.success ? keywordsData.totalKeywords : 0,
+        totalCompanies: businessesData.success ? (businessesData.total || businessesData.data.length) : 0
+      });
+      
+      setExpandedIndustryId(industryId);
+    } catch (error) {
+      console.error('❌ Failed to fetch industry details:', error);
+      // Show error to user
+      alert(`Failed to fetch industry details: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
   const deleteIndustry = async (id: number) => {
     if (!confirm('Are you sure you want to delete this industry? This action cannot be undone.')) {
       return;
@@ -227,9 +315,11 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
     setKeywords(null);
     setSuccessMessage(''); // Clear any previous success message
     
+    let tempJobId: string | null = null;
+    
     try {
       // Optimistically show spinner immediately
-      const tempJobId = `temp:${Date.now()}:${title}`;
+      tempJobId = `temp:${Date.now()}:${title}`;
       addJob({
         id: tempJobId,
         type: 'keyword-generation' as any,
@@ -299,7 +389,9 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
     } catch (error) {
       console.error('Job submission failed:', error);
       // Clean up optimistic job if present
-      try { removeJob(tempJobId); } catch {}
+      if (tempJobId) {
+        try { removeJob(tempJobId); } catch {}
+      }
       setGenError(error instanceof Error ? error.message : 'Unknown error occurred');
       if (onResult) onResult({ industry: title, error: error instanceof Error ? error.message : 'Unknown error occurred' });
     }
@@ -609,6 +701,24 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={async () => {
+              try {
+                const res = await fetch('/api/admin/industries/debug');
+                const data = await res.json();
+                console.log('Debug data:', data);
+                alert(`Debug info loaded! Check console for details.\n\nTotal keywords: ${data.data.totalKeywords}\nIndustries with keywords: ${data.data.industries.filter((i: any) => i._count.keywords > 0).length}`);
+              } catch (error) {
+                console.error('Debug failed:', error);
+                alert('Debug failed: ' + error);
+              }
+            }}
+            className="flex items-center gap-2"
+          >
+            🐛 Debug DB
+          </Button>
           {isLoading && (
             <div className="flex items-center gap-3 px-4 py-2 rounded-lg" style={{ 
               backgroundColor: 'var(--color-bg-secondary)',
@@ -899,6 +1009,19 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                         </Button>
                         <Button
                           variant="outline"
+                          onClick={() => fetchIndustryDetails(item.id)}
+                          size="sm"
+                          disabled={loadingDetails}
+                        >
+                          {loadingDetails && expandedIndustryId === item.id ? (
+                            <RefreshCw className="h-4 w-4 animate-spin mr-1" />
+                          ) : (
+                            <Eye className="h-4 w-4 mr-1" />
+                          )}
+                          {expandedIndustryId === item.id ? 'Hide Details' : 'View Details'}
+                        </Button>
+                        <Button
+                          variant="outline"
                           onClick={() => setShowDeleteConfirm(item.id)}
                           disabled={deletingId === item.id}
                           size="sm"
@@ -950,6 +1073,140 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
             </table>
           </div>
         </Card>
+      )}
+
+      {/* Industry Details Modal */}
+      {expandedIndustryId && industryDetails && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="p-6 border-b" style={{ borderColor: 'var(--color-gray-light)' }}>
+              <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold" style={{ color: 'var(--color-text-primary)' }}>
+                  Industry Details
+                </h2>
+                <button
+                  onClick={() => {
+                    setExpandedIndustryId(null);
+                    setIndustryDetails(null);
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              {/* Sub-Industries Section */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>
+                  Sub-Industries ({industryDetails.subIndustries.length})
+                </h3>
+                {industryDetails.subIndustries.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {industryDetails.subIndustries.map((subIndustry, idx) => (
+                      <div 
+                        key={subIndustry.id} 
+                        className="p-3 rounded-lg border"
+                        style={{ 
+                          backgroundColor: 'var(--color-bg-secondary)',
+                          borderColor: 'var(--color-gray-light)'
+                        }}
+                      >
+                        <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                          {subIndustry.name}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                    No sub-industries found for this industry. This might mean the industry doesn't have specialized categories defined yet.
+                  </p>
+                )}
+              </div>
+
+              {/* Keywords Section */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>
+                  Keywords ({industryDetails.totalKeywords})
+                </h3>
+                {industryDetails.keywords.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {industryDetails.keywords.map((keyword, idx) => (
+                      <div 
+                        key={keyword.id} 
+                        className="p-3 rounded-lg border"
+                        style={{ 
+                          backgroundColor: 'var(--color-bg-secondary)',
+                          borderColor: 'var(--color-gray-light)'
+                        }}
+                      >
+                        <span className="text-sm" style={{ color: 'var(--color-text-primary)' }}>
+                          {keyword.searchTerm}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                    No keywords generated for this industry yet. Use the "Generate Keywords" button to create them.
+                  </p>
+                )}
+              </div>
+
+              {/* Businesses Section */}
+              <div>
+                <h3 className="text-lg font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>
+                  Associated Companies ({industryDetails.totalCompanies})
+                </h3>
+                {industryDetails.companies.length > 0 ? (
+                  <div className="space-y-2">
+                    {industryDetails.companies.map((company, idx) => (
+                      <div 
+                        key={company.id} 
+                        className="p-3 rounded-lg border"
+                        style={{ 
+                          backgroundColor: 'var(--color-bg-secondary)',
+                          borderColor: 'var(--color-gray-light)'
+                        }}
+                      >
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                            {company.companyName || company.website}
+                          </span>
+                          {company.isPrimary && (
+                            <span 
+                              className="px-2 py-1 text-xs rounded-full"
+                              style={{ 
+                                backgroundColor: 'var(--color-primary-light)',
+                                color: 'var(--color-primary)'
+                              }}
+                            >
+                              Primary
+                            </span>
+                          )}
+                        </div>
+                        {company.description && (
+                          <p className="text-sm mt-1" style={{ color: 'var(--color-text-secondary)' }}>
+                            {company.description}
+                          </p>
+                        )}
+                        <p className="text-sm mt-1" style={{ color: 'var(--color-text-muted)' }}>
+                          {company.website}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                    No companies are currently associated with this industry. Companies can be linked to industries through the company management system.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       )}
 
       {items.length === 0 && !isLoading && (

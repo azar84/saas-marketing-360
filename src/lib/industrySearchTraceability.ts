@@ -325,7 +325,7 @@ export class IndustrySearchTraceability {
             include: {
               llmProcessing: {
                 include: {
-                  savedBusiness: true,
+                  // Note: savedBusiness relation removed with business_directory system
                 },
               },
             },
@@ -336,7 +336,7 @@ export class IndustrySearchTraceability {
               llmResults: {
                 include: {
                   searchResult: true,
-                  savedBusiness: true,
+                  // Note: savedBusiness relation removed with business_directory system
                 },
               },
             },

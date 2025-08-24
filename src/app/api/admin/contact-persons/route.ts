@@ -35,13 +35,6 @@ export async function GET(request: NextRequest) {
     // Get paginated results
     const contactPersons = await prisma.contactPerson.findMany({
       where,
-      include: {
-        _count: {
-          select: {
-            business_directory: true
-          }
-        }
-      },
       orderBy: { createdAt: 'desc' },
       skip,
       take: limit

@@ -100,7 +100,10 @@ export async function POST() {
     let inserted = 0;
     const batchSize = 200;
     for (let i = 0; i < labels.length; i += batchSize) {
-      const batch = labels.slice(i, i + batchSize).map((label) => ({ label }));
+      const batch = labels.slice(i, i + batchSize).map((label) => ({ 
+        label,
+        code: label.substring(0, 4).toUpperCase()
+      }));
       await prisma.industry.createMany({ data: batch });
       inserted += batch.length;
     }

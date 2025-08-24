@@ -16,10 +16,11 @@ export async function GET(
       );
     }
 
-    console.log('Retrieving keywords for industry:', industry);
-    console.log('Industry parameter received:', { industry, type: typeof industry });
+    console.log('🔍 Keywords API called for industry:', industry);
+    console.log('🔍 Industry parameter received:', { industry, type: typeof industry });
 
     // Find the industry - try both exact match and case-insensitive
+    console.log('🔍 Looking for industry with exact label match...');
     let industryRecord = await prisma.industry.findUnique({
       where: { label: industry },
       include: {
@@ -30,9 +31,11 @@ export async function GET(
       }
     });
 
+    console.log('🔍 Exact match result:', industryRecord ? `Found ID ${industryRecord.id}` : 'Not found');
+
     // If not found, try case-insensitive search
     if (!industryRecord) {
-      console.log('Exact match not found, trying case-insensitive search for:', industry);
+      console.log('🔍 Exact match not found, trying case-insensitive search for:', industry);
       industryRecord = await prisma.industry.findFirst({
         where: { 
           label: { 
@@ -46,15 +49,28 @@ export async function GET(
           }
         }
       });
+      console.log('🔍 Case-insensitive search result:', industryRecord ? `Found ID ${industryRecord.id}` : 'Not found');
     }
 
     // Debug: List all industries if still not found
     if (!industryRecord) {
-      console.log('Industry still not found, listing all available industries:');
+      console.log('🔍 Industry still not found, listing all available industries:');
       const allIndustries = await prisma.industry.findMany({
         select: { id: true, label: true }
       });
-      console.log('Available industries:', allIndustries);
+      console.log('🔍 Available industries:', allIndustries);
+      
+      // Let's also check if there are any keywords at all
+      const totalKeywords = await prisma.keyword.count();
+      console.log('🔍 Total keywords in database:', totalKeywords);
+      
+      if (totalKeywords > 0) {
+        const sampleKeywords = await prisma.keyword.findMany({
+          select: { id: true, searchTerm: true, industryId: true },
+          take: 5
+        });
+        console.log('🔍 Sample keywords:', sampleKeywords);
+      }
     }
 
     if (!industryRecord) {

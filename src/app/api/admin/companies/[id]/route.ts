@@ -5,10 +5,11 @@ const prisma = new PrismaClient();
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id } = await params;
   try {
-    const companyId = parseInt(params.id);
+    const companyId = parseInt(id);
     
     if (isNaN(companyId)) {
       return NextResponse.json(

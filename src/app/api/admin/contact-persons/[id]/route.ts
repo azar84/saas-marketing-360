@@ -18,18 +18,7 @@ export async function GET(
     }
 
     const contactPerson = await prisma.contactPerson.findUnique({
-      where: { id: contactId },
-      include: {
-        business_directory: {
-          select: {
-            id: true,
-            website: true,
-            companyName: true,
-            city: true,
-            stateProvince: true
-          }
-        }
-      }
+      where: { id: contactId }
     });
 
     if (!contactPerson) {
@@ -138,14 +127,7 @@ export async function DELETE(
 
     // Check if contact person exists
     const existingContactPerson = await prisma.contactPerson.findUnique({
-      where: { id: contactId },
-      include: {
-        _count: {
-          select: {
-            business_directory: true
-          }
-        }
-      }
+      where: { id: contactId }
     });
 
     if (!existingContactPerson) {
@@ -155,16 +137,8 @@ export async function DELETE(
       );
     }
 
-    // Check if contact person is associated with any businesses
-    if (existingContactPerson._count.business_directory > 0) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: 'Cannot delete contact person. They are associated with business directory entries.' 
-        },
-        { status: 400 }
-      );
-    }
+    // Note: Contact persons are no longer directly associated with companies in the new system
+    // They can be safely deleted
 
     // Delete contact person
     await prisma.contactPerson.delete({

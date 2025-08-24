@@ -21,7 +21,10 @@ export async function POST(request: NextRequest) {
     }
 
     const pageNumber = Math.max(parseInt(page) || 1, 1);
-    const limit = Math.min(Math.max(parseInt(resultsLimit) || 10, 1), 50);
+    const limit = Math.min(Math.max(parseInt(resultsLimit) || 10, 1), 1000);
+    
+    // Check if this is a request for all results (select all pages)
+    const isSelectAllPages = resultsLimit >= 1000;
 
     console.log('🔍 Searching database for existing results:', {
       queries,
@@ -71,23 +74,41 @@ export async function POST(request: NextRequest) {
 
     console.log(`✅ Found existing search session: ${searchSession.id} with ${searchSession._count.searchResults} results`);
 
-    // Get paginated results from the found session
-    const skip = (pageNumber - 1) * limit;
-    const [results, totalCount] = await Promise.all([
-      prisma.searchResult.findMany({
-        where: {
-          searchSessionId: searchSession.id
-        },
-        orderBy: {
-          position: 'asc'
-        },
-        skip,
-        take: limit
-      }),
-      searchSession._count.searchResults
-    ]);
+    // Get results from the found session
+    let results, totalCount;
+    
+    if (isSelectAllPages) {
+      // For "select all pages", get all results without pagination
+      [results, totalCount] = await Promise.all([
+        prisma.searchResult.findMany({
+          where: {
+            searchSessionId: searchSession.id
+          },
+          orderBy: {
+            position: 'asc'
+          }
+        }),
+        searchSession._count.searchResults
+      ]);
+    } else {
+      // Normal pagination
+      const skip = (pageNumber - 1) * limit;
+      [results, totalCount] = await Promise.all([
+        prisma.searchResult.findMany({
+          where: {
+            searchSessionId: searchSession.id
+          },
+          orderBy: {
+            position: 'asc'
+          },
+          skip,
+          take: limit
+        }),
+        searchSession._count.searchResults
+      ]);
+    }
 
-    const totalPages = Math.ceil(totalCount / limit);
+    const totalPages = isSelectAllPages ? 1 : Math.ceil(totalCount / limit);
 
     // Transform results to match the expected format
     const transformedResults = results.map(result => ({
@@ -103,7 +124,7 @@ export async function POST(request: NextRequest) {
       date: result.date
     }));
 
-    console.log(`📊 Returning ${transformedResults.length} results from database (page ${pageNumber}/${totalPages})`);
+    console.log(`📊 Returning ${transformedResults.length} results from database ${isSelectAllPages ? '(all results)' : `(page ${pageNumber}/${totalPages})`}`);
 
     return NextResponse.json({
       success: true,
@@ -111,7 +132,14 @@ export async function POST(request: NextRequest) {
       totalResults: totalCount,
       searchTime: searchSession.searchTime || 0,
       filtersApplied: {},
-      pagination: {
+      pagination: isSelectAllPages ? {
+        currentPage: 1,
+        resultsPerPage: totalCount,
+        totalPages: 1,
+        totalResults: totalCount,
+        hasNextPage: false,
+        hasPreviousPage: false
+      } : {
         currentPage: pageNumber,
         resultsPerPage: limit,
         totalPages,

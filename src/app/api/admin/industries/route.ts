@@ -23,10 +23,10 @@ export async function GET(request: NextRequest) {
 
     // Build orderBy clause based on sortBy parameter
     let orderBy: any = {};
-    if (sortBy === 'keywordsCount') {
-      orderBy = { keywords: { _count: sortOrder } };
-    } else {
+    if (sortBy === 'createdAt' || sortBy === 'updatedAt' || sortBy === 'label') {
       orderBy = { [sortBy]: sortOrder };
+    } else {
+      orderBy = { label: 'asc' }; // Default fallback
     }
 
     const rows = await prisma.industry.findMany({
@@ -39,28 +39,9 @@ export async function GET(request: NextRequest) {
         label: true, 
         isActive: true,
         createdAt: true,
-        updatedAt: true,
-        _count: {
-          select: { 
-            keywords: true,
-            businesses: true
-          }
-        }
+        updatedAt: true
       },
     });
-
-    // If sorting by keywordsCount, sort manually since Prisma's orderBy with _count can be unreliable
-    if (sortBy === 'keywordsCount') {
-      rows.sort((a, b) => {
-        const aCount = a._count.keywords;
-        const bCount = b._count.keywords;
-        if (sortOrder === 'asc') {
-          return aCount - bCount;
-        } else {
-          return bCount - aCount;
-        }
-      });
-    }
 
     const data = rows.map((r) => ({
       id: r.id,
@@ -68,8 +49,8 @@ export async function GET(request: NextRequest) {
       isActive: r.isActive,
       createdAt: r.createdAt,
       updatedAt: r.updatedAt,
-      keywordsCount: r._count.keywords,
-      businessesCount: r._count.businesses,
+      keywordsCount: 0, // We'll add this later if needed
+      businessesCount: 0, // We'll add this later if needed
     }));
 
     return NextResponse.json({
@@ -123,6 +104,7 @@ export async function POST(request: NextRequest) {
     const industry = await prisma.industry.create({
       data: {
         label: label.trim(),
+        code: label.trim().substring(0, 4).toUpperCase(),
         isActive
       }
     });
@@ -237,7 +219,7 @@ export async function DELETE(request: NextRequest) {
         _count: {
           select: {
             keywords: true,
-            businesses: true
+            companies: true
           }
         }
       }
@@ -251,14 +233,14 @@ export async function DELETE(request: NextRequest) {
     }
 
     // Show warning if industry has related data
-    if (existingIndustry._count.keywords > 0 || existingIndustry._count.businesses > 0) {
+    if (existingIndustry._count.keywords > 0 || existingIndustry._count.companies > 0) {
       return NextResponse.json({
         success: false,
         error: 'Cannot delete industry with related data',
         details: {
           keywordsCount: existingIndustry._count.keywords,
-          businessesCount: existingIndustry._count.businesses,
-          message: 'This industry has keywords and/or business associations. Please delete them first or use the force delete option.'
+          companiesCount: existingIndustry._count.companies,
+          message: 'This industry has keywords and/or company associations. Please delete them first or use the force delete option.'
         }
       }, { status: 400 });
     }

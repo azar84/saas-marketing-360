@@ -4,16 +4,16 @@ import { prisma } from '@/lib/db';
 // GET - Fetch search results for a specific session with pagination
 export async function GET(
   request: NextRequest,
-  { params }: { params: { sessionId: string } }
+  { params }: { params: Promise<{ sessionId: string }> }
 ) {
   try {
+    const { sessionId } = await params;
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
     const limit = parseInt(searchParams.get('limit') || '10');
     const query = searchParams.get('query'); // Filter by specific query within session
 
     const skip = (page - 1) * limit;
-    const sessionId = params.sessionId;
 
     // Build where clause
     const where: any = {

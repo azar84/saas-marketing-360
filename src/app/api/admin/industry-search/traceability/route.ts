@@ -41,27 +41,14 @@ export async function GET(request: NextRequest) {
         );
       }
 
-      // Extract individual LLM results from all sessions
-      const allLLMResults = traceability.llmProcessing.flatMap(session => 
-        session.llmResults || []
-      );
-
       return NextResponse.json({
         success: true,
         message: 'Session traceability retrieved successfully',
         data: {
           session: traceability,
           summary: {
-            searchResults: traceability.searchResults.length,
-            processedResults: traceability.searchResults.filter(r => r.isProcessed).length,
-            llmSessions: traceability.llmProcessing.length,
-            totalAccepted: traceability.llmProcessing.reduce((sum, s) => sum + (s.acceptedCount || 0), 0),
-            totalRejected: traceability.llmProcessing.reduce((sum, s) => sum + (s.rejectedCount || 0), 0),
-            totalErrors: traceability.llmProcessing.reduce((sum, s) => sum + (s.errorCount || 0), 0),
-          },
-          searchResults: traceability.searchResults,
-          llmSessions: traceability.llmProcessing,
-          llmResults: allLLMResults
+            message: 'Traceability data retrieved successfully'
+          }
         }
       });
     }

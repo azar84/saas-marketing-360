@@ -139,26 +139,12 @@ export async function POST(request: NextRequest) {
       saved: result.saved,
       skipped: result.skipped,
       errors: result.errors.length,
-      chainProcessing: result.chainProcessing,
       traceabilitySessionId: llmProcessingSessionId,
       searchSessionId: searchSessionId
     });
 
-    // Get the business classification data from the chain processing result
-    // Note: We don't need to call googleSearchParser.run() again since processAndSaveSearchResults already did it
+    // Note: Chain processing is handled by the processAndSaveSearchResults function
     let chainBusinesses: any[] = [];
-    if (result.chainProcessing) {
-      // The businesses were already processed and saved by processAndSaveSearchResults
-      // We can get them from the saved businesses in the database if needed
-      console.log(`📊 Chain already processed ${result.chainProcessing.totalProcessed} businesses`);
-      console.log(`   Company websites: ${result.chainProcessing.companyWebsites}`);
-      console.log(`   Directories: ${result.chainProcessing.directories}`);
-      console.log(`   Extraction quality: ${result.chainProcessing.extractionQuality}`);
-      
-      // For now, we'll use an empty array since the businesses were already processed
-      // If you need the actual business data, we could fetch it from the database
-      chainBusinesses = [];
-    }
 
     // Complete LLM processing session if traceability is enabled
     if (shouldEnableTraceability && llmProcessingSessionId) {
@@ -184,13 +170,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: result.message,
+      message: 'Search results processed successfully',
       data: {
         saved: result.saved,
         skipped: result.skipped,
         errors: result.errors,
-        details: result.details,
-        chainProcessing: result.chainProcessing,
+        details: {}, // No details available from result
+        chainProcessing: null, // Chain processing handled by processAndSaveSearchResults
         businesses: chainBusinesses, // Add the actual classified business data
         traceability: shouldEnableTraceability ? {
           enabled: true,

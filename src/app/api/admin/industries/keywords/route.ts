@@ -106,7 +106,10 @@ export async function POST(request: NextRequest) {
             // Only create if we really can't find it
             console.log(`Industry "${resolvedIndustry}" not found, creating new record...`);
             industryRecord = await prisma.industry.create({
-              data: { label: resolvedIndustry }
+              data: { 
+                label: resolvedIndustry,
+                code: resolvedIndustry.substring(0, 4).toUpperCase()
+              }
             });
             console.log('Created new industry record:', industryRecord.id);
           } else {
