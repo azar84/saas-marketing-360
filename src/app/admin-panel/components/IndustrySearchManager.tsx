@@ -1241,10 +1241,21 @@ export default function IndustrySearchManager() {
         })
       );
 
+      // Count successful vs failed submissions
+      const successfulJobs = results.filter(r => r.success);
+      const failedJobs = results.filter(r => r.error);
+      
+      console.log(`📊 Job submission summary:`, {
+        total: unique.length,
+        successful: successfulJobs.length,
+        failed: failedJobs.length,
+        successRate: `${((successfulJobs.length / unique.length) * 100).toFixed(1)}%`
+      });
+
       addNotification({
         type: 'success',
         title: 'Enrichment Jobs Submitted',
-        message: `Submitted ${unique.length} website${unique.length === 1 ? '' : 's'} for enrichment.`,
+        message: `Submitted ${successfulJobs.length} website${successfulJobs.length === 1 ? '' : 's'} for enrichment. ${failedJobs.length > 0 ? `(${failedJobs.length} failed)` : ''}`,
       });
     } catch (err) {
       addNotification({

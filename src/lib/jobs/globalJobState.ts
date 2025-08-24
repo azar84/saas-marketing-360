@@ -60,7 +60,14 @@ export const useGlobalJobStore = create<GlobalJobState>((set, get) => ({
       if (response.ok) {
         const data = await response.json();
         if (data.success) {
-          console.log('✅ Jobs loaded from database:', data.jobs?.length || 0, 'jobs');
+          const jobCount = data.jobs?.length || 0;
+          console.log('✅ Jobs loaded from database:', jobCount, 'jobs');
+          console.log('📊 Job breakdown by type:', {
+            total: jobCount,
+            'basic-enrichment': data.jobs?.filter((j: any) => j.type === 'basic-enrichment')?.length || 0,
+            'keyword-generation': data.jobs?.filter((j: any) => j.type === 'keyword-generation')?.length || 0,
+            'enhanced-enrichment': data.jobs?.filter((j: any) => j.type === 'enhanced-enrichment')?.length || 0
+          });
           set({ jobs: data.jobs || [] });
           return data.jobs || [];
         }

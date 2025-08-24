@@ -56,6 +56,16 @@ class DatabaseJobStore {
         orderBy: { submittedAt: 'desc' }
       });
 
+      console.log(`🗄️ Database query returned ${dbJobs.length} jobs`);
+      
+      // Log job types breakdown
+      const typeBreakdown = dbJobs.reduce((acc: any, job) => {
+        acc[job.type] = (acc[job.type] || 0) + 1;
+        return acc;
+      }, {});
+      
+      console.log('📊 Database jobs breakdown by type:', typeBreakdown);
+
       return dbJobs.map(this.mapDbJobToBaseJob);
     } catch (error) {
       console.error('Failed to get all jobs from database', error);
