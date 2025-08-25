@@ -145,6 +145,17 @@ export async function GET(request: NextRequest) {
               }
             },
             orderBy: { isPrimary: 'desc' }
+          },
+          subIndustries: {
+            include: {
+              subIndustry: {
+                select: {
+                  id: true,
+                  name: true
+                }
+              }
+            },
+            orderBy: { isPrimary: 'desc' }
           }
         },
         orderBy: {

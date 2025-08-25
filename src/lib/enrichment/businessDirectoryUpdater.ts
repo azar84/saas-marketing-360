@@ -102,6 +102,12 @@ export interface EnrichmentResult {
       description: string;
       businessType: string;
     };
+    industryCategories?: Array<{
+      code: string;
+      title: string;
+      description: string;
+      subIndustries: string[];
+    }>;
     metadata: {
       mode: string;
       baseUrl: string;
@@ -237,6 +243,11 @@ export class BusinessDirectoryUpdater {
       // Process industries/categories
       if (data.company?.categories && data.company.categories.length > 0) {
         await this.processIndustries(business.id, data.company.categories);
+      }
+
+      // Process industry categories with sub-industries
+      if (data.industryCategories && data.industryCategories.length > 0) {
+        await this.processIndustryCategories(business.id, data.industryCategories);
       }
 
       // Process addresses - use both locations and addresses arrays for complete data
@@ -607,6 +618,82 @@ export class BusinessDirectoryUpdater {
       }
     } catch (error) {
       console.error('Error processing industries:', error);
+    }
+  }
+
+  /**
+   * Process industry categories with sub-industries
+   */
+  private static async processIndustryCategories(companyId: number, industryCategories: Array<{
+    code: string;
+    title: string;
+    description: string;
+    subIndustries: string[];
+  }>) {
+    try {
+      for (const category of industryCategories) {
+        // Find or create the main industry
+        const industry = await prisma.industry.upsert({
+          where: { label: category.title },
+          update: {},
+          create: { 
+            label: category.title,
+            code: category.code
+          }
+        });
+
+        // Create company-industry relationship
+        await prisma.companyIndustryRelation.upsert({
+          where: {
+            companyId_industryId: {
+              companyId: companyId,
+              industryId: industry.id
+            }
+          },
+          update: {},
+          create: {
+            companyId: companyId,
+            industryId: industry.id,
+            isPrimary: false
+          }
+        });
+
+        // Process sub-industries
+        for (const subIndustryName of category.subIndustries) {
+          // Find or create sub-industry
+          const subIndustry = await prisma.subIndustry.upsert({
+            where: { 
+              name_industryId: {
+                name: subIndustryName,
+                industryId: industry.id
+              }
+            },
+            update: {},
+            create: {
+              name: subIndustryName,
+              industryId: industry.id
+            }
+          });
+
+          // Create company-sub-industry relationship
+          await prisma.companySubIndustry.upsert({
+            where: {
+              companyId_subIndustryId: {
+                companyId: companyId,
+                subIndustryId: subIndustry.id
+              }
+            },
+            update: {},
+            create: {
+              companyId: companyId,
+              subIndustryId: subIndustry.id,
+              isPrimary: false
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error processing industry categories:', error);
     }
   }
 

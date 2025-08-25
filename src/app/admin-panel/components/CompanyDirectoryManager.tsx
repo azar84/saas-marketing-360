@@ -55,6 +55,7 @@ interface Company {
   services: CompanyService[];
   staff: CompanyStaff[];
   industries: CompanyIndustryRelation[];
+  subIndustries: CompanySubIndustry[];
   urls: CompanyUrl[];
   enrichments: CompanyEnrichment[];
 }
@@ -124,6 +125,15 @@ interface CompanyIndustryRelation {
     id: number;
     label: string;
     code: string;
+  };
+}
+
+interface CompanySubIndustry {
+  id: number;
+  isPrimary: boolean;
+  subIndustry: {
+    id: number;
+    name: string;
   };
 }
 
@@ -1251,6 +1261,15 @@ export default function CompanyDirectoryManager() {
                         </div>
                       )}
                       
+                      {company.subIndustries && Array.isArray(company.subIndustries) && company.subIndustries.length > 0 && (
+                        <div className="flex items-center gap-2">
+                          <Hash className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                          <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                            {company.subIndustries.length} Sub-Industries
+                          </span>
+                        </div>
+                      )}
+                      
                                               {company.technologies && Array.isArray(company.technologies) && company.technologies.length > 0 && (
                         <div className="flex items-center gap-2">
                           <Zap className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
@@ -1321,6 +1340,26 @@ export default function CompanyDirectoryManager() {
                                     </div>
                                   </div>
                                 </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Sub-Industries */}
+                        {company.subIndustries && Array.isArray(company.subIndustries) && company.subIndustries.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Sub-Industries ({company.subIndustries.length})</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {company.subIndustries.map((relation) => (
+                                <Badge
+                                  key={relation.id}
+                                  variant={relation.isPrimary ? "success" : "outline"}
+                                  size="sm"
+                                  className="text-xs"
+                                >
+                                  {relation.subIndustry.name}
+                                  {relation.isPrimary && ' (Primary)'}
+                                </Badge>
                               ))}
                             </div>
                           </div>

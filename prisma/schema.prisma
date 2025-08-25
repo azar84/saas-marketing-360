@@ -1375,19 +1375,20 @@ model Industry {
   business_industries business_industries[]
   companies           CompanyIndustryRelation[]
   keywords            Keyword[]
-  subIndustries      SubIndustry[]
+  subIndustries       SubIndustry[]
 
   @@map("industries")
 }
 
 model SubIndustry {
-  id          Int      @id @default(autoincrement())
-  name        String
-  industryId  Int
-  industry    Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id         Int      @id @default(autoincrement())
+  name       String
+  industryId Int
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  industry   Industry @relation(fields: [industryId], references: [id], onDelete: Cascade)
+  companies  CompanySubIndustry[]
 
   @@unique([name, industryId])
   @@index([industryId])
@@ -1412,20 +1413,20 @@ model Keyword {
 }
 
 model ContactPerson {
-  id                                                                Int                  @id @default(autoincrement())
+  id                                                                Int                                @id @default(autoincrement())
   firstName                                                         String
   lastName                                                          String
   title                                                             String?
   email                                                             String?
   phone                                                             String?
-  isActive                                                          Boolean              @default(true)
-  createdAt                                                         DateTime             @default(now())
-  updatedAt                                                         DateTime             @default(now()) @updatedAt
+  isActive                                                          Boolean                            @default(true)
+  createdAt                                                         DateTime                           @default(now())
+  updatedAt                                                         DateTime                           @default(now()) @updatedAt
   businessId                                                        Int?
   department                                                        String?
-  isPrimary                                                         Boolean              @default(false)
-  business_directory_contact_persons_businessIdTobusiness_directory business_directory?  @relation("contact_persons_businessIdTobusiness_directory", fields: [businessId], references: [id])
-  business_directory_BusinessDirectoryToContactPerson               business_directory[] @relation("BusinessDirectoryToContactPerson")
+  isPrimary                                                         Boolean                            @default(false)
+  BusinessDirectoryToContactPerson                                  BusinessDirectoryToContactPerson[]
+  business_directory_contact_persons_businessIdTobusiness_directory business_directory?                @relation("contact_persons_businessIdTobusiness_directory", fields: [businessId], references: [id])
 
   @@index([firstName, lastName])
   @@index([isActive])
@@ -1573,6 +1574,7 @@ model Company {
   financial    CompanyFinancial?
   hiring       CompanyHiring?
   industries   CompanyIndustryRelation[]
+  subIndustries CompanySubIndustry[]
   intelligence CompanyIntelligence?
   services     CompanyService[]
   socials      CompanySocial[]
@@ -1715,6 +1717,22 @@ model CompanyIndustryRelation {
   @@map("company_industry_relations")
 }
 
+model CompanySubIndustry {
+  id             Int      @id @default(autoincrement())
+  companyId      Int
+  subIndustryId  Int
+  isPrimary      Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  company        Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  subIndustry    SubIndustry @relation(fields: [subIndustryId], references: [id], onDelete: Cascade)
+
+  @@unique([companyId, subIndustryId])
+  @@index([companyId])
+  @@index([subIndustryId])
+  @@map("company_sub_industries")
+}
+
 model CompanyFinancial {
   id            Int      @id @default(autoincrement())
   companyId     Int      @unique
@@ -1807,8 +1825,8 @@ model CompanyUrl {
 }
 
 model business_directory {
-  id                                                             Int                   @id @default(autoincrement())
-  website                                                        String                @unique
+  id                                                             Int                                @id @default(autoincrement())
+  website                                                        String                             @unique
   companyName                                                    String?
   city                                                           String?
   stateProvince                                                  String?
@@ -1816,8 +1834,8 @@ model business_directory {
   email                                                          String?
   employeesCount                                                 Int?
   contactPersonId                                                Int?
-  isActive                                                       Boolean               @default(true)
-  createdAt                                                      DateTime              @default(now())
+  isActive                                                       Boolean                            @default(true)
+  createdAt                                                      DateTime                           @default(now())
   updatedAt                                                      DateTime
   country                                                        String?
   address                                                        String?
@@ -1827,12 +1845,12 @@ model business_directory {
   extractedAt                                                    DateTime?
   industry                                                       String?
   phone                                                          String?
-  source                                                         String                @default("manual")
+  source                                                         String                             @default("manual")
   state                                                          String?
+  BusinessDirectoryToContactPerson                               BusinessDirectoryToContactPerson[]
   business_industries                                            business_industries[]
-  contact_persons_contact_persons_businessIdTobusiness_directory ContactPerson[]       @relation("contact_persons_businessIdTobusiness_directory")
+  contact_persons_contact_persons_businessIdTobusiness_directory ContactPerson[]                    @relation("contact_persons_businessIdTobusiness_directory")
   llm_processing_results                                         LLMProcessingResult[]
-  contact_persons_BusinessDirectoryToContactPerson               ContactPerson[]       @relation("BusinessDirectoryToContactPerson")
 
   @@index([city])
   @@index([country])
@@ -1852,4 +1870,15 @@ model business_industries {
   @@unique([businessId, industryId])
   @@index([businessId])
   @@index([industryId])
+}
+
+model BusinessDirectoryToContactPerson {
+  A                  Int
+  B                  Int
+  contact_persons    ContactPerson      @relation(fields: [A], references: [id], onDelete: Cascade)
+  business_directory business_directory @relation(fields: [B], references: [id], onDelete: Cascade)
+
+  @@id([A, B], map: "_BusinessDirectoryToContactPerson_AB_pkey")
+  @@index([B], map: "_BusinessDirectoryToContactPerson_B_index")
+  @@map("_BusinessDirectoryToContactPerson")
 }
