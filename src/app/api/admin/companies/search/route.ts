@@ -139,7 +139,8 @@ export async function GET(request: NextRequest) {
                 select: {
                   id: true,
                   label: true,
-                  code: true
+                  code: true,
+                  description: true
                 }
               }
             },

@@ -1157,7 +1157,19 @@ export default function CompanyDirectoryManager() {
                     {/* Services */}
                     {company.services && Array.isArray(company.services) && company.services.length > 0 && (
                       <div className="mb-4">
-                        <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>Services</h4>
+                        <div className="flex items-center justify-between mb-2">
+                          <h4 className="text-sm font-semibold" style={{ color: 'var(--color-text-primary)' }}>
+                            Services ({company.services.length})
+                          </h4>
+                          {company.services.length > 3 && (
+                            <button
+                              onClick={() => setExpandedCompany(expandedCompany === company.id ? null : company.id)}
+                              className="text-xs text-blue-600 hover:text-blue-800 hover:underline cursor-pointer"
+                            >
+                              {expandedCompany === company.id ? 'Show Less' : 'View All'}
+                            </button>
+                          )}
+                        </div>
                         <div className="flex flex-wrap gap-2">
                           {company.services && Array.isArray(company.services) && company.services.slice(0, 3).map((service) => (
                             <Badge
@@ -1171,7 +1183,11 @@ export default function CompanyDirectoryManager() {
                             </Badge>
                           ))}
                           {company.services && Array.isArray(company.services) && company.services.length > 3 && (
-                            <Badge variant="outline" size="sm" className="text-xs">
+                            <Badge 
+                              variant="outline" 
+                              size="sm" 
+                              className="text-xs"
+                            >
                               +{company.services.length - 3} more
                             </Badge>
                           )}
@@ -1218,12 +1234,20 @@ export default function CompanyDirectoryManager() {
 
                     {/* Quick Stats */}
                     <div className="flex flex-wrap gap-4 mb-4">
-                                              {company.industries && Array.isArray(company.industries) && company.industries.length > 0 && (
+                      {company.industries && Array.isArray(company.industries) && company.industries.length > 0 && (
                         <div className="flex items-center gap-2">
                           <Hash className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                           <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
                             {company.industries.length} Industries
                           </span>
+                          {company.industries.length > 0 && (
+                            <button
+                              onClick={() => setExpandedCompany(expandedCompany === company.id ? null : company.id)}
+                              className="text-xs text-blue-600 hover:text-blue-800 hover:underline cursor-pointer ml-2"
+                            >
+                              {expandedCompany === company.id ? 'Hide Details' : 'View Details'}
+                            </button>
+                          )}
                         </div>
                       )}
                       
@@ -1250,21 +1274,53 @@ export default function CompanyDirectoryManager() {
                     {expandedCompany === company.id && (
                       <div className="border-t pt-6 mt-6 space-y-6" style={{ borderColor: 'var(--color-gray-light)' }}>
                         
-                        {/* Industries */}
-                        {company.industries && Array.isArray(company.industries) && company.industries.length > 0 && (
+                        {/* All Services */}
+                        {company.services && Array.isArray(company.services) && company.services.length > 0 && (
                           <div>
-                            <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Industries</h4>
+                            <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>All Services ({company.services.length})</h4>
                             <div className="flex flex-wrap gap-2">
-                              {company.industries && Array.isArray(company.industries) && company.industries.map((relation) => (
+                              {company.services.map((service) => (
                                 <Badge
-                                  key={relation.id}
-                                  variant={relation.isPrimary ? "success" : "outline"}
+                                  key={service.id}
+                                  variant={service.isPrimary ? "success" : "outline"}
                                   size="sm"
                                   className="text-xs"
                                 >
-                                  {relation.industry.label}
-                                  {relation.isPrimary && ' (Primary)'}
+                                  {service.name}
+                                  {service.isPrimary && ' (Primary)'}
                                 </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
+                        {/* Industries */}
+                        {company.industries && Array.isArray(company.industries) && company.industries.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Industries ({company.industries.length})</h4>
+                            <div className="space-y-3">
+                              {company.industries && Array.isArray(company.industries) && company.industries.map((relation) => (
+                                <div key={relation.id} className="p-3 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <Hash className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                                    <div className="flex-1">
+                                      <div className="flex items-center gap-2">
+                                        <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                                          {relation.industry.label}
+                                        </span>
+                                        {relation.isPrimary && (
+                                          <Badge variant="success" size="sm" className="text-xs">Primary</Badge>
+                                        )}
+                                        {relation.industry.code && (
+                                          <Badge variant="outline" size="sm" className="text-xs">
+                                            {relation.industry.code}
+                                          </Badge>
+                                        )}
+                                      </div>
+                                      {/* Description field not currently included in API response */}
+                                    </div>
+                                  </div>
+                                </div>
                               ))}
                             </div>
                           </div>
@@ -1315,6 +1371,57 @@ export default function CompanyDirectoryManager() {
                                     </div>
                                   )}
                                 </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Technologies */}
+                        {company.technologies && Array.isArray(company.technologies) && company.technologies.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Technologies ({company.technologies.length})</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {company.technologies.map((tech) => (
+                                <Badge
+                                  key={tech.id}
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-xs"
+                                >
+                                  {tech.name}
+                                  {tech.category && ` (${tech.category})`}
+                                  {tech.version && ` v${tech.version}`}
+                                </Badge>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Social Media */}
+                        {company.socials && Array.isArray(company.socials) && company.socials.length > 0 && (
+                          <div>
+                            <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Social Media ({company.socials.length})</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {company.socials.map((social) => (
+                                <Badge
+                                  key={social.id}
+                                  variant="outline"
+                                  size="sm"
+                                  className="text-xs"
+                                >
+                                  {social.platform}
+                                  {social.handle && `: ${social.handle}`}
+                                  {social.url && (
+                                    <a 
+                                      href={social.url} 
+                                      target="_blank" 
+                                      rel="noopener noreferrer"
+                                      className="ml-1 hover:underline"
+                                    >
+                                      <ExternalLink className="h-3 w-3 inline" />
+                                    </a>
+                                  )}
+                                </Badge>
                               ))}
                             </div>
                           </div>
