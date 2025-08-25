@@ -150,6 +150,20 @@ export class BusinessDirectoryUpdater {
       // Extract business data from the enrichment result
       const businessData = this.extractBusinessData(finalResult);
 
+      // Check if this is actually a business - only save when isBusiness is explicitly true
+      if (finalResult.analysis?.isBusiness !== true) {
+        console.log(`🚫 Skipping non-business website: ${websiteUrl} (${finalResult.analysis?.companyName || 'Unknown'}) - ${finalResult.analysis?.reasoning || 'Not a business'}`);
+        return {
+          success: true,
+          businessId: undefined,
+          created: false,
+          updated: false,
+          error: undefined
+        };
+      }
+
+      console.log(`✅ Processing business website: ${websiteUrl} (${finalResult.analysis?.companyName || 'Unknown'}) - ${finalResult.analysis?.reasoning || 'Business confirmed'}`);
+
       // Check if business already exists (using normalized URL to prevent duplicates)
       const normalizedWebsite = normalizeWebsiteUrl(websiteUrl);
       const existingBusiness = await prisma.company.findFirst({

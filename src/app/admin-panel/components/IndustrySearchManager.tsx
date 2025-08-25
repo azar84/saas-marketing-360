@@ -1153,9 +1153,17 @@ export default function IndustrySearchManager() {
         // Get all URLs from all results
         const allUrls = new Set<string>(data.results.map((result: any) => result.url as string));
         
+        console.log(`🔍 Select All Pages Debug:`, {
+          totalResultsFetched: data.results.length,
+          totalResultsInSession: data.totalResults,
+          uniqueUrlsSelected: allUrls.size,
+          sampleUrls: Array.from(allUrls).slice(0, 5)
+        });
+        
         setSelectedResults(prev => {
           const newSet = new Set(prev);
           allUrls.forEach(url => newSet.add(url));
+          console.log(`✅ Updated selectedResults: ${newSet.size} total URLs selected`);
           return newSet;
         });
         
@@ -1182,8 +1190,8 @@ export default function IndustrySearchManager() {
   };
 
   const getSelectedResultsForEnrichment = (): string[] => {
+    // Don't filter by current page - selectedResults already contains all selected URLs
     return Array.from(selectedResults)
-      .filter(url => searchResults.some(result => result.url === url))
       .map(url => normalizeWebsite(url));
   };
 
@@ -1195,6 +1203,11 @@ export default function IndustrySearchManager() {
     }
     
     console.log('🚀 Starting enrichment job submission for URLs:', websiteUrls);
+    console.log('📊 Submission Debug:', {
+      totalUrlsReceived: websiteUrls.length,
+      selectedResultsSize: selectedResults.size,
+      sampleUrls: websiteUrls.slice(0, 5)
+    });
     
     try {
       const unique = Array.from(new Set(websiteUrls.filter(Boolean)));
