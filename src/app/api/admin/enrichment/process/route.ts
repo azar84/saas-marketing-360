@@ -39,8 +39,24 @@ async function handler(request: NextRequest) {
               includeTechnologyExtraction: true
             }
           },
-          finalResult: enrichmentResult.data
-        }
+          // Direct fields matching the actual API response structure
+          ...enrichmentResult.data,
+          // Add missing fields that our interface expects
+          scrapedPages: [],
+          staffEnrichment: null,
+          websiteAnalysis: null,
+          scrapingStrategy: null,
+          aggregatedContent: '',
+          contactInformation: null
+        },
+        worker: 'api-processor',
+        success: true,
+        metadata: {
+          mode: 'basic',
+          type: 'basic_enrichment',
+          timestamp: new Date().toISOString()
+        },
+        processingTime: 0
       };
     } else {
       return NextResponse.json(

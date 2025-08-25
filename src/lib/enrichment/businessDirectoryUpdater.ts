@@ -35,84 +35,83 @@ export interface EnrichmentResult {
       };
     };
     baseUrl: string;
-    finalResult: {
-      staff: {
-        staff: any[];
-        reasoning: string;
-        confidence: number;
-      };
-      company: {
-        name: string;
-        website: string;
-        services: string[];
-        categories: string[];
-        description: string;
-      };
-      contact: {
-        forms: Array<{
-          url: string;
-          type: string;
-          description: string;
-        }>;
-        hours: {
-          timezone: string | null;
-          supportHours: string | null;
-          businessHours: string | null;
-        };
-        social: {
-          github: string | null;
-          twitter: string | null;
-          youtube: string | null;
-          facebook: string | null;
-          linkedin: string | null;
-          instagram: string | null;
-          crunchbase: string | null;
-        };
-        primary: {
-          emails: string[];
-          phones: string[];
-          contactPage: string;
-        };
-        addresses: any[];
-        locations: Array<{
-          city: string;
-          type: string;
-          email: string | null;
-          phone: string | null;
-          state: string;
-          address: string;
-          country: string;
-          zipCode: string | null;
-        }>;
-        reasoning: string;
-        confidence: number;
-        departments: Array<{
-          name: string;
-          emails: string[];
-          phones: string[];
-          description: string;
-        }>;
-      };
-      analysis: {
-        services: string[];
-        reasoning: string;
-        confidence: number;
-        isBusiness: boolean;
-        companyName: string;
-        description: string;
-        businessType: string;
-      };
-      metadata: {
-        mode: string;
-        baseUrl: string;
-        scrapedAt: string;
-        confidence: number;
-        pagesScraped: number;
-        totalPagesFound: number;
-      };
-      intelligence: any;
-      technologies: any;
+    // Direct fields matching the actual API response structure
+    staff: {
+      staff: any[];
+      reasoning: string;
+      confidence: number;
     };
+    company: {
+      name: string;
+      website: string;
+      services: string[];
+      categories: string[];
+      description: string;
+    };
+    contact: {
+      forms: Array<{
+        url: string;
+        type: string;
+        description: string;
+      }>;
+      hours: {
+        timezone: string | null;
+        supportHours: string | null;
+        businessHours: string | null;
+      };
+      social: {
+        github: string | null;
+        twitter: string | null;
+        youtube: string | null;
+        facebook: string | null;
+        linkedin: string | null;
+        instagram: string | null;
+        crunchbase: string | null;
+      };
+      primary: {
+        emails: string[];
+        phones: string[];
+        contactPage: string;
+      };
+      addresses: any[];
+      locations: Array<{
+        city: string;
+        type: string;
+        email: string | null;
+        phone: string | null;
+        state: string;
+        address: string;
+        country: string;
+        zipCode: string | null;
+      }>;
+      reasoning: string;
+      confidence: number;
+      departments: Array<{
+        name: string;
+        emails: string[];
+        phones: string[];
+        description: string;
+      }>;
+    };
+    analysis: {
+      services: string[];
+      reasoning: string;
+      confidence: number;
+      isBusiness: boolean;
+      companyName: string;
+      description: string;
+      businessType: string;
+    };
+    metadata: {
+      mode: string;
+      baseUrl: string;
+      scrapedAt: string;
+      confidence: number;
+      pagesScraped: number;
+      totalPagesFound: number;
+    };
+    intelligence: any;
+    technologies: any;
     scrapedPages: any[];
     staffEnrichment: any;
     websiteAnalysis: any;
@@ -133,7 +132,7 @@ export interface EnrichmentResult {
 export class BusinessDirectoryUpdater {
   /**
    * Process an enrichment result and update the business directory
-   * Only uses data from finalResult section of the enrichment response
+   * Only uses data from the enrichment response
    */
   static async processEnrichmentResult(enrichmentResult: EnrichmentResult): Promise<{
     success: boolean;
@@ -144,15 +143,15 @@ export class BusinessDirectoryUpdater {
   }> {
     try {
       const { data } = enrichmentResult;
-      const { input, finalResult } = data;
+      const { input, analysis } = data;
       const websiteUrl = input.websiteUrl;
 
       // Extract business data from the enrichment result
-      const businessData = this.extractBusinessData(finalResult);
+      const businessData = this.extractBusinessData(data);
 
       // Check if this is actually a business - only save when isBusiness is explicitly true
-      if (finalResult.analysis?.isBusiness !== true) {
-        console.log(`🚫 Skipping non-business website: ${websiteUrl} (${finalResult.analysis?.companyName || 'Unknown'}) - ${finalResult.analysis?.reasoning || 'Not a business'}`);
+      if (analysis?.isBusiness !== true) {
+        console.log(`🚫 Skipping non-business website: ${websiteUrl} (${analysis?.companyName || 'Unknown'}) - ${analysis?.reasoning || 'Not a business'}`);
         return {
           success: true,
           businessId: undefined,
@@ -162,7 +161,7 @@ export class BusinessDirectoryUpdater {
         };
       }
 
-      console.log(`✅ Processing business website: ${websiteUrl} (${finalResult.analysis?.companyName || 'Unknown'}) - ${finalResult.analysis?.reasoning || 'Business confirmed'}`);
+      console.log(`✅ Processing business website: ${websiteUrl} (${analysis?.companyName || 'Unknown'}) - ${analysis?.reasoning || 'Business confirmed'}`);
 
       // Check if business already exists (using normalized URL to prevent duplicates)
       const normalizedWebsite = normalizeWebsiteUrl(websiteUrl);
@@ -210,43 +209,43 @@ export class BusinessDirectoryUpdater {
         console.log(`✅ Created new company: ${business.name} (ID: ${business.id})`);
       }
 
-      // Process contact persons from finalResult only
-      if (finalResult.contact?.departments && finalResult.contact.departments.length > 0) {
-        await this.processContactPersons(business.id, finalResult.contact.departments);
+      // Process contact persons from data only
+      if (data.contact?.departments && data.contact.departments.length > 0) {
+        await this.processContactPersons(business.id, data.contact.departments);
       }
 
       // Process primary contact information (emails, phones)
-      if (finalResult.contact?.primary) {
-        await this.processPrimaryContacts(business.id, finalResult.contact.primary);
+      if (data.contact?.primary) {
+        await this.processPrimaryContacts(business.id, data.contact.primary);
       }
 
       // Process services
-      if (finalResult.company?.services && finalResult.company.services.length > 0) {
-        await this.processServices(business.id, finalResult.company.services);
+      if (data.company?.services && data.company.services.length > 0) {
+        await this.processServices(business.id, data.company.services);
       }
 
       // Process technologies
-      if (finalResult.technologies?.technologies && Object.keys(finalResult.technologies.technologies).length > 0) {
-        await this.processTechnologies(business.id, finalResult.technologies.technologies);
+      if (data.technologies?.technologies && Object.keys(data.technologies.technologies).length > 0) {
+        await this.processTechnologies(business.id, data.technologies.technologies);
       }
 
       // Process social media
-      if (finalResult.contact?.social && Object.keys(finalResult.contact.social).length > 0) {
-        await this.processSocialMedia(business.id, finalResult.contact.social);
+      if (data.contact?.social && Object.keys(data.contact.social).length > 0) {
+        await this.processSocialMedia(business.id, data.contact.social);
       }
 
       // Process industries/categories
-      if (finalResult.company?.categories && finalResult.company.categories.length > 0) {
-        await this.processIndustries(business.id, finalResult.company.categories);
+      if (data.company?.categories && data.company.categories.length > 0) {
+        await this.processIndustries(business.id, data.company.categories);
       }
 
       // Process addresses - use both locations and addresses arrays for complete data
-      if (finalResult.contact?.locations && finalResult.contact.locations.length > 0) {
-        await this.processAddresses(business.id, finalResult.contact.locations, finalResult.contact.addresses);
+      if (data.contact?.locations && data.contact.locations.length > 0) {
+        await this.processAddresses(business.id, data.contact.locations, data.contact.addresses);
       }
 
       // Create enrichment record
-      await this.createEnrichmentRecord(business.id, finalResult);
+      await this.createEnrichmentRecord(business.id, data);
 
       return {
         success: true,
@@ -265,10 +264,10 @@ export class BusinessDirectoryUpdater {
   }
 
   /**
-   * Extract business data from the enrichment final result only
+   * Extract business data from the enrichment data only
    */
-  private static extractBusinessData(finalResult: any) {
-    const { company, contact, analysis } = finalResult;
+  private static extractBusinessData(data: any) {
+    const { company, contact, analysis } = data;
 
     // Extract primary location from contact.locations only
     let city = null;
@@ -293,7 +292,7 @@ export class BusinessDirectoryUpdater {
       ? contact.primary.phones[0] 
       : null;
 
-    // Use only finalResult data, prioritize company data over analysis
+    // Use only data, prioritize company data over analysis
     return {
       name: company?.name || analysis?.companyName || 'Unknown Company',
       description: company?.description || analysis?.description || null,
