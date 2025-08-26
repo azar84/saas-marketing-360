@@ -37,6 +37,7 @@ import { Card } from '@/components/ui/Card';
 import { AutocompleteInput } from '@/components/ui/AutocompleteInput';
 import { useAdminApi } from '@/hooks/useApi';
 import { getCountryDisplayName, getStateProvinceDisplayName } from '@/lib/utils/locationNormalizer';
+import { useCompanyStore } from '@/lib/companyStore';
 
 interface Company {
   id: number;
@@ -159,15 +160,21 @@ interface CompanyEnrichment {
 export default function CompanyDirectoryManager() {
   const { get } = useAdminApi();
   
-  const [companies, setCompanies] = useState<Company[]>([]);
+  // Use global company store instead of local state
+  const { 
+    companies, 
+    setCompanies, 
+    loading, 
+    setLoading, 
+    lastUpdated, 
+    setLastUpdated 
+  } = useCompanyStore();
   
-  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterActive, setFilterActive] = useState(true);
   const [expandedCompany, setExpandedCompany] = useState<number | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   
   // Advanced filtering state
   const [industryFilter, setIndustryFilter] = useState('');
@@ -208,11 +215,18 @@ export default function CompanyDirectoryManager() {
       const queryString = params.toString();
       const endpoint = queryString ? `/api/admin/companies/search?${queryString}` : '/api/admin/companies';
       
+      console.log('🔍 Loading companies from endpoint:', endpoint);
       const response = await get(endpoint);
+      console.log('🔍 API Response:', response);
+      
       if (response && typeof response === 'object' && 'success' in response && response.success) {
         const companiesData = (response as any).data;
+        console.log('📊 Companies data from API:', companiesData);
+        console.log('📊 First company industries:', companiesData?.[0]?.industries);
+        console.log('📊 First company subIndustries:', companiesData?.[0]?.subIndustries);
         setCompanies(Array.isArray(companiesData) ? companiesData : []);
       } else {
+        console.log('❌ API response not successful:', response);
         setCompanies([]);
       }
     } catch (error) {
@@ -238,6 +252,24 @@ export default function CompanyDirectoryManager() {
   useEffect(() => {
     loadCompanies();
   }, []);
+  
+  // Auto-refresh companies every 2 minutes to catch new additions from scheduler
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadCompanies();
+    }, 120000); // 2 minutes
+    
+    return () => clearInterval(interval);
+  }, []);
+  
+  // Listen for real-time updates from the global company store
+  useEffect(() => {
+    // If we have companies in the store, it means new companies were added by the scheduler
+    if (companies.length > 0) {
+      // The companies are already in the store, no need to reload from API
+      // The component will re-render automatically when companies change
+    }
+  }, [companies.length]);
 
   // Reload companies when filters change
   useEffect(() => {
@@ -255,9 +287,7 @@ export default function CompanyDirectoryManager() {
   // Ensure companies is an array and never undefined
   const safeCompanies = companies && Array.isArray(companies) ? companies : [];
   
-  // Debug logging
-  console.log('Companies state:', companies);
-  console.log('Safe companies:', safeCompanies);
+
   
   // Filter companies based on search and active status
   let filteredCompanies: Company[] = [];
@@ -463,41 +493,49 @@ export default function CompanyDirectoryManager() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
       {/* Header Section */}
-                      <div className="border-b" style={{ borderColor: 'var(--color-gray-light)', backgroundColor: 'var(--color-bg-primary)' }}>
+      <div className="border-b" style={{ borderColor: 'var(--color-gray-light)', backgroundColor: 'var(--color-bg-primary)' }}>
         <div className="px-8 py-10">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-4xl font-bold mb-3" style={{ color: 'var(--color-text-primary)' }}>
                 Company Directory
               </h1>
-              <p className="text-lg" style={{ color: 'var(--color-text-secondary)' }}>
-                Manage your enriched company data with comprehensive business intelligence
-              </p>
-              {deleteSuccess && (
-                <div className="mt-3 p-3 rounded-lg flex items-center gap-2" style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-dark)' }}>
-                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-success-dark)' }}></div>
-                  {deleteSuccess}
-                </div>
-              )}
+              <div className="flex items-center space-x-4">
+                <p className="text-lg" style={{ color: 'var(--color-text-secondary)' }}>
+                  Manage and view all companies in the business directory
+                </p>
+                {lastUpdated && (
+                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                    Last updated: {lastUpdated.toLocaleTimeString()}
+                  </span>
+                )}
+              </div>
             </div>
-            <div className="flex gap-4">
+            <div className="flex items-center space-x-2">
               <Button
-                variant="outline"
-                size="lg"
                 onClick={loadCompanies}
                 disabled={loading}
-                className="h-12 px-6"
+                variant="outline"
+                className="flex items-center space-x-2"
+                title="Refresh companies list"
               >
-                <RefreshCw className={`h-5 w-5 ${loading ? 'animate-spin' : ''}`} />
-                Refresh
+                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                <span>Refresh</span>
               </Button>
             </div>
           </div>
+          
+          {deleteSuccess && (
+            <div className="mt-3 p-3 rounded-lg flex items-center gap-2" style={{ backgroundColor: 'var(--color-success-light)', color: 'var(--color-success-dark)' }}>
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'var(--color-success-dark)' }}></div>
+              {deleteSuccess}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Search and Filter Section */}
-                  <div className="px-8 py-6" style={{ backgroundColor: 'var(--color-bg-primary)', borderBottom: '1px solid var(--color-gray-light)' }}>
+      <div className="px-8 py-6" style={{ backgroundColor: 'var(--color-bg-primary)', borderBottom: '1px solid var(--color-gray-light)' }}>
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between gap-6">
             <div className="flex-1 max-w-lg">
@@ -552,7 +590,7 @@ export default function CompanyDirectoryManager() {
       </div>
 
       {/* Advanced Filters Section */}
-                  <div className="px-8 py-4" style={{ backgroundColor: 'var(--color-bg-primary)', borderBottom: '1px solid var(--color-gray-light)' }}>
+      <div className="px-8 py-4" style={{ backgroundColor: 'var(--color-bg-primary)', borderBottom: '1px solid var(--color-gray-light)' }}>
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between mb-4">
             <Button
@@ -1313,57 +1351,71 @@ export default function CompanyDirectoryManager() {
                           </div>
                         )}
                         
-                        {/* Industries */}
-                        {company.industries && Array.isArray(company.industries) && company.industries.length > 0 && (
-                          <div>
-                            <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Industries ({company.industries.length})</h4>
-                            <div className="space-y-3">
-                              {company.industries && Array.isArray(company.industries) && company.industries.map((relation) => (
-                                <div key={relation.id} className="p-3 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <Hash className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
-                                    <div className="flex-1">
-                                      <div className="flex items-center gap-2">
-                                        <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>
-                                          {relation.industry.label}
-                                        </span>
-                                        {relation.isPrimary && (
-                                          <Badge variant="success" size="sm" className="text-xs">Primary</Badge>
-                                        )}
+                        {/* Industries with Sub-Industries nested underneath */}
+                        <div>
+                          <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>
+                            Industries ({company.industries ? (Array.isArray(company.industries) ? company.industries.length : 'Not Array') : 'Null'})
+                          </h4>
+                          {company.industries && Array.isArray(company.industries) && company.industries.length > 0 ? (
+                            <div className="flex flex-wrap gap-2">
+                              {company.industries.map((relation) => {
+                                // Find sub-industries that belong to this industry
+                                const industrySubIndustries = company.subIndustries?.filter(sub => 
+                                  sub.subIndustry.industryId === relation.industry.id
+                                ) || [];
+                                
+                                return (
+                                  <div key={relation.id} className="p-2 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)', minWidth: '200px' }}>
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <Hash className="h-3 w-3" style={{ color: 'var(--color-text-muted)' }} />
+                                      <div className="flex-1">
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                                            {relation.industry.label}
+                                          </span>
+                                          {relation.isPrimary && (
+                                            <Badge variant="success" size="sm" className="text-xs">Primary</Badge>
+                                          )}
+                                        </div>
                                         {relation.industry.code && (
-                                          <Badge variant="outline" size="sm" className="text-xs">
+                                          <div className="text-xs mt-1" style={{ color: 'var(--color-text-muted)' }}>
                                             {relation.industry.code}
-                                          </Badge>
+                                          </div>
                                         )}
                                       </div>
-                                      {/* Description field not currently included in API response */}
                                     </div>
+                                    
+                                    {/* Show sub-industries underneath the industry */}
+                                    {industrySubIndustries.length > 0 && (
+                                      <div className="mt-2 pt-2 border-t" style={{ borderColor: 'var(--color-gray-light)' }}>
+                                        <div className="text-xs font-medium mb-1" style={{ color: 'var(--color-text-muted)' }}>
+                                          Sub ({industrySubIndustries.length}):
+                                        </div>
+                                        <div className="flex flex-wrap gap-1">
+                                          {industrySubIndustries.map((subRelation) => (
+                                            <Badge
+                                              key={subRelation.id}
+                                              variant={subRelation.isPrimary ? "success" : "outline"}
+                                              size="sm"
+                                              className="text-xs"
+                                            >
+                                              {subRelation.subIndustry.name}
+                                              {subRelation.isPrimary && ' (P)'}
+                                            </Badge>
+                                          ))}
+                                        </div>
+                                      </div>
+                                    )}
                                   </div>
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
-                          </div>
-                        )}
+                          ) : (
+                            <div className="text-sm text-gray-500">No industries found</div>
+                          )}
+                        </div>
+                        
 
-                        {/* Sub-Industries */}
-                        {company.subIndustries && Array.isArray(company.subIndustries) && company.subIndustries.length > 0 && (
-                          <div>
-                            <h4 className="text-sm font-semibold mb-3" style={{ color: 'var(--color-text-primary)' }}>Sub-Industries ({company.subIndustries.length})</h4>
-                            <div className="flex flex-wrap gap-2">
-                              {company.subIndustries.map((relation) => (
-                                <Badge
-                                  key={relation.id}
-                                  variant={relation.isPrimary ? "success" : "outline"}
-                                  size="sm"
-                                  className="text-xs"
-                                >
-                                  {relation.subIndustry.name}
-                                  {relation.isPrimary && ' (Primary)'}
-                                </Badge>
-                              ))}
-                            </div>
-                          </div>
-                        )}
 
                         {/* Addresses */}
                         {company.addresses && Array.isArray(company.addresses) && company.addresses.length > 0 && (
