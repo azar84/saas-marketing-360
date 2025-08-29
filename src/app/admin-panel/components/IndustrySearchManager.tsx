@@ -33,6 +33,7 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useNotificationContext } from '@/components/providers/NotificationProvider';
 import { EnhancedSearch, type SearchFilter, type SortOption } from '@/components/ui/EnhancedSearch';
+import SearchResultEnrichment from '@/components/ui/SearchResultEnrichment';
 
 interface Industry {
   id: number;
@@ -628,21 +629,8 @@ export default function IndustrySearchManager() {
       .map(term => term.trim())
       .filter(term => term.length > 0);
     
-    // If only one term, create variations
-    if (terms.length === 1) {
-      const baseTerm = terms[0];
-      const queries = [
-        baseTerm, // Just the term (location will be passed separately to API)
-        `${baseTerm} services`,
-        `${baseTerm} companies`,
-        `best ${baseTerm}`,
-        `professional ${baseTerm}`
-      ];
-      setGeneratedQueries(queries);
-    } else {
-      // Multiple terms, use them as individual queries
-      setGeneratedQueries(terms);
-    }
+    // Use the terms as-is, no automatic expansion
+    setGeneratedQueries(terms);
   };
 
   const performSearch = async (page: number = 1) => {
@@ -2200,7 +2188,7 @@ export default function IndustrySearchManager() {
           {searchMode === 'industry' && (
             <div className="space-y-4 p-4 rounded-lg" style={{
               backgroundColor: 'var(--color-bg-secondary)',
-              border: '1px solid var(--color-primary-light)'
+              border: '1px solid var(--color-gray-light)'
             }}>
               <div className="flex items-center gap-2 mb-3">
                 <Building className="h-4 w-4" style={{ color: 'var(--color-primary)' }} />
@@ -2300,7 +2288,7 @@ export default function IndustrySearchManager() {
           {searchMode === 'custom' && (
             <div className="space-y-4 p-4 rounded-lg" style={{
               backgroundColor: 'var(--color-bg-secondary)',
-              border: '1px solid var(--color-accent-light)'
+              border: '1px solid var(--color-gray-light)'
             }}>
               <div className="flex items-center gap-2 mb-3">
                 <Search className="h-4 w-4" style={{ color: 'var(--color-accent)' }} />
@@ -2315,12 +2303,13 @@ export default function IndustrySearchManager() {
                 value={customSearchTerms}
                 onChange={(e) => setCustomSearchTerms(e.target.value)}
                 placeholder="Enter what you're looking for...&#10;&#10;Examples:&#10;• web design companies&#10;• marketing agencies&#10;• accounting services&#10;• plumbing contractors&#10;• restaurants&#10;• software developers"
-                className="w-full px-3 py-3 rounded-md border text-sm min-h-[120px] resize-vertical"
+                className="w-full px-3 py-3 rounded-md border text-sm min-h-[120px] resize-vertical focus:outline-none focus:ring-2 focus:ring-opacity-50"
                 style={{
                   backgroundColor: 'var(--color-bg-primary)',
-                  borderColor: 'var(--color-accent-light)',
-                  color: 'var(--color-text-primary)'
-                }}
+                  borderColor: 'var(--color-gray-light)',
+                  color: 'var(--color-text-primary)',
+                  '--tw-ring-color': 'var(--color-primary)'
+                } as any}
               />
               <div className="flex items-start gap-2">
                 <Info className="h-4 w-4 mt-0.5" style={{ color: 'var(--color-accent)' }} />
@@ -2356,7 +2345,7 @@ export default function IndustrySearchManager() {
           {/* City Selection - Always visible */}
           <div className="space-y-4 p-4 rounded-lg" style={{
             backgroundColor: 'var(--color-bg-secondary)',
-            border: '1px solid var(--color-info-light)'
+            border: '1px solid var(--color-gray-light)'
           }}>
             <div className="flex items-center gap-2 mb-3">
               <MapPinIcon className="h-4 w-4" style={{ color: 'var(--color-info)' }} />
@@ -2374,6 +2363,11 @@ export default function IndustrySearchManager() {
                 placeholder="Search for a city..."
                 className="pr-10"
                 onFocus={() => setShowCityDropdown(true)}
+                style={{
+                  backgroundColor: 'var(--color-bg-primary)',
+                  borderColor: 'var(--color-gray-light)',
+                  color: 'var(--color-text-primary)'
+                }}
               />
               {selectedCity && (
                 <button
@@ -2408,9 +2402,9 @@ export default function IndustrySearchManager() {
                           color: 'var(--color-text-primary)',
                           backgroundColor: 'transparent'
                         }}
-                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-gray-light)'}
+                        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)'}
                         onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                        onFocus={(e) => e.currentTarget.style.backgroundColor = 'var(--color-gray-light)'}
+                        onFocus={(e) => e.currentTarget.style.backgroundColor = 'var(--color-bg-secondary)'}
                         onBlur={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                       >
                         <div className="font-medium">{city.name}</div>

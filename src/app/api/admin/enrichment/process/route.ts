@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { adminAuthMiddleware } from '@/middleware/adminAuth';
-import { BusinessDirectoryUpdater, type EnrichmentResult } from '@/lib/enrichment/businessDirectoryUpdater';
+import { EnrichmentProcessor } from '@/lib/enrichment/enrichmentProcessor';
 
 async function handler(request: NextRequest) {
   try {
@@ -21,52 +21,10 @@ async function handler(request: NextRequest) {
       );
     }
 
-    // Validate enrichment result structure
-    // The API response has data directly under 'data' with company, contact, analysis, etc.
-    let processData;
-    if (enrichmentResult.data && enrichmentResult.data.company && enrichmentResult.data.contact) {
-      // This is the standard enrichment result format from the Marketing MCP API
-      processData = {
-        data: {
-          input: { 
-            websiteUrl: enrichmentResult.metadata?.websiteUrl || enrichmentResult.data.metadata?.baseUrl || 'unknown',
-            options: {
-              basicMode: true,
-              maxHtmlLength: 50000,
-              includeIntelligence: false,
-              includeStaffEnrichment: false,
-              includeExternalEnrichment: false,
-              includeTechnologyExtraction: true
-            }
-          },
-          // Direct fields matching the actual API response structure
-          ...enrichmentResult.data,
-          // Add missing fields that our interface expects
-          scrapedPages: [],
-          staffEnrichment: null,
-          websiteAnalysis: null,
-          scrapingStrategy: null,
-          aggregatedContent: '',
-          contactInformation: null
-        },
-        worker: 'api-processor',
-        success: true,
-        metadata: {
-          mode: 'basic',
-          type: 'basic_enrichment',
-          timestamp: new Date().toISOString()
-        },
-        processingTime: 0
-      };
-    } else {
-      return NextResponse.json(
-        { error: 'Invalid enrichment result structure - missing company or contact data' },
-        { status: 400 }
-      );
-    }
-
-    // Process the enrichment result
-    const result = await BusinessDirectoryUpdater.processEnrichmentResult(processData as EnrichmentResult);
+    // Use the original working flow - call BusinessDirectoryUpdater directly
+    const { BusinessDirectoryUpdater } = await import('@/lib/enrichment/businessDirectoryUpdater');
+    
+    const result = await BusinessDirectoryUpdater.processEnrichmentResult(enrichmentResult);
 
     if (!result.success) {
       return NextResponse.json(

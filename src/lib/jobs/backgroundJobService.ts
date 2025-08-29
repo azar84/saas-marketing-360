@@ -106,11 +106,23 @@ class BackgroundJobService {
         if (externalData.success && (externalData.status === 'completed' || externalData.result)) {
           console.log(`✅ Background service: Job ${job.id} completed!`);
           
+          // Parse the result if it's a JSON string
+          let parsedResult = externalData.result;
+          if (typeof externalData.result === 'string') {
+            try {
+              parsedResult = JSON.parse(externalData.result);
+            } catch (parseError) {
+              console.warn(`Failed to parse job result JSON for job ${job.id}:`, parseError);
+              // Keep the original string if parsing fails
+              parsedResult = externalData.result;
+            }
+          }
+          
           // Update job status in database
           await this.updateJobStatus(job.id, {
             status: 'completed',
             progress: 100,
-            result: externalData.result
+            result: parsedResult
           });
           
           // Sync keywords to industry if this is a keyword generation job

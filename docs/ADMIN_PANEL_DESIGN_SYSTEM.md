@@ -9,8 +9,8 @@ This document defines the standardized styling patterns for the admin panel to e
 ## 🎨 Color System
 
 ### Background Colors
-- **Main Container Background**: `Secondary Background`
-- **Card Background**: `Primary Background`
+- **Main Page Container**: `Primary Background`
+- **Card Background**: Alternates by depth (see Alternating Background Hierarchy)
 - **Sidebar Background**: `Dark Background`
 - **Table Header Background**: `Secondary Background`
 - **Table Body Background**: `Primary Background`
@@ -65,7 +65,9 @@ Use `Primary Text`
 - Description: `Secondary Text`
 
 ### Card
-- Background: `Primary Background`
+- Background: Alternates by nesting depth
+  - Inside a `Secondary` container → use `Primary`
+  - Inside a `Primary` container → use `Secondary`
 - Border: `Gray Light`
 
 ### Table
@@ -181,20 +183,21 @@ For content-heavy interfaces like HTML sections manager:
 When cards are nested within other cards (like in page builder), use this background pattern:
 
 #### Container Cards (Outer)
-- **Background**: `Secondary Background`
-- **Border**: `Gray Light`
-- **Padding**: `p-6`
-- **Border Radius**: `rounded-xl`
-- **Shadow**: `shadow-sm`
+- Background: Opposite of parent (alternate by depth)
+  - If parent is `Primary` → use `Secondary`
+  - If parent is `Secondary` → use `Primary`
+- Border: `Gray Light`
+- Padding: `p-6`
+- Border Radius: `rounded-xl`
+- Shadow: `shadow-sm`
 
 #### Content Cards (Inner)
-- **Background**: `Primary Background` (when active/visible)
-- **Background**: `Secondary Background` (when inactive/hidden)
-- **Border**: `Gray Light` (when active)
-- **Border**: `Muted Text` (when inactive)
-- **Padding**: `p-4`
-- **Border Radius**: `rounded-lg`
-- **Border Width**: `border-2`
+- Background: Opposite of its container (alternate by depth)
+  - Active/visible: background alternates per depth with `Gray Light` border
+  - Inactive/hidden: use `Secondary Background`, `Muted` border, reduced opacity
+- Padding: `p-4`
+- Border Radius: `rounded-lg`
+- Border Width: `border-2`
 
 #### Implementation Example
 ```tsx
@@ -227,6 +230,22 @@ When cards are nested within other cards (like in page builder), use this backgr
 ### Card States
 - **Active/Visible**: Full opacity, primary background, gray border
 - **Inactive/Hidden**: Reduced opacity (0.6), secondary background, muted border
+
+---
+
+## 📚 Alternating Background Hierarchy
+
+Use an alternating background pattern by nesting depth to ensure clear visual hierarchy. This matches the Company Directory implementation and should be followed across admin views.
+
+- **Level 1 — Main Page Container (view wrapper):** `Primary Background`
+- **Level 2 — Section Wrappers / Outer Containers:** `Secondary Background`
+- **Level 3 — Content Cards:** `Primary Background`
+- **Level 4 — Nested Blocks/Cards:** `Secondary Background`
+- Continue alternating for deeper nesting as needed
+
+Notes:
+- Tables still follow: Header `Secondary`, Rows `Primary`.
+- If a section wrapper visually functions as a card, prefer using the Card component and apply the level-appropriate background.
 - **Dragging**: Scale transform (1.05), primary border, 0.9 opacity
 
 ---

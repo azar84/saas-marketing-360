@@ -129,11 +129,23 @@ export function useJobPolling() {
                 console.log(`✅ Job ${job.id} completed!`);
                 console.log(`📊 Updating global state for job ${job.id} to completed`);
                 
+                // Parse the result if it's a JSON string
+                let parsedResult = externalData.result;
+                if (typeof externalData.result === 'string') {
+                  try {
+                    parsedResult = JSON.parse(externalData.result);
+                  } catch (parseError) {
+                    console.warn(`Failed to parse job result JSON for job ${job.id}:`, parseError);
+                    // Keep the original string if parsing fails
+                    parsedResult = externalData.result;
+                  }
+                }
+                
                 // Update global state immediately
                 updateJob(job.id, {
                   status: 'completed',
                   progress: 100,
-                  result: externalData.result,
+                  result: parsedResult,
                   completedAt: new Date().toISOString()
                 });
                 

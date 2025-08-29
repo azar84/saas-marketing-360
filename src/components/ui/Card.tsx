@@ -47,7 +47,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
         ref={ref}
         className={cn(cardVariants({ variant, padding, hover, className }))}
         style={{
-          backgroundColor: variant === 'outlined' ? 'transparent' : 'var(--color-bg-secondary, #F9FAFB)',
+          backgroundColor: variant === 'outlined' ? 'transparent' : 'var(--color-bg-primary, #FFFFFF)',
           borderColor: 'var(--color-gray-light, #E5E7EB)',
           color: 'var(--color-text-primary, #1F2937)'
         }}

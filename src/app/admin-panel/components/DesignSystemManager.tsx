@@ -452,7 +452,8 @@ const DesignSystemManager: React.FC = () => {
       {/* Tab Content */}
       <div className="space-y-8">
         {activeTab === 'colors' && (
-          <div className="space-y-8">
+          <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+            <div className="space-y-8">
             {/* Brand Colors */}
             <Card className="p-6">
               <h3 className="text-xl font-semibold mb-6 flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
@@ -597,11 +598,13 @@ const DesignSystemManager: React.FC = () => {
                 />
               </div>
             </Card>
-          </div>
+            </div>
+          </Card>
         )}
 
         {activeTab === 'typography' && (
-          <div className="space-y-8">
+          <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+            <div className="space-y-8">
             {/* Font Families */}
             <Card className="p-6">
               <h3 className="text-xl font-semibold mb-6 flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
@@ -759,11 +762,13 @@ const DesignSystemManager: React.FC = () => {
                 </div>
               </div>
             </Card>
-          </div>
+            </div>
+          </Card>
         )}
 
         {activeTab === 'spacing' && (
-          <div className="space-y-8">
+          <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+            <div className="space-y-8">
             {/* Spacing Scale */}
             <Card className="p-6">
               <h3 className="text-xl font-semibold mb-6 flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
@@ -944,11 +949,13 @@ const DesignSystemManager: React.FC = () => {
                 </div>
               </div>
             </Card>
-          </div>
+            </div>
+          </Card>
         )}
 
         {activeTab === 'effects' && (
-          <div className="space-y-8">
+          <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+            <div className="space-y-8">
             {/* Shadows */}
             <Card className="p-6">
               <h3 className="text-xl font-semibold mb-6 flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
@@ -1075,11 +1082,13 @@ const DesignSystemManager: React.FC = () => {
                 </div>
               </div>
             </Card>
-          </div>
+            </div>
+          </Card>
         )}
 
         {activeTab === 'breakpoints' && (
-          <div className="space-y-8">
+          <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+            <div className="space-y-8">
             <Card className="p-6">
               <h3 className="text-xl font-semibold mb-6 flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
                 <Monitor className="w-5 h-5 mr-2" />
@@ -1185,11 +1194,13 @@ const DesignSystemManager: React.FC = () => {
                 </div>
               </div>
             </Card>
-          </div>
+            </div>
+          </Card>
         )}
 
         {activeTab === 'preview' && (
-          <div className="space-y-8">
+          <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+            <div className="space-y-8">
             <Card className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-xl font-semibold flex items-center" style={{ color: 'var(--color-text-primary, #1F2937)' }}>
@@ -1369,7 +1380,8 @@ const DesignSystemManager: React.FC = () => {
                 </div>
               </div>
             </Card>
-          </div>
+            </div>
+          </Card>
         )}
       </div>
     </div>

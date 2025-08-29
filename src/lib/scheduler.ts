@@ -763,12 +763,24 @@ class AppScheduler {
           // Update job status in database
           const { PrismaClient } = await import('@prisma/client');
           const prisma = new PrismaClient();
+          // Parse the result if it's a JSON string
+          let parsedResult = externalData.result;
+          if (typeof externalData.result === 'string') {
+            try {
+              parsedResult = JSON.parse(externalData.result);
+            } catch (parseError) {
+              console.warn(`Failed to parse job result JSON for job ${job.id}:`, parseError);
+              // Keep the original string if parsing fails
+              parsedResult = externalData.result;
+            }
+          }
+          
           await prisma.job.update({
             where: { id: job.id },
             data: {
               status: 'completed',
               progress: 100,
-              result: externalData.result,
+              result: parsedResult,
               completedAt: new Date()
             }
           });
@@ -885,6 +897,17 @@ class AppScheduler {
 
           const jobResult = job.result as any;
           
+          // Fix the data structure by adding the missing input field
+          const fixedJobResult = {
+            ...jobResult,
+            data: {
+              ...jobResult.data,
+              input: {
+                websiteUrl: (job.metadata as any)?.websiteUrl || jobResult.data?.metadata?.baseUrl || 'unknown'
+              }
+            }
+          };
+          
           // Call the enrichment process API to save data
           const processResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000'}/api/admin/enrichment/process`, {
             method: 'POST',
@@ -892,12 +915,7 @@ class AppScheduler {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              enrichmentResult: {
-                data: jobResult.data,
-                metadata: {
-                  websiteUrl: (job.metadata as any)?.websiteUrl || jobResult.data?.metadata?.baseUrl || 'unknown'
-                }
-              },
+              enrichmentResult: fixedJobResult,
               jobId: job.id
             })
           });

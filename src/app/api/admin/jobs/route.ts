@@ -40,14 +40,17 @@ export async function POST(request: NextRequest) {
     }
 
     if (type === 'keyword-generation') {
+      console.log('🔑 Keyword generation job request received:', { type, data });
+      
       if (!data.industry || typeof data.industry !== 'string') {
+        console.error('❌ Invalid industry parameter:', data.industry);
         return NextResponse.json(
           { success: false, error: 'Industry parameter is required and must be a string' },
           { status: 400 }
         );
       }
 
-      console.log('Checking if industry already has keywords:', data.industry);
+      console.log('🔍 Checking if industry already has keywords:', data.industry);
 
       // Check if industry already has keywords
       try {
@@ -67,8 +70,14 @@ export async function POST(request: NextRequest) {
           }
         });
 
+        console.log('🏢 Industry record found:', industryRecord ? {
+          id: industryRecord.id,
+          label: industryRecord.label,
+          keywordsCount: industryRecord.keywords.length
+        } : null);
+
         if (industryRecord && industryRecord.keywords.length > 0) {
-          console.log(`Industry "${data.industry}" already has ${industryRecord.keywords.length} keywords, skipping job submission`);
+          console.log(`⏭️ Industry "${data.industry}" already has ${industryRecord.keywords.length} keywords, skipping job submission`);
           return NextResponse.json({
             success: false,
             error: 'Industry already has keywords',
@@ -78,24 +87,28 @@ export async function POST(request: NextRequest) {
           }, { status: 409 }); // 409 Conflict status code
         }
 
-        console.log(`Industry "${data.industry}" has no keywords, proceeding with job submission`);
+        console.log(`✅ Industry "${data.industry}" has no keywords, proceeding with job submission`);
       } catch (dbError) {
-        console.error('Error checking existing keywords:', dbError);
+        console.error('❌ Error checking existing keywords:', dbError);
         // Continue with job submission if database check fails
-        console.log('Database check failed, proceeding with job submission anyway');
+        console.log('⚠️ Database check failed, proceeding with job submission anyway');
       }
 
-      console.log('Submitting keyword generation job for industry:', data.industry);
+      console.log('🚀 Submitting keyword generation job for industry:', data.industry);
 
       // Submit job to external API
       const submitResult = await submitKeywordGenerationJob({ industry: data.industry });
+      console.log('📡 External API submit result:', submitResult);
 
       if (!submitResult.success || !submitResult.jobId) {
+        console.error('❌ External API submission failed:', submitResult);
         return NextResponse.json(
           { success: false, error: submitResult.error || 'Failed to submit job' },
           { status: 500 }
         );
       }
+
+      console.log('✅ External API submission successful, creating job record');
 
       // Create job record
       const job = createKeywordGenerationJob(
@@ -108,7 +121,7 @@ export async function POST(request: NextRequest) {
 
       await databaseJobStore.addJob(job);
 
-      console.log('Job submitted successfully:', {
+      console.log('💾 Job stored in database successfully:', {
         jobId: job.id,
         type: job.type,
         industry: job.metadata.industry,

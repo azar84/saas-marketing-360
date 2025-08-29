@@ -49,10 +49,12 @@ export default function JobsManager() {
     loadJobs();
   }, []);
 
-  // Process any existing completed enrichment jobs that haven't been processed yet
+  // Clean up any existing job results that are still JSON strings
   useEffect(() => {
     if (jobs.length > 0) {
-      processExistingCompletedEnrichmentJobs();
+      cleanupExistingJobResults();
+      // Note: Enrichment processing is now handled automatically by the server-side scheduler
+      // No need to process jobs from the frontend
     }
   }, [jobs]);
 
@@ -77,46 +79,32 @@ export default function JobsManager() {
     }
   };
 
-  const processExistingCompletedEnrichmentJobs = async () => {
-    try {
-      const completedEnrichmentJobs = jobs.filter(job => 
-        job.type === 'basic-enrichment' && 
-        job.status === 'completed' && 
-        job.result && 
-        !job.result.processed // Check if already processed
-      );
+  const cleanupExistingJobResults = () => {
+    // Clean up any existing job results that are still JSON strings
+    const jobsToCleanup = jobs.filter(job => 
+      job.status === 'completed' && 
+      job.result && 
+      typeof job.result === 'string' &&
+      job.result.startsWith('{') // Likely a JSON string
+    );
+    
+    if (jobsToCleanup.length > 0) {
+      console.log(`🧹 Cleaning up ${jobsToCleanup.length} job results with unparsed JSON strings`);
       
-      if (completedEnrichmentJobs.length === 0) {
-        return;
-      }
-      
-      console.log(`🔄 Processing ${completedEnrichmentJobs.length} existing completed enrichment jobs`);
-      
-      for (const job of completedEnrichmentJobs) {
+      jobsToCleanup.forEach(job => {
         try {
-          // Pass the full enrichment result structure that the API expects
-          const fullEnrichmentResult = {
-            data: job.result.data, // Extract the actual enrichment data
-            metadata: {
-              websiteUrl: job.metadata?.websiteUrl || 'unknown'
-            }
-          };
-          
-          await processEnrichmentResult(fullEnrichmentResult, job.id);
-          
-          // Mark as processed to avoid reprocessing
-          await updateJobStatus(job.id, {
-            result: { ...job.result, processed: true }
-          });
-          
-        } catch (error) {
-          console.error(`❌ Failed to process existing enrichment job ${job.id}:`, error);
+          const parsedResult = JSON.parse(job.result);
+          updateJob(job.id, { result: parsedResult });
+          console.log(`✅ Cleaned up job result for ${job.id}`);
+        } catch (parseError) {
+          console.warn(`⚠️ Failed to parse job result for ${job.id}:`, parseError);
         }
-      }
-    } catch (error) {
-      console.error('❌ Error processing existing completed enrichment jobs:', error);
+      });
     }
   };
+
+  // Note: Enrichment processing is now handled automatically by the server-side scheduler
+  // This function has been removed to avoid duplicate processing
 
   const pollIncompleteJobs = async () => {
     // Only poll jobs that are not completed
@@ -148,10 +136,22 @@ export default function JobsManager() {
               const externalData = data.data; // Extract the actual external API response
               
               if (externalData.success && (externalData.status === 'completed' || externalData.result)) {
+                // Parse the result if it's a JSON string
+                let parsedResult = externalData.result;
+                if (typeof externalData.result === 'string') {
+                  try {
+                    parsedResult = JSON.parse(externalData.result);
+                  } catch (parseError) {
+                    console.warn(`Failed to parse job result JSON for job ${job.id}:`, parseError);
+                    // Keep the original string if parsing fails
+                    parsedResult = externalData.result;
+                  }
+                }
+                
                 await updateJobStatus(job.id, {
                   status: 'completed',
                   progress: 100,
-                  result: externalData.result,
+                  result: parsedResult,
                   completedAt: new Date().toISOString()
                 });
                 
@@ -160,17 +160,9 @@ export default function JobsManager() {
                   await syncKeywordsToIndustry(job.metadata?.industry, externalData.result);
                 }
                 
-                // Process enrichment result and save to business directory if this is a basic enrichment job
-                if (job.type === 'basic-enrichment' && externalData.result) {
-                  // Pass the full enrichment result structure that the API expects
-                  const fullEnrichmentResult = {
-                    data: externalData.result,
-                    metadata: {
-                      websiteUrl: job.metadata?.websiteUrl || 'unknown'
-                    }
-                  };
-                  await processEnrichmentResult(fullEnrichmentResult, job.id);
-                }
+                // Note: Enrichment processing is now handled automatically by the server-side scheduler
+                // No need to process jobs from the frontend - just update the job status
+                // The scheduler will pick up completed jobs and process them automatically
               } else if (externalData.status && externalData.status !== job.status) {
                 await updateJobStatus(job.id, {
                   status: externalData.status,
@@ -492,7 +484,7 @@ export default function JobsManager() {
         </CardHeader>
                 <CardContent>
           {jobs.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
+            <div className="text-center py-8" style={{ color: 'var(--color-text-secondary)' }}>
               No jobs found. Jobs will appear here when submitted.
             </div>
           ) : (
@@ -500,28 +492,31 @@ export default function JobsManager() {
               {jobs.map((job) => (
                 <div
                   key={job.id}
-                  className="border rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                  className="border rounded-lg p-4 transition-colors"
+                  style={{ backgroundColor: 'var(--color-bg-primary)', borderColor: 'var(--color-gray-light)' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = 'var(--color-bg-secondary)'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.backgroundColor = 'var(--color-bg-primary)'; }}
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div className="flex items-center gap-2">
                         {getJobTypeIcon(job.type)}
-                        <span className="text-sm font-medium text-gray-700">
+                        <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
                           {getJobTypeName(job.type)}
                         </span>
                       </div>
                       <div>
-                        <h3 className="font-medium text-gray-900">{getJobData(job)}</h3>
-                        <p className="text-sm text-gray-500">
+                        <h3 className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{getJobData(job)}</h3>
+                        <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                           Submitted: {formatDate(job.submittedAt)}
                         </p>
                         {job.completedAt && (
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
                             Completed: {formatDate(job.completedAt)}
                           </p>
                         )}
                         {job.metadata?.pollUrl && (
-                          <p className="text-xs text-blue-600 font-mono">
+                          <p className="text-xs font-mono" style={{ color: 'var(--color-primary)' }}>
                             Poll URL: {job.metadata.pollUrl}
                           </p>
                         )}
@@ -531,16 +526,16 @@ export default function JobsManager() {
                     <div className="flex items-center gap-2">
                       {job.status === 'queued' && (
                         <div className="flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-yellow-600"></div>
-                          <span className="text-sm text-yellow-600 font-medium">Queued</span>
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2" style={{ borderColor: 'var(--color-warning)', borderBottomColor: 'transparent' }}></div>
+                          <span className="text-sm font-medium" style={{ color: 'var(--color-warning)' }}>Queued</span>
                         </div>
                       )}
                       
                       {(job.status === 'processing' || job.status === 'active') && (
                         <div className="flex items-center gap-2">
-                          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                          <span className="text-sm text-blue-600 font-medium">Processing...</span>
-                          <span className="text-sm text-gray-600">
+                          <div className="animate-spin rounded-full h-4 w-4 border-b-2" style={{ borderColor: 'var(--color-info)', borderBottomColor: 'transparent' }}></div>
+                          <span className="text-sm font-medium" style={{ color: 'var(--color-info)' }}>Processing...</span>
+                          <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
                             {job.progress}%
                           </span>
                         </div>
@@ -572,8 +567,8 @@ export default function JobsManager() {
                       
                       {job.status === 'failed' && (
                         <div className="flex items-center gap-2">
-                          <XCircle className="w-4 h-4 text-red-500" />
-                          <span className="text-sm text-red-600 font-medium">Failed</span>
+                          <XCircle className="w-4 h-4" style={{ color: 'var(--color-error)' }} />
+                          <span className="text-sm font-medium" style={{ color: 'var(--color-error)' }}>Failed</span>
                         </div>
                       )}
                       
@@ -590,10 +585,10 @@ export default function JobsManager() {
                   
                   {(job.status === 'processing' || job.status === 'active') && (
                     <div className="mt-3">
-                      <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div className="w-full rounded-full h-2" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
                         <div
-                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${job.progress}%` }}
+                          className="h-2 rounded-full transition-all duration-300"
+                          style={{ width: `${job.progress}%`, backgroundColor: 'var(--color-primary)' }}
                         />
                       </div>
                     </div>
@@ -629,7 +624,7 @@ export default function JobsManager() {
       {/* Job Details Modal */}
       {selectedJob && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto border" style={{ backgroundColor: 'var(--color-bg-primary)', borderColor: 'var(--color-gray-light)' }}>
             <div className="p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-2xl font-bold">Job Results: {getJobData(selectedJob)}</h2>
@@ -677,11 +672,128 @@ export default function JobsManager() {
                 {(selectedJob.type === 'basic-enrichment' || selectedJob.type === 'enhanced-enrichment') && selectedJob.result && (
                   <div>
                     <h3 className="text-lg font-semibold mb-3">Enrichment Result</h3>
-                    <div className="p-3 bg-gray-50 rounded-md">
-                      <pre className="text-sm overflow-auto max-h-96">
-                        {JSON.stringify(selectedJob.result, null, 2)}
-                      </pre>
-                    </div>
+                    
+                    {/* Handle case where result might still be a JSON string */}
+                    {typeof selectedJob.result === 'string' && (
+                      <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-md">
+                        <p className="text-sm text-orange-800">
+                          <strong>Note:</strong> This result appears to be stored as a JSON string. 
+                          The system will automatically parse this on the next refresh.
+                        </p>
+                        <button 
+                          onClick={() => {
+                            try {
+                              const parsedResult = JSON.parse(selectedJob.result);
+                              updateJob(selectedJob.id, { result: parsedResult });
+                              setSelectedJob({ ...selectedJob, result: parsedResult });
+                            } catch (parseError) {
+                              console.error('Failed to parse result:', parseError);
+                            }
+                          }}
+                          className="mt-2 px-3 py-1 bg-orange-100 text-orange-800 rounded text-sm hover:bg-orange-200"
+                        >
+                          Parse Now
+                        </button>
+                      </div>
+                    )}
+                    
+                    {/* Display key enrichment data in a structured format */}
+                    {(selectedJob.result.data || (typeof selectedJob.result === 'string' && selectedJob.result.startsWith('{'))) && (
+                      <div className="space-y-4">
+                        {/* If result is still a string, try to parse it for display */}
+                        {typeof selectedJob.result === 'string' && (
+                          <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                            <p className="text-sm text-red-800">
+                              <strong>Warning:</strong> Result is stored as a JSON string. 
+                              Please use the "Parse Now" button above to view structured data.
+                            </p>
+                          </div>
+                        )}
+                        
+                        {/* Only show structured data if result is parsed */}
+                        {selectedJob.result.data && (
+                          <>
+                            {/* Company Information */}
+                            {selectedJob.result.data.company && (
+                              <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                                <h4 className="font-semibold text-blue-800 mb-2">Company Information</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                                  <div><span className="font-medium">Name:</span> {selectedJob.result.data.company.name || 'Unknown'}</div>
+                                  <div><span className="font-medium">Website:</span> {selectedJob.result.data.company.website || 'Unknown'}</div>
+                                  {selectedJob.result.data.company.categories && selectedJob.result.data.company.categories.length > 0 && (
+                                    <div className="md:col-span-2">
+                                      <span className="font-medium">Categories:</span> {selectedJob.result.data.company.categories.join(', ')}
+                                    </div>
+                                  )}
+                                  {selectedJob.result.data.company.services && selectedJob.result.data.company.services.length > 0 && (
+                                    <div className="md:col-span-2">
+                                      <span className="font-medium">Services:</span> {selectedJob.result.data.company.services.join(', ')}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Contact Information */}
+                            {selectedJob.result.data.contact && (
+                              <div className="p-3 bg-green-50 border border-green-200 rounded-md">
+                                <h4 className="font-semibold text-green-800 mb-2">Contact Information</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                                  {selectedJob.result.data.contact.primary?.emails && selectedJob.result.data.contact.primary.emails.length > 0 && (
+                                    <div className="md:col-span-2">
+                                      <span className="font-medium">Emails:</span> {selectedJob.result.data.contact.primary.emails.join(', ')}
+                                    </div>
+                                  )}
+                                  {selectedJob.result.data.contact.primary?.phones && selectedJob.result.data.contact.primary.phones.length > 0 && (
+                                    <div className="md:col-span-2">
+                                      <span className="font-medium">Phones:</span> {selectedJob.result.data.contact.primary.phones.map((phone: any, idx: number) => 
+                                        `${phone.number}${phone.label ? ` (${phone.label})` : ''}`
+                                      ).join(', ')}
+                                    </div>
+                                  )}
+                                  {selectedJob.result.data.contact.addresses && selectedJob.result.data.contact.addresses.length > 0 && (
+                                    <div className="md:col-span-2">
+                                      <span className="font-medium">Addresses:</span> {selectedJob.result.data.contact.addresses.map((addr: any, idx: number) => 
+                                        `${addr.fullAddress || `${addr.streetAddress}, ${addr.city}, ${addr.stateProvince} ${addr.zipPostalCode}`}`
+                                      ).join('; ')}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Analysis Results */}
+                            {selectedJob.result.data.analysis && (
+                              <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                                <h4 className="font-semibold text-yellow-800 mb-2">Analysis Results</h4>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                                  <div><span className="font-medium">Is Business:</span> {selectedJob.result.data.analysis.isBusiness ? 'Yes' : 'No'}</div>
+                                  <div><span className="font-medium">Business Type:</span> {selectedJob.result.data.analysis.businessType || 'Unknown'}</div>
+                                  <div><span className="font-medium">Confidence:</span> {selectedJob.result.data.analysis.confidence || 0}</div>
+                                  {selectedJob.result.data.analysis.reasoning && (
+                                    <div className="md:col-span-2">
+                                      <span className="font-medium">Reasoning:</span> {selectedJob.result.data.analysis.reasoning}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )}
+                    
+                    {/* Raw JSON for debugging */}
+                    <details className="mt-4">
+                      <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-800">
+                        View Raw JSON Data
+                      </summary>
+                      <div className="p-3 bg-gray-50 rounded-md mt-2">
+                        <pre className="text-xs overflow-auto max-h-96">
+                          {JSON.stringify(selectedJob.result, null, 2)}
+                        </pre>
+                      </div>
+                    </details>
                   </div>
                 )}
                 

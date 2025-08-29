@@ -10,6 +10,9 @@ interface FlatItem {
   id: number;
   title: string;
   keywordsCount?: number;
+  businessesCount?: number;
+  childCount?: number;
+  hasChildren?: boolean;
 }
 
 interface ListResponse {
@@ -18,6 +21,9 @@ interface ListResponse {
     id: number;
     title: string;
     keywordsCount?: number;
+    businessesCount?: number;
+    childCount?: number;
+    hasChildren?: boolean;
   }>;
   pagination: {
     page: number;
@@ -106,7 +112,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
   const [selectedIndustry, setSelectedIndustry] = useState<FlatItem | null>(null);
   const [industryKeywords, setIndustryKeywords] = useState<IndustryKeywords | null>(null);
   const [loadingKeywords, setLoadingKeywords] = useState(false);
-  const [sortBy, setSortBy] = useState<'id' | 'label' | 'keywordsCount'>('id');
+  const [sortBy, setSortField] = useState<'id' | 'label' | 'keywordsCount' | 'businessesCount' | 'childCount'>('id');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   
   // Delete confirmation state
@@ -172,7 +178,10 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
         const mappedItems = data.data.map(d => ({ 
           id: d.id, 
           title: d.title, 
-          keywordsCount: d.keywordsCount || 0 
+          keywordsCount: d.keywordsCount || 0,
+          businessesCount: d.businessesCount || 0,
+          childCount: d.childCount || 0,
+          hasChildren: d.hasChildren || false
         }));
         
         setItems(mappedItems);
@@ -311,6 +320,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
   };
 
   const generateFor = async (id: number, title: string) => {
+    console.log('🚀 Starting keyword generation for:', title, 'ID:', id);
     setGenError(null);
     setKeywords(null);
     setSuccessMessage(''); // Clear any previous success message
@@ -320,6 +330,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
     try {
       // Optimistically show spinner immediately
       tempJobId = `temp:${Date.now()}:${title}`;
+      console.log('➕ Adding optimistic job with ID:', tempJobId);
       addJob({
         id: tempJobId,
         type: 'keyword-generation' as any,
@@ -330,6 +341,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
       } as any);
 
       // Submit job to the new job management system
+      console.log('📤 Submitting job to API for industry:', title);
       const res = await fetch('/api/admin/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -339,9 +351,12 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
         })
       });
       
+      console.log('📥 API Response status:', res.status, res.statusText);
+      
       // Handle skip case (409 status)
       if (res.status === 409) {
         const skipData = await res.json();
+        console.log('⏭️ Skipping generation - industry already has keywords:', skipData);
         if (skipData.skipped) {
           // Clean up optimistic job
           try { removeJob(tempJobId); } catch {}
@@ -351,9 +366,16 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
         }
       }
       
-      if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      if (!res.ok) {
+        console.error('❌ API request failed:', res.status, res.statusText);
+        const errorText = await res.text();
+        console.error('❌ Error response body:', errorText);
+        throw new Error(`HTTP ${res.status}: ${res.statusText} - ${errorText}`);
+      }
       
       const data = await res.json();
+      console.log('📊 API Response data:', data);
+      
       if (data.success && data.job) {
         console.log(`✅ Job submitted successfully for "${title}"`, data.job);
         
@@ -384,10 +406,11 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
         setTimeout(() => setSuccessMessage(''), 3000);
         
       } else {
+        console.error('❌ API returned success=false:', data);
         throw new Error(data.error || 'Failed to submit job');
       }
     } catch (error) {
-      console.error('Job submission failed:', error);
+      console.error('💥 Job submission failed:', error);
       // Clean up optimistic job if present
       if (tempJobId) {
         try { removeJob(tempJobId); } catch {}
@@ -701,24 +724,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
             <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
             {isRefreshing ? 'Refreshing...' : 'Refresh'}
           </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={async () => {
-              try {
-                const res = await fetch('/api/admin/industries/debug');
-                const data = await res.json();
-                console.log('Debug data:', data);
-                alert(`Debug info loaded! Check console for details.\n\nTotal keywords: ${data.data.totalKeywords}\nIndustries with keywords: ${data.data.industries.filter((i: any) => i._count.keywords > 0).length}`);
-              } catch (error) {
-                console.error('Debug failed:', error);
-                alert('Debug failed: ' + error);
-              }
-            }}
-            className="flex items-center gap-2"
-          >
-            🐛 Debug DB
-          </Button>
+          
           {isLoading && (
             <div className="flex items-center gap-3 px-4 py-2 rounded-lg" style={{ 
               backgroundColor: 'var(--color-bg-secondary)',
@@ -746,7 +752,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
       )}
 
       {/* Search */}
-      <Card>
+      <Card style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
         <CardContent className="space-y-3">
           <label htmlFor="industry-search" className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
             Search Industries
@@ -824,7 +830,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                 <select
                   value={sortBy}
                   onChange={(e) => {
-                    setSortBy(e.target.value as 'id' | 'label' | 'keywordsCount');
+                    setSortField(e.target.value as 'id' | 'label' | 'keywordsCount' | 'businessesCount' | 'childCount');
                     setPage(1); // Reset to first page when sorting changes
                   }}
                   className="text-xs px-2 py-1 rounded border transition-colors focus:outline-none focus:ring-1 focus:ring-opacity-50"
@@ -838,6 +844,8 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                   <option value="id">ID</option>
                   <option value="label">Industry Name</option>
                   <option value="keywordsCount">Keywords Count</option>
+                  <option value="businessesCount">Businesses Count</option>
+                  <option value="childCount">Sub-Industries Count</option>
                 </select>
                 <button
                   onClick={() => {
@@ -883,10 +891,10 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
             </div>
           </div>
           
-          <div className="overflow-hidden">
+          <Card className="overflow-hidden" style={{ backgroundColor: 'var(--color-bg-primary)', borderColor: 'var(--color-gray-light)' }}>
             <table className="min-w-full">
               <thead>
-                <tr style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+                <tr style={{ backgroundColor: 'var(--color-bg-secondary)', borderBottom: '1px solid var(--color-gray-light)' }}>
                   <th 
                     className="text-left px-6 py-4 text-xs font-semibold tracking-wider uppercase cursor-pointer hover:bg-opacity-80 transition-colors"
                     style={{ color: 'var(--color-text-secondary)' }}
@@ -894,7 +902,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                       if (sortBy === 'id') {
                         setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
                       } else {
-                        setSortBy('id');
+                        setSortField('id');
                         setSortOrder('asc');
                       }
                       setPage(1);
@@ -916,7 +924,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                       if (sortBy === 'label') {
                         setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
                       } else {
-                        setSortBy('label');
+                        setSortField('label');
                         setSortOrder('asc');
                       }
                       setPage(1);
@@ -938,7 +946,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                       if (sortBy === 'keywordsCount') {
                         setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
                       } else {
-                        setSortBy('keywordsCount');
+                        setSortField('keywordsCount');
                         setSortOrder('desc'); // Default to descending for keywords count
                       }
                       setPage(1);
@@ -953,14 +961,61 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                       )}
                     </div>
                   </th>
+                  <th className="text-left px-6 py-4 text-xs font-semibold tracking-wider uppercase cursor-pointer hover:bg-opacity-80 transition-colors" style={{ color: 'var(--color-text-secondary)' }}
+                    onClick={() => {
+                      if (sortBy === 'businessesCount') {
+                        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                      } else {
+                        setSortField('businessesCount');
+                        setSortOrder('desc'); // Default to descending for businesses count
+                      }
+                      setPage(1);
+                    }}
+                  >
+                    <div className="flex items-center gap-1">
+                      Businesses
+                      {sortBy === 'businessesCount' && (
+                        <span className="text-xs" style={{ color: 'var(--color-primary)' }}>
+                          {sortOrder === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
+                  </th>
+                  <th className="text-left px-6 py-4 text-xs font-semibold tracking-wider uppercase cursor-pointer hover:bg-opacity-80 transition-colors" style={{ color: 'var(--color-text-secondary)' }}
+                    onClick={() => {
+                      if (sortBy === 'childCount') {
+                        setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+                      } else {
+                        setSortField('childCount');
+                        setSortOrder('desc'); // Default to descending for sub-industries count
+                      }
+                      setPage(1);
+                    }}
+                  >
+                    <div className="flex items-center gap-1">
+                      Sub-Industries
+                      {sortBy === 'childCount' && (
+                        <span className="text-xs" style={{ color: 'var(--color-primary)' }}>
+                          {sortOrder === 'asc' ? '↑' : '↓'}
+                        </span>
+                      )}
+                    </div>
+                  </th>
                   <th className="text-left px-6 py-4 text-xs font-semibold tracking-wider uppercase" style={{ color: 'var(--color-text-secondary)' }}>Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y" style={{ borderColor: 'var(--color-gray-light)' }}>
+              <tbody>
                 {items.map((item, index) => (
-                  <tr key={item.id} className={index % 2 === 0 ? '' : 'bg-opacity-50'} style={{ 
-                    backgroundColor: index % 2 === 0 ? 'transparent' : 'var(--color-bg-secondary)' 
-                  }}>
+                  <tr 
+                    key={item.id} 
+                    className="transition-colors"
+                    style={{ 
+                      backgroundColor: 'var(--color-bg-primary)',
+                      borderTop: index > 0 ? '1px solid var(--color-gray-light)' : 'none'
+                    }}
+                    onMouseEnter={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = 'var(--color-bg-secondary)'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLTableRowElement).style.backgroundColor = 'var(--color-bg-primary)'; }}
+                  >
                     <td className="px-6 py-4 align-top font-mono text-sm" style={{ color: 'var(--color-text-secondary)' }}>{item.id}</td>
                     <td className="px-6 py-4 align-top">
                       <span className="font-medium" style={{ color: 'var(--color-text-primary)' }}>{item.title}</span>
@@ -980,6 +1035,16 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                             )}
                           </span>
                         )}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 align-top">
+                      <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                        {item.businessesCount || 0}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 align-top">
+                      <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                        {item.childCount || 0}
                       </span>
                     </td>
                     <td className="px-6 py-4 align-top">
@@ -1071,7 +1136,7 @@ export default function NAICSManager({ onResult }: { onResult?: (payload: Keywor
                 ))}
               </tbody>
             </table>
-          </div>
+          </Card>
         </Card>
       )}
 

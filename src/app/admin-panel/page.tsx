@@ -50,18 +50,17 @@ import NAICSManager from './components/NAICSManager';
 import KeywordsManager from './components/KeywordsManager';
 import KeywordsResult from './components/KeywordsResult';
 import JobsManager from './components/JobsManager';
-import SearchEngineManager from './components/SearchEngineManager';
 import IndustrySearchManager from './components/IndustrySearchManager';
 import CompanyDirectoryManager from './components/CompanyDirectoryManager';
 
-import TraceabilityViewer from './components/TraceabilityViewer';
+import SearchData from './components/SearchData';
 import { NotificationCenter } from '@/components/ui/NotificationCenter';
 import { useNotificationContext } from '@/components/providers/NotificationProvider';
 
 // Force dynamic rendering
 export const dynamic = 'force-dynamic';
 
-type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'geographic-manager' | 'naics-manager' | 'keyword-jobs' | 'search-engine' | 'industry-search' | 'business-directory' | 'enrichment' | 'traceability';
+type Section = 'dashboard' | 'media-library' | 'pricing' | 'faq-management' | 'contact-management' | 'newsletter-management' | 'script-installation' | 'users' | 'site-settings' | 'design-system' | 'scheduler' | 'geographic-manager' | 'naics-manager' | 'keyword-jobs' | 'industry-search' | 'business-directory' | 'enrichment' | 'search-data';
 
 // Navigation items with design system colors
 const getNavigationItems = (designSystem: any) => {
@@ -74,8 +73,7 @@ const getNavigationItems = (designSystem: any) => {
     { id: 'enrichment', name: 'Data Enrichment', icon: Zap, color: colors.info },
     { id: 'naics-manager', name: 'Industry Manager', icon: BarChart3, color: colors.accent },
     { id: 'keyword-jobs', name: 'Jobs', icon: Clock, color: colors.warning },
-    { id: 'traceability', name: 'Traceability', icon: Database, color: colors.accent },
-    { id: 'search-engine', name: 'Search Engine', icon: Search, color: colors.info },
+    { id: 'search-data', name: 'Search Data', icon: Database, color: colors.accent },
     // { id: 'tech-discovery', name: 'Tech Discovery', icon: Search, color: colors.accent }, // Removed
     { id: 'geographic-manager', name: 'Geographic Database', icon: Globe, color: colors.success },
     { id: 'media-library', name: 'Media Library', icon: FolderOpen, color: colors.primary },
@@ -209,13 +207,13 @@ export default function AdminPanel() {
     return () => clearInterval(interval);
   }, [user, router, get, isLoading]);
 
-  // Lightweight hash-based routing for deep-link actions (e.g., View Traceability)
+  // Lightweight hash-based routing for deep-link actions (e.g., View Search Data)
   useEffect(() => {
     const applyHashRoute = () => {
       if (typeof window === 'undefined') return;
       const hash = window.location.hash || '';
-      if (hash.startsWith('#traceability')) {
-        setActiveSection('traceability');
+      if (hash.startsWith('#search-data')) {
+        setActiveSection('search-data');
       }
     };
     applyHashRoute();
@@ -223,10 +221,10 @@ export default function AdminPanel() {
     return () => window.removeEventListener('hashchange', applyHashRoute);
   }, []);
 
-  // When switching away from traceability, clear any leftover hash
+  // When switching away from search-data, clear any leftover hash
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    if (activeSection !== 'traceability' && window.location.hash.startsWith('#traceability')) {
+    if (activeSection !== 'search-data' && window.location.hash.startsWith('#search-data')) {
       try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch {}
     }
   }, [activeSection]);
@@ -377,13 +375,13 @@ export default function AdminPanel() {
             <JobsManager />
           </div>
         );
-      case 'traceability':
+      case 'search-data':
         return (
           <div 
             className="p-8 space-y-8"
             style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
           >
-            <TraceabilityViewer />
+            <SearchData />
           </div>
         );
       case 'users':
@@ -422,15 +420,7 @@ export default function AdminPanel() {
             <DesignSystemManager />
           </div>
         );
-      case 'search-engine':
-        return (
-          <div 
-            className="p-8 space-y-8"
-            style={{ backgroundColor: 'var(--color-bg-primary, #FFFFFF)' }}
-          >
-            <SearchEngineManager />
-          </div>
-        );
+      
       case 'industry-search':
         return (
           <div 
@@ -511,7 +501,8 @@ export default function AdminPanel() {
             </div>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Card className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
@@ -623,10 +614,12 @@ export default function AdminPanel() {
                   </span>
                 </div>
               </Card>
-            </div>
+              </div>
+            </Card>
 
             {/* Quick Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <Card className="p-6" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setActiveSection('site-settings')}>
                 <div className="flex items-center space-x-4">
                   <div 
@@ -662,25 +655,8 @@ export default function AdminPanel() {
                   </div>
                 </div>
               </Card>
-
-              <Card className="p-6 cursor-pointer hover:shadow-lg transition-shadow" onClick={() => setActiveSection('search-engine')}>
-                <div className="flex items-center space-x-4">
-                  <div 
-                    className="p-3 rounded-lg"
-                    style={{ backgroundColor: `${designSystem?.infoColor || '#3B82F6'}1A` }}
-                  >
-                    <Search 
-                      className="w-6 h-6" 
-                      style={{ color: designSystem?.infoColor || '#3B82F6' }}
-                    />
-                  </div>
-                  <div>
-                    <h3 style={{ color: 'var(--color-text-primary, #1F2937)' }} className="font-semibold">Search Engine</h3>
-                    <p style={{ color: 'var(--color-text-secondary, #6B7280)' }} className="text-sm">Optimize your site for search engines</p>
-                  </div>
-                </div>
-              </Card>
-            </div>
+              </div>
+            </Card>
           </div>
         );
     }
@@ -753,8 +729,8 @@ export default function AdminPanel() {
                     if (window.innerWidth < 1024) {
                       setSidebarOpen(false);
                     }
-                    // Clear traceability hash when leaving that view
-                    if (typeof window !== 'undefined' && (item.id as Section) !== 'traceability') {
+                    // Clear search-data hash when leaving that view
+                    if (typeof window !== 'undefined' && (item.id as Section) !== 'search-data') {
                       try { history.replaceState(null, '', window.location.pathname + window.location.search); } catch {}
                     }
                   }}

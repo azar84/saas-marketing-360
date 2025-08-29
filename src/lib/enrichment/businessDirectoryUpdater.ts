@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { getCountryStoredValue, getStateProvinceStoredValue } from '@/lib/utils/locationNormalizer';
+import { getCountryStoredValue, getStateProvinceStoredValue } from '../utils/locationNormalizer';
 
 const prisma = new PrismaClient();
 
@@ -149,15 +149,48 @@ export class BusinessDirectoryUpdater {
   }> {
     try {
       const { data } = enrichmentResult;
-      const { input, analysis } = data;
-      const websiteUrl = input.websiteUrl;
+      const { input, analysis, contact } = data;
+      
+      // Validate that we have the required website URL data
+      let websiteUrl = null;
+      
+      // Check multiple possible locations for website URL
+      if (input?.websiteUrl) {
+        websiteUrl = input.websiteUrl;
+      } else if (data.company?.website) {
+        websiteUrl = data.company.website;
+      } else if (data.metadata?.baseUrl) {
+        websiteUrl = data.metadata.baseUrl;
+      }
+      
+      if (!websiteUrl) {
+        console.error('❌ Missing website URL in enrichment data:', { 
+          input: input?.websiteUrl, 
+          companyWebsite: data.company?.website, 
+          metadataBaseUrl: data.metadata?.baseUrl,
+          enrichmentResult 
+        });
+        return {
+          success: false,
+          error: 'Missing website URL in enrichment data'
+        };
+      }
 
       // Extract business data from the enrichment result
-      const businessData = this.extractBusinessData(data);
+      const businessData = BusinessDirectoryUpdater.extractBusinessData(data);
+      
+      // Validate that we have basic business data
+      if (!businessData.name) {
+        console.error('❌ Missing business name from enrichment data:', businessData);
+        return {
+          success: false,
+          error: 'Missing business name from enrichment data'
+        };
+      }
 
-      // Check if this is actually a business - only save when isBusiness is explicitly true
-      if (analysis?.isBusiness !== true) {
-        console.log(`🚫 Skipping non-business website: ${websiteUrl} (${analysis?.companyName || 'Unknown'}) - ${analysis?.reasoning || 'Not a business'}`);
+      // Skip directory businesses (platforms that list other businesses)
+      if (analysis?.businessType === 'directory') {
+        console.log(`🚫 Skipping directory business: ${websiteUrl} (${analysis?.companyName || 'Unknown'}) - ${analysis?.reasoning || 'Directory platform detected'}`);
         return {
           success: true,
           businessId: undefined,
@@ -165,6 +198,29 @@ export class BusinessDirectoryUpdater {
           updated: false,
           error: undefined
         };
+      }
+
+      // Check if this is actually a business - be more flexible with the check
+      // Allow saving if we have good contact information, even if business analysis failed
+      const hasGoodContactInfo = contact?.primary?.emails?.length > 0 || contact?.primary?.phones?.length > 0 || contact?.addresses?.length > 0;
+      const hasGoodContactConfidence = contact?.confidence > 0.7;
+      
+      // For your API response structure, we need to check if we have company data
+      const hasCompanyData = data.company?.name && (data.company?.services || data.company?.description);
+      
+      if (analysis?.isBusiness !== true && !(hasGoodContactInfo && hasGoodContactConfidence) && !hasCompanyData) {
+        console.log(`🚫 Skipping non-business website: ${websiteUrl} (${analysis?.companyName || 'Unknown'}) - ${analysis?.reasoning || 'Not a business'} and insufficient contact data`);
+        return {
+          success: true,
+          businessId: undefined,
+          created: false,
+          updated: false,
+          error: undefined
+        };
+      }
+
+      if (analysis?.isBusiness !== true && hasCompanyData) {
+        console.log(`⚠️ Business analysis failed but saving due to company data: ${websiteUrl} (${analysis?.companyName || 'Unknown'})`);
       }
 
       console.log(`✅ Processing business website: ${websiteUrl} (${analysis?.companyName || 'Unknown'}) - ${analysis?.reasoning || 'Business confirmed'}`);
@@ -213,50 +269,83 @@ export class BusinessDirectoryUpdater {
         });
         created = true;
         console.log(`✅ Created new company: ${business.name} (ID: ${business.id})`);
+        
+        // Notify the global company store about the new company
+        try {
+          // Import and update the company store
+          const { useCompanyStore } = await import('../companyStore');
+          const companyStore = useCompanyStore.getState();
+          
+          // Fetch the complete company data with all relations
+          const completeCompany = await prisma.company.findUnique({
+            where: { id: business.id },
+            include: {
+              addresses: true,
+              contacts: true,
+              socials: true,
+              technologies: true,
+              services: true,
+              staff: true,
+              industries: {
+                include: {
+                  industry: true
+                }
+              },
+              subIndustries: true,
+              urls: true,
+              enrichments: true
+            }
+          });
+          
+          if (completeCompany) {
+            companyStore.addCompany(completeCompany as any);
+            console.log(`🔄 Updated global company store with new company: ${business.name}`);
+          }
+        } catch (storeError) {
+          console.warn('⚠️ Failed to update global company store:', storeError);
+          // Don't fail the main operation if store update fails
+        }
       }
 
       // Process contact persons from data only
       if (data.contact?.departments && data.contact.departments.length > 0) {
-        await this.processContactPersons(business.id, data.contact.departments);
+        await BusinessDirectoryUpdater.processContactPersons(business.id, data.contact.departments);
       }
 
       // Process primary contact information (emails, phones)
       if (data.contact?.primary) {
-        await this.processPrimaryContacts(business.id, data.contact.primary);
+        await BusinessDirectoryUpdater.processPrimaryContacts(business.id, data.contact.primary);
       }
 
       // Process services
       if (data.company?.services && data.company.services.length > 0) {
-        await this.processServices(business.id, data.company.services);
+        await BusinessDirectoryUpdater.processServices(business.id, data.company.services);
       }
 
       // Process technologies
       if (data.technologies?.technologies && Object.keys(data.technologies.technologies).length > 0) {
-        await this.processTechnologies(business.id, data.technologies.technologies);
+        await BusinessDirectoryUpdater.processTechnologies(business.id, data.technologies.technologies);
       }
 
       // Process social media
       if (data.contact?.social && Object.keys(data.contact.social).length > 0) {
-        await this.processSocialMedia(business.id, data.contact.social);
+        await BusinessDirectoryUpdater.processSocialMedia(business.id, data.contact.social);
       }
 
-      // Process industries/categories
-      if (data.company?.categories && data.company.categories.length > 0) {
-        await this.processIndustries(business.id, data.company.categories);
-      }
-
-      // Process industry categories with sub-industries
-      if (data.industryCategories && data.industryCategories.length > 0) {
-        await this.processIndustryCategories(business.id, data.industryCategories);
+      // Process industry categories with sub-industries (properly structured data)
+      if (data.company?.industryCategories && data.company.industryCategories.length > 0) {
+        await BusinessDirectoryUpdater.processIndustryCategories(business.id, data.company.industryCategories);
       }
 
       // Process addresses - use both locations and addresses arrays for complete data
-      if (data.contact?.locations && data.contact.locations.length > 0) {
-        await this.processAddresses(business.id, data.contact.locations, data.contact.addresses);
+      if (data.contact?.addresses && data.contact.addresses.length > 0) {
+        await BusinessDirectoryUpdater.processAddresses(business.id, [], data.contact.addresses);
+      } else if (data.contact?.locations && data.contact.locations.length > 0) {
+        await BusinessDirectoryUpdater.processAddresses(business.id, data.contact.locations, []);
       }
 
       // Create enrichment record
-      await this.createEnrichmentRecord(business.id, data);
+      await BusinessDirectoryUpdater.createEnrichmentRecord(business.id, data);
 
       return {
         success: true,
@@ -307,8 +396,8 @@ export class BusinessDirectoryUpdater {
     return {
       name: company?.name || analysis?.companyName || 'Unknown Company',
       description: company?.description || analysis?.description || null,
-      website: company?.website || null,
-      baseUrl: company?.website || null,
+      website: data.metadata?.baseUrl || company?.website || null,
+      baseUrl: data.metadata?.baseUrl || company?.website || null,
       isActive: true
     };
   }
@@ -631,6 +720,10 @@ export class BusinessDirectoryUpdater {
     subIndustries: string[];
   }>) {
     try {
+      // Import Prisma client for this static method
+      const { PrismaClient } = await import('@prisma/client');
+      const prisma = new PrismaClient();
+      
       for (const category of industryCategories) {
         // Find or create the main industry
         const industry = await prisma.industry.upsert({
@@ -692,8 +785,17 @@ export class BusinessDirectoryUpdater {
           });
         }
       }
+      
+      // Disconnect Prisma client
+      await prisma.$disconnect();
     } catch (error) {
       console.error('Error processing industry categories:', error);
+      // Ensure prisma is disconnected even on error
+      try {
+        await prisma.$disconnect();
+      } catch (disconnectError) {
+        console.error('Error disconnecting Prisma:', disconnectError);
+      }
     }
   }
 
@@ -702,46 +804,61 @@ export class BusinessDirectoryUpdater {
    */
   private static async processAddresses(companyId: number, locations: any[], addresses?: any[]) {
     try {
-      // Only process addresses from the addresses array (most detailed and complete)
+      // Process addresses from the addresses array (most detailed and complete)
       if (addresses && addresses.length > 0) {
         for (const address of addresses) {
-          // Check if address already exists by matching key fields
-          const existing = await prisma.companyAddress.findFirst({
-            where: {
-              companyId: companyId,
-              city: address.city,
-              stateProvince: address.stateProvince,
-              country: address.country
-            }
-          });
-
-          if (!existing) {
-            // Normalize country and state/province to full names for consistency
-            const normalizedCountry = getCountryStoredValue(address.country);
-            const normalizedStateProvince = getStateProvinceStoredValue(address.stateProvince, normalizedCountry);
-            
-            await prisma.companyAddress.create({
-              data: {
-                companyId: companyId,
-                type: address.type || 'HQ',
-                fullAddress: address.fullAddress || null,
-                streetAddress: address.streetAddress || null,
-                addressLine2: address.addressLine2 || null,
-                city: address.city || null,
-                stateProvince: normalizedStateProvince,
-                country: normalizedCountry,
-                zipPostalCode: address.zipPostalCode || null,
-                isPrimary: address.type === 'headquarters' || address.type === 'corporate office'
-              }
-            });
-          }
+          await BusinessDirectoryUpdater.createAddressRecord(companyId, address);
         }
       }
       
-      // Note: locations array is ignored to prevent data duplication
-      // The addresses array contains all the necessary information
+      // Also process locations array if addresses array is empty or doesn't exist
+      if ((!addresses || addresses.length === 0) && locations && locations.length > 0) {
+        for (const location of locations) {
+          await BusinessDirectoryUpdater.createAddressRecord(companyId, location);
+        }
+      }
     } catch (error) {
       console.error('Error processing addresses:', error);
+    }
+  }
+
+  /**
+   * Helper method to create address records
+   */
+  private static async createAddressRecord(companyId: number, addressData: any) {
+    try {
+      // Check if address already exists by matching key fields
+      const existing = await prisma.companyAddress.findFirst({
+        where: {
+          companyId: companyId,
+          city: addressData.city,
+          stateProvince: addressData.stateProvince,
+          country: addressData.country
+        }
+      });
+
+      if (!existing) {
+        // Normalize country and state/province to full names for consistency
+        const normalizedCountry = getCountryStoredValue(addressData.country);
+        const normalizedStateProvince = getStateProvinceStoredValue(addressData.stateProvince, normalizedCountry);
+        
+        await prisma.companyAddress.create({
+          data: {
+            companyId: companyId,
+            type: addressData.type || 'HQ',
+            fullAddress: addressData.fullAddress || addressData.address || null,
+            streetAddress: addressData.streetAddress || null,
+            addressLine2: addressData.addressLine2 || null,
+            city: addressData.city || null,
+            stateProvince: normalizedStateProvince,
+            country: normalizedCountry,
+            zipPostalCode: addressData.zipCode || addressData.zipPostalCode || null,
+            isPrimary: addressData.type === 'headquarters' || addressData.type === 'corporate office'
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error creating address record:', error);
     }
   }
 
