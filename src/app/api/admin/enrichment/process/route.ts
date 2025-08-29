@@ -21,10 +21,13 @@ async function handler(request: NextRequest) {
       );
     }
 
-    // Use the original working flow - call BusinessDirectoryUpdater directly
-    const { BusinessDirectoryUpdater } = await import('@/lib/enrichment/businessDirectoryUpdater');
-    
-    const result = await BusinessDirectoryUpdater.processEnrichmentResult(enrichmentResult);
+    // Normalize and process via centralized processor to handle varying result shapes
+    const result = await EnrichmentProcessor.processEnrichmentResult({
+      jobId: jobId || 'unknown',
+      websiteUrl: EnrichmentProcessor.extractWebsiteUrl(enrichmentResult),
+      result: enrichmentResult,
+      metadata: enrichmentResult?.metadata || enrichmentResult?.data?.metadata
+    });
 
     if (!result.success) {
       return NextResponse.json(
@@ -39,9 +42,7 @@ async function handler(request: NextRequest) {
     // Return success response
     return NextResponse.json({
       success: true,
-      message: result.created 
-        ? 'New business created in directory' 
-        : 'Existing business updated in directory',
+      message: result.message,
       businessId: result.businessId,
       created: result.created,
       updated: result.updated,

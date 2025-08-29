@@ -130,8 +130,8 @@ class BackgroundJobService {
             await this.syncKeywordsToIndustry(job.metadata?.industry, externalData.result);
           }
           
-          // Process enrichment result and save to business directory if this is a basic enrichment job
-          if (job.type === 'basic-enrichment' && externalData.result) {
+          // Process enrichment result and save to business directory if this is a basic or enhanced enrichment job
+          if ((job.type === 'basic-enrichment' || job.type === 'enhanced-enrichment') && externalData.result) {
             await this.processEnrichmentResult(externalData.result, job.id);
           }
         } else if (externalData.status && externalData.status !== job.status) {

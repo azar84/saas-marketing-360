@@ -790,8 +790,8 @@ class AppScheduler {
             await this.syncKeywordsToIndustry(job.metadata?.industry, externalData.result);
           }
           
-          // Process enrichment results automatically when they complete
-          if (job.type === 'basic-enrichment' && externalData.result) {
+          // Process enrichment results automatically when they complete (basic or enhanced)
+          if ((job.type === 'basic-enrichment' || job.type === 'enhanced-enrichment') && externalData.result) {
             console.log(`✅ Enrichment job ${job.id} completed with results - processing automatically`);
             try {
               await this.processEnrichmentResult(job.id, externalData.result);
@@ -867,10 +867,10 @@ class AppScheduler {
       const { PrismaClient } = await import('@prisma/client');
       const prisma = new PrismaClient();
 
-      // Get all completed enrichment jobs that haven't been processed yet
+      // Get all completed enrichment jobs (basic and enhanced) that haven't been processed yet
       const completedEnrichmentJobs = await prisma.job.findMany({
         where: {
-          type: 'basic-enrichment',
+          type: { in: ['basic-enrichment', 'enhanced-enrichment'] },
           status: 'completed'
         }
       });

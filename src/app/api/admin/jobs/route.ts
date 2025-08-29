@@ -200,6 +200,61 @@ export async function POST(request: NextRequest) {
       });
     }
 
+    if (type === 'enhanced-enrichment') {
+      if (!data.websiteUrl || typeof data.websiteUrl !== 'string') {
+        return NextResponse.json(
+          { success: false, error: 'websiteUrl is required and must be a string' },
+          { status: 400 }
+        );
+      }
+
+      // Reuse the basic submitter with provided options (enhanced options set by caller)
+      const submitResult = await submitBasicEnrichmentJob({
+        websiteUrl: data.websiteUrl,
+        options: data.options
+      });
+
+      if (!submitResult.success || !submitResult.jobId) {
+        return NextResponse.json(
+          { success: false, error: submitResult.error || 'Failed to submit job' },
+          { status: 500 }
+        );
+      }
+
+      // Construct an enhanced-enrichment job inline (no dedicated factory yet)
+      const job = {
+        id: submitResult.jobId,
+        type: 'enhanced-enrichment' as const,
+        status: 'queued' as const,
+        submittedAt: new Date(),
+        progress: 0,
+        metadata: {
+          websiteUrl: data.websiteUrl,
+          options: data.options,
+          pollUrl: submitResult.pollUrl,
+          position: submitResult.position,
+          estimatedWaitTime: submitResult.estimatedWaitTime
+        }
+      };
+
+      await databaseJobStore.addJob(job as any);
+
+      return NextResponse.json({
+        success: true,
+        message: 'Job submitted successfully',
+        job: {
+          id: job.id,
+          type: job.type,
+          websiteUrl: job.metadata.websiteUrl,
+          status: job.status,
+          submittedAt: job.submittedAt,
+          position: job.metadata.position,
+          estimatedWaitTime: job.metadata.estimatedWaitTime,
+          pollUrl: job.metadata.pollUrl
+        }
+      });
+    }
+
     return NextResponse.json(
       { success: false, error: 'Unsupported job type' },
       { status: 400 }

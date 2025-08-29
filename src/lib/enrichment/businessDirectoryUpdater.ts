@@ -21,6 +21,20 @@ function normalizeWebsiteUrl(url: string): string {
     .split('#')[0]; // Remove hash fragments
 }
 
+/**
+ * Extract root host (domain) from a URL or normalized URL string
+ */
+function extractRootHost(url: string): string {
+  if (!url) return '';
+  try {
+    const u = url.startsWith('http') ? new URL(url) : new URL(`https://${url}`);
+    return u.host.replace(/^www\./, '');
+  } catch {
+    const normalized = normalizeWebsiteUrl(url);
+    return normalized.split('/')[0];
+  }
+}
+
 export interface EnrichmentResult {
   data: {
     input: {
@@ -225,14 +239,25 @@ export class BusinessDirectoryUpdater {
 
       console.log(`✅ Processing business website: ${websiteUrl} (${analysis?.companyName || 'Unknown'}) - ${analysis?.reasoning || 'Business confirmed'}`);
 
-      // Check if business already exists (using normalized URL to prevent duplicates)
+      // Check if business already exists (match by base URL or root host, ignore paths)
       const normalizedWebsite = normalizeWebsiteUrl(websiteUrl);
+      const rootHost = extractRootHost(normalizedWebsite);
+      const candidateBaseUrl = data?.metadata?.baseUrl || data?.company?.website || websiteUrl;
+      const normalizedBase = normalizeWebsiteUrl(candidateBaseUrl);
+      const baseHost = extractRootHost(normalizedBase);
+
       const existingBusiness = await prisma.company.findFirst({
         where: {
           OR: [
-            { website: websiteUrl }, // Exact match
-            { website: { contains: normalizedWebsite } }, // Contains normalized version
-            { baseUrl: { contains: normalizedWebsite } } // Check baseUrl as well
+            // Exact matches
+            { website: candidateBaseUrl },
+            { website: websiteUrl },
+            { baseUrl: candidateBaseUrl },
+            // Host-based matches (endsWith to avoid partial middle matches)
+            { website: { endsWith: rootHost } },
+            { baseUrl: { endsWith: rootHost } },
+            { website: { endsWith: baseHost } },
+            { baseUrl: { endsWith: baseHost } }
           ]
         }
       });
@@ -257,18 +282,51 @@ export class BusinessDirectoryUpdater {
         updated = true;
         console.log(`🔄 Updated existing company: ${business.name} (ID: ${business.id})`);
       } else {
-        // Create new business
-        business = await prisma.company.create({
-          data: {
-            website: businessData.website || websiteUrl, // Use extracted website if available
-            name: businessData.name,
-            description: businessData.description,
-            baseUrl: businessData.baseUrl || websiteUrl,
-            isActive: businessData.isActive
+        // Create new business (with safety fallback on unique website constraint)
+        try {
+          business = await prisma.company.create({
+            data: {
+              website: businessData.website || candidateBaseUrl || websiteUrl,
+              name: businessData.name,
+              description: businessData.description,
+              baseUrl: businessData.baseUrl || candidateBaseUrl || websiteUrl,
+              isActive: businessData.isActive
+            }
+          });
+          created = true;
+          console.log(`✅ Created new company: ${business.name} (ID: ${business.id})`);
+        } catch (error: any) {
+          // If another record already exists with same website, fetch and update it instead
+          if (error?.code === 'P2002') {
+            console.warn('⚠️ Unique website constraint hit on create, attempting update instead');
+            const fallbackExisting = await prisma.company.findFirst({
+              where: {
+                OR: [
+                  { website: businessData.website || candidateBaseUrl || websiteUrl },
+                  { website: { endsWith: baseHost || rootHost } }
+                ]
+              }
+            });
+            if (fallbackExisting) {
+              business = await prisma.company.update({
+                where: { id: fallbackExisting.id },
+                data: {
+                  name: businessData.name,
+                  description: businessData.description,
+                  baseUrl: businessData.baseUrl || fallbackExisting.baseUrl || candidateBaseUrl || websiteUrl,
+                  isActive: businessData.isActive,
+                  updatedAt: new Date()
+                }
+              });
+              updated = true;
+              console.log(`🔄 Updated existing company after unique conflict: ${business.name} (ID: ${business.id})`);
+            } else {
+              throw error;
+            }
+          } else {
+            throw error;
           }
-        });
-        created = true;
-        console.log(`✅ Created new company: ${business.name} (ID: ${business.id})`);
+        }
         
         // Notify the global company store about the new company
         try {
@@ -332,16 +390,25 @@ export class BusinessDirectoryUpdater {
         await BusinessDirectoryUpdater.processSocialMedia(business.id, data.contact.social);
       }
 
-      // Process industry categories with sub-industries (properly structured data)
-      if (data.company?.industryCategories && data.company.industryCategories.length > 0) {
-        await BusinessDirectoryUpdater.processIndustryCategories(business.id, data.company.industryCategories);
+      // Process industries and sub-industries from either properly structured top-level field
+      // or fallback simple categories on company
+      if (data.industryCategories && Array.isArray(data.industryCategories) && data.industryCategories.length > 0) {
+        await BusinessDirectoryUpdater.processIndustryCategories(business.id, data.industryCategories);
+      } else if (data.company?.categories && Array.isArray(data.company.categories) && data.company.categories.length > 0) {
+        await BusinessDirectoryUpdater.processIndustries(business.id, data.company.categories);
       }
 
       // Process addresses - use both locations and addresses arrays for complete data
       if (data.contact?.addresses && data.contact.addresses.length > 0) {
         await BusinessDirectoryUpdater.processAddresses(business.id, [], data.contact.addresses);
-      } else if (data.contact?.locations && data.contact.locations.length > 0) {
+      }
+      if (data.contact?.locations && data.contact.locations.length > 0) {
         await BusinessDirectoryUpdater.processAddresses(business.id, data.contact.locations, []);
+      }
+
+      // Process staff profiles if present (enhanced enrichment)
+      if (data.staff?.staff && Array.isArray(data.staff.staff) && data.staff.staff.length > 0) {
+        await BusinessDirectoryUpdater.processStaffMembers(business.id, data.staff.staff);
       }
 
       // Create enrichment record
@@ -410,12 +477,13 @@ export class BusinessDirectoryUpdater {
       // Process primary emails
       if (primary.emails && primary.emails.length > 0) {
         for (const email of primary.emails) {
+          const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : email;
           // Check if contact already exists
           const existing = await prisma.companyContact.findFirst({
             where: {
               companyId: companyId,
               type: 'email',
-              value: email
+              value: normalizedEmail
             }
           });
 
@@ -424,7 +492,7 @@ export class BusinessDirectoryUpdater {
               data: {
                 companyId: companyId,
                 type: 'email',
-                value: email,
+                value: normalizedEmail,
                 label: 'Primary Email',
                 description: 'Primary company email address',
                 isPrimary: true
@@ -437,12 +505,13 @@ export class BusinessDirectoryUpdater {
       // Process primary phones
       if (primary.phones && primary.phones.length > 0) {
         for (const phone of primary.phones) {
+          const phoneValue = (phone?.number || phone || '').toString().trim();
           // Check if contact already exists
           const existing = await prisma.companyContact.findFirst({
             where: {
               companyId: companyId,
               type: 'phone',
-              value: phone.number || phone
+              value: phoneValue
             }
           });
 
@@ -451,13 +520,36 @@ export class BusinessDirectoryUpdater {
               data: {
                 companyId: companyId,
                 type: 'phone',
-                value: phone.number || phone,
+                value: phoneValue,
                 label: phone.label || 'Primary Phone',
                 description: phone.type || 'Primary company phone number',
                 isPrimary: true
               }
             });
           }
+        }
+      }
+
+      // Process contact page URL if present
+      if (primary.contactPage && typeof primary.contactPage === 'string') {
+        const existing = await prisma.companyContact.findFirst({
+          where: {
+            companyId,
+            type: 'url',
+            value: primary.contactPage
+          }
+        });
+        if (!existing) {
+          await prisma.companyContact.create({
+            data: {
+              companyId,
+              type: 'url',
+              value: primary.contactPage,
+              label: 'Contact Page',
+              description: 'Primary contact page',
+              isPrimary: true
+            }
+          });
         }
       }
     } catch (error) {
@@ -581,11 +673,12 @@ export class BusinessDirectoryUpdater {
   private static async processServices(companyId: number, services: string[]) {
     try {
       for (const serviceName of services) {
+        const normalizedName = serviceName.trim();
         // Check if service already exists
         const existing = await prisma.companyService.findFirst({
           where: {
             companyId: companyId,
-            name: serviceName
+            name: { equals: normalizedName, mode: 'insensitive' }
           }
         });
 
@@ -593,7 +686,7 @@ export class BusinessDirectoryUpdater {
           await prisma.companyService.create({
             data: {
               companyId: companyId,
-              name: serviceName,
+              name: normalizedName,
               isPrimary: false
             }
           });
@@ -617,7 +710,7 @@ export class BusinessDirectoryUpdater {
             const existing = await prisma.companyTechnology.findFirst({
               where: {
                 companyId: companyId,
-                name: tech
+                name: { equals: tech as string, mode: 'insensitive' }
               }
             });
 
@@ -831,16 +924,23 @@ export class BusinessDirectoryUpdater {
       const existing = await prisma.companyAddress.findFirst({
         where: {
           companyId: companyId,
-          city: addressData.city,
-          stateProvince: addressData.stateProvince,
-          country: addressData.country
+          city: addressData.city || undefined,
+          stateProvince: addressData.stateProvince || addressData.state || undefined,
+          country: addressData.country || undefined,
+          OR: [
+            { fullAddress: addressData.fullAddress || addressData.address || null },
+            { zipPostalCode: addressData.zipCode || addressData.zipPostalCode || null }
+          ]
         }
       });
 
       if (!existing) {
         // Normalize country and state/province to full names for consistency
-        const normalizedCountry = getCountryStoredValue(addressData.country);
-        const normalizedStateProvince = getStateProvinceStoredValue(addressData.stateProvince, normalizedCountry);
+        const normalizedCountry = getCountryStoredValue(addressData.country || null);
+        const normalizedStateProvince = getStateProvinceStoredValue(
+          addressData.stateProvince || addressData.state || null,
+          normalizedCountry
+        );
         
         await prisma.companyAddress.create({
           data: {
@@ -867,11 +967,21 @@ export class BusinessDirectoryUpdater {
    */
   private static async createEnrichmentRecord(companyId: number, finalResult: any) {
     try {
+      // Determine source based on mode/options (basic vs enhanced)
+      let source = 'basic_enrichment';
+      const mode = finalResult?.metadata?.mode || finalResult?.mode;
+      const options = finalResult?.input?.options || finalResult?.options;
+      if (
+        mode === 'enhanced' ||
+        (options && (options.includeStaffEnrichment || options.includeExternalEnrichment || options.includeIntelligence) && options.basicMode === false)
+      ) {
+        source = 'enhanced_enrichment';
+      }
       await prisma.companyEnrichment.create({
         data: {
           companyId: companyId,
-          source: 'basic_enrichment',
-          mode: finalResult.metadata?.mode || 'basic',
+          source: source,
+          mode: finalResult.metadata?.mode || mode || 'basic',
           pagesScraped: finalResult.metadata?.pagesScraped || 0,
           totalPagesFound: finalResult.metadata?.totalPagesFound || 0,
           rawData: finalResult,
@@ -880,6 +990,80 @@ export class BusinessDirectoryUpdater {
       });
     } catch (error) {
       console.error('Error creating enrichment record:', error);
+    }
+  }
+}
+
+/**
+ * Enhanced data processors
+ */
+export namespace BusinessDirectoryUpdater {
+  export async function processStaffMembers(companyId: number, staffMembers: any[]) {
+    try {
+      for (const member of staffMembers) {
+        const email = (member.email || '').toString().trim().toLowerCase() || null;
+        const phone = (member.phone || '').toString().trim() || null;
+        const linkedinUrl = member.linkedinUrl || member.linkedin || null;
+        let firstName = member.firstName || null;
+        let lastName = member.lastName || null;
+        if ((!firstName || !lastName) && member.name) {
+          const parts = member.name.trim().split(/\s+/);
+          firstName = firstName || parts[0] || null;
+          lastName = lastName || parts.slice(1).join(' ') || null;
+        }
+        const title = member.title || null;
+        const department = member.department || null;
+
+        // Try to find existing by email first
+        let existing = null as any;
+        if (email) {
+          existing = await prisma.companyStaff.findFirst({
+            where: { companyId, email }
+          });
+        }
+        // Fallback: match by name + title
+        if (!existing && firstName && lastName) {
+          existing = await prisma.companyStaff.findFirst({
+            where: {
+              companyId,
+              firstName,
+              lastName,
+              title: title || undefined
+            }
+          });
+        }
+
+        if (existing) {
+          await prisma.companyStaff.update({
+            where: { id: existing.id },
+            data: {
+              firstName: firstName ?? existing.firstName,
+              lastName: lastName ?? existing.lastName,
+              title: title ?? existing.title,
+              department: department ?? existing.department,
+              email: email ?? existing.email,
+              phone: phone ?? existing.phone,
+              linkedinUrl: linkedinUrl ?? existing.linkedinUrl
+            }
+          });
+        } else {
+          await prisma.companyStaff.create({
+            data: {
+              companyId,
+              firstName,
+              lastName,
+              title,
+              department,
+              email,
+              phone,
+              linkedinUrl,
+              isPrimary: false
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.error('Error processing staff members:', error);
     }
   }
 }

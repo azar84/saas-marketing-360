@@ -175,6 +175,8 @@ export default function CompanyDirectoryManager() {
   const [expandedCompany, setExpandedCompany] = useState<number | null>(null);
   const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
   const [deleteSuccess, setDeleteSuccess] = useState<string | null>(null);
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const [editSaving, setEditSaving] = useState(false);
   
   // Advanced filtering state
   const [industryFilter, setIndustryFilter] = useState('');
@@ -344,6 +346,42 @@ export default function CompanyDirectoryManager() {
     }
   };
 
+  const handleOpenEdit = (company: Company) => {
+    setEditingCompany(company);
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editingCompany) return;
+    setEditSaving(true);
+    try {
+      const response = await fetch(`/api/admin/companies/${editingCompany.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: editingCompany.name,
+          description: editingCompany.description,
+          isActive: editingCompany.isActive,
+          baseUrl: editingCompany.baseUrl
+        })
+      });
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(text);
+      }
+      const data = await response.json();
+      const updated = data.data as Company;
+      // update store
+      setCompanies(Array.isArray(companies) ? companies.map(c => c.id === updated.id ? { ...c, ...updated } : c) : []);
+      setEditingCompany(null);
+      setDeleteSuccess('Company updated successfully');
+      setTimeout(() => setDeleteSuccess(null), 3000);
+    } catch (e) {
+      console.error('Failed to save company edits:', e);
+    } finally {
+      setEditSaving(false);
+    }
+  };
+
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString();
   };
@@ -428,23 +466,35 @@ export default function CompanyDirectoryManager() {
     try {
       const enrichPromises = Array.from(selectedCompanies).map(companyId => {
         const company = Array.isArray(companies) ? companies.find(c => c.id === companyId) : null;
-        if (!company) return null;
+        if (!company || !company.website) return null;
         
-        return fetch('/api/admin/enrichment/process', {
+        // Submit enhanced enrichment job via jobs API so it appears in Jobs Manager
+        return fetch('/api/admin/jobs', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            websiteUrl: company.website,
-            companyId: company.id
+            type: 'enhanced-enrichment',
+            data: {
+              websiteUrl: company.website,
+              options: {
+                includeStaffEnrichment: true,
+                includeExternalEnrichment: true,
+                includeIntelligence: true,
+                includeTechnologyExtraction: true,
+                basicMode: false,
+                maxHtmlLength: 50000
+              }
+            }
           })
         });
-      }).filter(Boolean);
+      }).filter(Boolean) as Promise<Response>[];
 
       const results = await Promise.all(enrichPromises);
-      const successCount = results.filter(r => r && r.ok).length;
+      const successCount = results.filter(r => r.ok).length;
+      const failureCount = results.length - successCount;
 
       if (successCount > 0) {
-        setDeleteSuccess(`${successCount} companies queued for enrichment`);
+        setDeleteSuccess(`${successCount} compan${successCount === 1 ? 'y' : 'ies'} queued for enrichment${failureCount > 0 ? ` (${failureCount} failed)` : ''}`);
         clearSelection();
         
         setTimeout(() => setDeleteSuccess(null), 3000);
@@ -818,108 +868,186 @@ export default function CompanyDirectoryManager() {
         </div>
       </div>
 
-      {/* Search Results Summary */}
+      {/* Controls Card: summary, export, pagination, and bulk actions */}
       {!loading && Array.isArray(filteredCompanies) && filteredCompanies.length > 0 && (
-        <div className="px-8 py-4" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
+        <div className="px-8 pt-6" style={{ backgroundColor: 'var(--color-bg-secondary)' }}>
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
-                  Showing <strong>{filteredCompanies.length}</strong> companies
-                </span>
-                {(searchTerm || industryFilter || servicesFilter || cityFilter || countryFilter || stateProvinceFilter || technologyFilter || hasAddressFilter || hasContactsFilter || hasTechnologiesFilter) && (
-                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                    (filtered from {safeCompanies.length} total)
+            <Card className="p-4" style={{ backgroundColor: 'var(--color-bg-primary)' }}>
+              {/* Summary + Export */}
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center space-x-4">
+                  <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>
+                    Showing <strong>{filteredCompanies.length}</strong> companies
                   </span>
-                )}
+                  {(searchTerm || industryFilter || servicesFilter || cityFilter || countryFilter || stateProvinceFilter || technologyFilter || hasAddressFilter || hasContactsFilter || hasTechnologiesFilter) && (
+                    <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                      (filtered from {safeCompanies.length} total)
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center space-x-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      // TODO: Implement CSV export
+                      console.log('Export CSV functionality to be implemented');
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <Database className="h-4 w-4" />
+                    Export CSV
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      // TODO: Implement search history
+                      console.log('Search history functionality to be implemented');
+                    }}
+                    className="flex items-center gap-2"
+                  >
+                    <Calendar className="h-4 w-4" />
+                    Search History
+                  </Button>
+                </div>
               </div>
-              
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    // TODO: Implement CSV export
-                    console.log('Export CSV functionality to be implemented');
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <Database className="h-4 w-4" />
-                  Export CSV
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    // TODO: Implement search history
-                    console.log('Search history functionality to be implemented');
-                  }}
-                  className="flex items-center gap-2"
-                >
-                  <Calendar className="h-4 w-4" />
-                  Search History
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Bulk Actions Toolbar */}
-      {selectedCompanies.size > 0 && (
-        <div className="px-8 py-3" style={{ backgroundColor: 'var(--color-bg-secondary)', borderTop: '1px solid var(--color-gray-light)', borderBottom: '1px solid var(--color-gray-light)' }}>
-          <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
-                  {selectedCompanies.size} company{selectedCompanies.size !== 1 ? 'ies' : 'y'} selected
-                </span>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={clearSelection}
-                  className="text-xs"
-                  style={{ color: 'var(--color-text-secondary)' }}
-                >
-                  Clear Selection
-                </Button>
+              {/* Select All + Pagination */}
+              <div className="flex items-center justify-between p-3 rounded-lg border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+                <div className="flex items-center space-x-4">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={selectAll}
+                      onChange={handleSelectAll}
+                      className="w-4 h-4 rounded border-2 cursor-pointer"
+                      style={{ 
+                        borderColor: 'var(--color-gray-light)',
+                        backgroundColor: selectAll ? 'var(--color-primary)' : 'transparent'
+                      }}
+                    />
+                    <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                      Select All
+                    </span>
+                  </div>
+                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                    {selectedCompanies.size} of {filteredCompanies.length} selected
+                  </span>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                    Page {currentPage} of {totalPages}
+                  </span>
+                  <div className="flex items-center space-x-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={goToPreviousPage}
+                      disabled={currentPage === 1}
+                      className="px-2 py-1"
+                    >
+                      <ChevronLeft className="h-3 w-3" />
+                    </Button>
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
+                      if (pageNum > totalPages) return null;
+                      return (
+                        <Button
+                          key={pageNum}
+                          variant={pageNum === currentPage ? 'primary' : 'outline'}
+                          size="sm"
+                          onClick={() => goToPage(pageNum)}
+                          className="px-3 py-1 min-w-[2rem]"
+                        >
+                          {pageNum}
+                        </Button>
+                      );
+                    })}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={goToNextPage}
+                      disabled={currentPage === totalPages}
+                      className="px-2 py-1"
+                    >
+                      <ChevronRight className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
+                      Show:
+                    </span>
+                    <select
+                      value={itemsPerPage}
+                      onChange={(e) => {
+                        setItemsPerPage(Number(e.target.value));
+                        setCurrentPage(1);
+                      }}
+                      className="px-2 py-1 text-sm border rounded"
+                      style={{ borderColor: 'var(--color-gray-light)' }}
+                    >
+                      <option value={5}>5</option>
+                      <option value={10}>10</option>
+                      <option value={20}>20</option>
+                      <option value={50}>50</option>
+                    </select>
+                  </div>
+                </div>
               </div>
-              
-              <div className="flex items-center space-x-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleBulkExport}
-                  className="flex items-center gap-2"
-                  style={{ borderColor: 'var(--color-gray-light)', color: 'var(--color-text-primary)' }}
-                >
-                  <Download className="h-4 w-4" />
-                  Export Selected
-                </Button>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleBulkEnrich}
-                  className="flex items-center gap-2"
-                  style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
-                >
-                  <Zap className="h-4 w-4" />
-                  Enrich Selected
-                </Button>
-                
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleBulkDelete}
-                  className="flex items-center gap-2"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Delete Selected
-                </Button>
-              </div>
-            </div>
+
+              {/* Bulk Actions (when selected) */}
+              {selectedCompanies.size > 0 && (
+                <div className="flex items-center justify-between mt-3 pt-3 border-t" style={{ borderColor: 'var(--color-gray-light)' }}>
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
+                      {selectedCompanies.size} company{selectedCompanies.size !== 1 ? 'ies' : 'y'} selected
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={clearSelection}
+                      className="text-xs"
+                      style={{ color: 'var(--color-text-secondary)' }}
+                    >
+                      Clear Selection
+                    </Button>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleBulkExport}
+                      className="flex items-center gap-2"
+                      style={{ borderColor: 'var(--color-gray-light)', color: 'var(--color-text-primary)' }}
+                    >
+                      <Download className="h-4 w-4" />
+                      Export Selected
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleBulkEnrich}
+                      className="flex items-center gap-2"
+                      style={{ borderColor: 'var(--color-primary)', color: 'var(--color-primary)' }}
+                    >
+                      <Zap className="h-4 w-4" />
+                      Enrich Selected
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={handleBulkDelete}
+                      className="flex items-center gap-2"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Delete Selected
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </Card>
           </div>
         </div>
       )}
@@ -944,98 +1072,6 @@ export default function CompanyDirectoryManager() {
             </div>
           ) : (
             <div className="space-y-6">
-              {/* Select All and Pagination Controls */}
-              <div className="flex items-center justify-between p-4 rounded-lg border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      checked={selectAll}
-                      onChange={handleSelectAll}
-                      className="w-4 h-4 rounded border-2 cursor-pointer"
-                      style={{ 
-                        borderColor: 'var(--color-gray-light)',
-                        backgroundColor: selectAll ? 'var(--color-primary)' : 'transparent'
-                      }}
-                    />
-                    <span className="text-sm font-medium" style={{ color: 'var(--color-text-primary)' }}>
-                      Select All
-                    </span>
-                  </div>
-                  
-                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                    {selectedCompanies.size} of {filteredCompanies.length} selected
-                  </span>
-                </div>
-                
-                {/* Pagination Controls */}
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                    Page {currentPage} of {totalPages}
-                  </span>
-                  
-                  <div className="flex items-center space-x-1">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={goToPreviousPage}
-                      disabled={currentPage === 1}
-                      className="px-2 py-1"
-                    >
-                      <ChevronLeft className="h-3 w-3" />
-                    </Button>
-                    
-                    {/* Page Numbers */}
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      const pageNum = Math.max(1, Math.min(totalPages - 4, currentPage - 2)) + i;
-                      if (pageNum > totalPages) return null;
-                      
-                      return (
-                        <Button
-                          key={pageNum}
-                          variant={pageNum === currentPage ? "primary" : "outline"}
-                          size="sm"
-                          onClick={() => goToPage(pageNum)}
-                          className="px-3 py-1 min-w-[2rem]"
-                        >
-                          {pageNum}
-                        </Button>
-                      );
-                    })}
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={goToNextPage}
-                      disabled={currentPage === totalPages}
-                      className="px-2 py-1"
-                    >
-                      <ChevronRight className="h-3 w-3" />
-                    </Button>
-                  </div>
-                  
-                  {/* Items Per Page */}
-                  <div className="flex items-center space-x-2">
-                    <span className="text-sm" style={{ color: 'var(--color-text-muted)' }}>
-                      Show:
-                    </span>
-                    <select
-                      value={itemsPerPage}
-                      onChange={(e) => {
-                        setItemsPerPage(Number(e.target.value));
-                        setCurrentPage(1);
-                      }}
-                      className="px-2 py-1 text-sm border rounded"
-                      style={{ borderColor: 'var(--color-gray-light)' }}
-                    >
-                      <option value={5}>5</option>
-                      <option value={10}>10</option>
-                      <option value={20}>20</option>
-                      <option value={50}>50</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
               
               {/* Company Cards */}
               {paginatedCompanies.map((company) => (
@@ -1092,6 +1128,13 @@ export default function CompanyDirectoryManager() {
                           onClick={() => handleToggleExpanded(company.id)}
                         >
                           {expandedCompany === company.id ? 'Show Less' : 'Show Details'}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleOpenEdit(company)}
+                        >
+                          Edit
                         </Button>
                         
                         {deleteConfirm === company.id ? (
@@ -1244,11 +1287,11 @@ export default function CompanyDirectoryManager() {
                     )}
 
                     {/* Staff */}
-                    {company.staff && Array.isArray(company.staff) && company.staff.length > 0 && (
-                      <div className="mb-4">
-                        <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>Key Staff</h4>
+                    <div className="mb-4">
+                      <h4 className="text-sm font-semibold mb-2" style={{ color: 'var(--color-text-primary)' }}>Key Staff</h4>
+                      {company.staff && Array.isArray(company.staff) && company.staff.length > 0 ? (
                         <div className="space-y-2">
-                          {company.staff && Array.isArray(company.staff) && company.staff.slice(0, 2).map((staff) => (
+                          {company.staff.slice(0, 2).map((staff) => (
                             <div key={staff.id} className="flex items-center gap-3 text-sm p-3 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
                               <Users className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
                               <div className="flex-1">
@@ -1271,14 +1314,23 @@ export default function CompanyDirectoryManager() {
                               </div>
                             </div>
                           ))}
-                          {company.staff && Array.isArray(company.staff) && company.staff.length > 2 && (
+                          {company.staff.length > 2 && (
                             <div className="text-xs text-center py-1" style={{ color: 'var(--color-text-muted)' }}>
                               +{company.staff.length - 2} more staff members
                             </div>
                           )}
                         </div>
-                      </div>
-                    )}
+                      ) : (
+                        <div className="flex items-center gap-3 text-sm p-3 rounded border" style={{ backgroundColor: 'var(--color-bg-secondary)', borderColor: 'var(--color-gray-light)' }}>
+                          <Users className="h-4 w-4" style={{ color: 'var(--color-text-muted)' }} />
+                          <div className="flex-1">
+                            <div className="text-xs" style={{ color: 'var(--color-text-muted)' }}>
+                              No staff found.
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
 
                     {/* Quick Stats */}
                     <div className="flex flex-wrap gap-4 mb-4">
@@ -1722,6 +1774,54 @@ export default function CompanyDirectoryManager() {
           )}
         </div>
       </div>
+
+      {/* Edit Company Modal */}
+      {editingCompany && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0" style={{ backgroundColor: 'rgba(0,0,0,0.3)' }} onClick={() => setEditingCompany(null)} />
+          <div className="relative w-full max-w-lg rounded-xl shadow-lg p-6" style={{ backgroundColor: 'var(--color-bg-primary)', border: '1px solid var(--color-gray-light)' }}>
+            <h3 className="text-lg font-semibold mb-4" style={{ color: 'var(--color-text-primary)' }}>Edit Company</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Name</label>
+                <input
+                  className="w-full px-3 py-2 rounded border"
+                  style={{ borderColor: 'var(--color-gray-light)', backgroundColor: 'transparent', color: 'var(--color-text-primary)' }}
+                  value={editingCompany.name || ''}
+                  onChange={(e) => setEditingCompany({ ...editingCompany, name: e.target.value })}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1" style={{ color: 'var(--color-text-secondary)' }}>Description</label>
+                <textarea
+                  className="w-full px-3 py-2 rounded border"
+                  style={{ borderColor: 'var(--color-gray-light)', backgroundColor: 'transparent', color: 'var(--color-text-primary)' }}
+                  rows={3}
+                  value={editingCompany.description || ''}
+                  onChange={(e) => setEditingCompany({ ...editingCompany, description: e.target.value })}
+                />
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border"
+                  style={{ borderColor: 'var(--color-gray-light)' }}
+                  checked={!!editingCompany.isActive}
+                  onChange={(e) => setEditingCompany({ ...editingCompany, isActive: e.target.checked })}
+                />
+                <span className="text-sm" style={{ color: 'var(--color-text-secondary)' }}>Active</span>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={() => setEditingCompany(null)}>Cancel</Button>
+              <Button variant="primary" size="sm" onClick={handleSaveEdit} disabled={editSaving}>
+                {editSaving ? 'Saving...' : 'Save'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+    
   );
 }

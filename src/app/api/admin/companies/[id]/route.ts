@@ -3,6 +3,56 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+export async function PUT(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const { id } = await params;
+  try {
+    const companyId = parseInt(id);
+    if (isNaN(companyId)) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid company ID' },
+        { status: 400 }
+      );
+    }
+
+    const body = await request.json();
+    const { name, description, isActive, baseUrl, website } = body || {};
+
+    // Build update data only from provided fields
+    const data: any = {};
+    if (typeof name === 'string') data.name = name;
+    if (typeof description === 'string') data.description = description;
+    if (typeof isActive === 'boolean') data.isActive = isActive;
+    if (typeof baseUrl === 'string') data.baseUrl = baseUrl;
+    if (typeof website === 'string') data.website = website; // must be unique
+    data.updatedAt = new Date();
+
+    const updated = await prisma.company.update({
+      where: { id: companyId },
+      data
+    });
+
+    return NextResponse.json({ success: true, data: updated });
+  } catch (error: any) {
+    console.error('Error updating company:', error);
+    const code = error?.code || '';
+    if (code === 'P2002') {
+      return NextResponse.json(
+        { success: false, error: 'Website must be unique' },
+        { status: 409 }
+      );
+    }
+    return NextResponse.json(
+      { success: false, error: 'Failed to update company' },
+      { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
