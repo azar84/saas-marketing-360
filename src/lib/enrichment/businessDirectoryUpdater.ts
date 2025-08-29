@@ -150,6 +150,7 @@ export interface EnrichmentResult {
 }
 
 export class BusinessDirectoryUpdater {
+  // No industry creation is allowed beyond canonical/seeded entries
   /**
    * Process an enrichment result and update the business directory
    * Only uses data from the enrichment response
@@ -390,12 +391,11 @@ export class BusinessDirectoryUpdater {
         await BusinessDirectoryUpdater.processSocialMedia(business.id, data.contact.social);
       }
 
-      // Process industries and sub-industries from either properly structured top-level field
-      // or fallback simple categories on company
-      if (data.industryCategories && Array.isArray(data.industryCategories) && data.industryCategories.length > 0) {
+      // Process industries and sub-industries only from structured industryCategories returned by API
+      if (data.company?.industryCategories && Array.isArray(data.company.industryCategories) && data.company.industryCategories.length > 0) {
+        await BusinessDirectoryUpdater.processIndustryCategories(business.id, data.company.industryCategories);
+      } else if (data.industryCategories && Array.isArray(data.industryCategories) && data.industryCategories.length > 0) {
         await BusinessDirectoryUpdater.processIndustryCategories(business.id, data.industryCategories);
-      } else if (data.company?.categories && Array.isArray(data.company.categories) && data.company.categories.length > 0) {
-        await BusinessDirectoryUpdater.processIndustries(business.id, data.company.categories);
       }
 
       // Process addresses - use both locations and addresses arrays for complete data
@@ -769,18 +769,15 @@ export class BusinessDirectoryUpdater {
   private static async processIndustries(companyId: number, categories: string[]) {
     try {
       for (const category of categories) {
-        // Extract industry name from category (e.g., "CONST - Construction & Building" -> "Construction & Building")
-        const industryName = category.includes(' - ') ? category.split(' - ')[1] : category;
-        
-        // Find or create industry
-        const industry = await prisma.industry.upsert({
-          where: { label: industryName },
-          update: {},
-          create: { 
-            label: industryName,
-            code: industryName.substring(0, 4).toUpperCase() // Generate a simple code from label
-          }
-        });
+        // Extract possible code and label (e.g., "CONST - Construction & Building")
+        const trimmed = (category || '').trim();
+        const hasPair = trimmed.includes(' - ');
+        const parts = hasPair ? trimmed.split(' - ') : [trimmed];
+        const codePrefix = hasPair ? (parts[0] || '').trim() : undefined;
+        const industryName = hasPair ? (parts[1] || '').trim() : trimmed;
+
+        // Find or create industry robustly (handling code uniqueness)
+        const industry = await BusinessDirectoryUpdater.findOrCreateIndustryByLabelOrCode(industryName, codePrefix);
 
         // Create company-industry relationship
         await prisma.companyIndustryRelation.upsert({
@@ -818,15 +815,28 @@ export class BusinessDirectoryUpdater {
       const prisma = new PrismaClient();
       
       for (const category of industryCategories) {
-        // Find or create the main industry
-        const industry = await prisma.industry.upsert({
-          where: { label: category.title },
-          update: {},
-          create: { 
-            label: category.title,
-            code: category.code
+        // Find or create the main industry (robust to unique code conflicts)
+        let industry = await prisma.industry.findUnique({ where: { label: category.title } });
+        if (!industry) {
+          const existingByCode = category.code ? await prisma.industry.findUnique({ where: { code: category.code } }) : null;
+          if (existingByCode) {
+            industry = existingByCode;
+          } else {
+            try {
+              industry = await prisma.industry.create({
+                data: { label: category.title, code: category.code || category.title.substring(0, 8).toUpperCase() }
+              });
+            } catch (error: any) {
+              if (error?.code === 'P2002') {
+                // Code conflict: generate unique code
+                const created = await BusinessDirectoryUpdater.findOrCreateIndustryByLabelOrCode(category.title, category.code);
+                industry = created;
+              } else {
+                throw error;
+              }
+            }
           }
-        });
+        }
 
         // Create company-industry relationship
         await prisma.companyIndustryRelation.upsert({
